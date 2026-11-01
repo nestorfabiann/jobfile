@@ -1,5 +1,7 @@
 import Link from 'next/link';
 import { requireUser } from '@/lib/session';
+import { supabaseAdmin } from '@/lib/supabase/server';
+import KitchenArt from '@/components/KitchenArt';
 import { createCompany, createProject } from './actions';
 
 const TZ = 'America/Chicago';
@@ -22,6 +24,28 @@ export default async function Projects({ searchParams }: { searchParams: { error
   const company = (memberships ?? [])[0] as { company_id: string; companies?: { name?: string } } | undefined;
   const list = projects ?? [];
 
+  // Newest progress photo per project becomes its picture. Without one, the drawn kitchen shows.
+  const covers = new Map<string, string>();
+  if (list.length) {
+    const { data: ph } = await sb
+      .from('photos')
+      .select('project_id,path')
+      .in('project_id', list.map((p) => p.id))
+      .eq('kind', 'progress')
+      .order('created_at', { ascending: false })
+      .limit(100);
+    const firstPath = new Map<string, string>();
+    (ph ?? []).forEach((r) => !firstPath.has(r.project_id as string) && firstPath.set(r.project_id as string, r.path as string));
+    if (firstPath.size) {
+      const { data: signed } = await supabaseAdmin().storage.from('project-photos').createSignedUrls(Array.from(firstPath.values()), 3600);
+      const byPath = new Map((signed ?? []).map((s) => [s.path, s.signedUrl] as const));
+      firstPath.forEach((path, pid) => {
+        const u = byPath.get(path);
+        if (u) covers.set(pid, u);
+      });
+    }
+  }
+
   return (
     <>
       <div className="stack">
@@ -34,8 +58,14 @@ export default async function Projects({ searchParams }: { searchParams: { error
       {list.length > 0 && (
         <section className="stack" aria-label="Your projects">
           {list.map((p) => (
-            <Link key={p.id} href={`/projects/${p.id}/overview`} className="card proj">
-              <div className="stack" style={{ gap: 4 }}>
+            <Link key={p.id} href={`/projects/${p.id}/overview`} className="card proj" style={{ flexDirection: 'row', alignItems: 'center' }}>
+              {covers.get(p.id) ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={covers.get(p.id)} alt="" width={72} height={72} style={{ borderRadius: 14, objectFit: 'cover', flex: 'none' }} />
+              ) : (
+                <KitchenArt />
+              )}
+              <div className="stack" style={{ gap: 4, flex: 1, minWidth: 0 }}>
                 <h3>{p.name}</h3>
                 <span className="muted small">{[p.address, p.homeowner_name].filter(Boolean).join(' · ') || 'No address yet'}</span>
               </div>

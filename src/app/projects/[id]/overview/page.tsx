@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { loadProject } from '@/lib/project';
 import { supabaseAdmin } from '@/lib/supabase/server';
 import AutoRefresh from '@/components/AutoRefresh';
+import KitchenArt from '@/components/KitchenArt';
 import { dollars, signedDollars, daysText } from '@/lib/money';
 import { milestoneAmounts, totals, type ChangeOrder, type Item, type Milestone } from '@/lib/agreement';
 import { setStage } from './actions';
@@ -89,6 +90,7 @@ export default async function Overview({ params }: { params: { id: string } }) {
       <AutoRefresh seconds={30} />
 
       <section className="hero" aria-label="Project summary">
+        <KitchenArt size={56} />
         <span className="lbl" style={{ color: 'rgba(255,255,255,.8)' }}>{project.address || 'No address yet'}</span>
         <h2 style={{ fontSize: 26 }}>{project.name}</h2>
         <p>{contractorName} · {homeownerName}</p>
