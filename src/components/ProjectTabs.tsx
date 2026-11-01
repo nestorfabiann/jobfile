@@ -7,9 +7,12 @@ export default function ProjectTabs({ id }: { id: string }) {
   const path = usePathname();
   const base = `/projects/${id}`;
   const tabs = [
+    [`${base}/overview`, 'Overview'],
     [base, 'Messages'],
     [`${base}/agreement`, 'Agreement'],
+    [`${base}/photos`, 'Photos'],
     [`${base}/changes`, 'Changes'],
+    [`${base}/payments`, 'Payments'],
   ];
   return (
     <nav className="ptabs" aria-label="Project sections">

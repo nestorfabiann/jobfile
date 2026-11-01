@@ -15,15 +15,18 @@ A shared project record for contractors and homeowners. This first slice covers:
 - Texas pieces: the disclosure statement step before the homeowner signs, and a homestead checklist (spouse signature,
   filed with the county clerk). See the Texas notes below.
 
-Not built yet: payment records, schedule, photos, punch list, subcontractor list, lien waivers and bills-paid affidavit,
-PDFs. The prototype in Claude already has most of these screens; they get ported next.
+- Overview page: stage bar, what needs your attention, money summary, schedule, latest photos, closeout and complete.
+- Photos: progress photos and "needs fixing" details (contractor marks fixed, homeowner confirms). Private storage, shrunk in the browser.
+- Payments: record payments against milestones, other side confirms or disputes. Jobfile does not move money.
+
+Not built yet: schedule editing, subcontractor list, lien waivers and bills-paid affidavit, PDFs.
 
 **Status: written but not yet run.** The workspace this was written in could not reach the npm registry, so
 `npm install`, the type check and `next build` have not been run. Expect to fix a few small errors on first build.
 
 ## Setup
 
-1. **Supabase.** Create a project at supabase.com. In the SQL editor, run `supabase/migrations/001_init.sql`, then `002_agreements.sql`.
+1. **Supabase.** Create a project at supabase.com. In the SQL editor, run `001_init.sql`, `002_agreements.sql`, then `003_photos_payments_stage.sql` (all in `supabase/migrations/`).
 2. **Sign-in email.** In Supabase go to Authentication > Email Templates > Magic Link. Replace the link with:
 
    ```html

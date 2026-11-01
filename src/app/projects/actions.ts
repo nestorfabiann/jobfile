@@ -95,5 +95,5 @@ export async function createProject(formData: FormData) {
   }
 
   revalidatePath('/projects');
-  redirect(`/projects/${project.id}`);
+  redirect(`/projects/${project.id}/overview`);
 }

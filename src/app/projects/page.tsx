@@ -34,7 +34,7 @@ export default async function Projects({ searchParams }: { searchParams: { error
       {list.length > 0 && (
         <section className="stack" aria-label="Your projects">
           {list.map((p) => (
-            <Link key={p.id} href={`/projects/${p.id}`} className="card proj">
+            <Link key={p.id} href={`/projects/${p.id}/overview`} className="card proj">
               <div className="stack" style={{ gap: 4 }}>
                 <h3>{p.name}</h3>
                 <span className="muted small">{[p.address, p.homeowner_name].filter(Boolean).join(' · ') || 'No address yet'}</span>

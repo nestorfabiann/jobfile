@@ -12,7 +12,7 @@ export const loadProject = cache(async (id: string) => {
 
   const { data: project } = await sb
     .from('projects')
-    .select('id,name,address,homeowner_name,homeowner_email,is_homestead,company_id')
+    .select('*')
     .eq('id', id)
     .maybeSingle();
   if (!project) notFound();
