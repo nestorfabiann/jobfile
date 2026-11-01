@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jobfile Redesign Preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* Direction: Jobfile's blue and orange, softer and rounder, phone-first. One orange action per screen. */
+:root{--bg:#f3f6fc;--surface:#fff;--surface2:#f6f9ff;--ink:#0e1a2e;--ink2:#55657c;--line:#dde5f2;--brand:#1b56e0;--brand2:#0a33a8;--accent:#ff7a1a;--accentfg:#1a0e00;
+--okbg:#ddf3e6;--ok:#14753f;--warnbg:#fff0cc;--warn:#8a5600;--home:#e6eeff;--con:#ffefe0;--shadow:0 1px 2px rgba(14,26,46,.05),0 14px 34px -16px rgba(14,26,46,.28);--page:#e9eef8;
+--font:'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0a1120;--surface:#131d33;--surface2:#18253f;--ink:#e9effa;--ink2:#9fb0c8;--line:#25324b;--brand:#7ba6ff;--brand2:#3d74ff;--accentfg:#1a0e00;--okbg:#133626;--ok:#62cf8e;--warnbg:#3a2f10;--warn:#ebbb4d;--home:#17284d;--con:#3e2412;--page:#060b16;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0a1120;--surface:#131d33;--surface2:#18253f;--ink:#e9effa;--ink2:#9fb0c8;--line:#25324b;--brand:#7ba6ff;--brand2:#3d74ff;--accentfg:#1a0e00;--okbg:#133626;--ok:#62cf8e;--warnbg:#3a2f10;--warn:#ebbb4d;--home:#17284d;--con:#3e2412;--page:#060b16;color-scheme:dark}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--page);color:var(--ink);font:500 15px/1.5 var(--font);-webkit-font-smoothing:antialiased}
+h1,h2,h3,p{margin:0;text-wrap:balance}button{font:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.wrap{max-width:1080px;margin:0 auto;padding:20px 16px 56px;display:flex;flex-direction:column;gap:18px}
+.bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+.bar h1{font-size:20px;font-weight:800}.bar small{color:var(--ink2);display:block;font-weight:500}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:9px 16px;border-radius:999px;font-weight:700;font-size:14px}
+.chip[aria-selected=true]{background:var(--brand2);color:#fff;border-color:var(--brand2)}
+.tog{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:9px 14px;font-weight:700;font-size:14px}
+.stagearea{display:grid;grid-template-columns:minmax(0,420px) minmax(0,1fr);gap:28px;align-items:start}
+.notes{background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:22px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:14px;position:sticky;top:16px}
+.notes h2{font-size:19px;font-weight:800}.notes ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:12px}
+.notes li{display:grid;grid-template-columns:26px 1fr;gap:10px;color:var(--ink2);font-size:14.5px}.notes li b{color:var(--ink);display:block}
+.notes li i{width:26px;height:26px;border-radius:50%;background:var(--accent);color:var(--accentfg);display:grid;place-items:center;font-style:normal;font-weight:800;font-size:13px}
+.phone{width:100%;max-width:392px;margin:0 auto;border:9px solid #0b1224;border-radius:44px;background:var(--bg);overflow:hidden;box-shadow:0 30px 60px -24px rgba(0,0,0,.5);position:relative;height:790px;display:flex;flex-direction:column}
+.phone .scr{flex:1;overflow-y:auto;overflow-x:hidden;padding:0 0 12px}
+.status{display:flex;justify-content:space-between;padding:10px 22px 4px;font-weight:700;font-size:13px;background:linear-gradient(135deg,#1b56e0,#0a33a8);color:#fff}
+.top{background:linear-gradient(135deg,#1b56e0,#0a33a8);color:#fff;padding:6px 18px 16px;display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid var(--accent)}
+.brand{font-weight:800;letter-spacing:.06em;font-size:19px}.avatar{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.2);display:grid;place-items:center;font-weight:800;font-size:13px}
+.pad{padding:16px;display:flex;flex-direction:column;gap:14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:16px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:10px}
+.btn{border:0;border-radius:999px;padding:14px 22px;font-weight:800;background:var(--brand);color:#fff;min-height:48px}
+.btn.go{background:var(--accent);color:var(--accentfg)}.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:999px;font-weight:700;font-size:12px;background:var(--surface2);border:1px solid var(--line);color:var(--ink2)}
+.pill.ok{background:var(--okbg);color:var(--ok);border-color:transparent}.pill.warn{background:var(--warnbg);color:var(--warn);border-color:transparent}.pill.home{background:var(--home);color:var(--brand);border-color:transparent}
+.muted{color:var(--ink2)}.small{font-size:13px}.row{display:flex;gap:10px;align-items:center}.sb{justify-content:space-between}
+.mono{font-variant-numeric:tabular-nums;font-weight:800}
+.bottom{display:grid;grid-template-columns:repeat(4,1fr);background:var(--surface);border-top:1px solid var(--line);padding:8px 6px 14px;position:relative}
+.bottom button{background:none;border:0;color:var(--ink2);display:flex;flex-direction:column;align-items:center;gap:3px;font-weight:700;font-size:11.5px;position:relative;padding:6px 0}
+.bottom button[aria-current=true]{color:var(--brand)}.bottom svg{width:24px;height:24px}
+.badge{position:absolute;top:0;left:calc(50% + 6px);min-width:18px;height:18px;border-radius:9px;background:var(--accent);color:var(--accentfg);font-size:11px;font-weight:800;display:grid;place-items:center;padding:0 4px}
+.fab{position:absolute;right:16px;bottom:78px;width:58px;height:58px;border-radius:50%;border:0;background:var(--accent);color:var(--accentfg);display:grid;place-items:center;box-shadow:0 12px 26px -8px rgba(255,122,26,.7)}
+.ring{width:64px;height:64px;flex:none}
+.prog{height:8px;border-radius:8px;background:var(--line);overflow:hidden}.prog span{display:block;height:100%;background:var(--accent);border-radius:8px}
+.jt{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;flex:none}
+.hero{background:linear-gradient(135deg,#1b56e0,#0a33a8);color:#fff;border-radius:24px;padding:18px;position:relative;overflow:hidden;display:flex;flex-direction:column;gap:4px}
+.hero:after{content:"";position:absolute;right:-40px;top:-40px;width:150px;height:150px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#ffb061,#ff7a1a);opacity:.9}
+.hero>*{position:relative;z-index:1}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--ink2)}
+.steps span{display:block;height:6px;border-radius:6px;background:var(--line);margin-bottom:5px}.steps .d span{background:var(--brand)}.steps .n span{background:var(--accent)}.steps .n{color:var(--ink)}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px}.tile{background:var(--surface2);border:1px solid var(--line);border-radius:18px;padding:12px 14px}.tile.s{background:var(--brand);color:#fff;border-color:var(--brand)}
+.tile b{font-size:21px;display:block;font-variant-numeric:tabular-nums}
+.msgs{display:flex;flex-direction:column;gap:12px;padding:16px}
+.m{display:flex;gap:8px;align-items:flex-end;max-width:92%}.m.me{align-self:flex-end;flex-direction:row-reverse}
+.av{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:800;flex:none}
+.av.h{background:var(--home);color:var(--brand)}.av.c{background:var(--con);color:#c75400}
+.bub{background:var(--surface);border:1px solid var(--line);border-radius:18px 18px 18px 6px;padding:10px 14px}
+.me .bub{background:var(--con);border-radius:18px 18px 6px 18px;border-color:transparent}
+.meta{font-size:11.5px;color:var(--ink2);margin-top:3px;display:flex;gap:6px;align-items:center}.me .meta{justify-content:flex-end}
+.quick{display:flex;gap:8px;overflow-x:auto;padding:0 16px 10px}.quick button{flex:none;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:8px 14px;border-radius:999px;font-weight:700;font-size:13px}
+.compose{display:flex;gap:8px;padding:10px 12px;background:var(--surface);border-top:1px solid var(--line)}
+.compose div{flex:1;background:var(--surface2);border:1px solid var(--line);border-radius:999px;padding:12px 16px;color:var(--ink2)}
+.empty{border:2px dashed var(--line);border-radius:22px;padding:28px 18px;text-align:center;display:flex;flex-direction:column;gap:10px;align-items:center;background:var(--surface)}
+.tip{position:relative}.tip button.q{width:22px;height:22px;border-radius:50%;border:1px solid var(--line);background:var(--surface2);color:var(--brand);font-weight:800;font-size:12px;padding:0}
+.tipbox{position:absolute;z-index:5;left:0;top:30px;width:250px;background:#0b1224;color:#fff;border-radius:14px;padding:12px 14px;font-size:13px;box-shadow:0 14px 30px -10px rgba(0,0,0,.6)}
+.hidden{display:none!important}
+/* landing */
+.land{background:var(--bg);border-radius:26px;overflow:hidden;border:1px solid var(--line);box-shadow:var(--shadow)}
+.lnav{display:flex;justify-content:space-between;align-items:center;padding:16px 28px;background:linear-gradient(135deg,#1b56e0,#0a33a8);color:#fff;border-bottom:3px solid var(--accent)}
+.lhero{display:grid;grid-template-columns:1.1fr .9fr;gap:20px;padding:44px 28px 20px;align-items:center;background:linear-gradient(135deg,#1b56e0,#0a33a8);color:#fff}
+.lhero h2{font-size:clamp(30px,4.6vw,48px);line-height:1.08;font-weight:800}.lhero p{font-size:18px;opacity:.92;margin:14px 0 22px;max-width:470px}
+.emailrow{display:flex;gap:8px;flex-wrap:wrap}.emailrow div{flex:1;min-width:200px;background:#fff;color:#55657c;border-radius:999px;padding:14px 18px}
+.three{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;padding:26px 28px}.three .card h3{font-size:17px}
+.how{padding:6px 28px 30px;display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.how .n{width:36px;height:36px;border-radius:50%;background:var(--accent);color:var(--accentfg);display:grid;place-items:center;font-weight:800}
+.trust{margin:0 28px 28px;background:var(--okbg);color:var(--ok);border-radius:18px;padding:14px 18px;display:flex;gap:12px;align-items:center;font-weight:700}
+.lfoot{padding:18px 28px;border-top:1px solid var(--line);display:flex;gap:18px;flex-wrap:wrap;color:var(--ink2);font-size:13px}
+.conf{position:fixed;width:10px;height:16px;z-index:99;pointer-events:none}
+@media (max-width:860px){.stagearea{grid-template-columns:1fr}.notes{position:static;order:2}.lhero,.three,.how{grid-template-columns:1fr}.phone{height:760px}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style></head><body>
+<div class="wrap">
+ <div class="bar"><div><h1>Jobfile redesign preview</h1><small>A mockup only. Nothing on the live site has changed. Tap around.</small></div>
+ <button class="tog" id="theme" type="button">Dark mode</button></div>
+ <div class="chips" role="tablist" id="tabs"></div>
+ <div id="view"></div>
+</div>
+<svg width="0" height="0" style="position:absolute"><defs>
+<symbol id="i-home" viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+<symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+<symbol id="i-cam" viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="13" r="3.5" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+<symbol id="i-pay" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="2.5" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+<symbol id="i-roll" viewBox="0 0 24 24"><rect x="4" y="3" width="14" height="6" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M18 6h2v5h-8v3" fill="none" stroke="currentColor" stroke-width="2"/><rect x="10" y="14" width="4" height="7" rx="1" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+<symbol id="i-tub" viewBox="0 0 24 24"><path d="M3 12h18v2a5 5 0 0 1-5 5H8a5 5 0 0 1-5-5zM6 12V7a2 2 0 0 1 4 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+<symbol id="i-roof" viewBox="0 0 24 24"><path d="M2 12L12 4l10 8M5 10v10h14V10" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+<symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M8.5 12l2.5 2.5 4.5-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+</defs></svg>
+<script>
+const $=s=>document.querySelector(s);
+const bar=(cur)=>`<nav class="bottom" aria-label="Project">${[['home','Overview',0,'i-home'],['chat','Messages',2,'i-chat'],['cam','Photos',0,'i-cam'],['pay','Pay',1,'i-pay']].map(([k,l,b,ic])=>`<button type="button" data-go="${k}" ${cur===k?'aria-current="true"':''}><svg><use href="#${ic}"/></svg>${l}${b?`<span class="badge">${b}</span>`:''}</button>`).join('')}</nav>`;
+const phone=(inner,bn,cur,fab)=>`<div class="phone"><div class="status"><span>9:41</span><span>5G ▮▮▮</span></div>${inner}${fab?`<button class="fab" type="button" aria-label="Add photo"><svg width="26" height="26"><use href="#i-cam"/></svg></button>`:''}${bn?bar(cur):''}</div>`;
+const notes=(t,items)=>`<aside class="notes"><h2>${t}</h2><ul>${items.map(([a,b],i)=>`<li><i>${i+1}</i><span><b>${a}</b>${b}</span></li>`).join('')}</ul></aside>`;
+const ring=(p)=>`<svg class="ring" viewBox="0 0 64 64"><circle cx="32" cy="32" r="26" fill="none" stroke="var(--line)" stroke-width="8"/><circle cx="32" cy="32" r="26" fill="none" stroke="var(--accent)" stroke-width="8" stroke-linecap="round" stroke-dasharray="${163*p} 163" transform="rotate(-90 32 32)"/><text x="32" y="37" text-anchor="middle" font-weight="800" font-size="15" fill="var(--ink)">${Math.round(p*3)}/3</text></svg>`;
+
+const V={};
+V.land=()=>`<div class="land">
+<div class="lnav"><span class="brand">JOBFILE</span><span class="row" style="gap:20px;font-weight:700"><span>How it works</span><span>Sign in</span></span></div>
+<div class="lhero"><div><span class="pill" style="background:rgba(255,255,255,.18);color:#fff;border:0">Built for Texas home projects</span>
+<h2 style="margin-top:14px">Every price, photo and payment in one shared record.</h2>
+<p>Homeowners and contractors keep the agreement, the messages and the progress in one place, so nobody has to scroll through texts to remember what was decided.</p>
+<div class="emailrow"><div>you@example.com</div><button class="btn go" type="button" data-conf>Start your first project</button></div>
+<p class="small" style="margin:10px 0 0;opacity:.8">No password. We email you a sign-in link.</p></div>
+<svg viewBox="0 0 420 300" style="width:100%;max-width:420px;justify-self:center"><circle cx="330" cy="70" r="56" fill="#ff9a45"/><path d="M100 200V120l110-70 110 70v80z" fill="#fff" opacity=".16"/>
+<g><rect x="40" y="170" width="110" height="140" rx="40" fill="#ff7a1a"/><circle cx="95" cy="130" r="30" fill="#c68a5a"/><path d="M62 126a34 30 0 0 1 66 0z" fill="#ffd23f"/><rect x="54" y="122" width="82" height="8" rx="4" fill="#f2b800"/></g>
+<g><rect x="270" y="170" width="110" height="140" rx="40" fill="#1b56e0" stroke="#fff" stroke-opacity=".25"/><circle cx="325" cy="130" r="30" fill="#f1c27d"/><path d="M293 126q4-34 34-32q30 2 30 32q-10-14-30-14q-22 0-34 14z" fill="#5a3418"/></g>
+<path d="M140 225l40-10 40 0 40 10" stroke="#c68a5a" stroke-width="22" stroke-linecap="round" fill="none"/><circle cx="210" cy="222" r="20" fill="#d9a46f"/></svg></div>
+<div class="three"><div class="card"><h3>Agree in writing</h3><p class="muted small">Scope, price and payment milestones. Both sides sign.</p></div><div class="card"><h3>See the work</h3><p class="muted small">Progress photos and a fix list the homeowner can confirm.</p></div><div class="card"><h3>Track every payment</h3><p class="muted small">Requested, paid, confirmed. Jobfile records it and never moves money.</p></div></div>
+<div class="how"><div class="card"><span class="n">1</span><b>Create a project</b><span class="muted small">Add the address and the homeowner's email.</span></div><div class="card"><span class="n">2</span><b>Write the agreement</b><span class="muted small">Send it. The homeowner signs from their phone.</span></div><div class="card"><span class="n">3</span><b>Run the job</b><span class="muted small">Messages, photos, changes and payments in one thread.</span></div></div>
+<div class="trust"><svg width="26" height="26"><use href="#i-shield"/></svg><span>Jobfile never holds your money. Payments are recorded between you and your contractor.</span></div>
+<div class="lfoot"><span>Terms</span><span>Privacy</span><span>Contact</span><span style="margin-left:auto">Made for Texas homeowners and contractors</span></div></div>`;
+
+V.home=()=>`<div class="stagearea">${phone(`<div class="scr"><div class="top"><span class="brand">JOBFILE</span><span class="avatar">NR</span></div><div class="pad">
+<div><h2 style="font-size:24px;font-weight:800">Good evening, Nesty</h2><p class="muted small">Here is where things stand.</p></div>
+<div class="card"><div class="row">${ring(1/3*3*0+1/3)}<div><b>Set up your first project</b><div class="muted small">3 quick steps. About 5 minutes.</div></div></div>
+<div class="row sb"><span class="row"><span class="pill ok">Done</span> Create the project</span></div>
+<div class="row sb"><span class="row"><span class="pill warn">Next</span> Write the agreement</span><button class="btn go" style="padding:9px 16px;min-height:40px" type="button" data-conf>Start</button></div>
+<div class="row sb muted"><span class="row"><span class="pill">To do</span> Invite the homeowner</span></div></div>
+<h3 style="font-size:17px;font-weight:800">Your projects</h3>
+<div class="card"><div class="row"><span class="jt" style="background:var(--con);color:#c75400"><svg width="26" height="26"><use href="#i-roll"/></svg></span><div style="flex:1"><b>Kitchen and walls painting</b><div class="muted small">727 Plano TX · Jerry still</div></div></div><div class="row sb"><span class="pill ok">Active</span><span class="small muted">Payment 1 of 4 confirmed</span></div><div class="prog"><span style="width:25%"></span></div></div>
+<div class="card"><div class="row"><span class="jt" style="background:var(--home);color:var(--brand)"><svg width="26" height="26"><use href="#i-tub"/></svg></span><div style="flex:1"><b>Guest bathroom remodel</b><div class="muted small">12 Oak Ln · Maria Lopez</div></div></div><div class="row sb"><span class="pill warn">Agreement sent</span><span class="small muted">Waiting for signature</span></div><div class="prog"><span style="width:8%"></span></div></div>
+<div class="card"><div class="row"><span class="jt" style="background:var(--okbg);color:var(--ok)"><svg width="26" height="26"><use href="#i-roof"/></svg></span><div style="flex:1"><b>Roof replacement</b><div class="muted small">88 Elm St · D. Carter</div></div></div><div class="row sb"><span class="pill">Closeout</span><span class="small muted">2 fixes left</span></div><div class="prog"><span style="width:92%"></span></div></div>
+</div></div>`,false,'',false)}${notes('The home screen',[['A friendly start','A greeting and a 3-step setup checklist with a progress ring, so a new contractor always knows what is next.'],['Icons by job type','Paint, bathroom, roof and more, in a colored tile so projects are easy to tell apart.'],['Status at a glance','A colored status chip and a progress bar on every card, no opening needed.']])}</div>`;
+
+V.proj=()=>`<div class="stagearea">${phone(`<div class="scr"><div class="top"><span class="brand">JOBFILE</span><span class="avatar">NR</span></div><div class="pad">
+<div class="hero"><span class="small" style="opacity:.85;font-weight:700;letter-spacing:.06em">727 PLANO TX</span><h2 style="font-size:23px;font-weight:800">Kitchen and walls painting</h2><span class="small" style="opacity:.9">Nesty's Painting · Jerry still</span></div>
+<div class="steps"><div class="d"><span></span>Agreement</div><div class="n"><span></span>Active</div><div><span></span>Closeout</div><div><span></span>Complete</div></div>
+<div class="card" style="border-color:var(--accent);border-width:2px"><span class="pill warn" style="align-self:flex-start">Needs you</span><b style="font-size:18px">Confirm payment 1 arrived</b><p class="muted small">Jerry marked $1,001.60 as paid by check on Oct 28.</p><button class="btn go" id="confirm" type="button">Confirm received</button><span id="done" class="hidden pill ok" style="align-self:flex-start">Confirmed. Nice work!</span></div>
+<div class="tiles"><div class="tile"><span class="small muted">Contract</span><b>$5,008</b></div><div class="tile s"><span class="small" style="opacity:.8">Confirmed</span><b id="cfv">$0</b></div></div>
+<div class="card"><div class="row sb"><b>Agreement</b><span class="pill ok">Fully signed</span></div><div class="row sb"><b>Schedule</b><span class="muted small">Nov 3 to Nov 14</span></div></div>
+</div></div>`,true,'home',true)}${notes('The project screen',[['One clear next step','The "Needs you" card is the first thing on screen with one orange button. Tap Confirm received to see the celebration.'],['Tab bar with badges','The bottom bar sits under your thumb and shows counts. Tap Messages or Photos to jump to those mockups.'],['Camera button','A round button opens the camera straight away to add a photo.'],['Calmer cards','Larger corners, softer shadows and more space between things.']])}</div>`;
+
+V.chat=()=>`<div class="stagearea">${phone(`<div style="padding:8px 16px;background:var(--surface);border-bottom:1px solid var(--line)" class="row sb"><b>Messages</b><span class="pill ok">Jerry is online</span></div><div class="scr"><div class="msgs">
+<div class="m"><span class="av h">JS</span><div><div class="bub">Can we pick the cabinet color this week?</div><div class="meta"><span class="pill home" style="padding:2px 8px">question</span> 9:12 AM</div></div></div>
+<div class="m me"><span class="av c">NR</span><div><div class="bub">Yes. I will bring samples Thursday.</div><div class="meta">9:40 AM · Seen ✓✓</div></div></div>
+<div class="m"><span class="av h">JS</span><div><div class="bub">Great. We like the white one from the photo.</div><div class="meta"><span class="pill ok" style="padding:2px 8px">decision</span> 10:05 AM</div></div></div>
+<div class="m me hidden" id="sent"><span class="av c">NR</span><div><div class="bub" id="sentt"></div><div class="meta">Just now · Delivered ✓</div></div></div></div></div>
+<div class="quick"><button type="button" data-q="Sounds good!">Sounds good!</button><button type="button" data-q="Can we talk?">Can we talk?</button><button type="button" data-q="On my way.">On my way</button><button type="button" data-q="Photo coming now.">Photo coming now</button></div>
+<div class="compose"><div>Write a message</div><button class="btn" type="button" style="padding:10px 18px">Send</button></div>`,true,'chat',false)}${notes('Messages',[['Feels like chat','Initials avatars, soft bubbles, delivery and seen ticks.'],['Quick replies','One tap answers like "Sounds good!". Tap one to try it.'],['Tags stay','Question, update and decision chips are still on each message, so important things are easy to find later.']])}</div>`;
+
+V.photos=()=>`<div class="stagearea">${phone(`<div style="padding:8px 16px;background:var(--surface);border-bottom:1px solid var(--line)" class="row sb"><b>Photos</b><span class="tip"><span class="row small muted">Fix list <button class="q" type="button" data-tip="t1" aria-label="What is a fix list?">?</button></span><div class="tipbox hidden" id="t1" style="left:auto;right:0">A fix list is things the homeowner wants corrected. The contractor marks each one fixed, then the homeowner confirms.</div></span></div><div class="scr"><div class="pad">
+<div class="empty"><svg width="54" height="54" style="color:var(--brand)"><use href="#i-cam"/></svg><b style="font-size:18px">No photos yet</b><p class="muted small">Snap one from the job site. Both of you will see it right away.</p><button class="btn go" type="button" data-conf>Take a photo</button></div>
+<div class="card"><div class="row sb"><b>Payment tracker</b></div><div class="row sb"><span class="row small">Lien waiver <span class="tip"><button class="q" type="button" data-tip="t2" aria-label="What is a lien waiver?">?</button><div class="tipbox hidden" id="t2">A lien waiver is a note that the contractor was paid for this stage and will not claim a lien for it.</div></span></span><span class="pill">Optional</span></div></div>
+<div class="card" style="background:var(--okbg);border-color:transparent;color:var(--ok)"><div class="row"><svg width="24" height="24"><use href="#i-shield"/></svg><b>Jobfile never holds your money.</b></div></div>
+</div></div>`,true,'cam',false)}${notes('Friendly help and empty states',[['Empty states that guide','"No photos yet. Snap one from the job site" with a clear button instead of a blank grid.'],['Plain-English tips','Tap the ? icons for short definitions of fix list and lien waiver.'],['Trust note','A green reminder that payments are only recorded. It helps new customers feel safe.']])}</div>`;
+
+const T=[['land','1. Home page'],['home','2. First project'],['proj','3. Project'],['chat','4. Messages'],['photos','5. Photos and help']];
+function show(k){location.hash=k;$('#view').innerHTML=V[k]();[...$('#tabs').children].forEach(c=>c.setAttribute('aria-selected',c.dataset.k===k));bind(k)}
+$('#tabs').innerHTML=T.map(([k,l])=>`<button class="chip" role="tab" type="button" data-k="${k}">${l}</button>`).join('');
+$('#tabs').onclick=e=>{const k=e.target.dataset.k;if(k)show(k)};
+function confetti(){const c=['#ff7a1a','#1b56e0','#ffd23f','#14c46b','#ff5d8f'];for(let i=0;i<60;i++){const d=document.createElement('div');d.className='conf';d.style.background=c[i%5];d.style.left=(20+Math.random()*60)+'vw';d.style.top='20vh';document.body.appendChild(d);d.animate([{transform:'translate(0,0) rotate(0)',opacity:1},{transform:`translate(${(Math.random()-.5)*400}px,${50+Math.random()*60}vh) rotate(${Math.random()*720}deg)`,opacity:.8}],{duration:1500+Math.random()*1200,easing:'cubic-bezier(.2,.6,.4,1)'}).onfinish=()=>d.remove()}}
+function bind(k){const v=$('#view');
+ v.querySelectorAll('[data-conf]').forEach(b=>b.onclick=confetti);
+ v.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>{const m={home:'proj',chat:'chat',cam:'photos',pay:'proj'};show(m[b.dataset.go])});
+ v.querySelectorAll('[data-tip]').forEach(b=>b.onclick=()=>{const t=document.getElementById(b.dataset.tip);t.classList.toggle('hidden')});
+ v.querySelectorAll('[data-q]').forEach(b=>b.onclick=()=>{$('#sent').classList.remove('hidden');$('#sentt').textContent=b.dataset.q});
+ const c=$('#confirm');if(c)c.onclick=()=>{c.classList.add('hidden');$('#done').classList.remove('hidden');$('#cfv').textContent='$1,001.60';confetti()}}
+$('#theme').onclick=()=>{const r=document.documentElement,d=(r.dataset.theme||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'))==='dark';r.dataset.theme=d?'light':'dark';$('#theme').textContent=d?'Dark mode':'Light mode'};
+const start=location.hash.slice(1);show(V[start]?start:'land');
+</script></body></html>
