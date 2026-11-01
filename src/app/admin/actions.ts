@@ -134,3 +134,33 @@ export async function restoreReview(_: Result | null, f: FormData): Promise<Resu
   revalidatePath('/admin/reviews');
   return { ok: true, message: dismiss ? 'Report dismissed. The review stays visible.' : 'Review restored.' };
 }
+
+/** Approve or reject an insurance certificate. The contractor is told either way. */
+export async function reviewInsurance(_: Result | null, f: FormData): Promise<Result> {
+  const { user: me, db } = await requireAdmin();
+  const id = str(f, 'id');
+  const decision = str(f, 'decision');
+  const note = str(f, 'note').slice(0, 300);
+  if (!id || (decision !== 'approved' && decision !== 'rejected')) return { ok: false, error: 'Nothing to review.' };
+  if (decision === 'rejected' && !note) return { ok: false, error: 'Tell the contractor why. They will see this note.' };
+  const { data: ins } = await db.from('company_insurance').select('id,company_id,kind,expires_on,status').eq('id', id).maybeSingle();
+  if (!ins) return { ok: false, error: 'Certificate not found.' };
+  if (decision === 'approved' && (ins.expires_on as string) < new Date().toISOString().slice(0, 10)) return { ok: false, error: 'That policy has already expired. Reject it.' };
+  const { error } = await db
+    .from('company_insurance')
+    .update({ status: decision, review_note: decision === 'rejected' ? note : '', reviewed_by: me.id, reviewed_at: new Date().toISOString() })
+    .eq('id', id);
+  if (error) return { ok: false, error: `Could not save: ${error.message}` };
+  await audit(me, decision === 'approved' ? 'insurance_approve' : 'insurance_reject', { type: 'company', id: ins.company_id as string }, { kind: ins.kind, note });
+  const { data: owners } = await db.from('company_members').select('user_id').eq('company_id', ins.company_id as string).eq('role', 'owner');
+  await notifyUsers({
+    userIds: (owners ?? []).map((o) => o.user_id as string),
+    projectId: null,
+    kind: 'admin',
+    title: decision === 'approved' ? 'Your insurance was verified' : 'Your insurance certificate needs another look',
+    body: decision === 'approved' ? 'The Insurance verified badge now shows on your public profile.' : `Reason: ${note}. Open Settings, Business profile to upload a new one.`,
+    force: true,
+  });
+  revalidatePath('/admin/verification');
+  return { ok: true, message: decision === 'approved' ? 'Approved. The badge is live.' : 'Rejected. The contractor was told why.' };
+}

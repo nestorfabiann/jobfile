@@ -5,13 +5,31 @@ import { supabaseAdmin } from '@/lib/supabase/server';
 import Stars from '@/components/Stars';
 import { companyReviews, HOME_CATS, summarize } from '@/lib/reviews';
 import { reportReview } from './actions';
+import { fmtDate, INSURANCE_KINDS, isCurrent, signedUrls, type InsuranceKind } from '@/lib/companyProfile';
 
 export const dynamic = 'force-dynamic';
 
 export default async function Profile({ params, searchParams }: { params: { id: string }; searchParams: { reported?: string } }) {
   await requireUser();
-  const { data: c } = await supabaseAdmin().from('companies').select('id,name').eq('id', params.id).maybeSingle();
+  const db = supabaseAdmin();
+  const { data: c } = await db.from('companies').select('*').eq('id', params.id).maybeSingle<any>();
   if (!c) notFound();
+  const [{ data: photos }, { data: ins }] = await Promise.all([
+    db.from('company_photos').select('id,path,caption').eq('company_id', c.id).order('created_at'),
+    db.from('company_insurance').select('kind,status,expires_on').eq('company_id', c.id),
+  ]);
+  const urls = await signedUrls('company-photos', [...(photos ?? []).map((p) => p.path as string), ...(c.logo_path ? [c.logo_path as string] : [])]);
+  const verified = (ins ?? []).filter((i: any) => isCurrent(i)) as { kind: InsuranceKind; expires_on: string }[];
+  const links = [['Website', c.website], ['Facebook', c.facebook], ['Instagram', c.instagram], ['Reviews and more', c.other_link]].filter(([, u]) => !!u) as [string, string][];
+  const details = [
+    ['Years in business', c.year_started ? `Since ${c.year_started}` : ''],
+    ['Service area', c.service_radius_mi ? `${c.service_radius_mi} miles` : ''],
+    ['Crew size', c.crew_size ? `${c.crew_size}` : ''],
+    ['Workmanship warranty', c.warranty],
+    ['Hours', c.hours],
+    ['Accepts', (c.payments ?? []).join(', ')],
+    ['License or registration', c.license_note ? `${c.license_note} (stated by the contractor)` : ''],
+  ].filter(([, v]) => !!v) as [string, string][];
   const reviews = await companyReviews(c.id);
   const s = summarize(reviews);
   const month = (iso: string) => new Date(iso).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
@@ -20,8 +38,56 @@ export default async function Profile({ params, searchParams }: { params: { id: 
     <>
       <div className="stack">
         <Link href="/projects" className="small">‹ All projects</Link>
-        <h1>{c.name}</h1>
+        <div className="row" style={{ flexWrap: 'nowrap' }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          {c.logo_path && urls.get(c.logo_path) ? <img src={urls.get(c.logo_path)} alt="" width={64} height={64} style={{ borderRadius: 16, objectFit: 'cover', flex: 'none' }} /> : null}
+          <h1>{c.name}</h1>
+        </div>
+        <div className="row">
+          {verified.length > 0 && <span className="pill ok">Insurance verified until {fmtDate(verified.map((v) => v.expires_on).sort()[0])}</span>}
+          {(c.languages ?? []).map((l: string) => <span className="pill" key={l}>{l}</span>)}
+        </div>
       </div>
+      {(c.about || (c.services ?? []).length > 0) && (
+        <div className="card">
+          {c.about ? <p style={{ whiteSpace: 'pre-wrap' }}>{c.about}</p> : null}
+          {(c.services ?? []).length > 0 && <div className="chips">{(c.services as string[]).map((x) => <span className="pill" key={x}>{x}</span>)}</div>}
+        </div>
+      )}
+
+      {(photos ?? []).length > 0 && (
+        <div className="card">
+          <h2>Photos of their work</h2>
+          <div className="grid2" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))' }}>
+            {(photos ?? []).map((p) => urls.get(p.path as string) ? (
+              <figure key={p.id} style={{ margin: 0 }}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={urls.get(p.path as string)} alt={(p.caption as string) || 'Work photo'} loading="lazy" style={{ width: '100%', aspectRatio: '1', objectFit: 'cover', borderRadius: 12 }} />
+                {p.caption ? <figcaption className="small muted">{p.caption}</figcaption> : null}
+              </figure>
+            ) : null)}
+          </div>
+        </div>
+      )}
+
+      {details.length > 0 && (
+        <div className="card">
+          <h2>Business details</h2>
+          {details.map(([k, v]) => <div className="row" style={{ justifyContent: 'space-between', flexWrap: 'nowrap', alignItems: 'flex-start' }} key={k}><span className="muted">{k}</span><b style={{ textAlign: 'right' }}>{v}</b></div>)}
+          {verified.length > 0 && <p className="muted small">{verified.map((v) => INSURANCE_KINDS[v.kind]).join(' and ')} insurance certificate approved by a Jobfile admin. This is not a guarantee of coverage. Confirm coverage with the contractor before work starts.</p>}
+        </div>
+      )}
+
+      {links.length > 0 && (
+        <div className="card">
+          <h2>Find them online</h2>
+          <p className="muted small">These links are added by the contractor and open other websites.</p>
+          <div className="row">
+            {links.map(([label, url]) => <a key={label} className="btn ghost" href={url} target="_blank" rel="noopener noreferrer nofollow">{label}</a>)}
+          </div>
+        </div>
+      )}
+
       {searchParams.reported ? <div className="box ok">Thanks. An admin will review it.</div> : null}
 
       {s.count === 0 ? (

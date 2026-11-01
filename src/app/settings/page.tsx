@@ -1,10 +1,13 @@
 import { requireUser } from '@/lib/session';
+import Link from 'next/link';
 import { saveSettings } from './actions';
+import { myOwnedCompany } from '@/lib/companyProfile';
 import { asLang, translateEnabled } from '@/lib/translate';
 
 export default async function Settings({ searchParams }: { searchParams: { saved?: string; error?: string } }) {
   const { sb, user } = await requireUser();
   const tOn = translateEnabled();
+  const owned = await myOwnedCompany();
   const { data: p } = await sb
     .from('profiles')
     .select(tOn ? 'full_name,phone,notify_email,notify_sms,sms_consent_at,language,auto_translate' : 'full_name,phone,notify_email,notify_sms,sms_consent_at')
@@ -20,6 +23,17 @@ export default async function Settings({ searchParams }: { searchParams: { saved
 
       {searchParams.saved ? <div className="box ok">Saved.</div> : null}
       {searchParams.error ? <div className="box bad">{searchParams.error}</div> : null}
+
+      {owned && (
+        <div className="card">
+          <h2>Business profile</h2>
+          <p className="muted small">Add photos of your work, proof of insurance, your website and social links, and a description for homeowners.</p>
+          <div className="row">
+            <Link className="btn" href="/settings/business">Edit business profile</Link>
+            <Link className="btn ghost" href={`/contractors/${owned.companyId}`}>View public page</Link>
+          </div>
+        </div>
+      )}
 
       <form action={saveSettings} className="card">
         <h2>You</h2>

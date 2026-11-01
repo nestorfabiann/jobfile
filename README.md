@@ -144,3 +144,12 @@ Run `supabase/migrations/008_reviews.sql`. No flag is needed. The Ratings tab ap
 - Homeowner ratings are private to Jobfile by default. Set `HOMEOWNER_RATINGS_VISIBLE=true` to show a contractor a score-only summary of a homeowner's past projects.
 - Admin: `/admin/reviews` lists reported reviews. Hide (reason required) or dismiss. Everything is audit-logged.
 To remove: delete `src/app/projects/[id]/rating`, `src/app/contractors`, `src/app/admin/reviews`, `src/lib/reviews.ts`, `src/components/{Stars,StarInput,AdminReviewActions}.tsx`, the Ratings tab flag and the review actions in `src/app/admin/actions.ts`.
+
+## Contractor business profile
+
+Run `supabase/migrations/009_contractor_profile.sql` once. Company owners edit it at Settings > Business profile (`/settings/business`): description, services, service area, languages, warranty, hours, payment methods, website and social links, logo, up to 24 work photos, and insurance certificates.
+- Public page: `/contractors/[id]` (signed-in people only). Shows the Insurance verified badge only while an admin-approved certificate is unexpired.
+- Certificates live in the private `company-docs` bucket. Only admins can open them (`/admin/verification`, each open is written to the audit log). They are never linked from public pages.
+- Work photos live in the private `company-photos` bucket and are shown through one-hour signed links.
+- To remove the feature: drop the three new tables and the added `companies` columns, delete the two buckets, and delete `src/app/settings/business`, `src/app/admin/verification`, `src/lib/companyProfile.ts` and the two components.
+- Not built: automatic expiry reminder emails. The badge simply disappears on the expiry date.
