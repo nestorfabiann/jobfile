@@ -93,7 +93,7 @@ export default async function Overview({ params }: { params: { id: string } }) {
         <KitchenArt size={56} />
         <span className="lbl" style={{ color: 'rgba(255,255,255,.8)' }}>{project.address || 'No address yet'}</span>
         <h2 style={{ fontSize: 26 }}>{project.name}</h2>
-        <p>{contractorName} · {homeownerName}</p>
+        <p>{role === 'homeowner' ? <Link href={`/contractors/${project.company_id}`} style={{ color: 'inherit' }}>{contractorName}</Link> : contractorName} · {homeownerName}</p>
       </section>
 
       <ol className="stages" aria-label="Project stage">

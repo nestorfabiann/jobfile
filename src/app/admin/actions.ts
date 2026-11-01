@@ -106,3 +106,31 @@ export async function sendBroadcast(_: Result | null, f: FormData): Promise<Resu
   revalidatePath('/admin/audit');
   return { ok: true, message: `Sent to ${ids.length} ${ids.length === 1 ? 'person' : 'people'}.` };
 }
+
+/** Review moderation. Hide for rule violations (abuse, personal details, off-topic, fake), never for a low rating alone. */
+export async function hideReview(_: Result | null, f: FormData): Promise<Result> {
+  const { user: me, db } = await requireAdmin();
+  const id = str(f, 'review_id');
+  const reason = str(f, 'reason').slice(0, 500);
+  if (!id) return { ok: false, error: 'No review selected.' };
+  if (!reason) return { ok: false, error: 'Write the reason. It goes in the audit log.' };
+  const { error } = await db.from('reviews').update({ hidden_at: new Date().toISOString(), hidden_reason: reason }).eq('id', id);
+  if (error) return { ok: false, error: `Could not hide: ${error.message}` };
+  await audit(me, 'hide_review', { type: 'review', id }, { reason });
+  revalidatePath('/admin/reviews');
+  return { ok: true, message: 'Review hidden.' };
+}
+
+export async function restoreReview(_: Result | null, f: FormData): Promise<Result> {
+  const { user: me, db } = await requireAdmin();
+  const id = str(f, 'review_id');
+  const dismiss = f.get('dismiss') === '1';
+  const patch = dismiss
+    ? { reported_at: null, reported_by: null, report_reason: '' }
+    : { hidden_at: null, hidden_reason: '', reported_at: null, reported_by: null, report_reason: '' };
+  const { error } = await db.from('reviews').update(patch).eq('id', id);
+  if (error) return { ok: false, error: `Could not update: ${error.message}` };
+  await audit(me, dismiss ? 'dismiss_report' : 'restore_review', { type: 'review', id });
+  revalidatePath('/admin/reviews');
+  return { ok: true, message: dismiss ? 'Report dismissed. The review stays visible.' : 'Review restored.' };
+}

@@ -11,6 +11,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           ['/admin/activity', 'Activity'],
           ['/admin/users', 'Users'],
           ['/admin/projects', 'Projects'],
+          ['/admin/reviews', 'Reviews'],
           ['/admin/broadcast', 'Broadcast'],
           ['/admin/audit', 'Audit log'],
         ].map(([href, label]) => (

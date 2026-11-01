@@ -125,3 +125,16 @@ details.card > summary { cursor: pointer; font-weight: 700; min-height: 32px; di
 .scale { display: flex; justify-content: space-between; font: 500 11.5px/1.2 ui-monospace, Menlo, monospace; color: var(--ink-2); font-variant-numeric: tabular-nums; }
 .card.line { border-left: 6px solid var(--line); } .card.line.ok { border-left-color: var(--ok); } .card.line.warn { border-left-color: var(--accent); }
 ul.plain { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 4px; font-size: 14px; }
+
+/* Ratings */
+.rstars { display: inline-flex; gap: 2px; color: var(--line); font-size: 22px; line-height: 1; } .rstars.sm { font-size: 17px; }
+.rstars .on, .rstars button.on { color: #ffb020; }
+.rstars.input { gap: 4px; font-size: 34px; } .rstars.input.sm { font-size: 24px; }
+.rstars button { background: none; border: 0; padding: 4px; font: inherit; color: var(--line); cursor: pointer; line-height: 1; min-width: 36px; min-height: 36px; }
+.rstars button.on { color: #ffb020; } .rstars button:focus-visible { outline: 3px solid var(--accent); border-radius: 8px; }
+.rr { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 6px 0; border-top: 1px solid var(--line); }
+.rcol { display: flex; flex-direction: column; gap: 6px; font-weight: 700; }
+.rdist { display: grid; grid-template-columns: 26px 1fr 38px; gap: 8px; align-items: center; font-size: 13px; }
+.rdist i { height: 8px; border-radius: 8px; background: var(--line); overflow: hidden; display: block; } .rdist i b { display: block; height: 100%; background: #ffb020; }
+.rvbig { font: 800 40px/1 ui-monospace, Menlo, monospace; }
+.reply { background: var(--surface-2); border-left: 4px solid var(--brand); border-radius: 0 12px 12px 0; padding: 8px 12px; font-size: 14px; }

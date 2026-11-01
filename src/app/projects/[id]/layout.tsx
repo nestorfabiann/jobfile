@@ -40,7 +40,7 @@ export default async function ProjectLayout({
         </div>
       )}
 
-      <ProjectTabs id={project.id} priceCheck={role === 'homeowner' && priceCheckEnabled()} />
+      <ProjectTabs id={project.id} priceCheck={role === 'homeowner' && priceCheckEnabled()} rating={!!project.completed_at} />
       {children}
     </>
   );

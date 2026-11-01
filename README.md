@@ -134,3 +134,13 @@ Each person picks English or Español in Settings. Incoming messages show a Tran
 Translations are cached per message and language, limited to 150 new translations per person per day, and the model is `TRANSLATE_MODEL` (default claude-haiku-5-5).
 Message text is sent to the Anthropic API to translate, so mention that in your privacy policy.
 The agreement and emails are not translated. To remove: delete `src/lib/translate.ts`, `src/app/projects/[id]/translate.ts`, `src/components/TranslatedBody.tsx` and the language block in Settings.
+
+## Ratings (both sides)
+
+Run `supabase/migrations/008_reviews.sql`. No flag is needed. The Ratings tab appears on a project once the contractor marks it complete.
+- Homeowners rate the contractor (5 categories), contractors rate the homeowner (4). One rating per side per project, editable until revealed.
+- Ratings are hidden until both rate, or 14 days after completion.
+- Public contractor profile at `/contractors/<company id>` (signed-in users only), with the contractor's single reply and a Report button.
+- Homeowner ratings are private to Jobfile by default. Set `HOMEOWNER_RATINGS_VISIBLE=true` to show a contractor a score-only summary of a homeowner's past projects.
+- Admin: `/admin/reviews` lists reported reviews. Hide (reason required) or dismiss. Everything is audit-logged.
+To remove: delete `src/app/projects/[id]/rating`, `src/app/contractors`, `src/app/admin/reviews`, `src/lib/reviews.ts`, `src/components/{Stars,StarInput,AdminReviewActions}.tsx`, the Ratings tab flag and the review actions in `src/app/admin/actions.ts`.
