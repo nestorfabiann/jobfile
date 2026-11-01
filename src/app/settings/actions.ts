@@ -3,6 +3,7 @@
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 import { requireUser } from '@/lib/session';
+import { asLang, translateEnabled } from '@/lib/translate';
 
 /** Turns a US phone number into +1XXXXXXXXXX, or returns null if it is not one. */
 function toE164(raw: string): string | null {
@@ -31,9 +32,12 @@ export async function saveSettings(formData: FormData) {
 
   const { data: current } = await sb.from('profiles').select('sms_consent_at').eq('id', user.id).single();
 
+  const lang = translateEnabled() ? { language: asLang(formData.get('language')), auto_translate: formData.get('auto_translate') === 'on' } : {};
+
   const { error } = await sb
     .from('profiles')
     .update({
+      ...lang,
       full_name: fullName,
       phone,
       notify_email: notifyEmail,

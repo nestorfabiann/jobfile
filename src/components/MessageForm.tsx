@@ -3,7 +3,7 @@
 import { useRef, useState } from 'react';
 import { sendMessage } from '@/app/projects/[id]/actions';
 
-export default function MessageForm({ projectId, otherName }: { projectId: string; otherName: string }) {
+export default function MessageForm({ projectId, otherName, hint }: { projectId: string; otherName: string; hint?: string }) {
   const ref = useRef<HTMLFormElement>(null);
   const [busy, setBusy] = useState(false);
 
@@ -35,7 +35,7 @@ export default function MessageForm({ projectId, otherName }: { projectId: strin
       </div>
       <textarea name="body" rows={2} required maxLength={4000} aria-label="Message" placeholder={`Message ${otherName}…`} />
       <div className="row" style={{ justifyContent: 'space-between' }}>
-        <span className="muted small">Mark agreements as Decision so they are easy to find later.</span>
+        <span className="muted small">{hint ?? 'Mark agreements as Decision so they are easy to find later.'}</span>
         <button className="btn" type="submit" disabled={busy}>
           {busy ? 'Sending…' : 'Send'}
         </button>

@@ -1,13 +1,15 @@
 import { requireUser } from '@/lib/session';
 import { saveSettings } from './actions';
+import { asLang, translateEnabled } from '@/lib/translate';
 
 export default async function Settings({ searchParams }: { searchParams: { saved?: string; error?: string } }) {
   const { sb, user } = await requireUser();
+  const tOn = translateEnabled();
   const { data: p } = await sb
     .from('profiles')
-    .select('full_name,phone,notify_email,notify_sms,sms_consent_at')
+    .select(tOn ? 'full_name,phone,notify_email,notify_sms,sms_consent_at,language,auto_translate' : 'full_name,phone,notify_email,notify_sms,sms_consent_at')
     .eq('id', user.id)
-    .single();
+    .single<any>();
 
   return (
     <>
@@ -31,6 +33,24 @@ export default async function Settings({ searchParams }: { searchParams: { saved
             <input name="phone" defaultValue={p?.phone ?? ''} inputMode="tel" autoComplete="tel" placeholder="(512) 555-0100" />
           </label>
         </div>
+
+        {tOn && (
+          <>
+            <h2>Language</h2>
+            <p className="muted small">Pick the language you read best. Messages from the other person can be translated for you. Translations are made by AI and can be imperfect. The signed agreement stays in the language it was written in.</p>
+            <label className="fld">
+              I read
+              <select name="language" defaultValue={asLang(p?.language)}>
+                <option value="en">English</option>
+                <option value="es">Español</option>
+              </select>
+            </label>
+            <label className="row" style={{ flexWrap: 'nowrap' }}>
+              <input type="checkbox" name="auto_translate" defaultChecked={p?.auto_translate ?? true} />
+              <span>Translate new messages automatically</span>
+            </label>
+          </>
+        )}
 
         <h2>How to alert you</h2>
         <p className="muted small">

@@ -126,3 +126,11 @@ Set `ADMIN_EMAILS` (comma separated) and run `supabase/migrations/006_admin.sql`
 
 Mention admin access in your terms and privacy policy.
 To remove: delete `src/app/admin`, `src/app/banned`, `src/lib/admin*.ts`, `src/components/Admin*.tsx` and the Admin link in `src/app/layout.tsx`.
+
+## Message translation (English and Spanish)
+
+Set `TRANSLATE_ENABLED=true` (needs `ANTHROPIC_API_KEY`) and run `supabase/migrations/007_translation.sql`.
+Each person picks English or Español in Settings. Incoming messages show a Translate button, and the newest ones translate automatically if that is on.
+Translations are cached per message and language, limited to 150 new translations per person per day, and the model is `TRANSLATE_MODEL` (default claude-haiku-5-5).
+Message text is sent to the Anthropic API to translate, so mention that in your privacy policy.
+The agreement and emails are not translated. To remove: delete `src/lib/translate.ts`, `src/app/projects/[id]/translate.ts`, `src/components/TranslatedBody.tsx` and the language block in Settings.
