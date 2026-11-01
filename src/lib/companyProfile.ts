@@ -10,10 +10,11 @@ export type InsuranceKind = keyof typeof INSURANCE_KINDS;
 /** The signed-in person's company, only if they own it. Returns null for everyone else. */
 export async function myOwnedCompany() {
   const { sb, user } = await requireUser();
-  const { data } = await sb.from('company_members').select('company_id, role, companies(id,name)').eq('user_id', user.id).eq('role', 'owner').limit(1);
-  const row = (data ?? [])[0] as { company_id: string; companies?: { id: string; name: string } } | undefined;
+  const { data } = await sb.from('company_members').select('company_id').eq('user_id', user.id).eq('role', 'owner').limit(1);
+  const row = (data ?? [])[0];
   if (!row) return null;
-  return { user, companyId: row.company_id, name: row.companies?.name ?? '' };
+  const { data: co } = await sb.from('companies').select('name').eq('id', row.company_id).maybeSingle();
+  return { user, companyId: row.company_id as string, name: (co?.name as string | undefined) ?? '' };
 }
 
 /** Makes a safe web link, or '' if it is not one. Only http and https are allowed. */
