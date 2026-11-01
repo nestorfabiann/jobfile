@@ -74,6 +74,16 @@ export default async function Overview({ params }: { params: { id: string } }) {
   if (lastQ !== -1 && !msgs.slice(0, lastQ).some((m) => m.sender_role === role))
     todo.push({ text: 'Answer a question in Messages.', href: base });
 
+  // After completion, ask each side to rate until they have.
+  if (project.completed_at) {
+    const { data: myReview } = await sb.from('reviews').select('id').eq('project_id', project.id).eq('reviewer_role', role).maybeSingle();
+    if (!myReview)
+      todo.unshift({
+        text: `Project complete. Rate your experience with ${role === 'homeowner' ? contractorName : homeownerName}.`,
+        href: `${base}/rating`,
+      });
+  }
+
   // Latest photos, with short-lived private links.
   const recent = photos.slice(0, 4);
   const urls = new Map<string, string>();

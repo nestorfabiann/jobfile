@@ -14,7 +14,7 @@ export default async function Rating({
   searchParams,
 }: {
   params: { id: string };
-  searchParams: { error?: string; saved?: string };
+  searchParams: { error?: string; saved?: string; done?: string };
 }) {
   const { project, role, contractorName, homeownerName, homeownerJoined } = await loadProject(params.id);
   const done = !!project.completed_at;
@@ -64,6 +64,11 @@ export default async function Rating({
           Rate each other after the project is complete. Ratings stay hidden until you both rate, or until {REVEAL_DAYS} days after completion, so no one rates in reaction to the other.
         </p>
       </div>
+      {searchParams.done && !mine ? (
+        <div className="box ok">
+          <b>Project complete. Congratulations!</b> Take a moment to rate {target} below. Your rating stays hidden until they rate too.
+        </div>
+      ) : null}
       {searchParams.saved ? <div className="box ok">Saved.</div> : null}
       {searchParams.error ? <div className="box bad">{searchParams.error}</div> : null}
 

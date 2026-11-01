@@ -1,6 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
 import { loadProject } from '@/lib/project';
 import { supabaseAdmin } from '@/lib/supabase/server';
 import { notifyOtherSide } from '@/lib/notify';
@@ -26,7 +27,7 @@ export async function setStage(formData: FormData) {
   } else if (to === 'complete' && project.closeout_started_at && !project.completed_at) {
     await admin.from('projects').update({ completed_at: now }).eq('id', project.id);
     title = 'Project marked complete:';
-    body = 'The contractor marked this project complete.';
+    body = 'The contractor marked this project complete. Open the Ratings tab to rate your experience. Ratings are shown once you both rate.';
   } else if (to === 'reopen' && (project.closeout_started_at || project.completed_at)) {
     await admin.from('projects').update({ closeout_started_at: null, completed_at: null }).eq('id', project.id);
     title = 'Project moved back to active:';
@@ -42,4 +43,6 @@ export async function setStage(formData: FormData) {
     body,
   });
   revalidatePath(`/projects/${project.id}`, 'layout');
+  // Take the contractor straight to the rating form.
+  if (to === 'complete') redirect(`/projects/${project.id}/rating?done=1`);
 }
