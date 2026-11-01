@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Jobfile Marketplace Preview</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#cd7d2e;--orl:#f9efe4;--gr:#1f7a55;--grl:#d9f1e6;--bl:#2f5bd0;--rad:22px}
+@media(prefers-color-scheme:dark){:root{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--grl:#173a2c}}
+*{box-sizing:border-box}body{margin:0;background:#e9e5dc;font-family:'IBM Plex Sans',system-ui,sans-serif;color:var(--ink)}
+@media(prefers-color-scheme:dark){body{background:#0d0c0b}}
+.wrap{max-width:430px;margin:0 auto;min-height:100vh;background:var(--bg);position:relative;padding-bottom:84px}
+h1,h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0}
+.top{position:sticky;top:0;z-index:5;background:var(--bg);padding:12px 18px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line)}
+.logo{font-family:'Bricolage Grotesque';font-weight:800;font-size:20px}.logo b{color:var(--or)}
+.pill{font-size:12px;padding:5px 10px;border-radius:99px;background:var(--orl);color:var(--or);font-weight:600}
+.seg{display:flex;gap:6px;padding:10px 18px;overflow:auto;border-bottom:1px solid var(--line)}
+.seg button{white-space:nowrap;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:8px 13px;border-radius:99px;font:500 13px inherit;font-family:inherit}
+.seg button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.scr{display:none;padding:22px 18px}.scr.on{display:block}
+.eyebrow{font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--or);font-weight:600}
+.hero h1{font-size:40px;line-height:1.02;margin:10px 0 14px;font-weight:800}.hero h1 em{font-style:normal;color:var(--or)}
+.hero p{color:var(--mut);font-size:17px;line-height:1.5}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;border-radius:99px;padding:16px;font:600 16px inherit;font-family:inherit;border:1px solid var(--line);background:var(--card);color:var(--ink);margin-top:10px;cursor:pointer}
+.btn.p{background:var(--or);color:#fff;border-color:var(--or);box-shadow:0 6px 16px #cd7d2e44}
+.stats{display:flex;justify-content:space-between;margin:26px 0 4px}.stats div{font-family:'Bricolage Grotesque';font-weight:800;font-size:26px;color:var(--or)}.stats small{display:block;font:400 13px 'IBM Plex Sans';color:var(--mut)}
+.note{font-size:11.5px;color:var(--mut);margin-top:6px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--rad);padding:18px;margin-top:14px}
+.card.ai{border-color:#ecd4a8}
+.photo{height:200px;border-radius:var(--rad);background:linear-gradient(135deg,#d9d2c4,#b9ae9a);display:flex;align-items:end;padding:14px;color:#fff;font-weight:600;margin-top:18px;box-shadow:0 10px 24px #0002}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.big{font-family:'Bricolage Grotesque';font-weight:800;font-size:28px;letter-spacing:-.03em}
+.mut{color:var(--mut);font-size:14px}.or{color:var(--or)}
+.ic{width:46px;height:46px;border-radius:14px;background:var(--orl);display:grid;place-items:center;font-size:22px;margin-bottom:12px}
+label{display:block;font-size:13px;font-weight:600;margin:16px 0 6px}
+input,textarea,select{width:100%;padding:13px 14px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:14px;font:400 15px 'IBM Plex Sans',sans-serif}
+textarea{min-height:96px;resize:vertical}
+.chips{display:flex;flex-wrap:wrap;gap:8px}.chips button{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:99px;padding:8px 13px;font:500 13px 'IBM Plex Sans'}
+.chips button.on{background:var(--orl);color:var(--or);border-color:#ecd4a8}
+.tag{display:inline-block;font-size:12px;font-weight:600;padding:5px 11px;border-radius:99px;background:var(--orl);color:var(--or);border:1px solid #ecd4a8}
+.tag.g{background:var(--grl);color:var(--gr);border-color:transparent}
+.flex{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.bar{position:relative;height:12px;border-radius:9px;background:var(--line);margin:34px 0 26px}
+.bar .rng{position:absolute;top:0;bottom:0;border-radius:9px;background:linear-gradient(90deg,#f0c78d,var(--or))}
+.bar .mk{position:absolute;top:-7px;width:4px;height:26px;background:var(--ink);border-radius:2px}
+.bar .mk span{position:absolute;top:-22px;left:50%;transform:translateX(-50%);font-size:11px;font-weight:600;white-space:nowrap}
+.brk div{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line);font-size:14px}.brk div:last-child{border:0}
+.spin{display:none;text-align:center;padding:30px;color:var(--mut)}.spin i{display:inline-block;width:26px;height:26px;border:3px solid var(--line);border-top-color:var(--or);border-radius:50%;animation:s 1s linear infinite}@keyframes s{to{transform:rotate(360deg)}}
+.hide{display:none}
+.bid .nm{font-weight:600;font-size:16px}.stars{color:var(--or);letter-spacing:1px}
+.bid.best{border:2px solid var(--or)}
+.tabbar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:var(--card);border-top:1px solid var(--line);display:flex;padding:8px 6px 14px}
+.tabbar button{flex:1;border:0;background:none;color:var(--mut);font:500 11px 'IBM Plex Sans';display:flex;flex-direction:column;align-items:center;gap:3px}.tabbar button span{font-size:20px}.tabbar button.on{color:var(--or)}
+.flow{display:flex;gap:10px;align-items:flex-start;margin-top:14px}.flow b{flex:none;width:28px;height:28px;border-radius:50%;background:var(--or);color:#fff;display:grid;place-items:center;font-size:13px}
+.toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:14px;font-size:14px;opacity:0;pointer-events:none;transition:.25s;max-width:360px;text-align:center}.toast.on{opacity:1}
+</style></head><body><div class="wrap">
+<div class="top"><div class="logo">Job<b>file</b></div><span class="pill">Marketplace · preview</span></div>
+<div class="seg" id="seg">
+<button class="on" data-s="home">1 · Landing</button><button data-s="post">2 · Post a project</button><button data-s="board">3 · Contractor board</button><button data-s="bids">4 · Compare bids</button><button data-s="then">5 · Then Jobfile</button></div>
+
+<!-- 1 LANDING -->
+<section class="scr on" id="home">
+ <div class="hero"><div class="eyebrow">Home improvement marketplace</div>
+ <h1>Post it. Compare bids. Build it <em>for a fair price.</em></h1>
+ <p>Homeowners post projects, local contractors bid, and our AI shows you what the job should cost in your area. Then Jobfile keeps the whole job organized.</p></div>
+ <button class="btn p" data-go="post">Post a Project →</button>
+ <button class="btn" data-go="board">🔍 Find Work</button>
+ <div class="stats"><div>—<small>Projects posted</small></div><div>—<small>Local pros</small></div><div>—<small>Avg. rating</small></div></div>
+ <div class="note">Numbers stay blank until they're real. We won't show made-up stats.</div>
+ <div class="photo">Kitchen remodel · photo from the homeowner's post</div>
+ <div class="row2"><div class="card ai"><div class="tag">✦ AI Cost Reference</div><div class="big" style="margin-top:10px">$18k–$32k</div><div class="mut">Kitchen remodel · Plano, TX</div></div>
+ <div class="card"><div class="tag g">✓ Verified</div><div class="stars" style="margin-top:14px">★★★★★</div><div class="mut">Ratings from finished Jobfile projects</div></div></div>
+ <h2 style="font-size:26px;margin-top:28px">How it works</h2>
+ <div class="card"><div class="ic">📝</div><h3>Post your project</h3><div class="mut">Describe the job, add photos, set a budget range and location in minutes.</div></div>
+ <div class="card"><div class="ic">🔨</div><h3>Compare bids</h3><div class="mut">Local contractors send proposals. Review them side by side.</div></div>
+ <div class="card"><div class="ic">✦</div><h3>Know fair pricing</h3><div class="mut">Get an AI cost reference before you commit.</div></div>
+ <div class="card"><div class="ic">📂</div><h3>Run the job in Jobfile</h3><div class="mut">Accept a bid and the project opens with scope, price, photos, payments and change orders.</div></div>
+</section>
+
+<!-- 2 POST -->
+<section class="scr" id="post">
+ <div class="eyebrow">Homeowner</div><h2 style="font-size:30px;margin:6px 0 4px">Post a project</h2><div class="mut">Takes about 2 minutes.</div>
+ <label>What kind of job?</label>
+ <div class="chips" id="cat"><button class="on">Kitchen remodel</button><button>Bathroom</button><button>Painting</button><button>Roofing</button><button>Flooring</button><button>Landscaping</button></div>
+ <label>Describe the scope of work</label>
+ <textarea id="scope">Gut and rebuild a 220 sq ft kitchen. New semi-custom cabinets, quartz counters, tile backsplash, new flooring and lighting.</textarea>
+ <div class="row2"><div><label>Size (sq ft)</label><input id="sqft" value="220"></div><div><label>ZIP code</label><input id="zip" value="75074"></div></div>
+ <label>Photos</label><div class="card" style="margin:0;text-align:center;border-style:dashed;color:var(--mut)">📷 Add photos or a short video</div>
+ <button class="btn p" id="getai">✦ Get AI cost reference</button>
+ <div class="spin" id="spin"><i></i><div style="margin-top:10px">Checking local pricing for the scope…</div></div>
+ <div id="aires" class="hide">
+  <div class="card ai"><div class="tag">✦ AI Cost Reference · Plano, TX</div>
+   <div class="big" style="margin-top:12px">$24,000 – $38,000</div><div class="mut">Typical range for this scope in your area</div>
+   <div class="bar"><div class="rng" style="left:18%;right:22%"></div><div class="mk" style="left:52%"><span>Most likely ~$31k</span></div></div>
+   <div class="brk"><div><span>Cabinets &amp; install</span><b>$9k–$15k</b></div><div><span>Countertops</span><b>$3k–$6k</b></div><div><span>Flooring &amp; tile</span><b>$3k–$5k</b></div><div><span>Electrical &amp; lighting</span><b>$2k–$4k</b></div><div><span>Labor, demo &amp; permits</span><b>$7k–$8k</b></div></div>
+   <div class="note">Based on the scope you wrote and typical local pricing. It's a reference only, not a quote. Final price comes from contractor bids.</div></div>
+  <div class="card"><b>Your budget range</b><div class="row2" style="margin-top:10px"><input value="$24,000"><input value="$38,000"></div></div>
+  <button class="btn p" id="publish">Publish project →</button>
+ </div>
+</section>
+
+<!-- 3 BOARD -->
+<section class="scr" id="board">
+ <div class="eyebrow">Contractor</div><h2 style="font-size:30px;margin:6px 0 4px">Projects near you</h2><div class="mut">Real jobs waiting for bids.</div>
+ <div class="chips" style="margin-top:14px"><button class="on">All trades</button><button>Painting</button><button>Kitchen</button><button>Within 25 mi</button></div>
+ <div class="card"><div class="flex"><span class="tag">Kitchen Remodel</span><span class="tag g">Open</span></div>
+  <h3 style="font-size:20px;margin:12px 0 6px">Full kitchen remodel with island</h3><div class="mut">Gut and rebuild a 220 sq ft kitchen. New semi-custom cabinets, quartz counters, tile backsplash…</div>
+  <div class="mut" style="margin:12px 0">📍 Plano, TX &nbsp; 🔨 2 bids</div><div class="flex" style="border-top:1px solid var(--line);padding-top:12px"><b class="or" style="font-size:19px">$24,000 – $38,000</b><span class="mut">by Jerry S.</span></div>
+  <button class="btn p" data-go="bids" id="bidbtn">Place a bid</button></div>
+ <div class="card"><div class="flex"><span class="tag">Painting</span><span class="tag g">Open</span></div>
+  <h3 style="font-size:20px;margin:12px 0 6px">Interior repaint, 3 bedrooms</h3><div class="mut">Walls and ceilings, patch and prime. Homeowner supplies colors.</div>
+  <div class="mut" style="margin:12px 0">📍 Frisco, TX &nbsp; 🔨 0 bids</div><div class="flex" style="border-top:1px solid var(--line);padding-top:12px"><b class="or" style="font-size:19px">$2,800 – $4,200</b><span class="mut">by Dana R.</span></div></div>
+ <div class="card ai"><b>What a contractor sees when bidding</b><div class="mut" style="margin-top:6px">Scope, photos, size, the homeowner's budget. Then price, timeline, what's included, and a note. Your Jobfile rating shows on every bid.</div></div>
+</section>
+
+<!-- 4 BIDS -->
+<section class="scr" id="bids">
+ <div class="eyebrow">Homeowner</div><h2 style="font-size:30px;margin:6px 0 4px">3 bids received</h2><div class="mut">Full kitchen remodel · AI reference $24k–$38k</div>
+ <div class="card bid best"><div class="flex"><div><div class="nm">Alvarez Builders</div><div class="stars">★★★★★ <span class="mut">4.9 · 12 Jobfile jobs</span></div></div><span class="tag g">Within range</span></div>
+  <div class="big" style="margin:12px 0 2px">$31,400</div><div class="mut">8 weeks · starts Nov 18 · cabinets &amp; permits included</div>
+  <div class="bar" style="margin:26px 0 8px"><div class="rng" style="left:18%;right:22%;opacity:.55"></div><div class="mk" style="left:50%"></div></div><div class="note">Bid vs AI range</div>
+  <div class="row2"><button class="btn" style="margin:8px 0 0" data-toast="Message thread opened (Español/English translate available)">Message</button><button class="btn p" style="margin:8px 0 0" data-go="then">Accept bid</button></div></div>
+ <div class="card bid"><div class="flex"><div><div class="nm">Lone Star Remodeling</div><div class="stars">★★★★☆ <span class="mut">4.6 · 5 Jobfile jobs</span></div></div><span class="tag g">Within range</span></div>
+  <div class="big" style="margin:12px 0 2px">$27,900</div><div class="mut">10 weeks · starts Dec 2 · permits extra</div>
+  <div class="bar" style="margin:26px 0 8px"><div class="rng" style="left:18%;right:22%;opacity:.55"></div><div class="mk" style="left:35%"></div></div></div>
+ <div class="card bid"><div class="flex"><div><div class="nm">QuickFix Pros</div><div class="stars">★★★☆☆ <span class="mut">3.8 · 2 Jobfile jobs</span></div></div><span class="tag" style="background:#fde8e6;color:#b3261e;border-color:transparent">Below range</span></div>
+  <div class="big" style="margin:12px 0 2px">$16,500</div><div class="mut">5 weeks · starts next week</div>
+  <div class="note" style="color:#b3261e">⚠ Well below the local range. Ask what's excluded before accepting.</div></div>
+</section>
+
+<!-- 5 THEN -->
+<section class="scr" id="then">
+ <div class="eyebrow">The difference</div><h2 style="font-size:30px;margin:6px 0 10px">Accept a bid and the job runs itself in Jobfile</h2>
+ <div class="mut">Other marketplaces end at "hire." Yours keeps going.</div>
+ <div class="card"><div class="flow" style="margin-top:0"><b>1</b><div><b>Project is created</b><div class="mut">Bid amount becomes the contract. Scope and photos carry over.</div></div></div>
+ <div class="flow"><b>2</b><div><b>Both sides agree</b><div class="mut">Price &amp; scope approval, messages, translation if needed.</div></div></div>
+ <div class="flow"><b>3</b><div><b>Track the work</b><div class="mut">Photos, milestone payments (recorded), change orders.</div></div></div>
+ <div class="flow"><b>4</b><div><b>Complete and rate</b><div class="mut">Ratings feed the contractor's public profile and future bids.</div></div></div></div>
+ <div class="card ai"><b>Built to stay safe</b><div class="mut" style="margin-top:6px">Contractors' contact details stay private until a bid is accepted. Admin can ban bad actors. The AI figure is always labelled a reference, not a quote. The homeowner decides who to hire.</div></div>
+ <button class="btn" data-go="home">↺ Start over</button>
+</section>
+</div>
+<div class="tabbar" id="tb"><button class="on" data-s="home"><span>🏠</span>Home</button><button data-s="post"><span>➕</span>Post</button><button data-s="board"><span>🔨</span>Work</button><button data-s="bids"><span>📬</span>Bids</button><button data-s="then"><span>📂</span>Jobs</button></div>
+<div class="toast" id="toast"></div>
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+function go(id){$$('.scr').forEach(e=>e.classList.toggle('on',e.id===id));$$('#seg button,#tb button').forEach(b=>b.classList.toggle('on',b.dataset.s===id));scrollTo(0,0)}
+$$('[data-s]').forEach(b=>b.onclick=()=>go(b.dataset.s));$$('[data-go]').forEach(b=>b.onclick=()=>go(b.dataset.go));
+function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('on');setTimeout(()=>e.classList.remove('on'),2600)}
+$$('[data-toast]').forEach(b=>b.onclick=()=>toast(b.dataset.toast));
+$$('#cat button').forEach(b=>b.onclick=()=>{$$('#cat button').forEach(x=>x.classList.remove('on'));b.classList.add('on')});
+$('#getai').onclick=()=>{$('#aires').classList.add('hide');$('#spin').style.display='block';setTimeout(()=>{$('#spin').style.display='none';$('#aires').classList.remove('hide');$('#aires').scrollIntoView({behavior:'smooth'})},1400)};
+$('#publish').onclick=()=>{toast('Published! Local contractors are notified.');setTimeout(()=>go('board'),1200)};
+</script></body></html>
