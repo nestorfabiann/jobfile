@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jobfile On My Way Preview</title>
+<style>
+/* Direction: current Jobfile look. A visit has a time window; "On my way" is one orange button that only appears when it is allowed. */
+:root{--bg:#f2f5fb;--surface:#fff;--surface2:#f5f8fd;--ink:#0e1a2e;--ink2:#55657c;--line:#dae2ef;--brand:#1b56e0;--brand2:#0a33a8;--accent:#ff7a1a;--accentfg:#1a0e00;--okbg:#ddf3e6;--ok:#14753f;--warnbg:#fff0cc;--warn:#8a5600;--page:#e6ecf7;--shadow:0 1px 2px rgba(14,26,46,.05),0 8px 24px -12px rgba(14,26,46,.18);--font:system-ui,-apple-system,'Segoe UI',sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0a1120;--surface:#121b2e;--surface2:#18233a;--ink:#e9effa;--ink2:#98a8c0;--line:#25324b;--brand:#7ba6ff;--okbg:#133626;--ok:#62cf8e;--warnbg:#3a2f10;--warn:#ebbb4d;--page:#060b16;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0a1120;--surface:#121b2e;--surface2:#18233a;--ink:#e9effa;--ink2:#98a8c0;--line:#25324b;--brand:#7ba6ff;--okbg:#133626;--ok:#62cf8e;--warnbg:#3a2f10;--warn:#ebbb4d;--page:#060b16;color-scheme:dark}
+*{box-sizing:border-box}html,body{margin:0}body{background:var(--page);color:var(--ink);font:15px/1.5 var(--font)}
+h1,h2,h3,p{margin:0}button{font:inherit;cursor:pointer}:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.wrap{max-width:1040px;margin:0 auto;padding:18px 16px 50px;display:flex;flex-direction:column;gap:16px}
+.hd{display:flex;gap:10px;justify-content:space-between;flex-wrap:wrap;align-items:center}.hd h1{font-size:20px}.hd small{display:block;color:var(--ink2)}
+.seg{display:flex;gap:8px;flex-wrap:wrap}.chip{border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:9px 14px;border-radius:999px;font-weight:700;font-size:14px}
+.chip[aria-pressed=true]{background:var(--brand2);color:#fff;border-color:var(--brand2)}
+.lbl{font:700 12px ui-monospace,Menlo,monospace;text-transform:uppercase;letter-spacing:.06em;color:var(--ink2)}
+.grid{display:grid;grid-template-columns:minmax(0,400px) minmax(0,1fr);gap:26px;align-items:start}
+.phone{width:100%;max-width:392px;margin:0 auto;border:9px solid #0b1224;border-radius:40px;background:var(--bg);overflow:hidden;height:780px;display:flex;flex-direction:column;box-shadow:0 30px 60px -24px rgba(0,0,0,.5)}
+.chrome{background:linear-gradient(135deg,#1b56e0,#0a33a8);color:#fff;border-bottom:3px solid var(--accent);padding:12px 18px;display:flex;justify-content:space-between;font-weight:700}.brand{font-weight:800;font-size:19px}
+.scr{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:12px;position:relative}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:10px}
+.btn{border:0;border-radius:999px;background:var(--brand);color:#fff;font-weight:700;padding:13px 20px;min-height:48px}.btn.go{background:var(--accent);color:var(--accentfg)}.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}.btn[disabled]{opacity:.45;cursor:not-allowed}
+.pill{font:600 10.5px/1 ui-monospace,Menlo,monospace;text-transform:uppercase;letter-spacing:.04em;padding:5px 9px;border-radius:999px;background:var(--surface2);border:1px solid var(--line);color:var(--ink2);display:inline-block}.pill.ok{background:var(--okbg);color:var(--ok);border-color:transparent}.pill.warn{background:var(--warnbg);color:var(--warn);border-color:transparent}
+.muted{color:var(--ink2)}.small{font-size:13px}.row{display:flex;gap:10px;align-items:center}.sb{justify-content:space-between}
+.box{border-radius:14px;padding:12px 14px;font-weight:600;font-size:14px}.box.ok{background:var(--okbg);color:var(--ok)}.box.warn{background:var(--warnbg);color:var(--warn)}
+.sheet{position:absolute;inset:0;background:rgba(6,12,24,.55);display:flex;align-items:flex-end}.sheet>div{background:var(--surface);border-radius:22px 22px 0 0;padding:20px;width:100%;display:flex;flex-direction:column;gap:12px}
+.eta{display:flex;gap:14px;align-items:center}.etab{font:800 38px/1 ui-monospace,Menlo,monospace}
+.side{display:flex;flex-direction:column;gap:14px}.side ul{margin:0;padding-left:20px;color:var(--ink2);display:flex;flex-direction:column;gap:8px}.side b{color:var(--ink)}
+.hidden{display:none!important}
+@media (max-width:860px){.grid{grid-template-columns:1fr}.phone{height:760px}}
+</style></head><body><div class="wrap">
+<div class="hd"><div><h1>Jobfile "On my way" preview</h1><small>A mockup with example people. Tap around. Nothing on the live site is affected.</small></div><button class="chip" id="th" type="button">Dark mode</button></div>
+<div><div class="lbl" style="margin-bottom:6px">1. Who is looking</div><div class="seg" id="who"></div></div>
+<div><div class="lbl" style="margin-bottom:6px">2. Pretend the clock says (visit starts 9:00 AM)</div><div class="seg" id="clk"></div></div>
+<div class="grid"><div id="ph"></div><div class="side" id="side"></div></div></div>
+<script>
+const $=s=>document.querySelector(s);
+const CL=[['early','8:20 AM (40 min before)'],['open','8:45 AM (15 min before)'],['late','9:15 AM (15 min after)'],['closed','9:35 AM (35 min after)']];
+const S={who:'c',clk:'open',sheet:false,otw:false,arrived:false};
+const shell=(inner,top)=>`<div class="phone"><div class="chrome"><span class="brand">JOBFILE</span><span>${top}</span></div><div class="scr">${inner}</div></div>`;
+const windowOpen=()=>S.clk==='open'||S.clk==='late';
+function contractor(){
+ const visit=`<div class="card"><span class="lbl">Today's visit</span><h2 style="font-size:19px">Cabinet prep and priming</h2><div class="muted small">9:00 AM to 12:00 PM · 727 Plano TX</div><div class="muted small">Homeowner: Jerry Still</div></div>`;
+ let action;
+ if(S.arrived)action=`<div class="box ok">You are marked as arrived. Jerry was notified.</div>`;
+ else if(S.otw)action=`<div class="box ok">Jerry knows you are on the way (about 15 min, around 9:00 AM).</div><button class="btn go" id="arr" type="button">I have arrived</button>`;
+ else if(windowOpen())action=`<button class="btn go" id="otw" type="button">On my way</button><p class="muted small">Sends Jerry your estimated arrival. Uses your location one time and does not save it.</p>`;
+ else if(S.clk==='early')action=`<button class="btn go" disabled type="button">On my way</button><p class="muted small">Available from 8:40 AM, 20 minutes before the visit.</p>`;
+ else action=`<button class="btn go" disabled type="button">On my way</button><p class="muted small">The window closed at 9:20 AM. Message Jerry from the Messages tab.</p>`;
+ const sheet=S.sheet?`<div class="sheet"><div><h3>Share your location one time?</h3><p class="muted small">Jobfile uses it only to work out how far you are from 727 Plano TX and to estimate your arrival. It is not saved and is not shown to anyone.</p><button class="btn go" id="allow" type="button">Allow once</button><button class="btn ghost" id="deny" type="button">Not now</button></div></div>`:'';
+ return shell(visit+`<div class="card">${action}</div><div class="card"><span class="lbl">Later this week</span><div class="row sb"><span>Thu, Nov 5 · Painting day 2</span><span class="pill">Scheduled</span></div><div class="row sb"><span>Fri, Nov 6 · Touch-ups</span><span class="pill">Scheduled</span></div><button class="btn ghost" type="button">Add a visit</button></div>`+sheet,'Overview');}
+function homeowner(){
+ let top;
+ if(S.arrived)top=`<div class="box ok">Nesty arrived at 9:02 AM.</div>`;
+ else if(S.otw)top=`<div class="card" style="border:2px solid var(--accent)"><span class="pill ok" style="align-self:flex-start">On the way</span><div class="eta"><span class="etab">~15</span><div><b>minutes away</b><div class="muted small">Arriving around 9:00 AM</div></div></div><p class="muted small">Estimated when Nesty tapped On my way at 8:45 AM. Nesty's exact location is never shared.</p></div>`;
+ else top=`<div class="card"><span class="lbl">Today's visit</span><h2 style="font-size:19px">Cabinet prep and priming</h2><div class="muted small">9:00 AM to 12:00 PM</div><span class="pill warn" style="align-self:flex-start">Scheduled</span><p class="muted small">You will get an alert when Nesty is on the way.</p></div>`;
+ return shell(top+`<div class="card"><span class="lbl">Needs your attention</span><p class="muted">Nothing waiting on you.</p></div><div class="card"><span class="lbl">Alerts you would get</span><p class="small">Email and text, if you turned them on: <b>"Nesty is on the way. About 15 minutes."</b> Texts contain no exact location.</p></div>`,'Overview');}
+function render(){
+ $('#ph').innerHTML=S.who==='c'?contractor():homeowner();
+ $('#who').innerHTML=`<button class="chip" data-w="c" type="button" aria-pressed="${S.who==='c'}">Nesty (contractor)</button><button class="chip" data-w="h" type="button" aria-pressed="${S.who==='h'}">Jerry (homeowner)</button>`;
+ $('#clk').innerHTML=CL.map(([k,l])=>`<button class="chip" data-k="${k}" type="button" aria-pressed="${S.clk===k}">${l}</button>`).join('');
+ $('#side').innerHTML=`<div class="card"><h2>How it works</h2><ul>
+ <li><b>A visit has a time.</b> The contractor adds visits (date, time, short note). The homeowner sees them on Overview.</li>
+ <li><b>"On my way" is available in a window:</b> from 20 minutes before the start to 20 minutes after. Outside it, the button explains why it is off. Change the clock above to see.</li>
+ <li><b>One tap, one location check.</b> The phone asks permission once. Jobfile estimates the drive and sends "about 15 minutes". It does not store or show the location.</li>
+ <li><b>The homeowner gets an alert</b> and a banner. They never see a map or a moving dot.</li>
+ <li><b>"I have arrived"</b> closes it out and notifies the homeowner.</li></ul></div>
+ <div class="card"><h2>Good to know</h2><ul>
+ <li><b>Estimate quality.</b> Without a routing service the ETA is straight-line distance at an average speed, so it can be off in traffic. A routing service (Google or Mapbox) makes it accurate and costs a few cents per 100 checks.</li>
+ <li><b>Works on a phone browser.</b> No app install. The contractor must tap the button while the page is open.</li>
+ <li><b>Privacy.</b> Only the estimate is kept, the contractor chooses to send it, and it is mentioned in the privacy policy.</li></ul></div>`;
+ document.querySelectorAll('[data-w]').forEach(b=>b.onclick=()=>{S.who=b.dataset.w;render()});
+ document.querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>{S.clk=b.dataset.k;S.otw=false;S.arrived=false;S.sheet=false;render()});
+ const o=$('#otw');if(o)o.onclick=()=>{S.sheet=true;render()};
+ const a=$('#allow');if(a)a.onclick=()=>{S.sheet=false;S.otw=true;render()};
+ const d=$('#deny');if(d)d.onclick=()=>{S.sheet=false;render()};
+ const r=$('#arr');if(r)r.onclick=()=>{S.arrived=true;render()};
+}
+$('#th').onclick=()=>{const r=document.documentElement,d=(r.dataset.theme||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'))==='dark';r.dataset.theme=d?'light':'dark';$('#th').textContent=d?'Dark mode':'Light mode'};
+render();
+</script></body></html>
