@@ -34,14 +34,19 @@ export default async function Projects({ searchParams }: { searchParams: { error
       .eq('kind', 'progress')
       .order('created_at', { ascending: false })
       .limit(100);
-    const firstPath = new Map<string, string>();
-    (ph ?? []).forEach((r) => !firstPath.has(r.project_id as string) && firstPath.set(r.project_id as string, r.path as string));
-    if (firstPath.size) {
-      const { data: signed } = await supabaseAdmin().storage.from('project-photos').createSignedUrls(Array.from(firstPath.values()), 3600);
-      const byPath = new Map((signed ?? []).map((s) => [s.path, s.signedUrl] as const));
-      firstPath.forEach((path, pid) => {
-        const u = byPath.get(path);
-        if (u) covers.set(pid, u);
+    const firstPath: Record<string, string> = {};
+    (ph ?? []).forEach((r: { project_id: string; path: string }) => {
+      if (!firstPath[r.project_id]) firstPath[r.project_id] = r.path;
+    });
+    const paths = Object.values(firstPath);
+    if (paths.length) {
+      const { data: signed } = await supabaseAdmin().storage.from('project-photos').createSignedUrls(paths, 3600);
+      const byPath: Record<string, string> = {};
+      (signed ?? []).forEach((x: { path: string | null; signedUrl: string }) => {
+        if (x.path && x.signedUrl) byPath[x.path] = x.signedUrl;
+      });
+      Object.entries(firstPath).forEach(([pid, path]) => {
+        if (byPath[path]) covers.set(pid, byPath[path]);
       });
     }
   }
