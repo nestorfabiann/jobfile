@@ -60,10 +60,13 @@ export async function sendSms(opts: { to: string; text: string }): Promise<SendR
 
 type Alert = {
   userIds: string[];
-  projectId: string;
+  /** Null for messages that are not about one project (admin broadcasts). */
+  projectId: string | null;
   kind: string;
   title: string;
   body: string;
+  /** Send email even if the person turned alerts off (admin notices). */
+  force?: boolean;
   /** Skip email and text if this person already got one for this project in the last few minutes. */
   throttle?: boolean;
 };
@@ -75,15 +78,15 @@ type Alert = {
 export async function notifyUsers(a: Alert) {
   if (!a.userIds.length) return;
   const admin = supabaseAdmin();
-  const link = `${APP_URL()}/projects/${a.projectId}`;
+  const link = a.projectId ? `${APP_URL()}/projects/${a.projectId}` : `${APP_URL()}/projects`;
 
   const { data: profiles } = await admin
     .from('profiles')
-    .select('id,email,phone,notify_email,notify_sms,sms_consent_at')
+    .select('id,email,phone,notify_email,notify_sms,sms_consent_at,banned_at')
     .in('id', a.userIds);
 
   await Promise.allSettled(
-    (profiles ?? []).map(async (p) => {
+    (profiles ?? []).filter((p) => !p.banned_at).map(async (p) => {
       const { data: row } = await admin
         .from('notifications')
         .insert({ user_id: p.id, project_id: a.projectId, kind: a.kind, title: a.title, body: a.body })
@@ -92,7 +95,7 @@ export async function notifyUsers(a: Alert) {
       if (!row) return;
 
       let quiet = false;
-      if (a.throttle) {
+      if (a.throttle && a.projectId) {
         const since = new Date(Date.now() - 5 * 60_000).toISOString();
         const { count } = await admin
           .from('notifications')
@@ -107,7 +110,7 @@ export async function notifyUsers(a: Alert) {
       const update: Record<string, string> = {};
       const errors: string[] = [];
 
-      if (!quiet && p.notify_email && p.email) {
+      if (!quiet && (p.notify_email || a.force) && p.email) {
         const r = await sendEmail({ to: p.email, subject: a.title, text: a.body, link });
         if (r.ok) update.email_sent_at = new Date().toISOString();
         else if (r.error) errors.push(r.error);

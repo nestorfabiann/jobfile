@@ -3,6 +3,7 @@ import Link from 'next/link';
 import type { Metadata, Viewport } from 'next';
 import { supabaseServer } from '@/lib/supabase/server';
 import { signOut } from './auth/actions';
+import { isAdminEmail } from '@/lib/admin';
 
 export const metadata: Metadata = {
   title: 'Jobfile',
@@ -27,6 +28,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               <nav aria-label="Main">
                 <Link href="/projects">Projects</Link>
                 <Link href="/settings">Settings</Link>
+                {isAdminEmail(user.email, !!user.email_confirmed_at) && <Link href="/admin">Admin</Link>}
                 <form action={signOut}>
                   <button className="linkbtn">Sign out</button>
                 </form>

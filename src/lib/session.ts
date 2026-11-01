@@ -9,6 +9,8 @@ export async function requireUser() {
     data: { user },
   } = await sb.auth.getUser();
   if (!user) redirect('/login');
+  const { data: prof } = await sb.from('profiles').select('banned_at').eq('id', user.id).maybeSingle();
+  if (prof?.banned_at) redirect('/banned');
   return { sb, user };
 }
 

@@ -113,3 +113,16 @@ Per the Texas Property Code (check current text before relying on any of this):
 - Homestead: written contract signed before work or materials, both spouses sign if married, contract filed with the county clerk (s. 53.254).
 - The owner is told to hold back 10% of payments during the work and for 30 days after completion.
 - Final payment: a bills-paid affidavit from the contractor, and lien releases (s. 53.259 and the statutory waiver forms).
+
+## Admin panel
+
+Set `ADMIN_EMAILS` (comma separated) and run `supabase/migrations/006_admin.sql`. Admins get an **Admin** link in the header.
+
+- **Overview / Activity**: counts and a merged feed of signups, projects, messages (metadata only), agreements, change orders, payments, photos and price checks.
+- **Users / Projects**: search, details, timeline. Suspend or restore an account (blocks sign-in, stops existing sessions, skips alerts).
+- **Conversation**: message text is visible only through a project's "View conversation", and each open is written to the audit log. Price check results are never shown.
+- **Broadcast**: in-app alert plus email to everyone, all contractors, all homeowners, one project, or one person (200 per send, no texts).
+- **Audit log**: every admin action.
+
+Mention admin access in your terms and privacy policy.
+To remove: delete `src/app/admin`, `src/app/banned`, `src/lib/admin*.ts`, `src/components/Admin*.tsx` and the Admin link in `src/app/layout.tsx`.
