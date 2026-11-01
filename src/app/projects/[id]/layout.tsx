@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { loadProject } from '@/lib/project';
 import ProjectTabs from '@/components/ProjectTabs';
+import { priceCheckEnabled } from '@/lib/pricecheck';
 
 export default async function ProjectLayout({
   children,
@@ -39,7 +40,7 @@ export default async function ProjectLayout({
         </div>
       )}
 
-      <ProjectTabs id={project.id} />
+      <ProjectTabs id={project.id} priceCheck={role === 'homeowner' && priceCheckEnabled()} />
       {children}
     </>
   );

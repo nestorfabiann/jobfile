@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-export default function ProjectTabs({ id }: { id: string }) {
+export default function ProjectTabs({ id, priceCheck = false }: { id: string; priceCheck?: boolean }) {
   const path = usePathname();
   const base = `/projects/${id}`;
   const tabs = [
@@ -13,6 +13,7 @@ export default function ProjectTabs({ id }: { id: string }) {
     [`${base}/photos`, 'Photos'],
     [`${base}/changes`, 'Changes'],
     [`${base}/payments`, 'Payments'],
+    ...(priceCheck ? [[`${base}/price-check`, 'Price check']] : []),
   ];
   return (
     <nav className="ptabs" aria-label="Project sections">

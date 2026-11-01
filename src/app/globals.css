@@ -114,3 +114,14 @@ details.card > summary { cursor: pointer; font-weight: 700; min-height: 32px; di
 .card.ms.requested, .card.ms.paid { border-left-color: var(--accent); }
 .card.ms.confirmed { border-left-color: var(--ok); }
 .amt { font: 700 20px/1.1 ui-monospace, Menlo, monospace; font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* price check */
+.verdict { display: grid; grid-template-columns: 1fr auto; gap: 6px 12px; align-items: start; }
+.big { font: 700 28px/1.1 ui-monospace, Menlo, monospace; font-variant-numeric: tabular-nums; }
+.track { position: relative; height: 12px; border-radius: 8px; background: var(--surface-2); border: 1px solid var(--line); margin: 26px 0 4px; }
+.band { position: absolute; top: -1px; bottom: -1px; background: var(--home-bg); border-radius: 8px; border: 1px solid var(--brand); }
+.mark { position: absolute; top: -7px; width: 4px; height: 24px; border-radius: 3px; background: var(--accent); transform: translateX(-2px); }
+.mark::after { content: attr(data-t); position: absolute; bottom: 27px; left: 50%; transform: translateX(-50%); font: 700 11px/1 ui-monospace, Menlo, monospace; white-space: nowrap; color: var(--ink); }
+.scale { display: flex; justify-content: space-between; font: 500 11.5px/1.2 ui-monospace, Menlo, monospace; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.card.line { border-left: 6px solid var(--line); } .card.line.ok { border-left-color: var(--ok); } .card.line.warn { border-left-color: var(--accent); }
+ul.plain { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 4px; font-size: 14px; }

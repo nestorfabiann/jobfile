@@ -19,6 +19,11 @@ A shared project record for contractors and homeowners. This first slice covers:
 - Photos: progress photos and "needs fixing" details (contractor marks fixed, homeowner confirms). Private storage, shrunk in the browser.
 - Payments: per-milestone tracker. Contractor requests, homeowner marks paid, contractor confirms receipt and lien waiver. Jobfile does not move money.
 
+- Price check (homeowner only, off by default): compares each priced agreement line with typical prices in the area using Claude.
+  Turn on with `PRICE_CHECK_ENABLED=true` and `ANTHROPIC_API_KEY`; run `005_price_checks.sql`. Limited to 3 checks per project per day.
+  To remove: set `PRICE_CHECK_ENABLED=false` (hides it), or delete `src/lib/pricecheck.ts`, `src/app/projects/[id]/price-check`,
+  `src/components/PriceQuestions.tsx`, the tab flag in `ProjectTabs.tsx`/`layout.tsx`, and `drop table public.price_checks`.
+
 Not built yet: schedule editing, subcontractor list, lien waivers and bills-paid affidavit, PDFs.
 
 **Status: written but not yet run.** The workspace this was written in could not reach the npm registry, so
