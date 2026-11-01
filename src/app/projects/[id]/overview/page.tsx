@@ -3,7 +3,7 @@ import { loadProject } from '@/lib/project';
 import { supabaseAdmin } from '@/lib/supabase/server';
 import AutoRefresh from '@/components/AutoRefresh';
 import { dollars, signedDollars, daysText } from '@/lib/money';
-import { totals, type ChangeOrder, type Item } from '@/lib/agreement';
+import { milestoneAmounts, totals, type ChangeOrder, type Item, type Milestone } from '@/lib/agreement';
 import { setStage } from './actions';
 
 const TZ = 'America/Chicago';
@@ -21,13 +21,13 @@ export default async function Overview({ params }: { params: { id: string } }) {
   const base = `/projects/${project.id}`;
   const other = role === 'contractor' ? 'homeowner' : 'contractor';
 
-  const [{ data: agr }, { data: itemRows }, { data: sigRows }, { data: coRows }, { data: payRows }, { data: photoRows }, { data: msgRows }] =
+  const [{ data: agr }, { data: itemRows }, { data: sigRows }, { data: coRows }, { data: msRows2 }, { data: photoRows }, { data: msgRows }] =
     await Promise.all([
       sb.from('agreements').select('sent_at,executed_at,start_date,end_date').eq('project_id', project.id).maybeSingle(),
       sb.from('agreement_items').select('price_cents').eq('project_id', project.id),
       sb.from('agreement_signatures').select('role').eq('project_id', project.id),
       sb.from('change_orders').select('*').eq('project_id', project.id),
-      sb.from('payments').select('amount_cents,status,recorded_role').eq('project_id', project.id),
+      sb.from('agreement_milestones').select('id,position,label,pct,pay_status').eq('project_id', project.id).order('position'),
       sb.from('photos').select('id,kind,status,path,caption,created_at').eq('project_id', project.id).order('created_at', { ascending: false }).limit(200),
       sb.from('messages').select('sender_role,tag,created_at').eq('project_id', project.id).order('created_at', { ascending: false }).limit(50),
     ]);
@@ -37,9 +37,11 @@ export default async function Overview({ params }: { params: { id: string } }) {
   const t = totals(items, cos);
   const executed = !!agr?.executed_at;
   const signed = new Set((sigRows ?? []).map((s) => s.role as string));
-  const pays = payRows ?? [];
-  const confirmed = pays.filter((p) => p.status === 'confirmed').reduce((s, p) => s + Number(p.amount_cents), 0);
-  const pending = pays.filter((p) => p.status === 'recorded').reduce((s, p) => s + Number(p.amount_cents), 0);
+  const pms = ((msRows2 ?? []) as (Milestone & { pay_status: string })[]).map((m) => ({ ...m, pct: Number(m.pct) }));
+  const dueAmts = milestoneAmounts(t.base, pms);
+  const sumBy = (st: string) => pms.reduce((s, m, i) => (m.pay_status === st ? s + dueAmts[i] : s), 0);
+  const confirmed = sumBy('confirmed');
+  const pending = sumBy('paid');
   const photos = photoRows ?? [];
   const fixes = photos.filter((p) => p.kind === 'fix');
   const openFixes = fixes.filter((p) => p.status === 'open').length;
@@ -57,9 +59,12 @@ export default async function Overview({ params }: { params: { id: string } }) {
   cos.filter((c) => c.status === 'pending' && c.requested_role !== role).forEach((c) =>
     todo.push({ text: `Approve or decline CO-${c.number}: ${c.title} (${signedDollars(c.cost_cents)}).`, href: `${base}/changes` }),
   );
-  pays.filter((p) => p.status === 'recorded' && p.recorded_role !== role).forEach((p) =>
-    todo.push({ text: `Confirm a ${dollars(Number(p.amount_cents))} payment.`, href: `${base}/payments` }),
-  );
+  pms.forEach((m, i) => {
+    if (role === 'homeowner' && m.pay_status === 'requested')
+      todo.push({ text: `Payment requested: ${m.label} (${dollars(dueAmts[i])}).`, href: `${base}/payments` });
+    if (role === 'contractor' && m.pay_status === 'paid')
+      todo.push({ text: `Confirm you received ${dollars(dueAmts[i])} for ${m.label}.`, href: `${base}/payments` });
+  });
   if (role === 'contractor' && openFixes) todo.push({ text: `${openFixes} detail${openFixes === 1 ? '' : 's'} to fix.`, href: `${base}/photos` });
   if (role === 'homeowner' && awaitingConfirm)
     todo.push({ text: `Check ${awaitingConfirm} fixed detail${awaitingConfirm === 1 ? '' : 's'} and confirm.`, href: `${base}/photos` });
@@ -118,7 +123,7 @@ export default async function Overview({ params }: { params: { id: string } }) {
             <div className="tile"><span className="lbl">Agreed price</span><b>{dollars(t.base)}</b></div>
             <div className="tile"><span className="lbl">Approved changes</span><b>{signedDollars(t.chg)}</b></div>
             <div className="tile strong"><span className="lbl">Contract total</span><b>{dollars(t.total)}</b></div>
-            <div className="tile"><span className="lbl">Paid (confirmed)</span><b>{dollars(confirmed)}</b></div>
+            <div className="tile"><span className="lbl">Paid</span><b>{dollars(confirmed)}</b></div>
           </div>
           <div className="bar" role="img" aria-label={`${pct}% of the contract total paid`}><span style={{ width: `${pct}%` }} /></div>
           <p className="muted small">

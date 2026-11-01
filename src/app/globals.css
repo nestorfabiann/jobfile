@@ -108,3 +108,9 @@ details.card > summary { cursor: pointer; font-weight: 700; min-height: 32px; di
 .tile b { font: 700 22px/1.1 ui-monospace, Menlo, monospace; font-variant-numeric: tabular-nums; }
 .tile.strong { background: var(--brand); border-color: var(--brand); color: #fff; } .tile.strong .lbl { color: rgba(255, 255, 255, 0.8); }
 .bar { height: 10px; border-radius: 10px; background: var(--line); overflow: hidden; } .bar span { display: block; height: 100%; background: var(--accent); }
+
+/* milestone payment cards */
+.card.ms { border-left: 6px solid var(--line); }
+.card.ms.requested, .card.ms.paid { border-left-color: var(--accent); }
+.card.ms.confirmed { border-left-color: var(--ok); }
+.amt { font: 700 20px/1.1 ui-monospace, Menlo, monospace; font-variant-numeric: tabular-nums; white-space: nowrap; }

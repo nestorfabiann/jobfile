@@ -5,8 +5,8 @@ import { revalidatePath } from 'next/cache';
 import { loadProject } from '@/lib/project';
 import { supabaseAdmin } from '@/lib/supabase/server';
 import { notifyOtherSide } from '@/lib/notify';
-import { dollars, parseDollars } from '@/lib/money';
-import { totals, type ChangeOrder, type Item } from '@/lib/agreement';
+import { dollars } from '@/lib/money';
+import { milestoneAmounts, type Milestone } from '@/lib/agreement';
 
 const page = (id: string, q = '') => `/projects/${id}/payments${q}`;
 function fail(id: string, msg: string): never {
@@ -14,107 +14,109 @@ function fail(id: string, msg: string): never {
 }
 const METHODS = ['check', 'cash', 'ach', 'card', 'other'];
 
-/** Either side records a payment. The other side confirms it. Jobfile does not move money. */
-export async function recordPayment(formData: FormData) {
+/** Loads a milestone, its agreed amount, and checks the agreement is signed by both sides. */
+async function load(formData: FormData) {
   const projectId = String(formData.get('project_id') ?? '');
-  const { role, user, project } = await loadProject(projectId);
+  const id = String(formData.get('id') ?? '');
+  const ctx = await loadProject(projectId);
   const admin = supabaseAdmin();
 
-  const { data: agr } = await admin.from('agreements').select('executed_at').eq('project_id', project.id).maybeSingle();
-  if (!agr?.executed_at) fail(project.id, 'Payments open after both sides sign the agreement.');
+  const { data: agr } = await admin.from('agreements').select('executed_at').eq('project_id', ctx.project.id).maybeSingle();
+  if (!agr?.executed_at) fail(ctx.project.id, 'Payments open after both sides sign the agreement.');
 
-  const amount = parseDollars(String(formData.get('amount') ?? ''));
-  if (amount <= 0) fail(project.id, 'Enter an amount greater than zero.');
-
-  const method = METHODS.includes(String(formData.get('method'))) ? String(formData.get('method')) : 'other';
-  const paidOn = String(formData.get('paid_on') ?? '');
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(paidOn)) fail(project.id, 'Choose the date of the payment.');
-  const note = String(formData.get('note') ?? '').trim().slice(0, 500);
-
-  let milestoneId: string | null = String(formData.get('milestone_id') ?? '') || null;
-  if (milestoneId) {
-    const { data: m } = await admin.from('agreement_milestones').select('id').eq('id', milestoneId).eq('project_id', project.id).maybeSingle();
-    if (!m) milestoneId = null;
-  }
-
-  // Do not let the total recorded go past the contract total.
-  const [{ data: items }, { data: cos }, { data: pays }] = await Promise.all([
-    admin.from('agreement_items').select('price_cents').eq('project_id', project.id),
-    admin.from('change_orders').select('cost_cents,days,status').eq('project_id', project.id),
-    admin.from('payments').select('amount_cents,status').eq('project_id', project.id),
+  const [{ data: ms }, { data: items }] = await Promise.all([
+    admin.from('agreement_milestones').select('*').eq('project_id', ctx.project.id).order('position'),
+    admin.from('agreement_items').select('price_cents').eq('project_id', ctx.project.id),
   ]);
-  const t = totals((items ?? []) as Item[], (cos ?? []) as ChangeOrder[]);
-  const already = (pays ?? []).filter((p) => p.status !== 'disputed').reduce((s, p) => s + Number(p.amount_cents), 0);
-  if (already + amount > t.total) {
-    fail(project.id, `That would be more than the contract total. Remaining balance: ${dollars(Math.max(0, t.total - already))}.`);
-  }
+  const list = ((ms ?? []) as (Milestone & { pay_status: string })[]).map((m) => ({ ...m, pct: Number(m.pct) }));
+  const idx = list.findIndex((m) => m.id === id);
+  if (idx === -1) fail(ctx.project.id, 'That milestone was not found.');
+  const base = (items ?? []).reduce((s, i) => s + Number(i.price_cents), 0);
+  const amount = milestoneAmounts(base, list)[idx];
+  return { ...ctx, admin, m: list[idx], amount };
+}
 
-  const { error } = await admin.from('payments').insert({
-    project_id: project.id,
-    milestone_id: milestoneId,
-    amount_cents: amount,
-    method,
-    paid_on: paidOn,
-    note,
-    recorded_by: user.id,
-    recorded_role: role,
-  });
-  if (error) fail(project.id, 'Could not save the payment. Try again.');
+function done(projectId: string): never {
+  revalidatePath(page(projectId));
+  revalidatePath(`/projects/${projectId}/overview`);
+  redirect(page(projectId));
+}
 
+/** Contractor asks for the next payment. */
+export async function requestPayment(formData: FormData) {
+  const { role, user, project, admin, m, amount } = await load(formData);
+  if (role !== 'contractor') fail(project.id, 'Only the contractor can request a payment.');
+  if (m.pay_status !== 'scheduled') fail(project.id, 'That payment was already requested.');
+
+  await admin.from('agreement_milestones').update({ pay_status: 'requested', requested_at: new Date().toISOString() }).eq('id', m.id);
   await notifyOtherSide({
     projectId: project.id,
     senderId: user.id,
     senderRole: role,
     kind: 'payment',
-    title: (n) => `${role === 'homeowner' ? 'A payment was made' : 'A payment was received'} on ${n}: please confirm`,
-    body: `${dollars(amount)} by ${method} on ${paidOn}.${note ? ' ' + note : ''} Open Payments to confirm or dispute it.`,
+    title: (n) => `Payment requested on ${n}: ${dollars(amount)}`,
+    body: `${m.label}: ${dollars(amount)}. Open Payments to mark it paid when you have paid it.`,
   });
-
-  revalidatePath(page(project.id));
-  revalidatePath(`/projects/${project.id}/overview`);
-  redirect(page(project.id));
+  done(project.id);
 }
 
-/** The other side confirms or disputes. The person who recorded it can remove it until it is confirmed. */
-export async function decidePayment(formData: FormData) {
-  const projectId = String(formData.get('project_id') ?? '');
-  const id = String(formData.get('id') ?? '');
-  const decision = String(formData.get('decision') ?? '');
-  const { role, user, project } = await loadProject(projectId);
-  const admin = supabaseAdmin();
+/** Contractor takes a request back. */
+export async function cancelRequest(formData: FormData) {
+  const { role, project, admin, m } = await load(formData);
+  if (role !== 'contractor') fail(project.id, 'Only the contractor can cancel a request.');
+  if (m.pay_status !== 'requested') fail(project.id, 'Nothing to cancel.');
+  await admin.from('agreement_milestones').update({ pay_status: 'scheduled', requested_at: null }).eq('id', m.id);
+  done(project.id);
+}
 
-  const { data: p } = await admin.from('payments').select('*').eq('id', id).eq('project_id', project.id).maybeSingle();
-  if (!p) fail(project.id, 'That payment was not found.');
+/** Homeowner says they paid, and how. */
+export async function markPaid(formData: FormData) {
+  const { role, user, project, admin, m, amount } = await load(formData);
+  if (role !== 'homeowner') fail(project.id, 'Only the homeowner marks a payment as paid.');
+  if (m.pay_status !== 'requested') fail(project.id, 'The contractor has not requested this payment.');
+  const method = METHODS.includes(String(formData.get('method'))) ? String(formData.get('method')) : 'other';
 
-  if (decision === 'withdraw') {
-    if (p.recorded_role !== role) fail(project.id, 'Only the person who recorded it can remove it.');
-    if (p.status === 'confirmed') fail(project.id, 'A confirmed payment cannot be removed.');
-    await admin.from('payments').delete().eq('id', p.id);
-  } else if (decision === 'confirm' || decision === 'dispute') {
-    if (p.recorded_role === role) fail(project.id, 'The other side has to confirm your payment.');
-    if (p.status !== 'recorded') fail(project.id, 'That payment was already decided.');
-    const status = decision === 'confirm' ? 'confirmed' : 'disputed';
-    await admin
-      .from('payments')
-      .update({ status, confirmed_by: user.id, confirmed_at: new Date().toISOString() })
-      .eq('id', p.id)
-      .eq('status', 'recorded');
-    await notifyOtherSide({
-      projectId: project.id,
-      senderId: user.id,
-      senderRole: role,
-      kind: 'payment',
-      title: (n) => `A payment was ${status} on ${n}`,
-      body:
-        status === 'confirmed'
-          ? `${dollars(Number(p.amount_cents))} was confirmed.`
-          : `${dollars(Number(p.amount_cents))} was disputed. Talk it through in Messages.`,
-    });
-  } else {
-    fail(project.id, 'Unknown action.');
-  }
+  await admin
+    .from('agreement_milestones')
+    .update({ pay_status: 'paid', paid_at: new Date().toISOString(), paid_method: method })
+    .eq('id', m.id);
+  await notifyOtherSide({
+    projectId: project.id,
+    senderId: user.id,
+    senderRole: role,
+    kind: 'payment',
+    title: (n) => `Payment sent on ${n}: ${dollars(amount)}`,
+    body: `${m.label}: marked paid by ${method}. Open Payments to confirm you received it.`,
+  });
+  done(project.id);
+}
 
-  revalidatePath(page(project.id));
-  revalidatePath(`/projects/${project.id}/overview`);
-  redirect(page(project.id));
+/** Contractor confirms the money arrived, and whether a lien waiver was handed over. */
+export async function confirmReceived(formData: FormData) {
+  const { role, user, project, admin, m, amount } = await load(formData);
+  if (role !== 'contractor') fail(project.id, 'Only the contractor confirms receipt.');
+  if (m.pay_status !== 'paid') fail(project.id, 'This payment has not been marked paid.');
+  const lien = formData.get('lien_waiver') === 'on';
+
+  await admin
+    .from('agreement_milestones')
+    .update({ pay_status: 'confirmed', confirmed_at: new Date().toISOString(), lien_waiver: lien })
+    .eq('id', m.id);
+  await notifyOtherSide({
+    projectId: project.id,
+    senderId: user.id,
+    senderRole: role,
+    kind: 'payment',
+    title: (n) => `Payment received on ${n}: ${dollars(amount)}`,
+    body: `${m.label} was confirmed received.${lien ? ' A lien waiver was provided.' : ''}`,
+  });
+  done(project.id);
+}
+
+/** Homeowner flags that a "paid" mark was a mistake, or contractor says money did not arrive. */
+export async function reopenPayment(formData: FormData) {
+  const { project, admin, m } = await load(formData);
+  if (m.pay_status !== 'paid') fail(project.id, 'Only a payment waiting for confirmation can be sent back.');
+  await admin.from('agreement_milestones').update({ pay_status: 'requested', paid_at: null, paid_method: null }).eq('id', m.id);
+  done(project.id);
 }

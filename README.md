@@ -17,7 +17,7 @@ A shared project record for contractors and homeowners. This first slice covers:
 
 - Overview page: stage bar, what needs your attention, money summary, schedule, latest photos, closeout and complete.
 - Photos: progress photos and "needs fixing" details (contractor marks fixed, homeowner confirms). Private storage, shrunk in the browser.
-- Payments: record payments against milestones, other side confirms or disputes. Jobfile does not move money.
+- Payments: per-milestone tracker. Contractor requests, homeowner marks paid, contractor confirms receipt and lien waiver. Jobfile does not move money.
 
 Not built yet: schedule editing, subcontractor list, lien waivers and bills-paid affidavit, PDFs.
 
@@ -26,7 +26,7 @@ Not built yet: schedule editing, subcontractor list, lien waivers and bills-paid
 
 ## Setup
 
-1. **Supabase.** Create a project at supabase.com. In the SQL editor, run `001_init.sql`, `002_agreements.sql`, then `003_photos_payments_stage.sql` (all in `supabase/migrations/`).
+1. **Supabase.** Create a project at supabase.com. In the SQL editor, run `001_init.sql`, `002_agreements.sql`, then `003_photos_payments_stage.sql`, then `004_milestone_payments.sql` (all in `supabase/migrations/`).
 2. **Sign-in email.** In Supabase go to Authentication > Email Templates > Magic Link. Replace the link with:
 
    ```html

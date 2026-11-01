@@ -34,7 +34,7 @@ export default function PhotoUploader({ projectId }: { projectId: string }) {
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    const files = Array.from(fileRef.current?.files ?? []).slice(0, MAX_FILES);
+    const files = Array.from(fileRef.current?.files ?? ([] as File[])).slice(0, MAX_FILES);
     if (!files.length) {
       setMsg({ tone: 'bad', text: 'Choose at least one photo.' });
       return;
