@@ -1,6 +1,7 @@
 'use server';
 
 import { redirect } from 'next/navigation';
+import { cookies } from 'next/headers';
 import { revalidatePath } from 'next/cache';
 import { requireUser } from '@/lib/session';
 import { supabaseAdmin } from '@/lib/supabase/server';
@@ -96,4 +97,12 @@ export async function createProject(formData: FormData) {
 
   revalidatePath('/projects');
   redirect(`/projects/${project.id}/overview`);
+}
+
+/** Hide or show the "Why run the job in Jobfile" card. Remembered for a year in a cookie. */
+export async function setWhy(formData: FormData) {
+  await requireUser();
+  const show = formData.get('show') === '1';
+  cookies().set('jf_why', show ? 'show' : 'hidden', { httpOnly: true, secure: true, sameSite: 'lax', maxAge: 365 * 86400, path: '/' });
+  revalidatePath('/projects');
 }

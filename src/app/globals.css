@@ -189,3 +189,12 @@ body.pub.withtabs { padding-bottom: calc(84px + env(safe-area-inset-bottom, 0px)
 body.pub .hero { background: linear-gradient(135deg, #cd7d2e, #a35f1d); }
 body.pub .ptabs a[aria-current='page'] { color: var(--ink); }
 body.pub .composer { box-shadow: 0 -10px 24px -14px rgba(27, 26, 24, 0.3); }
+
+.why { border: 1.5px solid #ecd4a8; background: linear-gradient(180deg, #f9efe4, var(--surface) 55%); }
+.why-ic { flex: none; width: 38px; height: 38px; border-radius: 12px; background: var(--surface); border: 1px solid #ecd4a8; display: grid; place-items: center; font-size: 18px; }
+.why-mini { display: flex; justify-content: space-between; align-items: center; gap: 10px; width: 100%; padding: 12px 18px; border-radius: 999px; border: 1px solid #ecd4a8; background: #f9efe4; color: var(--accent); font: 600 14px inherit; font-family: inherit; cursor: pointer; }
+@media (prefers-color-scheme: dark) {
+  .why { border-color: #5a4426; background: linear-gradient(180deg, #33281c, var(--surface) 55%); }
+  .why-ic { border-color: #5a4426; }
+  .why-mini { border-color: #5a4426; background: #33281c; }
+}

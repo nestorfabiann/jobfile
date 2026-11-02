@@ -7,6 +7,8 @@ import { isExpired, type Invite } from '@/lib/invites';
 import { dollars } from '@/lib/money';
 import { listingOpen, listingTitle, marketplaceEnabled, type Bid, type Listing } from '@/lib/marketplace';
 import ProjectsTabs from '@/components/ProjectsTabs';
+import WhyJobfile from '@/components/WhyJobfile';
+import { cookies } from 'next/headers';
 
 const TZ = 'America/Chicago';
 const when = (iso: string) =>
@@ -137,6 +139,7 @@ export default async function Projects({ searchParams }: { searchParams: { error
         <p className="muted">Signed in as {user.email}</p>
       </div>
       {tabs}
+      <WhyJobfile role={company ? 'contractor' : 'homeowner'} hidden={cookies().get('jf_why')?.value === 'hidden'} marketplace={mk} />
 
       {searchParams.error ? <div className="box bad">{searchParams.error}</div> : null}
 
