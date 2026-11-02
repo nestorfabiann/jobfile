@@ -1,5 +1,6 @@
 import { supabaseAdmin } from '@/lib/supabase/server';
 import { JOB_TYPES } from '@/lib/marketplace';
+import { publicReviews, summarize } from '@/lib/reviews';
 
 /** What a signed-out visitor may see. No street address, homeowner name, notes, budget, photos or bidder names. */
 export type PublicListing = {
@@ -42,4 +43,21 @@ export async function publicListing(id: string) {
   const l = data as PublicListing;
   const counts = await bidCounts([l.id]);
   return { listing: l, bids: counts.get(l.id) ?? 0, open: l.status === 'open' && new Date(l.expires_at).getTime() > Date.now() };
+}
+
+/** Real numbers for the landing page. A value is null until there is something true to show. */
+export async function landingStats(): Promise<{ posted: number | null; pros: number | null; rating: { avg: number; count: number } | null }> {
+  try {
+    const db = supabaseAdmin();
+    const [{ count: posted }, { count: pros }, { data: rows }] = await Promise.all([
+      db.from('marketplace_listings').select('id', { count: 'exact', head: true }),
+      db.from('companies').select('id', { count: 'exact', head: true }).not('business_zip', 'is', null),
+      db.from('reviews').select('*').eq('reviewer_role', 'homeowner').limit(2000),
+    ]);
+    const shown = await publicReviews((rows ?? []) as any[]);
+    const sum = summarize(shown);
+    return { posted: posted ? posted : null, pros: pros ? pros : null, rating: sum.count ? { avg: sum.avg, count: sum.count } : null };
+  } catch {
+    return { posted: null, pros: null, rating: null };
+  }
 }

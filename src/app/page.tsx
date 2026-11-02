@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { supabaseServer } from '@/lib/supabase/server';
 import { marketplaceEnabled } from '@/lib/marketplace';
-import { publicListings } from '@/lib/publicMarketplace';
+import { landingStats, publicListings } from '@/lib/publicMarketplace';
 import PublicJobCard from '@/components/PublicJobCard';
 
 export const dynamic = 'force-dynamic';
@@ -13,6 +13,11 @@ export default async function Home() {
   const signedIn = !!user;
 
   const { listings, counts } = await publicListings('', 3);
+  const st = await landingStats();
+  const nums: [string, string][] = [];
+  if (st.posted) nums.push([st.posted.toLocaleString('en-US'), 'Projects posted']);
+  if (st.pros) nums.push([st.pros.toLocaleString('en-US'), 'Local pros']);
+  if (st.rating) nums.push([`${st.rating.avg.toFixed(1)} ★`, `Avg. rating (${st.rating.count})`]);
   const steps: [string, string][] = [
     ['📝 Post your project', 'Tap the work you want done, add photos, set a budget range and location in minutes.'],
     ['🔨 Compare bids', 'Local contractors send proposals. Review them side by side.'],
@@ -36,6 +41,14 @@ export default async function Home() {
       <Link className="btn accent" href={signedIn ? '/marketplace/new' : `/login?next=${encodeURIComponent('/marketplace/new')}`}>Post a Project →</Link>
       <Link className="btn ghost" href={signedIn ? '/marketplace' : '/jobs'}>🔍 Find Work</Link>
 
+      {nums.length > 0 && (
+        <div className="row" style={{ justifyContent: 'space-around', textAlign: 'center' }} aria-label="Jobfile so far">
+          {nums.map(([n, t]) => (
+            <div key={t}><div style={{ fontSize: 26, fontWeight: 800, color: 'var(--accent)' }}>{n}</div><div className="muted small">{t}</div></div>
+          ))}
+        </div>
+      )}
+
       <section className="card why" aria-label="Bring your own contractor or customer">
         <span className="pill ok" style={{ width: 'max-content' }}>You do not need the marketplace</span>
         <h2 style={{ fontSize: 24 }}>Already have a contractor or a customer?</h2>
@@ -58,13 +71,6 @@ export default async function Home() {
         </div>
         <p className="muted small" style={{ margin: 0 }}>Free to start. The person you invite does not need an account first.</p>
       </section>
-
-      <div className="row" style={{ justifyContent: 'space-between' }}>
-        {['Projects posted', 'Local pros', 'Avg. rating'].map((t) => (
-          <div key={t}><div style={{ fontSize: 26, fontWeight: 800, color: 'var(--accent)' }}>—</div><div className="muted small">{t}</div></div>
-        ))}
-      </div>
-      <p className="muted small" style={{ margin: 0 }}>Numbers stay blank until they&apos;re real. We won&apos;t show made-up stats.</p>
 
       <div className="stack" style={{ marginTop: 10 }}>
         <h2 style={{ margin: 0 }}>Open near you</h2>
