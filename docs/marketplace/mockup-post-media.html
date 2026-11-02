@@ -1,0 +1,107 @@
+<title>Photos and Videos on Posting</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: the post form gets a Photos and videos section; three states: empty, picked, and what a contractor sees on the job. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#cd7d2e;--orl:#f9efe4;--orb:#ecd4a8;--gr:#1f7a55;--grl:#d9f1e6;--bad:#b3261e;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--grl:#173a2c;--bad:#f2b8b5;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--grl:#173a2c;--bad:#f2b8b5;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh}
+.g{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0}
+.sw{display:flex;gap:6px;padding-block:10px;border-bottom:1px dashed var(--line)}
+.sw button{flex:1;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:9px 6px;border-radius:99px;font:500 12.5px 'IBM Plex Sans',system-ui,sans-serif;cursor:pointer}
+.sw button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.sec[hidden]{display:none}
+.body{padding-block:16px 40px;display:flex;flex-direction:column;gap:14px}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
+.mut{color:var(--mut);font-size:14px;line-height:1.5}.sm{font-size:12.5px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:18px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.lbl{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--or);font-weight:600}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;border-radius:99px;min-height:50px;padding:0 20px;font:600 15.5px 'IBM Plex Sans',system-ui,sans-serif;border:1px solid var(--or);background:var(--or);color:#fff;box-shadow:0 6px 16px #cd7d2e44;width:100%;cursor:pointer}
+.btn.gh{background:var(--orl);color:var(--or);border-color:var(--orb);box-shadow:none}
+.drop{border:2px dashed var(--orb);background:var(--orl);border-radius:18px;padding:18px;text-align:center;display:flex;flex-direction:column;gap:10px;align-items:center}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.t{position:relative;aspect-ratio:1;border-radius:14px;overflow:hidden;background:linear-gradient(135deg,#9aa0a8,#565c66)}
+.t.b{background:linear-gradient(135deg,#c9a77a,#7a5a34)}.t.c{background:linear-gradient(135deg,#93a89a,#4a6355)}.t.v{background:linear-gradient(135deg,#6d7a90,#2e3544)}
+.t .x{position:absolute;top:5px;right:5px;width:26px;height:26px;border-radius:50%;border:0;background:#000b;color:#fff;font-size:14px;cursor:pointer;display:grid;place-items:center}
+.t .play{position:absolute;inset:0;display:grid;place-items:center;color:#fff;font-size:26px;text-shadow:0 1px 6px #0008}
+.t .dur{position:absolute;left:6px;bottom:6px;background:#000b;color:#fff;font-size:11px;font-weight:600;padding:2px 7px;border-radius:99px}
+.bar{height:6px;border-radius:99px;background:var(--line);overflow:hidden}.bar i{display:block;height:100%;background:var(--or);width:62%}
+.tip{font-size:12.5px;line-height:1.45;color:var(--mut);background:var(--orl);border-radius:12px;padding:10px 12px}
+.ok{display:inline-block;font-size:12px;font-weight:600;padding:5px 11px;border-radius:99px;background:var(--grl);color:var(--gr);width:max-content}
+.price{font:800 26px 'Bricolage Grotesque',system-ui,sans-serif}
+button:focus-visible{outline:2px solid var(--or);outline-offset:2px}
+</style>
+
+<div class="wrap">
+  <div class="sw g"><button class="on" data-s="a" type="button">1 · Empty</button><button data-s="b" type="button">2 · Picked</button><button data-s="c" type="button">3 · Contractor</button></div>
+
+  <!-- 1 empty -->
+  <div class="body g sec" id="a">
+    <div class="note"><b>New section</b> in the post form, between the scope and the budget. Optional. Nothing uploads until the homeowner taps Publish.</div>
+    <div class="card">
+      <h2 style="font-size:24px">Photos and videos <span class="mut" style="font-size:15px;font-weight:400">(optional)</span></h2>
+      <div class="mut sm">Show contractors the space. A short walk-through video often gets more accurate bids.</div>
+      <div class="drop">
+        <div class="two">
+          <button class="btn" type="button" id="p1">📷 Add photos</button>
+          <button class="btn gh" type="button" id="p2">🎥 Add video</button>
+        </div>
+        <span class="mut sm">Up to 12 photos and 2 videos. Videos: 50 MB or less each.</span>
+      </div>
+      <div class="tip">Contractors never see your street address. Before you add media, check that house numbers, mail and documents are not in the frame.</div>
+    </div>
+  </div>
+
+  <!-- 2 picked -->
+  <div class="body g sec" id="b" hidden>
+    <div class="note"><b>After picking.</b> Thumbnails with a ✕ to remove. Videos show a play badge and length. On Publish, each file uploads with a progress line. If one fails, the job still posts and the failed file can be retried from the job page.</div>
+    <div class="card">
+      <h2 style="font-size:24px">Photos and videos</h2>
+      <div class="grid">
+        <div class="t"><button class="x" type="button" aria-label="Remove">✕</button></div>
+        <div class="t b"><button class="x" type="button" aria-label="Remove">✕</button></div>
+        <div class="t c"><button class="x" type="button" aria-label="Remove">✕</button></div>
+        <div class="t v"><span class="play">▶</span><span class="dur">0:42</span><button class="x" type="button" aria-label="Remove">✕</button></div>
+      </div>
+      <div class="mut sm">3 photos · 1 video (18 MB)</div>
+      <div class="two"><button class="btn gh" type="button">📷 Add more</button><button class="btn gh" type="button">🎥 Add video</button></div>
+      <div class="card" style="gap:8px;padding:14px">
+        <b style="font-size:14px">Uploading 3 of 4…</b>
+        <div class="bar"><i></i></div>
+        <span class="mut sm">Keep this page open until it finishes.</span>
+      </div>
+      <div class="card" style="gap:6px;padding:14px;border-color:var(--bad)">
+        <b style="font-size:14px;color:var(--bad)">That video is 87 MB.</b>
+        <span class="mut sm">Videos can be up to 50 MB. Trim it to under a minute, or record it again.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3 contractor -->
+  <div class="body g sec" id="c" hidden>
+    <div class="note"><b>Contractor's view.</b> A gallery at the top of the job. Tap a photo to enlarge or a video to play. Shown only to signed-in contractors. The public job page for signed-out visitors does not show media.</div>
+    <div><span class="ok">Open for bids</span><h1 style="font-size:28px;margin-top:8px">Kitchen remodel · Plano</h1><div class="mut sm">3 rooms · 200 sq ft · ZIP 75074</div></div>
+    <div class="grid">
+      <div class="t"></div><div class="t b"></div><div class="t c"></div>
+      <div class="t v"><span class="play">▶</span><span class="dur">0:42</span></div>
+    </div>
+    <div class="card"><span class="lbl">Homeowner budget</span><div class="price">$20,000</div></div>
+  </div>
+</div>
+
+<script>
+document.querySelectorAll('.sw button').forEach(function(b){
+  b.addEventListener('click',function(){
+    document.querySelectorAll('.sw button').forEach(function(x){x.classList.toggle('on',x===b)});
+    ['a','b','c'].forEach(function(id){document.getElementById(id).hidden=(id!==b.dataset.s)});
+    window.scrollTo(0,0);
+  });
+});
+['p1','p2'].forEach(function(id){document.getElementById(id).addEventListener('click',function(){document.querySelector('.sw button[data-s="b"]').click()})});
+document.querySelectorAll('.t .x').forEach(function(x){x.addEventListener('click',function(){x.parentNode.remove()})});
+</script>
