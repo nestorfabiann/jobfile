@@ -64,9 +64,10 @@ textarea { resize: vertical; }
 .composer { position: sticky; bottom: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 14px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 -10px 24px -14px rgba(14, 26, 46, 0.35); }
 
 /* project tabs */
-.ptabs { display: flex; gap: 4px; overflow-x: auto; border-bottom: 1px solid var(--line); scrollbar-width: none; }
-.ptabs a { flex: 0 0 auto; padding: 11px 14px 10px; font-weight: 700; font-size: 14px; color: var(--ink-2); text-decoration: none; border-bottom: 3px solid transparent; min-height: 44px; }
-.ptabs a[aria-current='page'] { color: var(--ink); border-bottom-color: var(--accent); }
+.ptabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; padding-block: 10px; border-bottom: 1px solid var(--line); }
+.ptabs a { text-align: center; padding: 10px 4px; border-radius: 12px; border: 1px solid transparent; font-weight: 700; font-size: 13.5px; color: var(--ink-2); text-decoration: none; white-space: nowrap; min-height: 44px; display: flex; align-items: center; justify-content: center; }
+.ptabs a[aria-current='page'] { color: var(--accent); background: #f9efe4; border-color: #ecd4a8; }
+@media (prefers-color-scheme: dark) { .ptabs a[aria-current='page'] { color: #e0933f; background: #33281c; border-color: #5a4426; } }
 
 /* agreement document */
 .doc { background: var(--surface); border: 1px solid var(--line); border-top: 6px solid var(--brand); border-radius: 16px; padding: clamp(18px, 4vw, 30px); display: flex; flex-direction: column; gap: 22px; box-shadow: var(--shadow); }
@@ -187,7 +188,6 @@ body.pub.withtabs { padding-bottom: calc(84px + env(safe-area-inset-bottom, 0px)
 .pubnav a { color: var(--ink); font-weight: 600; font-size: 14px; text-decoration: none; padding: 6px 0; }
 .pubnav form { margin: 0; }
 body.pub .hero { background: linear-gradient(135deg, #cd7d2e, #a35f1d); }
-body.pub .ptabs a[aria-current='page'] { color: var(--ink); }
 body.pub .composer { box-shadow: 0 -10px 24px -14px rgba(27, 26, 24, 0.3); }
 
 .why { border: 1.5px solid #ecd4a8; background: linear-gradient(180deg, #f9efe4, var(--surface) 55%); }
