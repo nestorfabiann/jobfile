@@ -1,0 +1,110 @@
+<title>Accept Bid Confirmation</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: homeowner bid card in three steps. Bid card, confirm step inline on the same card, then the landing screen after accepting. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#cd7d2e;--orl:#f9efe4;--orb:#ecd4a8;--gr:#1f7a55;--grl:#d9f1e6;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--grl:#173a2c;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--grl:#173a2c;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh}
+.g{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;text-wrap:balance}
+.sw{display:flex;gap:6px;padding-block:10px;border-bottom:1px dashed var(--line)}
+.sw button{flex:1;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:9px 6px;border-radius:99px;font:500 12.5px 'IBM Plex Sans',system-ui,sans-serif;cursor:pointer}
+.sw button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.hd{border-bottom:1px solid var(--line);padding-block:12px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.logo{font:800 20px 'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.02em}.logo b{color:var(--or)}
+.nav{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:14px;font-weight:600}
+.body{padding-block:18px 40px;display:flex;flex-direction:column;gap:14px}
+.sec[hidden]{display:none}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
+.mut{color:var(--mut);font-size:14.5px;line-height:1.5}.sm{font-size:12.5px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:18px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.conf{border:1.5px solid var(--orb);background:linear-gradient(180deg,var(--orl),var(--card) 55%)}
+.btn{display:flex;align-items:center;justify-content:center;border-radius:99px;min-height:50px;padding:0 20px;font:600 15.5px 'IBM Plex Sans',system-ui,sans-serif;border:1px solid var(--or);background:var(--or);color:#fff;box-shadow:0 6px 16px #cd7d2e44;width:100%;cursor:pointer}
+.btn.gh{background:var(--card);color:var(--ink);border-color:var(--line);box-shadow:none}
+.btn:focus-visible{outline:2px solid var(--or);outline-offset:2px}
+.who{display:flex;gap:12px;align-items:center}
+.av{width:48px;height:48px;border-radius:14px;background:var(--orl);color:var(--or);display:grid;place-items:center;font:800 20px 'Bricolage Grotesque',system-ui,sans-serif;flex:none}
+.ok{display:inline-block;font-size:12px;font-weight:600;padding:5px 11px;border-radius:99px;background:var(--grl);color:var(--gr)}
+.price{font:800 28px 'Bricolage Grotesque',system-ui,sans-serif}
+.lst{display:grid;gap:10px;margin:0;padding:0;list-style:none}
+.lst li{display:flex;gap:10px;font-size:14px;line-height:1.45;align-items:flex-start}
+.lst span.i{flex:none;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:13px;background:var(--grl);color:var(--gr);font-weight:700}
+.lst span.n{flex:none;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:13px;background:var(--orl);color:var(--or);font-weight:700}
+.tabs{display:flex;gap:6px;flex-wrap:wrap}.tabs span{font-size:12.5px;font-weight:600;padding:6px 12px;border-radius:99px;border:1px solid var(--line);background:var(--card)}.tabs .a{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+hr{border:0;border-top:1px solid var(--line);margin:2px 0;width:100%}
+</style>
+
+<div class="wrap">
+  <div class="sw g">
+    <button class="on" data-s="s1" type="button">1 · Bid card</button>
+    <button data-s="s2" type="button">2 · Confirm</button>
+    <button data-s="s3" type="button">3 · After</button>
+  </div>
+  <div class="hd g"><span class="logo">Job<b>file</b></span><nav class="nav"><span>Projects</span><span>Marketplace</span><span>Settings</span></nav></div>
+
+  <!-- 1 -->
+  <div class="body g sec" id="s1">
+    <div class="note"><b>Step 1.</b> Same card as today. The only change: <b>Accept this bid</b> no longer fires right away. Tap it to see step 2.</div>
+    <h2 style="font-size:26px">1 bid</h2>
+    <div class="card">
+      <div class="who"><div class="av">N</div><div><b>Nesty’s Painting</b><div style="font-weight:700;color:var(--or);font-size:13px">View profile ›</div></div></div>
+      <div class="mut sm">No reviews yet &nbsp; <span class="ok">Insurance verified until Nov 12, 2026</span></div>
+      <div class="price">$25,000</div>
+      <div class="mut sm">5 weeks · starts Nov 19, 2026</div>
+      <div class="mut sm">Accepting opens a Jobfile project with this price and your scope filled in, and tells the other bidders. Nothing is charged. You both still review and sign the agreement.</div>
+      <button class="btn" type="button" id="go2">Accept this bid</button>
+    </div>
+  </div>
+
+  <!-- 2 -->
+  <div class="body g sec" id="s2" hidden>
+    <div class="note"><b>Step 2.</b> The card turns into a confirmation. Nothing happens until the homeowner taps the orange button. “Not yet” puts the card back.</div>
+    <h2 style="font-size:26px">1 bid</h2>
+    <div class="card conf">
+      <span class="ok" style="width:max-content">Last step</span>
+      <h3 style="font-size:23px">Accept Nesty’s Painting for $25,000?</h3>
+      <ul class="lst">
+        <li><span class="i">✓</span><span>A Jobfile project opens with this price, your scope and Nesty’s Painting’s start date.</span></li>
+        <li><span class="i">✓</span><span>You review and sign the agreement together. <b>Nothing is charged.</b></span></li>
+        <li><span class="n">!</span><span>The other bidders are told this project went to someone else, and your project closes to new bids. You can’t undo this.</span></li>
+      </ul>
+      <button class="btn" type="button" id="go3">Yes, accept this bid</button>
+      <button class="btn gh" type="button" id="back1">Not yet</button>
+    </div>
+  </div>
+
+  <!-- 3 -->
+  <div class="body g sec" id="s3" hidden>
+    <div class="note"><b>Step 3.</b> After accepting, the homeowner lands on the new project with a short “what now” banner at the top. This is the screen that is missing today. It shows once, then goes away.</div>
+    <div><h2 style="font-size:26px">Kitchen and walls painting</h2><div class="mut sm" style="margin-top:4px">Nesty’s Painting · $25,000</div></div>
+    <div class="tabs"><span class="a">Overview</span><span>Messages</span><span>Agreement</span><span>Photos</span><span>Changes</span><span>Payments</span></div>
+    <div class="card conf">
+      <span class="ok" style="width:max-content">You hired Nesty’s Painting</span>
+      <h3 style="font-size:22px">What happens next</h3>
+      <ul class="lst">
+        <li><span class="n">1</span><span><b>Nesty’s Painting reviews the agreement.</b> The scope and price are already filled in. They send it to you.</span></li>
+        <li><span class="n">2</span><span><b>You read it and sign.</b> Then they sign, and the job is official.</span></li>
+        <li><span class="n">3</span><span><b>Work starts Nov 19.</b> Photos, payments and changes all stay in this project.</span></li>
+      </ul>
+      <button class="btn gh" type="button">Open the agreement</button>
+      <button class="btn gh" type="button">Message Nesty’s Painting</button>
+    </div>
+    <div class="sm mut">The other bidders get a separate notice that the project went to someone else.</div>
+  </div>
+</div>
+
+<script>
+function show(id){
+  ['s1','s2','s3'].forEach(function(x){document.getElementById(x).hidden=(x!==id)});
+  document.querySelectorAll('.sw button').forEach(function(b){b.classList.toggle('on',b.dataset.s===id)});
+  window.scrollTo(0,0);
+}
+document.querySelectorAll('.sw button').forEach(function(b){b.addEventListener('click',function(){show(b.dataset.s)})});
+document.getElementById('go2').addEventListener('click',function(){show('s2')});
+document.getElementById('go3').addEventListener('click',function(){show('s3')});
+document.getElementById('back1').addEventListener('click',function(){show('s1')});
+</script>
