@@ -1,0 +1,126 @@
+<title>Admin Area Message</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: one phone-width admin screen. Pick area (ZIP + miles) > audience > live match list > message > confirm. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#cd7d2e;--orl:#f9efe4;--orb:#ecd4a8;--gr:#1f7a55;--grl:#d9f1e6;--bad:#b3261e;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--grl:#173a2c;--bad:#f2b8b5;--gr:#6fd1a3;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--grl:#173a2c;--bad:#f2b8b5;--gr:#6fd1a3;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:16px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px}
+h1,h2{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;text-wrap:balance}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
+.mut{color:var(--mut);font-size:14px;line-height:1.5}.sm{font-size:12.5px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:18px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.lbl{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--or);font-weight:600}
+.seg{display:grid;gap:6px}.seg.c3{grid-template-columns:repeat(3,1fr)}.seg.c4{grid-template-columns:repeat(4,1fr)}
+.seg button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:11px 4px;border-radius:99px;font:500 14px 'IBM Plex Sans',system-ui,sans-serif;cursor:pointer;min-height:44px}
+.seg button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+input[type=text],textarea{width:100%;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:14px;padding:12px;font:16px 'IBM Plex Sans',system-ui,sans-serif}
+textarea{min-height:96px;resize:vertical}
+input[type=range]{width:100%;accent-color:var(--or)}
+.big{font:800 40px 'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.04em;line-height:1}
+.row{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.list{display:flex;flex-direction:column;max-height:230px;overflow:auto;border:1px solid var(--line);border-radius:14px}
+.li{display:flex;justify-content:space-between;gap:10px;padding:10px 12px;border-bottom:1px solid var(--line);font-size:14px;align-items:center}
+.li:last-child{border-bottom:0}.li span:last-child{color:var(--mut);font-size:12.5px;white-space:nowrap}
+.li button{border:0;background:none;color:var(--or);font:600 12.5px 'IBM Plex Sans',sans-serif;cursor:pointer;padding:6px}
+.li.off{opacity:.45;text-decoration:line-through}
+.map{position:relative;aspect-ratio:2/1;border-radius:14px;background:var(--orl);border:1px solid var(--orb);overflow:hidden}
+.ring{position:absolute;left:50%;top:50%;border:2px solid var(--or);background:#cd7d2e22;border-radius:50%;transform:translate(-50%,-50%);transition:width .2s,height .2s}
+.dot{position:absolute;width:8px;height:8px;border-radius:50%;background:var(--mut);transform:translate(-50%,-50%)}.dot.in{background:var(--or)}
+.pin{position:absolute;left:50%;top:50%;width:10px;height:10px;background:var(--ink);border-radius:50%;transform:translate(-50%,-50%);z-index:2}
+.btn{display:flex;align-items:center;justify-content:center;border-radius:99px;min-height:50px;padding:0 20px;font:600 15.5px 'IBM Plex Sans',system-ui,sans-serif;border:1px solid var(--or);background:var(--or);color:#fff;width:100%;cursor:pointer}
+.btn.gh{background:var(--orl);color:var(--or);border-color:var(--orb)}.btn:disabled{opacity:.45;cursor:not-allowed}
+.ok{background:var(--grl);color:var(--gr);border-radius:14px;padding:12px;font-size:14px;line-height:1.45}
+.warn{background:var(--orl);border:1px solid var(--orb);border-radius:14px;padding:12px;font-size:14px;line-height:1.45}
+.chk{display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.4}.chk input{margin-top:3px;width:18px;height:18px;accent-color:var(--or)}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--or);outline-offset:2px}
+[hidden]{display:none!important}
+</style>
+
+<div class="wrap">
+  <div class="note"><b>Mockup.</b> Admin &gt; new "Message by area" page. The people below are example data. Move the radius and the match list and count update.</div>
+  <div><span class="lbl">Admin</span><h1 style="font-size:30px;margin-top:4px">Message by area</h1></div>
+
+  <div class="card" id="s1">
+    <span class="lbl">1 · Area</span>
+    <label for="zip" class="mut sm">Center ZIP code</label>
+    <input id="zip" type="text" inputmode="numeric" maxlength="5" value="75074">
+    <div class="mut sm" id="zipname">Plano, TX</div>
+    <div class="row"><span class="big" id="rad">25</span><span class="mut">mile radius</span></div>
+    <input id="slider" type="range" min="5" max="100" step="5" value="25" aria-label="Radius in miles">
+    <div class="seg c4" id="quick"><button data-r="5">5</button><button data-r="10">10</button><button data-r="25" class="on">25</button><button data-r="50">50</button></div>
+    <div class="map" aria-hidden="true"><div class="ring" id="ring"></div><div class="pin"></div></div>
+  </div>
+
+  <div class="card">
+    <span class="lbl">2 · Who</span>
+    <div class="seg c3" id="who"><button data-w="c" class="on">Contractors</button><button data-w="h">Homeowners</button><button data-w="b">Both</button></div>
+    <div class="mut sm" id="whonote">Uses each contractor's business ZIP.</div>
+  </div>
+
+  <div class="card">
+    <span class="lbl">3 · Matches</span>
+    <div class="row"><span class="big" id="count">0</span><span class="mut" id="countlbl">people match</span></div>
+    <div class="list" id="list"></div>
+    <div class="mut sm">Tap Skip to leave someone out. Banned accounts are never included.</div>
+  </div>
+
+  <div class="card">
+    <span class="lbl">4 · Message</span>
+    <label for="msg" class="mut sm">Shows as an alert in the app</label>
+    <textarea id="msg">We're adding more kitchen and bath jobs around Plano this month. Update your business profile so you get matched.</textarea>
+    <div class="chk"><input type="checkbox" id="em"><label for="em">Also send by email <span class="mut sm">(email reaches only test addresses until a domain is verified)</span></label></div>
+  </div>
+
+  <button class="btn" id="go" type="button">Review and send</button>
+
+  <div class="card" id="confirm" hidden>
+    <span class="lbl">Confirm</span>
+    <div class="warn" id="csum"></div>
+    <div class="mut sm">This is recorded in the audit log. You can't unsend it.</div>
+    <button class="btn" id="yes" type="button">Yes, send now</button>
+    <button class="btn gh" id="no" type="button">Not yet</button>
+  </div>
+  <div class="ok" id="done" hidden></div>
+</div>
+
+<script>
+var P=[ // example people: name, kind, miles from 75074
+['Nesty\'s Painting','c',0],['Lone Star Roofing','c',4],['Allen Tile & Stone','c',7],['Frisco Floors','c',11],['McKinney Remodeling','c',17],['Garland Plumbing','c',19],['Dallas Kitchen Co.','c',24],['Denton Builders','c',33],['Fort Worth Paint Pros','c',41],['Waco Carpentry','c',88],
+['Jerry Still','h',3],['M. Alvarez','h',9],['T. Nguyen','h',14],['R. Brooks','h',22],['K. Patel','h',37],['S. Okafor','h',60]];
+var rad=25,who='c',skip={};
+function $(i){return document.getElementById(i)}
+function match(){return P.filter(function(p){return p[2]<=rad&&(who==='b'||p[1]===who)})}
+function render(){
+  $('rad').textContent=rad;$('slider').value=rad;
+  [].forEach.call($('quick').children,function(b){b.classList.toggle('on',+b.dataset.r===rad)});
+  var m=match(),n=m.filter(function(p){return !skip[p[0]]}).length;
+  $('count').textContent=n;$('countlbl').textContent=(n===1?'person matches':'people match');
+  $('list').innerHTML=m.length?'':'<div class="li"><span>No one in this area. Try a bigger radius.</span></div>';
+  m.forEach(function(p){var d=document.createElement('div');d.className='li'+(skip[p[0]]?' off':'');
+    d.innerHTML='<span></span><span></span><button type="button"></button>';
+    d.children[0].textContent=p[0]+(p[1]==='h'?' (homeowner)':'');d.children[1].textContent=p[2]+' mi';
+    d.children[2].textContent=skip[p[0]]?'Include':'Skip';
+    d.children[2].onclick=function(){skip[p[0]]=!skip[p[0]];render()};$('list').appendChild(d)});
+  var r=Math.min(96,rad*0.9);$('ring').style.width=r+'%';$('ring').style.height=(r*2)+'%';
+  [].slice.call(document.querySelectorAll('.dot')).forEach(function(x){x.remove()});
+  P.forEach(function(p,i){if(who!=='b'&&p[1]!==who)return;var a=i*2.4,k=Math.min(p[2],100)/100*46;
+    var e=document.createElement('div');e.className='dot'+(p[2]<=rad?' in':'');e.style.left=(50+Math.cos(a)*k)+'%';e.style.top=(50+Math.sin(a)*k*0.9)+'%';$('ring').parentNode.appendChild(e)});
+  $('go').disabled=n===0;$('go').textContent=n?'Review and send to '+n:'Nobody to send to';
+}
+$('slider').oninput=function(){rad=+this.value;render()};
+[].forEach.call($('quick').children,function(b){b.onclick=function(){rad=+b.dataset.r;render()}});
+[].forEach.call($('who').children,function(b){b.onclick=function(){who=b.dataset.w;
+  [].forEach.call($('who').children,function(x){x.classList.toggle('on',x===b)});
+  $('whonote').textContent=who==='c'?"Uses each contractor's business ZIP.":who==='h'?'Homeowners with a posted job or a project in this area (not every signed-up homeowner has a ZIP).':'Both groups, counted together.';render()}});
+$('go').onclick=function(){var n=match().filter(function(p){return !skip[p[0]]}).length;
+  $('csum').textContent='Send this alert to '+n+(n===1?' person':' people')+' within '+rad+' miles of '+$('zip').value+($('em').checked?', and by email':'')+'.';
+  $('confirm').hidden=false;$('done').hidden=true;$('confirm').scrollIntoView({behavior:'smooth',block:'center'})};
+$('no').onclick=function(){$('confirm').hidden=true};
+$('yes').onclick=function(){var n=match().filter(function(p){return !skip[p[0]]}).length;
+  $('confirm').hidden=true;$('done').hidden=false;$('done').textContent='Sent to '+n+(n===1?' person':' people')+'. Saved in the audit log.';$('done').scrollIntoView({behavior:'smooth',block:'center'})};
+render();
+</script>
