@@ -119,7 +119,10 @@ export default async function ListingPage({ params, searchParams }: { params: { 
             return (
               <div className="card" key={b.id} style={b.status === 'won' ? { borderColor: 'var(--ok)' } : undefined}>
                 <div className="row" style={{ justifyContent: 'space-between' }}>
-                  <b><Link href={`/contractors/${b.company_id}`}>{c?.name ?? 'Contractor'}</Link></b>
+                  <span className="stack" style={{ gap: 2 }}>
+                    <b>{c?.name ?? 'Contractor'}</b>
+                    <Link href={`/contractors/${b.company_id}`} className="small" style={{ fontWeight: 700 }}>View profile ›</Link>
+                  </span>
                   {b.status === 'won' ? <span className="pill ok">Hired</span> : b.status === 'not_selected' ? <span className="pill">Not selected</span> : null}
                 </div>
                 <div className="row small muted">
