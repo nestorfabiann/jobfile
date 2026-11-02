@@ -203,3 +203,13 @@ body.pub .composer { box-shadow: 0 -10px 24px -14px rgba(27, 26, 24, 0.3); }
 /* Start a project: button that opens the form in place */
 .startp>summary{list-style:none;cursor:pointer}
 .startp>summary::-webkit-details-marker{display:none}
+
+/* Signed-in menu (Home, Projects, Marketplace, Settings, Sign out) */
+.appmenu { position: relative; }
+.appmenu-btn { display: flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 16px; border-radius: 99px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font: 600 14px 'IBM Plex Sans', system-ui, sans-serif; cursor: pointer; }
+.appmenu-sheet { position: absolute; right: 0; top: calc(100% + 8px); width: 230px; background: var(--surface); border: 1px solid var(--line); border-radius: 18px; box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18); padding: 8px; z-index: 20; display: flex; flex-direction: column; }
+.appmenu-sheet a, .appmenu-sheet button { display: block; width: 100%; text-align: left; padding: 12px; border-radius: 12px; border: 0; background: none; font: 600 15px 'IBM Plex Sans', system-ui, sans-serif; color: var(--ink); text-decoration: none; cursor: pointer; }
+.appmenu-sheet a[aria-current='page'] { background: #f9efe4; color: var(--accent); }
+.appmenu-sheet hr { border: 0; border-top: 1px solid var(--line); margin: 6px 4px; }
+.appmenu-sheet form { margin: 0; }
+@media (prefers-color-scheme: dark) { .appmenu-sheet a[aria-current='page'] { background: #33281c; color: #e0933f; } }

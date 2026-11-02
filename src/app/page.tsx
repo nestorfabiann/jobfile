@@ -9,8 +9,8 @@ export const dynamic = 'force-dynamic';
 
 export default async function Home() {
   const { data: { user } } = await supabaseServer().auth.getUser();
-  if (user) redirect('/projects');
-  if (!marketplaceEnabled()) redirect('/login');
+  if (!marketplaceEnabled()) redirect(user ? '/projects' : '/login');
+  const signedIn = !!user;
 
   const { listings, counts } = await publicListings('', 3);
   const steps: [string, string][] = [
@@ -21,6 +21,11 @@ export default async function Home() {
   ];
   return (
     <>
+      {signedIn && (
+        <div className="row" style={{ justifyContent: 'flex-end' }}>
+          <Link className="pill" href="/projects">Go to Projects →</Link>
+        </div>
+      )}
       <div className="stack">
         <span className="lbl">Home improvement marketplace</span>
         <h1 style={{ fontSize: 'clamp(32px, 9vw, 44px)', lineHeight: 1.05, letterSpacing: '-0.03em' }}>
@@ -28,8 +33,8 @@ export default async function Home() {
         </h1>
         <p className="muted" style={{ fontSize: 17 }}>Homeowners post projects, local contractors bid, and our AI shows you what the job should cost in your area. Then Jobfile keeps the whole job organized.</p>
       </div>
-      <Link className="btn accent" href={`/login?next=${encodeURIComponent('/marketplace/new')}`}>Post a Project →</Link>
-      <Link className="btn ghost" href="/jobs">🔍 Find Work</Link>
+      <Link className="btn accent" href={signedIn ? '/marketplace/new' : `/login?next=${encodeURIComponent('/marketplace/new')}`}>Post a Project →</Link>
+      <Link className="btn ghost" href={signedIn ? '/marketplace' : '/jobs'}>🔍 Find Work</Link>
 
       <section className="card why" aria-label="Bring your own contractor or customer">
         <span className="pill ok" style={{ width: 'max-content' }}>You do not need the marketplace</span>
@@ -48,8 +53,8 @@ export default async function Home() {
           ))}
         </div>
         <div className="grid2" style={{ gridTemplateColumns: '1fr 1fr' }}>
-          <Link className="btn ghost" href={`/login?next=${encodeURIComponent('/invites/new')}`}>I&apos;m a homeowner</Link>
-          <Link className="btn ghost" href={`/login?next=${encodeURIComponent('/projects')}`}>I&apos;m a contractor</Link>
+          <Link className="btn ghost" href={signedIn ? '/invites/new' : `/login?next=${encodeURIComponent('/invites/new')}`}>I&apos;m a homeowner</Link>
+          <Link className="btn ghost" href={signedIn ? '/projects' : `/login?next=${encodeURIComponent('/projects')}`}>I&apos;m a contractor</Link>
         </div>
         <p className="muted small" style={{ margin: 0 }}>Free to start. The person you invite does not need an account first.</p>
       </section>
@@ -63,7 +68,7 @@ export default async function Home() {
 
       <div className="stack" style={{ marginTop: 10 }}>
         <h2 style={{ margin: 0 }}>Open near you</h2>
-        <p className="muted" style={{ margin: 0 }}>Anyone can browse. Sign in to bid or post.</p>
+        <p className="muted" style={{ margin: 0 }}>{signedIn ? 'Open projects from homeowners near you.' : 'Anyone can browse. Sign in to bid or post.'}</p>
       </div>
       {listings.length === 0 ? (
         <div className="card"><p className="muted" style={{ margin: 0 }}>No open projects right now. Be the first to post one.</p></div>
@@ -76,7 +81,7 @@ export default async function Home() {
       {steps.map(([t, d]) => (
         <div className="card" key={t}><h3 style={{ margin: 0 }}>{t}</h3><p className="muted" style={{ margin: 0 }}>{d}</p></div>
       ))}
-      <Link className="btn accent" href="/login">Get started free →</Link>
+      <Link className="btn accent" href={signedIn ? '/projects' : '/login'}>{signedIn ? 'Go to Projects →' : 'Get started free →'}</Link>
     </>
   );
 }
