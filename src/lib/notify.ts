@@ -65,6 +65,8 @@ type Alert = {
   kind: string;
   title: string;
   body: string;
+  /** Page to open instead of the project, for example /marketplace/bids. */
+  path?: string;
   /** Send email even if the person turned alerts off (admin notices). */
   force?: boolean;
   /** Skip email and text if this person already got one for this project in the last few minutes. */
@@ -78,7 +80,7 @@ type Alert = {
 export async function notifyUsers(a: Alert) {
   if (!a.userIds.length) return;
   const admin = supabaseAdmin();
-  const link = a.projectId ? `${APP_URL()}/projects/${a.projectId}` : `${APP_URL()}/projects`;
+  const link = a.path ? `${APP_URL()}${a.path}` : a.projectId ? `${APP_URL()}/projects/${a.projectId}` : `${APP_URL()}/projects`;
 
   const { data: profiles } = await admin
     .from('profiles')

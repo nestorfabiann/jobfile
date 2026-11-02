@@ -164,3 +164,19 @@ export async function reviewInsurance(_: Result | null, f: FormData): Promise<Re
   revalidatePath('/admin/verification');
   return { ok: true, message: decision === 'approved' ? 'Approved. The badge is live.' : 'Rejected. The contractor was told why.' };
 }
+
+/** Admin closes a marketplace listing (rule violation). Waiting bidders are told it closed. */
+export async function adminCloseListing(formData: FormData) {
+  const { user: me, db } = await requireAdmin();
+  const id = String(formData.get('listing_id') ?? '');
+  const reason = String(formData.get('reason') ?? '').trim().slice(0, 300) || 'Closed by admin';
+  const { data: l } = await db.from('marketplace_listings').update({ status: 'closed' }).eq('id', id).eq('status', 'open').select('id,homeowner_id,job_type');
+  if ((l ?? []).length) {
+    const { data: bids } = await db.from('marketplace_bids').update({ status: 'not_selected', updated_at: new Date().toISOString() }).eq('listing_id', id).eq('status', 'waiting').select('bidder_id');
+    await audit(me, 'close_listing', { type: 'listing', id }, { reason });
+    await notifyUsers({ userIds: [(l ?? [])[0].homeowner_id as string], projectId: null, kind: 'admin', path: '/marketplace', title: 'Your marketplace project was closed', body: `Jobfile closed this project. Reason: ${reason}`, force: true });
+    await notifyUsers({ userIds: Array.from(new Set((bids ?? []).map((b) => b.bidder_id as string))), projectId: null, kind: 'bid', path: '/marketplace/bids', title: 'A project you bid on was closed', body: 'It is no longer taking bids.' });
+  }
+  revalidatePath('/admin/marketplace');
+  revalidatePath('/marketplace');
+}

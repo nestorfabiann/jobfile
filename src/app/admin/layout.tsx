@@ -13,6 +13,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           ['/admin/projects', 'Projects'],
           ['/admin/reviews', 'Reviews'],
           ['/admin/verification', 'Insurance'],
+          ['/admin/marketplace', 'Marketplace'],
           ['/admin/broadcast', 'Broadcast'],
           ['/admin/audit', 'Audit log'],
         ].map(([href, label]) => (

@@ -163,3 +163,14 @@ Run `supabase/migrations/010_project_invites.sql` once. A homeowner (anyone who 
 - Photos can be added once the project is open. Pre-accept photo upload is not built.
 - Not yet shown in the admin activity feed.
 - To remove: drop `project_invites`, delete `src/app/invites`, `src/lib/invites.ts`, and the invitation blocks in `src/app/projects/page.tsx`.
+
+## Marketplace
+
+Run `supabase/migrations/011_marketplace.sql`, then set `MARKETPLACE_ENABLED=true` in Vercel and redeploy. Optional: `ANTHROPIC_API_KEY` (with a spend limit) turns on the AI cost reference; without it listings simply have no reference.
+- Homeowners (anyone who is not a company member) post at `/marketplace/new`: pick a job type, tap scope items, size and ZIP, optional AI cost reference, budget, private address. Contractors browse `/marketplace`, bid on `/marketplace/[id]`, and track bids at `/marketplace/bids` (tab on the business profile).
+- The AI reference is made by the server and saved; a listing can only carry a reference the server made for exactly that scope. Limits: 10 references per user per day.
+- Accepting a bid creates a normal project: contractor's company, both people as members, an agreement draft with the scope and the bid price (and 4 default milestones), the homeowner's post and the bid note as first messages. Other waiting bids become "not selected". The homeowner's street address is only copied into the project at accept.
+- Limits: 5 open listings per homeowner, 10 posts per day, 30 bids per contractor per day. Listings expire after 30 days.
+- Admin: `/admin/marketplace` lists posts and can close one (audit logged, people notified).
+- Not built: messaging before a bid is accepted, public bid counts, expiry emails.
+- To remove: unset the flag (everything returns 404 and the nav link disappears). To delete entirely, drop the four marketplace tables, delete the `listing-photos` bucket, and delete `src/app/marketplace`, `src/app/admin/marketplace`, `src/lib/marketplace*.ts`, and the marketplace components.

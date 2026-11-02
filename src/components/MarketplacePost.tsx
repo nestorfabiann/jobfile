@@ -1,0 +1,119 @@
+'use client';
+
+import { useState } from 'react';
+import { getReference, publishListing, type RefResult } from '@/app/marketplace/actions';
+
+type Types = Record<string, { size: number; sizeLabel: string; groups: [string, string[]][] }>;
+const money = (n: number) => '$' + Math.round(n).toLocaleString('en-US');
+
+export default function MarketplacePost({ types, aiOn }: { types: Types; aiOn: boolean }) {
+  const names = Object.keys(types);
+  const [type, setType] = useState(names[0]);
+  const [picks, setPicks] = useState<string[]>([]);
+  const [size, setSize] = useState(String(types[names[0]].size));
+  const [zip, setZip] = useState('');
+  const [details, setDetails] = useState('');
+  const [bmin, setBmin] = useState('');
+  const [bmax, setBmax] = useState('');
+  const [ref, setRef] = useState<Extract<RefResult, { ok: true }> | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState('');
+
+  const changed = () => setRef(null);
+  const chooseType = (t: string) => { setType(t); setPicks([]); setSize(String(types[t].size)); changed(); };
+  const toggle = (item: string) => { setPicks((p) => (p.includes(item) ? p.filter((x) => x !== item) : [...p, item])); changed(); };
+
+  async function reference() {
+    setErr('');
+    if (!picks.length) return setErr('Pick at least one item first.');
+    if (!/^\d{5}$/.test(zip)) return setErr('Enter your 5-digit ZIP code first.');
+    setBusy(true);
+    const r = await getReference({ jobType: type, items: picks, size: parseInt(size.replace(/\D/g, ''), 10) || null, zip, details });
+    setBusy(false);
+    if (!r.ok) return setErr(r.error);
+    setRef(r);
+    setBmin(String(r.ref.low));
+    setBmax(String(r.ref.high));
+  }
+
+  return (
+    <form action={publishListing} className="stack" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <input type="hidden" name="job_type" value={type} />
+      {picks.map((p) => <input key={p} type="hidden" name="items" value={p} />)}
+      {ref ? <input type="hidden" name="ref_id" value={ref.id} /> : null}
+
+      <div className="card">
+        <h2>What kind of job?</h2>
+        <div className="chips" role="radiogroup" aria-label="Job type">
+          {names.map((n) => (
+            <label className="chip" key={n}><input type="radio" name="_type" checked={type === n} onChange={() => chooseType(n)} /><span>{n}</span></label>
+          ))}
+        </div>
+      </div>
+
+      <div className="card">
+        <h2>Tap what you want done</h2>
+        {types[type].groups.map(([group, items]) => (
+          <fieldset key={group} style={{ border: 0, padding: 0, margin: 0 }} className="stack">
+            <legend className="small muted" style={{ marginBottom: 6 }}>{group}</legend>
+            <div className="chips">
+              {items.map((it) => (
+                <label className="chip" key={it}><input type="checkbox" checked={picks.includes(it)} onChange={() => toggle(it)} /><span>{it}</span></label>
+              ))}
+            </div>
+          </fieldset>
+        ))}
+        <div className="box" style={{ background: 'var(--surface-2)' }}>
+          <b>Your scope ({picks.length} selected)</b>
+          <div className="small muted" style={{ whiteSpace: 'pre-line' }}>{picks.length ? picks.map((p) => `• ${p}`).join('\n') : 'Nothing picked yet.'}</div>
+        </div>
+        <div className="grid2">
+          <label className="fld">{types[type].sizeLabel}<input name="size" inputMode="numeric" value={size} onChange={(e) => { setSize(e.target.value); changed(); }} /></label>
+          <label className="fld">ZIP code<input name="zip" inputMode="numeric" maxLength={5} value={zip} onChange={(e) => { setZip(e.target.value.replace(/\D/g, '')); changed(); }} placeholder="75074" /></label>
+          <label className="fld">City (optional)<input name="city" maxLength={80} placeholder="Plano" /></label>
+        </div>
+        <label className="fld">Anything else? (optional)
+          <textarea name="details" rows={3} maxLength={1000} value={details} onChange={(e) => { setDetails(e.target.value); changed(); }} placeholder="Example: I want to start in January. Dogs at home." />
+        </label>
+      </div>
+
+      {aiOn && (
+        <div className="card">
+          <h2>AI cost reference</h2>
+          <p className="muted small">Get a typical local price range for the scope you picked. It is a reference only, not a quote.</p>
+          <div className="row"><button type="button" className="btn ghost" disabled={busy} onClick={reference}>{busy ? 'Checking local pricing…' : '✦ Get AI cost reference'}</button></div>
+          {err ? <div className="box bad">{err}</div> : null}
+          {ref && (
+            <div className="box" style={{ background: 'var(--surface-2)' }}>
+              <div className="small muted">Typical range for your scope ({ref.ref.confidence} confidence)</div>
+              <div style={{ fontSize: 26, fontWeight: 800 }}>{money(ref.ref.low)} – {money(ref.ref.high)}</div>
+              <div className="small">Most likely about {money(ref.ref.likely)}</div>
+              {ref.ref.breakdown.map((b) => (
+                <div className="row small" key={b.group} style={{ justifyContent: 'space-between', flexWrap: 'nowrap' }}><span>{b.group}</span><b>{money(b.low)}–{money(b.high)}</b></div>
+              ))}
+              {ref.ref.notes ? <p className="muted small">{ref.ref.notes}</p> : null}
+            </div>
+          )}
+        </div>
+      )}
+      {!aiOn && err ? <div className="box bad">{err}</div> : null}
+
+      <div className="card">
+        <h2>Your budget (optional)</h2>
+        <div className="grid2">
+          <label className="fld">From<input name="budget_min" inputMode="numeric" value={bmin} onChange={(e) => setBmin(e.target.value)} placeholder="$20,000" /></label>
+          <label className="fld">To<input name="budget_max" inputMode="numeric" value={bmax} onChange={(e) => setBmax(e.target.value)} placeholder="$30,000" /></label>
+        </div>
+        <h2>Address and details</h2>
+        <label className="fld">Street address (optional)<input name="address" maxLength={200} autoComplete="street-address" /></label>
+        <p className="muted small">Contractors never see your street address. It is shared only with the contractor you hire.</p>
+        <label className="row" style={{ alignItems: 'flex-start', flexWrap: 'nowrap' }}>
+          <input type="checkbox" name="is_homestead" />
+          <span>This is my homestead.<span className="muted small" style={{ display: 'block' }}>Texas has extra contract rules for homestead jobs. Jobfile will track them.</span></span>
+        </label>
+        <div className="row"><button className="btn" type="submit">Publish project</button></div>
+        <p className="muted small">Contractors on Jobfile can then send you bids. You choose who to hire. Your project stays open for 30 days.</p>
+      </div>
+    </form>
+  );
+}

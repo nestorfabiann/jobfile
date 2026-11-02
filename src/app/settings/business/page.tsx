@@ -4,6 +4,8 @@ import { myOwnedCompany, SERVICES, LANGUAGES, PAYMENTS, INSURANCE_KINDS, signedU
 import { supabaseAdmin } from '@/lib/supabase/server';
 import { WorkPhotoUploader, InsuranceUploader } from '@/components/BusinessUploaders';
 import { saveBusinessProfile, deleteBusinessPhoto, removeInsurance } from './actions';
+import BusinessTabs from '@/components/BusinessTabs';
+import { marketplaceEnabled } from '@/lib/marketplace';
 
 export const dynamic = 'force-dynamic';
 
@@ -31,6 +33,7 @@ export default async function Business({ searchParams }: { searchParams: { saved
       <div className="stack">
         <Link href="/settings" className="small">‹ Settings</Link>
         <h1>Business profile</h1>
+        {marketplaceEnabled() && <BusinessTabs active="profile" />}
         <p className="muted">Homeowners see this on your public page. Do not put phone numbers or emails in it. Your contact details are shared only after a homeowner works with you.</p>
       </div>
       {searchParams.saved ? <div className="box ok">Saved.</div> : null}
