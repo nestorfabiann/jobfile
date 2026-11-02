@@ -40,6 +40,10 @@ export default function WhyJobfile({ role, hidden, marketplace }: { role: 'homeo
         <form action={setWhy}><button type="submit" className="linkbtn" style={{ color: 'var(--ink-2)', fontSize: 13 }}>Hide</button></form>
       </div>
       <h2 style={{ fontSize: 23 }}>{home ? 'One shared record that protects you both' : 'Win the job, then run it without the paperwork'}</h2>
+      <div className="card" style={{ background: 'var(--surface)', borderColor: '#ecd4a8', padding: 14, gap: 6 }}>
+        <b>{home ? '🤝 Already hired someone? Bring them here.' : '🤝 Already have a customer? Bring them here.'}</b>
+        <span className="muted small">You do not need the marketplace. {home ? 'Invite your contractor by email and Jobfile keeps the agreement, photos, payments and messages for the job you already have.' : 'Start a project and invite your customer by email. Jobfile keeps the agreement, photos, payments and messages for the job you already have.'}</span>
+      </div>
       <div className="stack" style={{ gap: 12 }}>
         {items.map(([icon, title, text]) => (
           <div key={title} className="row" style={{ alignItems: 'flex-start', flexWrap: 'nowrap', gap: 12 }}>
