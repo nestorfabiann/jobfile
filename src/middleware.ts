@@ -27,7 +27,9 @@ export async function middleware(req: NextRequest) {
   } = await supabase.auth.getUser();
 
   const path = req.nextUrl.pathname;
-  const isOpen = path.startsWith('/login') || path.startsWith('/auth');
+  // Public marketplace pages (landing and open jobs) are visible when signed out, only while the marketplace is on.
+  const publicMarket = process.env.MARKETPLACE_ENABLED === 'true' && (path === '/' || path === '/jobs' || path.startsWith('/jobs/'));
+  const isOpen = path.startsWith('/login') || path.startsWith('/auth') || publicMarket;
 
   if (!user && !isOpen) {
     const url = req.nextUrl.clone();

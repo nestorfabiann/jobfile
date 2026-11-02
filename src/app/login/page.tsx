@@ -1,4 +1,5 @@
 import { sendLink } from './actions';
+import { safeNext } from '@/lib/nextPath';
 
 const ERRORS: Record<string, string> = {
   email: 'Enter a valid email address.',
@@ -6,13 +7,15 @@ const ERRORS: Record<string, string> = {
   '1': 'That sign-in link did not work. It may have expired or already been used. Request a new one.',
 };
 
-export default function Login({ searchParams }: { searchParams: { sent?: string; email?: string; error?: string } }) {
+export default function Login({ searchParams }: { searchParams: { sent?: string; email?: string; error?: string; next?: string } }) {
   const email = searchParams.email ?? '';
+  const next = safeNext(searchParams.next);
   return (
     <>
       <div className="stack">
         <h1>Sign in to Jobfile</h1>
         <p className="muted">Contractors and homeowners use the same email sign-in. No password to remember.</p>
+        {next ? <p className="muted small">After you sign in, you go right back to what you were doing.</p> : null}
       </div>
 
       {searchParams.sent ? (
@@ -26,6 +29,7 @@ export default function Login({ searchParams }: { searchParams: { sent?: string;
       ) : null}
 
       <form action={sendLink} className="card">
+        {next ? <input type="hidden" name="next" value={next} /> : null}
         {searchParams.error ? <div className="box bad">{ERRORS[searchParams.error] ?? ERRORS.send}</div> : null}
         <label className="fld">
           Email address

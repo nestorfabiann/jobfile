@@ -22,9 +22,15 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body>
         <header className="chrome">
           <div className="in top">
-            <Link href="/projects" className="brand">
+            <Link href={user || !marketplaceEnabled() ? '/projects' : '/'} className="brand">
               JOBFILE
             </Link>
+            {!user && marketplaceEnabled() && (
+              <nav aria-label="Main">
+                <Link href="/jobs">Open jobs</Link>
+                <Link href="/login">Sign in</Link>
+              </nav>
+            )}
             {user && (
               <nav aria-label="Main">
                 <Link href="/projects">Projects</Link>
