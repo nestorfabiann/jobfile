@@ -13,6 +13,7 @@ import {
   requireMarketplace, scopeText, type Bid, type Listing,
 } from '@/lib/marketplace';
 import { aiConfigured, makeReference, type Reference } from '@/lib/marketplaceAI';
+import { MAX_VIDEOS, MAX_VIDEO_BYTES, VIDEO_TYPES } from '@/lib/mediaLimits';
 
 const IMG: Record<string, string> = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' };
 const txt = (f: FormData, k: string, n: number) => String(f.get(k) ?? '').trim().slice(0, n);
@@ -64,18 +65,22 @@ export async function getReference(input: { jobType: string; items: string[]; si
   return { ok: true, id: row.id as string, ref: r.ref };
 }
 
-export async function publishListing(formData: FormData) {
+export type CreateResult = { ok: true; id: string } | { ok: false; error: string };
+const bad = (error: string): { ok: false; error: string } => ({ ok: false, error });
+
+/** Creates the listing and tells the matching contractors. The browser then uploads any photos and videos and opens the page. */
+export async function createListing(formData: FormData): Promise<CreateResult> {
   requireMarketplace();
   const { user } = await requireUser();
   const db = supabaseAdmin();
-  if (await myCompany(user.id)) back('/marketplace', 'Contractors bid on projects. Homeowners post them.');
+  if (await myCompany(user.id)) return bad('Contractors bid on projects. Homeowners post them.');
 
   const jobType = txt(formData, 'job_type', 60);
-  if (!JOB_TYPES[jobType]) back('/marketplace/new', 'Choose a job type.');
+  if (!JOB_TYPES[jobType]) return bad('Choose a job type.');
   const picked = cleanItems(jobType, formData.getAll('items').map(String));
-  if (!picked.length) back('/marketplace/new', 'Pick at least one item for your scope.');
+  if (!picked.length) return bad('Pick at least one item for your scope.');
   const zip = txt(formData, 'zip', 5);
-  if (!/^\d{5}$/.test(zip)) back('/marketplace/new', 'Enter a 5-digit ZIP code.');
+  if (!/^\d{5}$/.test(zip)) return bad('Enter a 5-digit ZIP code.');
   const sizeN = parseInt(txt(formData, 'size', 10).replace(/\D/g, ''), 10);
   const size = Number.isFinite(sizeN) && sizeN > 0 ? Math.min(1_000_000, sizeN) : null;
   const details = txt(formData, 'details', 1000);
@@ -84,9 +89,9 @@ export async function publishListing(formData: FormData) {
   if (bmin && bmax && bmin > bmax) [bmin, bmax] = [bmax, bmin];
 
   const { count: open } = await db.from('marketplace_listings').select('id', { count: 'exact', head: true }).eq('homeowner_id', user.id).eq('status', 'open').gt('expires_at', new Date().toISOString());
-  if ((open ?? 0) >= MAX_OPEN_LISTINGS) back('/marketplace/new', `You have ${MAX_OPEN_LISTINGS} open projects. Close one first.`);
+  if ((open ?? 0) >= MAX_OPEN_LISTINGS) return bad(`You have ${MAX_OPEN_LISTINGS} open projects. Close one first.`);
   const { count: recent } = await db.from('marketplace_listings').select('id', { count: 'exact', head: true }).eq('homeowner_id', user.id).gt('created_at', new Date(Date.now() - 24 * 3600_000).toISOString());
-  if ((recent ?? 0) >= MAX_LISTINGS_PER_DAY) back('/marketplace/new', 'You posted a lot today. Try again tomorrow.');
+  if ((recent ?? 0) >= MAX_LISTINGS_PER_DAY) return bad('You posted a lot today. Try again tomorrow.');
 
   // A reference counts only if this server made it for exactly this scope.
   let ref: Reference | null = null;
@@ -113,10 +118,10 @@ export async function publishListing(formData: FormData) {
     budget_max_cents: bmax,
     ...(ref ? { ai_low_cents: ref.low * 100, ai_high_cents: ref.high * 100, ai_likely_cents: ref.likely * 100, ai_confidence: ref.confidence, ai_breakdown: ref.breakdown, ai_notes: ref.notes } : {}),
   }).select('id,homeowner_id,job_type,zip,city,items,ai_low_cents,ai_high_cents').single();
-  if (error || !l) back('/marketplace/new', 'Could not post the project. Check that the database step was run.');
+  if (error || !l) return bad('Could not post the project. Check that the database step was run.');
   await alertMatchingContractors(l as any);
   revalidatePath('/marketplace');
-  redirect(`/marketplace/${l.id}?posted=1`);
+  return { ok: true, id: l.id as string };
 }
 
 export type UploadResult = { ok: true } | { ok: false; error: string };
@@ -147,6 +152,79 @@ export async function uploadListingPhoto(formData: FormData): Promise<UploadResu
   } catch {
     return { ok: false, error: 'Something went wrong saving that photo.' };
   }
+}
+
+export type VideoUrlResult = { ok: true; path: string; token: string } | { ok: false; error: string };
+
+/** Step 1 of a video upload: check the limits and hand the browser a one-time upload token. The video itself goes straight to storage. */
+export async function videoUploadUrl(input: { listingId: string; contentType: string; size: number }): Promise<VideoUrlResult> {
+  try {
+    requireMarketplace();
+    const { user } = await requireUser();
+    const l = await loadListing(String(input.listingId ?? ''));
+    if (!l || l.homeowner_id !== user.id) return { ok: false, error: 'Not allowed.' };
+    const ext = VIDEO_TYPES[input.contentType];
+    if (!ext) return { ok: false, error: 'Videos must be MP4, MOV or WebM.' };
+    if (!(input.size > 0) || input.size > MAX_VIDEO_BYTES) return { ok: false, error: 'Videos can be up to 50 MB. Trim it to under a minute and try again.' };
+    const db = supabaseAdmin();
+    const { count } = await db.from('marketplace_videos').select('id', { count: 'exact', head: true }).eq('listing_id', l.id);
+    if ((count ?? 0) >= MAX_VIDEOS) return { ok: false, error: `You can add up to ${MAX_VIDEOS} videos.` };
+    const path = `${l.id}/${randomUUID()}.${ext}`;
+    const { data, error } = await db.storage.from('listing-videos').createSignedUploadUrl(path);
+    if (error || !data) return { ok: false, error: 'Could not start the video upload. Check that the database step (013) was run.' };
+    return { ok: true, path, token: data.token };
+  } catch {
+    return { ok: false, error: 'Something went wrong starting the video upload.' };
+  }
+}
+
+/** Step 2: after the browser finished uploading, confirm the file exists and is within the limit, then record it. */
+export async function saveListingVideo(input: { listingId: string; path: string }): Promise<UploadResult> {
+  try {
+    requireMarketplace();
+    const { user } = await requireUser();
+    const l = await loadListing(String(input.listingId ?? ''));
+    if (!l || l.homeowner_id !== user.id) return { ok: false, error: 'Not allowed.' };
+    const m = /^([0-9a-f-]{36})\/([0-9a-f-]{36}\.(mp4|mov|webm))$/i.exec(String(input.path ?? ''));
+    if (!m || m[1] !== l.id) return { ok: false, error: 'That upload does not belong to this project.' };
+    const db = supabaseAdmin();
+    const { data: files } = await db.storage.from('listing-videos').list(l.id, { search: m[2] });
+    const f = (files ?? []).find((x) => x.name === m[2]);
+    if (!f) return { ok: false, error: 'The video did not finish uploading. Try again.' };
+    const size = Number((f.metadata as { size?: number } | null)?.size ?? 0);
+    if (size > MAX_VIDEO_BYTES) {
+      await db.storage.from('listing-videos').remove([input.path]);
+      return { ok: false, error: 'Videos can be up to 50 MB.' };
+    }
+    const { count } = await db.from('marketplace_videos').select('id', { count: 'exact', head: true }).eq('listing_id', l.id);
+    if ((count ?? 0) >= MAX_VIDEOS) {
+      await db.storage.from('listing-videos').remove([input.path]);
+      return { ok: false, error: `You can add up to ${MAX_VIDEOS} videos.` };
+    }
+    const { error } = await db.from('marketplace_videos').insert({ listing_id: l.id, path: input.path, size_bytes: size || null });
+    if (error) {
+      await db.storage.from('listing-videos').remove([input.path]);
+      return { ok: false, error: 'Could not save the video record.' };
+    }
+    return { ok: true };
+  } catch {
+    return { ok: false, error: 'Something went wrong saving that video.' };
+  }
+}
+
+export async function deleteListingVideo(formData: FormData) {
+  requireMarketplace();
+  const { user } = await requireUser();
+  const l = await loadListing(String(formData.get('listing_id') ?? ''));
+  if (!l || l.homeowner_id !== user.id || !listingOpen(l)) redirect('/marketplace');
+  const db = supabaseAdmin();
+  const { data: v } = await db.from('marketplace_videos').select('path').eq('id', String(formData.get('id') ?? '')).eq('listing_id', l.id).maybeSingle();
+  if (v?.path) {
+    await db.storage.from('listing-videos').remove([v.path as string]);
+    await db.from('marketplace_videos').delete().eq('id', String(formData.get('id'))).eq('listing_id', l.id);
+  }
+  revalidatePath(`/marketplace/${l.id}`);
+  redirect(`/marketplace/${l.id}`);
 }
 
 export async function deleteListingPhoto(formData: FormData) {

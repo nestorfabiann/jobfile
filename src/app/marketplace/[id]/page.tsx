@@ -9,13 +9,13 @@ import { firstNameInitial, listingOpen, listingTitle, requireMarketplace, type B
 import RangeBar from '@/components/RangeBar';
 import AcceptBid from '@/components/AcceptBid';
 import ListingPhotoUploader from '@/components/ListingPhotoUploader';
-import { acceptBid, closeListing, deleteListingPhoto, placeBid, withdrawBid } from '../actions';
+import { acceptBid, closeListing, deleteListingPhoto, deleteListingVideo, placeBid, withdrawBid } from '../actions';
 
 export const dynamic = 'force-dynamic';
 const when = (iso: string) => new Date(iso).toLocaleDateString('en-US', { timeZone: 'America/Chicago', month: 'short', day: 'numeric', year: 'numeric' });
 const range = (a: number | null, b: number | null) => [a, b].filter((x) => x != null).map((x) => dollars(x as number)).join(' – ');
 
-export default async function ListingPage({ params, searchParams }: { params: { id: string }; searchParams: { posted?: string; bid?: string; error?: string } }) {
+export default async function ListingPage({ params, searchParams }: { params: { id: string }; searchParams: { posted?: string; media?: string; bid?: string; error?: string } }) {
   requireMarketplace();
   const { user } = await requireUser();
   if (!/^[0-9a-f-]{36}$/i.test(params.id)) notFound();
@@ -28,11 +28,13 @@ export default async function ListingPage({ params, searchParams }: { params: { 
   if (!owner && !companyId) notFound();
   const open = listingOpen(l);
 
-  const [{ data: photoRows }, { data: bidRows }] = await Promise.all([
+  const [{ data: photoRows }, { data: bidRows }, { data: videoRows }] = await Promise.all([
     db.from('marketplace_photos').select('id,path').eq('listing_id', l.id).order('created_at'),
     db.from('marketplace_bids').select('*').eq('listing_id', l.id).order('created_at'),
+    db.from('marketplace_videos').select('id,path').eq('listing_id', l.id).order('created_at'),
   ]);
   const photoUrls = await signedUrls('listing-photos', (photoRows ?? []).map((p) => p.path as string));
+  const videoUrls = await signedUrls('listing-videos', (videoRows ?? []).map((v) => v.path as string));
   const allBids = (bidRows ?? []) as Bid[];
   const visible = owner ? allBids.filter((b) => b.status !== 'withdrawn') : [];
   const myBid = companyId ? allBids.find((b) => b.company_id === companyId) : undefined;
@@ -69,6 +71,7 @@ export default async function ListingPage({ params, searchParams }: { params: { 
         <p className="muted small">{[l.city, `ZIP ${l.zip}`, l.size_sqft ? `${l.size_sqft.toLocaleString('en-US')} sq ft` : '', `Posted ${when(l.created_at)}`, owner ? '' : `by ${firstNameInitial(l.homeowner_name)}`].filter(Boolean).join(' · ')}</p>
       </div>
       {searchParams.posted ? <div className="box ok">Your project is posted. Contractors can now send bids. Add photos below to help them price it.</div> : null}
+      {searchParams.media === 'partial' ? <div className="box bad">Your project is posted, but some photos or videos did not upload. You can add them again below.</div> : null}
       {searchParams.bid ? <div className="box ok">Your bid was sent.</div> : null}
       {searchParams.error ? <div className="box bad">{searchParams.error}</div> : null}
 
@@ -107,6 +110,21 @@ export default async function ListingPage({ params, searchParams }: { params: { 
             ))}
           </div>
           {owner && open && <ListingPhotoUploader listingId={l.id} />}
+        </div>
+      )}
+
+      {((videoRows ?? []).length > 0) && (
+        <div className="card">
+          <h2>Videos</h2>
+          <div className="stack" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {(videoRows ?? []).map((v) => (
+              <form key={v.id} action={deleteListingVideo} className="stack" style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                <input type="hidden" name="id" value={v.id} /><input type="hidden" name="listing_id" value={l.id} />
+                {videoUrls.get(v.path as string) ? <video src={videoUrls.get(v.path as string)} controls playsInline preload="metadata" style={{ width: '100%', borderRadius: 12, background: '#000' }} /> : null}
+                {owner && open && <button className="btn ghost" style={{ minHeight: 32, padding: '4px 10px' }}>Remove video</button>}
+              </form>
+            ))}
+          </div>
         </div>
       )}
 
