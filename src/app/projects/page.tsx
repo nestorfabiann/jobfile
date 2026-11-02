@@ -9,6 +9,7 @@ import { listingOpen, listingTitle, marketplaceEnabled, type Bid, type Listing }
 import ProjectsTabs from '@/components/ProjectsTabs';
 import WhyJobfile from '@/components/WhyJobfile';
 import StartProjectForm from '@/components/StartProjectForm';
+import { alertHref } from '@/lib/alertPath';
 import { cookies } from 'next/headers';
 
 const TZ = 'America/Chicago';
@@ -233,7 +234,7 @@ export default async function Projects({ searchParams }: { searchParams: { error
           <ul className="stack" style={{ listStyle: 'none', margin: 0, padding: 0 }}>
             {(alerts ?? []).map((a) => (
               <li key={a.id}>
-                <Link href={a.project_id ? `/projects/${a.project_id}` : '/projects'}>{a.title}</Link>
+                <Link href={alertHref(a.project_id, a.kind)}>{a.title}</Link>
                 <span className="muted small" style={{ display: 'block' }}>{when(a.created_at)}</span>
               </li>
             ))}

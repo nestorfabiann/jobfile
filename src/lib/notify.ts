@@ -1,4 +1,5 @@
 import { supabaseAdmin } from './supabase/server';
+import { alertHref } from '@/lib/alertPath';
 
 const APP_URL = () => (process.env.APP_URL || 'http://localhost:3000').replace(/\/$/, '');
 
@@ -82,7 +83,7 @@ type Alert = {
 export async function notifyUsers(a: Alert) {
   if (!a.userIds.length) return;
   const admin = supabaseAdmin();
-  const link = a.path ? `${APP_URL()}${a.path}` : a.projectId ? `${APP_URL()}/projects/${a.projectId}` : `${APP_URL()}/projects`;
+  const link = a.path ? `${APP_URL()}${a.path}` : `${APP_URL()}${alertHref(a.projectId, a.kind)}`;
 
   const { data: profiles } = await admin
     .from('profiles')
