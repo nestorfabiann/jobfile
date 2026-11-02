@@ -1,0 +1,61 @@
+<title>Landing Stats Position</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: landing page lower half. Three states: today, proposed with real numbers, proposed before any numbers exist. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#cd7d2e;--orl:#f9efe4;--orb:#ecd4a8;--gr:#1f7a55;--grl:#d9f1e6;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--grl:#173a2c;--gr:#6fd1a3;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--grl:#173a2c;--gr:#6fd1a3;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:14px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px}
+h1,h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;text-wrap:balance}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
+.mut{color:var(--mut);font-size:14px;line-height:1.5}.sm{font-size:12.5px}
+.sw{display:flex;gap:6px}.sw button{flex:1;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:10px 4px;border-radius:99px;font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:44px}.sw button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.btn{display:flex;align-items:center;justify-content:center;border-radius:99px;min-height:56px;font:600 17px 'IBM Plex Sans',sans-serif;border:1px solid var(--or);background:var(--or);color:#fff;box-shadow:0 8px 20px #cd7d2e44}
+.btn.gh{background:var(--card);color:var(--ink);border-color:var(--line);box-shadow:none}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center;padding-block:4px}
+.stats b{display:block;font:800 28px 'Bricolage Grotesque',sans-serif;letter-spacing:-.03em}
+.stats span{font-size:12.5px;color:var(--mut)}
+.stats .dash{color:var(--or)}
+.card{background:linear-gradient(var(--orl),var(--card));border:1px solid var(--orb);border-radius:22px;padding:18px;display:flex;flex-direction:column;gap:10px}
+.tag{display:inline-block;width:max-content;font-size:12px;font-weight:600;padding:5px 11px;border-radius:99px;background:var(--grl);color:var(--gr)}
+.sec[hidden]{display:none}
+button:focus-visible{outline:2px solid var(--or);outline-offset:2px}
+</style>
+
+<div class="wrap">
+  <div class="note"><b>Mockup, example numbers.</b> Same landing page, three states. Tap a tab.</div>
+  <div class="sw" id="sw"><button class="on" data-s="a" type="button">1 · Today</button><button data-s="b" type="button">2 · With numbers</button><button data-s="c" type="button">3 · Before numbers</button></div>
+
+  <!-- today -->
+  <div id="a" class="sec" style="display:flex;flex-direction:column;gap:14px">
+    <div class="note">Stats sit below the long "Already have a contractor" card and show dashes.</div>
+    <div class="btn">Post a Project →</div><div class="btn gh">Find Work</div>
+    <div class="card"><span class="tag">You do not need the marketplace</span><h2 style="font-size:24px">Already have a contractor or a customer?</h2><div class="mut">Steps, buttons and the rest of this card…</div></div>
+    <div class="stats"><div><b class="dash">–</b><span>Projects posted</span></div><div><b class="dash">–</b><span>Local pros</span></div><div><b class="dash">–</b><span>Avg. rating</span></div></div>
+    <div class="mut sm">Numbers stay blank until they're real. We won't show made-up stats.</div>
+  </div>
+
+  <!-- proposed with numbers -->
+  <div id="b" class="sec" hidden style="flex-direction:column;gap:14px">
+    <div class="note">Proposed: the row moves right under the two buttons. Each number shows only when it is real.</div>
+    <div class="btn">Post a Project →</div><div class="btn gh">Find Work</div>
+    <div class="stats"><div><b>42</b><span>Projects posted</span></div><div><b>18</b><span>Local pros</span></div><div><b>4.8 ★</b><span>Avg. rating</span></div></div>
+    <div class="card"><span class="tag">You do not need the marketplace</span><h2 style="font-size:24px">Already have a contractor or a customer?</h2><div class="mut">Steps, buttons and the rest of this card…</div></div>
+  </div>
+
+  <!-- proposed, nothing yet -->
+  <div id="c" class="sec" hidden style="flex-direction:column;gap:14px">
+    <div class="note">Proposed, today's situation: no real numbers yet, so the row and the "Numbers stay blank" line are not shown at all. Each stat appears on its own once it has a value (for example, the rating only after the first review).</div>
+    <div class="btn">Post a Project →</div><div class="btn gh">Find Work</div>
+    <div class="card"><span class="tag">You do not need the marketplace</span><h2 style="font-size:24px">Already have a contractor or a customer?</h2><div class="mut">Steps, buttons and the rest of this card…</div></div>
+  </div>
+</div>
+<script>
+var sw=document.getElementById('sw');
+[].forEach.call(sw.children,function(b){b.onclick=function(){
+  [].forEach.call(sw.children,function(x){x.classList.toggle('on',x===b)});
+  ['a','b','c'].forEach(function(id){var e=document.getElementById(id);e.hidden=id!==b.dataset.s;e.style.display=e.hidden?'none':'flex'});window.scrollTo(0,0)}})
+</script>
