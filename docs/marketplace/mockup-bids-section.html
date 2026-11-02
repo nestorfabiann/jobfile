@@ -1,0 +1,156 @@
+<title>Bids Section Preview</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: the job page in the live cream/orange look. Switch between the homeowner's bid comparison and the contractor's bid form. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#cd7d2e;--orl:#f9efe4;--orb:#ecd4a8;--gr:#1f7a55;--grl:#d9f1e6;--rd:#b3261e;--rdl:#fde8e6;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--grl:#173a2c;--rdl:#47201e;--rd:#ff8f85;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--grl:#173a2c;--rdl:#47201e;--rd:#ff8f85;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh}
+.g{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;text-wrap:balance}
+.sw{display:flex;gap:6px;padding-block:10px;border-bottom:1px dashed var(--line)}
+.sw button{flex:1;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:9px 12px;border-radius:99px;font:500 13px 'IBM Plex Sans',system-ui,sans-serif;cursor:pointer}
+.sw button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.hd{border-bottom:1px solid var(--line);padding-block:12px;display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center}
+.logo{font:800 20px 'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.02em}.logo b{color:var(--or)}
+.nav{display:flex;flex-wrap:wrap;gap:4px 16px;align-items:center;font-size:14px;font-weight:600}
+.pill{font-size:13px;font-weight:600;padding:7px 14px;border-radius:99px;background:var(--orl);color:var(--or)}
+.body{padding-block:18px 40px;display:flex;flex-direction:column;gap:14px}
+.body[hidden]{display:none}
+h1{font-size:27px;font-weight:800;line-height:1.1}
+.mut{color:var(--mut);font-size:14px;line-height:1.5}.sm{font-size:12.5px}
+.back{font-size:13px;color:var(--or);font-weight:600}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:18px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.card.ai{border-color:var(--orb)}.card.best{border:2px solid var(--or)}.card.won{border:2px solid var(--gr)}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.tag{display:inline-block;font-size:12px;font-weight:600;padding:5px 11px;border-radius:99px;background:var(--orl);color:var(--or);border:1px solid var(--orb);width:max-content}
+.tag.g{background:var(--grl);color:var(--gr);border-color:transparent}.tag.r{background:var(--rdl);color:var(--rd);border-color:transparent}
+.big{font:800 30px 'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;line-height:1.05;font-variant-numeric:tabular-nums}
+.stars{color:var(--or);letter-spacing:1px}
+.bar{position:relative;height:12px;border-radius:9px;background:var(--line);margin:26px 0 6px}
+.bar .rng{position:absolute;top:0;bottom:0;left:18%;width:60%;border-radius:9px;background:linear-gradient(90deg,#f0c78d,var(--or));opacity:.6}
+.bar .mk{position:absolute;top:-7px;width:4px;height:26px;background:var(--ink);border-radius:2px}
+.bar .mk span{position:absolute;top:-21px;left:50%;transform:translateX(-50%);font-size:11px;font-weight:700;white-space:nowrap}
+.cap{display:flex;justify-content:space-between;font-size:11.5px;color:var(--mut);font-variant-numeric:tabular-nums}
+.btn{display:flex;align-items:center;justify-content:center;border-radius:99px;min-height:50px;padding:0 20px;font:600 15px 'IBM Plex Sans',system-ui,sans-serif;border:1px solid var(--or);background:var(--or);color:#fff;box-shadow:0 6px 16px #cd7d2e44;cursor:pointer;width:100%}
+.btn.gh{background:var(--card);color:var(--ink);border-color:var(--line);box-shadow:none}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.box{border-radius:14px;padding:11px 14px;font-size:13.5px;line-height:1.4}
+.box.w{background:var(--orl);color:#8a5a1a}.box.o{background:var(--grl);color:var(--gr)}
+@media (prefers-color-scheme:dark){.box.w{color:#e9c08a}}
+label{display:flex;flex-direction:column;gap:5px;font-size:12.5px;font-weight:700;color:var(--mut)}
+input,textarea{font:16px 'IBM Plex Sans',system-ui,sans-serif;color:var(--ink);background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;min-height:48px;width:100%}
+textarea{resize:vertical}
+.conf{display:none;border:2px solid var(--or);background:var(--card);border-radius:22px;padding:18px;flex-direction:column;gap:10px}
+.conf.on{display:flex}
+.note{font-size:12px;color:var(--mut);text-align:center}
+[hidden]{display:none!important}
+</style>
+
+<div class="wrap">
+  <div class="sw g"><button class="on" data-u="own">Homeowner: compare bids</button><button data-u="pro">Contractor: place a bid</button></div>
+  <div class="hd g"><span class="logo">Job<b>file</b></span><nav class="nav"><span>Projects</span><span>Marketplace</span><span>Settings</span><span class="pill">Sign out</span></nav></div>
+
+  <!-- HOMEOWNER -->
+  <div class="body g" id="own">
+    <span class="back">‹ Posted jobs</span>
+    <h1>Bathroom: Walk-in shower, Double vanity +2 more</h1>
+    <div class="row" style="justify-content:flex-start;flex-wrap:wrap"><span class="tag">Bathroom</span><span class="tag g">Open · 22 days left</span></div>
+    <div class="mut sm">Plano, TX 75074 · 60 sq ft · Posted Oct 29</div>
+
+    <div class="card ai"><span class="tag">✦ AI cost reference</span>
+      <div class="big">$12,400 – $18,900</div><div class="mut sm">Most likely about $15,200 · medium confidence</div></div>
+
+    <h2 style="font-size:22px" id="hbids">3 bids</h2>
+
+    <div class="card best" id="b1">
+      <div class="row"><b style="font-size:17px">Alvarez Builders</b><span class="tag g">Best fit</span></div>
+      <div class="mut sm"><span class="stars">★★★★★</span> 4.9 · 12 reviews</div>
+      <span class="tag g" style="border:0">✓ Insurance verified until Nov 12, 2027</span>
+      <div class="big">$15,800</div>
+      <div class="mut sm">8 weeks · starts Nov 18</div>
+      <div><div class="bar"><div class="rng"></div><div class="mk" style="left:50%"></div></div><div class="cap"><span>$12,400</span><span>AI range</span><span>$18,900</span></div></div>
+      <div class="mut sm"><b>Included:</b> Permits, tile, glass door, haul-away.</div>
+      <div class="mut sm">"We can start right after the permit clears. Happy to walk the space first."</div>
+      <div class="two"><button class="btn gh" type="button">Message</button><button class="btn" type="button" data-acc="Alvarez Builders|$15,800">Accept bid</button></div>
+    </div>
+
+    <div class="card">
+      <div class="row"><b style="font-size:17px">Lone Star Remodeling</b></div>
+      <div class="mut sm"><span class="stars">★★★★☆</span> 4.6 · 5 reviews</div>
+      <div class="big">$13,800</div>
+      <div class="mut sm">10 weeks · starts Dec 2</div>
+      <div><div class="bar"><div class="rng"></div><div class="mk" style="left:34%"></div></div><div class="cap"><span>$12,400</span><span>AI range</span><span>$18,900</span></div></div>
+      <div class="mut sm"><b>Included:</b> Tile and fixtures. Permits extra.</div>
+      <div class="two"><button class="btn gh" type="button">Message</button><button class="btn" type="button" data-acc="Lone Star Remodeling|$13,800">Accept bid</button></div>
+    </div>
+
+    <div class="card">
+      <div class="row"><b style="font-size:17px">QuickFix Pros</b></div>
+      <div class="mut sm">No reviews yet</div>
+      <div class="big">$8,900</div>
+      <div class="mut sm">4 weeks · starts next week</div>
+      <div><div class="bar"><div class="rng"></div><div class="mk" style="left:6%"></div></div><div class="cap"><span>$12,400</span><span>AI range</span><span>$18,900</span></div></div>
+      <div class="box w">This bid is well below the local range. Ask what is not included before you accept.</div>
+      <div class="two"><button class="btn gh" type="button">Message</button><button class="btn" type="button" data-acc="QuickFix Pros|$8,900">Accept bid</button></div>
+    </div>
+
+    <div class="conf" id="conf" role="dialog" aria-live="polite">
+      <h3 style="font-size:19px" id="ct">Accept this bid?</h3>
+      <div class="mut">Accepting opens a Jobfile project with this price and your scope filled in, and tells the other bidders. Nothing is charged. You both still review and sign the agreement.</div>
+      <div class="two"><button class="btn gh" type="button" id="cno">Not yet</button><button class="btn" type="button" id="cyes">Yes, accept</button></div>
+    </div>
+    <div class="card won" id="done" hidden><span class="tag g" style="width:max-content">Hired</span><h3 style="font-size:19px" id="dt"></h3><div class="mut">Your project is open. The agreement is filled in with the bid price and a default payment plan. The other bidders were told the job went elsewhere.</div><button class="btn" type="button">Open the project</button></div>
+    <button class="btn gh" type="button">Close this project (no more bids)</button>
+  </div>
+
+  <!-- CONTRACTOR -->
+  <div class="body g" id="pro" hidden>
+    <span class="back">‹ Marketplace</span>
+    <h1>Bathroom: Walk-in shower, Double vanity +2 more</h1>
+    <div class="row" style="justify-content:flex-start;flex-wrap:wrap"><span class="tag">Bathroom</span><span class="tag g">Open for bids</span></div>
+    <div class="mut sm">Plano, TX 75074 · 60 sq ft · by Jerry S.</div>
+    <div class="card"><b>Scope of work</b><div class="mut">• Walk-in shower<br>• Double vanity<br>• New tile floor<br>• Tile on shower walls<br>• Lighting and fan</div>
+      <div class="mut sm">Homeowner budget $12,000 – $17,000. The street address is shared with the contractor the homeowner hires.</div></div>
+    <div class="card ai"><span class="tag">✦ AI cost reference</span><div class="big">$12,400 – $18,900</div><div class="mut sm">Bid what the work really costs you.</div></div>
+
+    <div class="card">
+      <h2 style="font-size:20px">Place a bid</h2>
+      <div class="two">
+        <label>Your price ($)<input inputmode="decimal" placeholder="15800"></label>
+        <label>How many weeks?<input inputmode="numeric" placeholder="8"></label>
+      </div>
+      <label>Earliest start date<input type="date"></label>
+      <label>What is included (permits, materials…)<textarea rows="2" placeholder="Permits, tile, glass door, haul-away"></textarea></label>
+      <label>Note to the homeowner<textarea rows="3" placeholder="No phone numbers or emails. You can talk once the homeowner accepts."></textarea></label>
+      <button class="btn" type="button" id="sendbid">Send bid</button>
+      <div class="box o" id="sent" hidden>Your bid was sent. You can edit or withdraw it until the homeowner decides.</div>
+      <div class="note">Your Jobfile rating and insurance badge show on your bid. Other contractors never see your price.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var $=function(i){return document.getElementById(i)};
+  Array.prototype.forEach.call(document.querySelectorAll('.sw button'),function(b){b.addEventListener('click',function(){
+    Array.prototype.forEach.call(document.querySelectorAll('.sw button'),function(x){x.classList.toggle('on',x===b)});
+    $('own').hidden=b.dataset.u!=='own';$('pro').hidden=b.dataset.u!=='pro';
+  })});
+  var pick='';
+  Array.prototype.forEach.call(document.querySelectorAll('[data-acc]'),function(b){b.addEventListener('click',function(){
+    pick=b.dataset.acc;var p=pick.split('|');
+    $('ct').textContent='Accept '+p[0]+' at '+p[1]+'?';
+    $('conf').classList.add('on');$('conf').scrollIntoView({behavior:'smooth',block:'center'});
+  })});
+  $('cno').addEventListener('click',function(){$('conf').classList.remove('on')});
+  $('cyes').addEventListener('click',function(){
+    var p=pick.split('|');$('conf').classList.remove('on');
+    $('dt').textContent='You hired '+p[0]+' for '+p[1];$('done').hidden=false;$('done').scrollIntoView({behavior:'smooth',block:'center'});
+  });
+  $('sendbid').addEventListener('click',function(){$('sent').hidden=false});
+})();
+</script>
