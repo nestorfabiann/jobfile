@@ -26,3 +26,12 @@ Homeowners post projects. Local contractors bid. An AI cost reference shows the 
 
 ## Update 2026-11-01: tap-to-pick scope
 The Post step now shows suggested scope items per job type (kitchen, bathroom, painting, roofing, flooring, landscaping), grouped (e.g. Cabinets, Countertops). Homeowners tap items instead of writing a description. The picked list plus an optional note becomes the project scope, and the AI cost reference is built from the picked items and the size. Prices in the mockup are sample numbers. The same picker could also be added to the live "Start a project" invite form.
+
+## Update 2026-11-01: Bids tab on the contractor profile (approved, build with the marketplace)
+Mockup: `mockup-bids-tab.html` (published: https://claude.ai/artifact/HGbSdMUTJ4q6uYMDAQ4vcp).
+- New "Bids" tab in the contractor's business profile (private to the contractor, never shown to homeowners).
+- Tiles: submitted, won, win rate, waiting now. Filters: All, Waiting, Won, Not selected (Withdrawn hidden unless filtered).
+- Each card: job title, location, homeowner first name and last initial, the contractor's price, date, and a bar placing the bid against the AI range. Waiting bids can be edited or withdrawn; won bids link to the Jobfile project; not-selected bids are locked and do not reveal the winning price.
+- Public profile shows only results (completed projects, rating), never bid counts or win rate.
+- Alerts: bid accepted, bid not selected, homeowner question about a bid.
+- Data: needs the `bids` table from the build plan (status waiting/won/not_selected/withdrawn, price, weeks, start date, note, listing_id, contractor company_id).

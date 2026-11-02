@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Contractor Bids Tab</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#cd7d2e;--orl:#f9efe4;--gr:#1f7a55;--grl:#d9f1e6;--rad:20px}
+@media(prefers-color-scheme:dark){:root{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--grl:#173a2c}}
+*{box-sizing:border-box}body{margin:0;background:#e9e5dc;font-family:'IBM Plex Sans',system-ui,sans-serif;color:var(--ink)}
+@media(prefers-color-scheme:dark){body{background:#0d0c0b}}
+.wrap{max-width:430px;margin:0 auto;min-height:100vh;background:var(--bg);padding-bottom:40px}
+h1,h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0}
+.top{padding:12px 18px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line)}
+.logo{font-family:'Bricolage Grotesque';font-weight:800;font-size:20px}.logo b{color:var(--or)}
+.pill{font-size:12px;padding:5px 10px;border-radius:99px;background:var(--orl);color:var(--or);font-weight:600}
+.seg{display:flex;gap:6px;padding:10px 18px;overflow:auto;border-bottom:1px solid var(--line)}
+.seg button{white-space:nowrap;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:8px 13px;border-radius:99px;font:500 13px 'IBM Plex Sans'}
+.seg button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.scr{display:none;padding:20px 18px}.scr.on{display:block}
+.eyebrow{font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--or);font-weight:600}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--rad);padding:16px;margin-top:12px}
+.card.hl{border:2px solid var(--or)}
+.mut{color:var(--mut);font-size:14px}.or{color:var(--or)}.note{font-size:12px;color:var(--mut);margin-top:8px}
+.btn{display:block;width:100%;text-align:center;border-radius:99px;padding:15px;font:600 16px 'IBM Plex Sans';border:1px solid var(--line);background:var(--card);color:var(--ink);margin-top:10px}
+.btn.p{background:var(--or);color:#fff;border-color:var(--or);box-shadow:0 6px 16px #cd7d2e44}
+.flex{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.tag{display:inline-block;font-size:12px;font-weight:600;padding:4px 10px;border-radius:99px;background:var(--orl);color:var(--or)}.tag.g{background:var(--grl);color:var(--gr)}
+.kv div{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line);font-size:14px}.kv div:last-child{border:0}
+.chk{display:flex;gap:10px;align-items:flex-start;padding:8px 0;font-size:14px}.chk i{flex:none;width:22px;height:22px;border-radius:50%;background:var(--grl);color:var(--gr);display:grid;place-items:center;font-style:normal;font-size:13px;font-weight:700}
+.big{font-family:'Bricolage Grotesque';font-weight:800;font-size:28px;letter-spacing:-.03em}
+.tabs{display:flex;gap:4px;overflow:auto;border-bottom:1px solid var(--line);margin:14px -18px 0;padding:0 18px}
+.tabs button{border:0;background:none;padding:10px 10px;font:500 14px 'IBM Plex Sans';color:var(--mut);border-bottom:2px solid transparent;white-space:nowrap}.tabs button.on{color:var(--or);border-color:var(--or)}
+.pane{display:none}.pane.on{display:block}
+.msg{max-width:85%;padding:10px 13px;border-radius:16px;margin-top:10px;font-size:14px}.msg.a{background:var(--card);border:1px solid var(--line)}.msg.b{background:var(--or);color:#fff;margin-left:auto}
+.stage{display:flex;gap:4px;margin:12px 0 4px}.stage i{flex:1;height:6px;border-radius:4px;background:var(--line)}.stage i.d{background:var(--or)}
+.todo{border-left:4px solid var(--or);background:var(--orl);border-radius:12px;padding:12px 14px;margin-top:12px;font-size:14px}
+.stars{color:var(--or)}
+.toast{position:fixed;left:50%;bottom:30px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:14px;font-size:14px;opacity:0;transition:.25s;pointer-events:none;max-width:360px;text-align:center}.toast.on{opacity:1}
+.arrow{text-align:center;color:var(--or);font-size:22px;margin:6px 0}
+.s{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin:0 -18px;padding:0 18px;overflow:auto}
+.tabs button{border:0;background:none;padding:12px 12px;font:500 15px 'IBM Plex Sans';color:var(--mut);border-bottom:2px solid transparent;white-space:nowrap}.tabs button.on{color:var(--or);border-color:var(--or)}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}.tile{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 14px}.tile small{display:block;font-size:12px;color:var(--mut)}.tile b{font-family:'Bricolage Grotesque';font-size:24px;letter-spacing:-.03em}
+.chips{display:flex;gap:7px;overflow:auto;margin-top:14px}.chips button{white-space:nowrap;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:99px;padding:7px 12px;font:500 13px 'IBM Plex Sans'}.chips button.on{background:var(--orl);color:var(--or);border-color:#ecd4a8}
+.bar{position:relative;height:10px;border-radius:8px;background:var(--line);margin:22px 0 6px}.bar .rng{position:absolute;top:0;bottom:0;border-radius:8px;background:#f0c78d}.bar .mk{position:absolute;top:-5px;width:4px;height:20px;background:var(--ink);border-radius:2px}.bar .bd{position:absolute;top:-3px;width:3px;height:16px;background:var(--bl);border-radius:2px}
+.t.w{background:var(--grl);color:var(--gr)}.t.n{background:#eee;color:#666}.t.p{background:#fff3cd;color:#8a6100}
+@media(prefers-color-scheme:dark){.t.n{background:#2c2a27;color:#bbb}.t.p{background:#3a3016;color:#e8c46a}}
+.lg{display:flex;gap:12px;font-size:11px;color:var(--mut);margin-bottom:4px}.lg i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px;vertical-align:-1px}
+.hide{display:none}
+</style></head><body><div class="wrap">
+<div class="top"><div class="logo">Job<b>file</b></div><span class="pill">Bids tab · preview</span></div>
+<div class="seg" id="seg"><button class="on" data-s="a">1 · My bids</button><button data-s="b">2 · Homeowner view</button><button data-s="c">3 · How it connects</button></div>
+
+<section class="scr on" id="a">
+ <div class="eyebrow">Contractor · Nesty's Painting</div><h2 style="font-size:26px;margin:6px 0 0">Business profile</h2>
+ <div class="tabs"><button>Profile</button><button class="on">Bids</button><button>Insurance</button><button>Photos</button></div>
+ <div class="tiles"><div class="tile"><small>Submitted</small><b>12</b></div><div class="tile"><small>Won</small><b>3</b></div><div class="tile"><small>Win rate</small><b>25%</b></div><div class="tile"><small>Waiting now</small><b>2</b></div></div>
+ <div class="note">Only you can see this tab. Homeowners never see your other bids.</div>
+ <div class="chips" id="f"><button class="on" data-f="all">All</button><button data-f="wait">Waiting</button><button data-f="won">Won</button><button data-f="lost">Not selected</button></div>
+ <div class="lg" style="margin-top:12px"><span><i style="background:#f0c78d"></i>AI range</span><span><i style="background:var(--ink)"></i>Your bid</span></div>
+ <div id="list"><div class="card bid" data-st="wait"><div class="flex"><b style="font-size:16px">Full kitchen remodel with island</b><span class="tag t p">Waiting</span></div>
+<div class="mut">Plano, TX · Jerry S.</div>
+<div class="flex" style="margin-top:10px"><div><small class="mut">Your bid</small><div class="big" style="font-size:22px">$31,400</div></div><div class="mut" style="text-align:right">Sent Oct 30 · 3 bids total</div></div>
+<div class="bar"><div class="rng" style="left:18%;right:22%"></div><div class="mk" style="left:50%"></div></div>
+<div class="note">Homeowner budget $24k to $38k · AI range $24k to $38k</div><div class="flex" style="gap:10px"><button class="btn" style="margin:10px 0 0" data-toast="Opens the bid to change price or note (while still waiting)">Edit bid</button><button class="btn" style="margin:10px 0 0" data-toast="Bid withdrawn. Jerry is told.">Withdraw</button></div></div><div class="card bid" data-st="wait"><div class="flex"><b style="font-size:16px">Interior repaint, 3 bedrooms</b><span class="tag t p">Waiting</span></div>
+<div class="mut">Frisco, TX · Dana R.</div>
+<div class="flex" style="margin-top:10px"><div><small class="mut">Your bid</small><div class="big" style="font-size:22px">$3,600</div></div><div class="mut" style="text-align:right">Sent Oct 29 · 1 bid total</div></div>
+<div class="bar"><div class="rng" style="left:18%;right:22%"></div><div class="mk" style="left:55%"></div></div>
+<div class="note">Homeowner budget $2,800 to $4,200</div></div><div class="card bid" data-st="won"><div class="flex"><b style="font-size:16px">Fence replacement</b><span class="tag t w">Won</span></div>
+<div class="mut">Allen, TX · Marcus B.</div>
+<div class="flex" style="margin-top:10px"><div><small class="mut">Your bid</small><div class="big" style="font-size:22px">$5,900</div></div><div class="mut" style="text-align:right">Won Oct 22</div></div>
+<div class="bar"><div class="rng" style="left:18%;right:22%"></div><div class="mk" style="left:48%"></div></div>
+<div class="note">Project opened in Jobfile</div><button class="btn p" data-toast="Opens the Jobfile project">Open project</button></div><div class="card bid" data-st="lost"><div class="flex"><b style="font-size:16px">Bathroom renovation</b><span class="tag t n">Not selected</span></div>
+<div class="mut">McKinney, TX · Priya K.</div>
+<div class="flex" style="margin-top:10px"><div><small class="mut">Your bid</small><div class="big" style="font-size:22px">$14,800</div></div><div class="mut" style="text-align:right">Not selected Oct 18</div></div>
+<div class="bar"><div class="rng" style="left:18%;right:22%"></div><div class="mk" style="left:70%"></div></div>
+<div class="note">Homeowner chose another bid. Winning price is not shown.</div></div></div>
+</section>
+
+<section class="scr" id="b">
+ <div class="eyebrow">Homeowner · Jerry</div><h2 style="font-size:26px;margin:6px 0 4px">What homeowners see</h2><div class="mut">Your public profile shows results, never your private bids.</div>
+ <div class="card"><b style="font-size:20px">Nesty's Painting</b><div style="margin:8px 0"><span class="tag g">✓ Insurance verified</span><span class="tag">Bids on Jobfile</span></div>
+  <div class="kv"><div><span>Projects completed on Jobfile</span><b>3</b></div><div><span>Rating</span><b>★ 4.9</b></div><div><span>Typically replies</span><b>Within a day</b></div></div></div>
+ <div class="card hl"><b>Bid on your project</b><div class="mut" style="margin-top:6px">Homeowners see the bid you sent them: price, timeline and note, next to your rating and insurance badge.</div></div>
+ <div class="note">Win rate and number of bids stay private. They are for you only.</div>
+</section>
+
+<section class="scr" id="c">
+ <div class="eyebrow">How it fits together</div><h2 style="font-size:26px;margin:6px 0 10px">One tab, four statuses</h2>
+ <div class="card"><div class="chk"><i>1</i><span><b>Waiting</b>: you sent a bid, the homeowner hasn't chosen. You can edit or withdraw.</span></div>
+ <div class="chk"><i>2</i><span><b>Won</b>: the homeowner accepted. A Jobfile project opens and the bid links to it.</span></div>
+ <div class="chk"><i>3</i><span><b>Not selected</b>: someone else was chosen, or the job closed. Locked, kept for your records.</span></div>
+ <div class="chk"><i>4</i><span><b>Withdrawn</b>: you took it back. Hidden from the list unless you filter for it.</span></div></div>
+ <div class="card"><b>You get alerts for</b><div class="mut" style="margin-top:6px">A bid accepted, a bid not selected, and a homeowner's question about your bid.</div></div>
+ <div class="card"><b>Needs the marketplace first</b><div class="mut" style="margin-top:6px">Bids only exist once homeowners can post jobs and contractors can bid on them. This tab is built together with that feature.</div></div>
+</section>
+</div><div class="toast" id="toast"></div>
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+function go(id){$$('.scr').forEach(e=>e.classList.toggle('on',e.id===id));$$('#seg button').forEach(b=>b.classList.toggle('on',b.dataset.s===id));scrollTo(0,0)}
+$$('[data-s]').forEach(b=>b.onclick=()=>go(b.dataset.s));
+$$('#f button').forEach(b=>b.onclick=()=>{$$('#f button').forEach(x=>x.classList.toggle('on',x===b));$$('#list .bid').forEach(c=>c.classList.toggle('hide',b.dataset.f!=='all'&&c.dataset.st!==b.dataset.f))});
+$$('[data-toast]').forEach(b=>b.onclick=()=>{const t=$('#toast');t.textContent=b.dataset.toast;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),2400)});
+</script></body></html>
