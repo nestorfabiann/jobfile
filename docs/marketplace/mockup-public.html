@@ -1,0 +1,221 @@
+<title>Jobfile Public Marketplace</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: phone-width column. Signed-out visitors see the open-jobs board; Bid / Post gate to sign-in and return to the same job. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#cd7d2e;--orl:#f9efe4;--gr:#1f7a55;--grl:#d9f1e6;--bl:#2a4fc4;--bar:#2a4fc4;--rad:20px;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--grl:#173a2c;--bl:#7c9bff;--bar:#7c9bff;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--grl:#173a2c;--bl:#7c9bff;--bar:#7c9bff;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif;padding-left:max(0px,env(safe-area-inset-left,0px));padding-right:max(0px,env(safe-area-inset-right,0px))}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh}
+.g{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;text-wrap:balance}
+.tabs{display:flex;gap:6px;padding-block:10px;overflow:auto;border-bottom:1px solid var(--line);position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);z-index:5}
+.tabs button{white-space:nowrap;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:8px 13px;border-radius:99px;font:500 13px 'IBM Plex Sans',system-ui,sans-serif;cursor:pointer}
+.tabs button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.bar{display:flex;justify-content:space-between;align-items:center;padding-block:14px;border-bottom:1px solid var(--line)}
+.logo{font-family:'Bricolage Grotesque';font-weight:800;font-size:21px;letter-spacing:-.02em}.logo b{color:var(--or)}
+.btn{display:inline-flex;align-items:center;justify-content:center;border-radius:99px;padding:10px 16px;font:600 14px 'IBM Plex Sans',system-ui,sans-serif;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer;text-decoration:none}
+.btn.p{background:var(--or);border-color:var(--or);color:#fff}
+.btn.full{width:100%;padding:15px;font-size:16px;margin-top:10px}
+.scr{display:none;padding-block:20px 40px}.scr.on{display:block}
+.eyebrow{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--or);font-weight:600}
+.hero h1{font-size:36px;line-height:1.04;margin:8px 0 12px;font-weight:800}
+.hero p{color:var(--mut);font-size:16px;line-height:1.5;margin:0 0 16px}
+.cta{display:flex;gap:10px;flex-wrap:wrap}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:22px 0 6px}
+.chip{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:99px;padding:8px 14px;font:500 13px 'IBM Plex Sans',system-ui,sans-serif;cursor:pointer}
+.chip.on{background:var(--bl);color:#fff;border-color:var(--bl)}
+.count{font-size:13px;color:var(--mut);margin:14px 0 4px}
+.job{display:block;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:var(--rad);padding:16px;margin-top:12px;color:inherit;font:inherit;cursor:pointer}
+.job h3{font-size:19px;font-weight:800}
+.meta{display:flex;flex-wrap:wrap;gap:6px 10px;font-size:13px;color:var(--mut);margin-top:6px}
+.tag{font-size:12px;border-radius:99px;padding:3px 9px;background:var(--orl);color:var(--or);font-weight:600}
+.tag.g{background:var(--grl);color:var(--gr)}
+.scope{font-size:14px;line-height:1.45;margin:10px 0 0;color:var(--ink)}
+.range{margin-top:14px}
+.range .lbl{display:flex;justify-content:space-between;font-size:12px;color:var(--mut)}
+.track{position:relative;height:8px;border-radius:99px;background:var(--line);margin:7px 0 5px}
+.fill{position:absolute;top:0;bottom:0;border-radius:99px;background:var(--bar);opacity:.85}
+.dot{position:absolute;top:-3px;width:14px;height:14px;border-radius:50%;background:var(--or);border:2px solid var(--card);transform:translateX(-50%)}
+.price{font-family:'Bricolage Grotesque';font-weight:800;font-size:20px;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.foot{display:flex;justify-content:space-between;align-items:center;margin-top:12px;font-size:13px;color:var(--mut)}
+.link{color:var(--bl);font-weight:600}
+.note{background:var(--orl);border-radius:14px;padding:12px 14px;font-size:13px;line-height:1.45;margin-top:16px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:var(--rad);padding:18px;margin-top:14px}
+.panel h3{font-size:18px}
+.mut{color:var(--mut);font-size:14px;line-height:1.5}
+.lock{border:1px dashed var(--line);border-radius:14px;padding:12px 14px;margin-top:12px;font-size:14px;color:var(--mut)}
+.lock b{color:var(--ink)}
+.field{width:100%;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:14px;padding:14px;font:16px 'IBM Plex Sans',system-ui,sans-serif;margin-top:10px}
+.cap{font-size:12px;color:var(--mut);padding:14px 0 0}
+.how{display:grid;gap:10px;margin-top:22px}
+.how div{display:flex;gap:12px;align-items:flex-start;font-size:14px;line-height:1.45}
+.how i{flex:none;width:30px;height:30px;border-radius:50%;background:var(--orl);color:var(--or);display:grid;place-items:center;font-style:normal;font-weight:700;font-size:14px}
+</style>
+
+<div class="wrap">
+  <div class="tabs g" id="tabs">
+    <button class="on" data-s="home">1 · Public board</button>
+    <button data-s="job">2 · Job (signed out)</button>
+    <button data-s="gate">3 · Sign-in gate</button>
+  </div>
+
+  <!-- Screen 1: public board -->
+  <section class="scr on g" id="home">
+    <div class="bar" style="margin:-20px 0 0;">
+      <div class="logo">JOB<b>FILE</b></div>
+      <a class="btn" href="#gate" data-go="gate">Sign in</a>
+    </div>
+    <div class="hero" style="padding-top:22px">
+      <div class="eyebrow">Texas · open jobs</div>
+      <h1>Real jobs from homeowners, waiting for bids.</h1>
+      <p>Browse what people near you want done. Each job shows the scope and a local price range. Sign in to bid or to post your own.</p>
+      <div class="cta">
+        <button class="btn p" data-go="gate">Post a project</button>
+        <button class="btn" data-go="gate">I'm a contractor</button>
+      </div>
+    </div>
+
+    <div class="chips" id="chips">
+      <button class="chip on" data-f="all">All</button>
+      <button class="chip" data-f="Kitchen remodel">Kitchen remodel</button>
+      <button class="chip" data-f="Bathroom">Bathroom</button>
+      <button class="chip" data-f="Painting">Painting</button>
+      <button class="chip" data-f="Roofing">Roofing</button>
+      <button class="chip" data-f="Flooring">Flooring</button>
+      <button class="chip" data-f="Landscaping">Landscaping</button>
+    </div>
+    <div class="count" id="count">5 open projects</div>
+
+    <div id="list">
+      <button class="job" data-type="Painting" data-go="job">
+        <div style="display:flex;justify-content:space-between;gap:10px;align-items:start"><h3>Interior painting, 3 bedrooms</h3><span class="tag">Painting</span></div>
+        <div class="meta"><span>Plano, TX 75023</span><span>·</span><span>Posted today</span><span>·</span><span>2 bids</span></div>
+        <p class="scope">Walls and ceilings in 3 bedrooms and hallway. Patch small nail holes. Two coats, color already chosen.</p>
+        <div class="range"><div class="lbl"><span>AI price reference</span><span>1,450 sq ft</span></div>
+          <div class="track"><div class="fill" style="left:18%;right:30%"></div><div class="dot" style="left:48%"></div></div>
+          <div class="price">$3,200 – $4,600</div></div>
+        <div class="foot"><span>Sign in to bid</span><span class="link">View job →</span></div>
+      </button>
+      <button class="job" data-type="Kitchen remodel" data-go="job">
+        <div style="display:flex;justify-content:space-between;gap:10px;align-items:start"><h3>Kitchen refresh with new counters</h3><span class="tag">Kitchen remodel</span></div>
+        <div class="meta"><span>Frisco, TX 75034</span><span>·</span><span>Posted yesterday</span><span>·</span><span class="tag g">Budget set</span></div>
+        <p class="scope">Replace countertops, new sink and faucet, tile backsplash, paint cabinets. Layout stays the same.</p>
+        <div class="range"><div class="lbl"><span>AI price reference</span><span>180 sq ft</span></div>
+          <div class="track"><div class="fill" style="left:30%;right:20%"></div><div class="dot" style="left:56%"></div></div>
+          <div class="price">$14,500 – $22,000</div></div>
+        <div class="foot"><span>0 bids</span><span class="link">View job →</span></div>
+      </button>
+      <button class="job" data-type="Roofing" data-go="job">
+        <div style="display:flex;justify-content:space-between;gap:10px;align-items:start"><h3>Replace shingle roof after hail</h3><span class="tag">Roofing</span></div>
+        <div class="meta"><span>McKinney, TX 75070</span><span>·</span><span>Posted 2 days ago</span><span>·</span><span>4 bids</span></div>
+        <p class="scope">Tear off and replace architectural shingles, about 28 squares. Insurance claim approved.</p>
+        <div class="range"><div class="lbl"><span>AI price reference</span><span>2,800 sq ft</span></div>
+          <div class="track"><div class="fill" style="left:22%;right:26%"></div><div class="dot" style="left:50%"></div></div>
+          <div class="price">$11,000 – $16,500</div></div>
+        <div class="foot"><span>Homestead property</span><span class="link">View job →</span></div>
+      </button>
+      <button class="job" data-type="Bathroom" data-go="job">
+        <div style="display:flex;justify-content:space-between;gap:10px;align-items:start"><h3>Guest bathroom tub to walk-in shower</h3><span class="tag">Bathroom</span></div>
+        <div class="meta"><span>Allen, TX 75013</span><span>·</span><span>Posted 3 days ago</span><span>·</span><span>1 bid</span></div>
+        <p class="scope">Remove tub, new shower pan and glass door, tile walls floor to ceiling, new vanity light.</p>
+        <div class="range"><div class="lbl"><span>AI price reference</span><span>45 sq ft</span></div>
+          <div class="track"><div class="fill" style="left:26%;right:24%"></div><div class="dot" style="left:52%"></div></div>
+          <div class="price">$9,000 – $14,000</div></div>
+        <div class="foot"><span>Sign in to bid</span><span class="link">View job →</span></div>
+      </button>
+      <button class="job" data-type="Landscaping" data-go="job">
+        <div style="display:flex;justify-content:space-between;gap:10px;align-items:start"><h3>Backyard sod and sprinkler repair</h3><span class="tag">Landscaping</span></div>
+        <div class="meta"><span>Richardson, TX 75080</span><span>·</span><span>Posted 5 days ago</span><span>·</span><span>3 bids</span></div>
+        <p class="scope">New sod on about 2,000 sq ft, repair 4 sprinkler heads, remove dead shrubs along the fence.</p>
+        <div class="range"><div class="lbl"><span>AI price reference</span><span>2,000 sq ft</span></div>
+          <div class="track"><div class="fill" style="left:15%;right:42%"></div><div class="dot" style="left:40%"></div></div>
+          <div class="price">$2,400 – $4,100</div></div>
+        <div class="foot"><span>Sign in to bid</span><span class="link">View job →</span></div>
+      </button>
+    </div>
+
+    <div class="note"><b>What visitors don't see:</b> street addresses, homeowner names and phone numbers. Only the city and ZIP show until a homeowner accepts a bid.</div>
+
+    <div class="how">
+      <div><i>1</i><span>Homeowners post a job by tapping the scope items that apply.</span></div>
+      <div><i>2</i><span>Local contractors bid with a price, timeline and what's included.</span></div>
+      <div><i>3</i><span>The homeowner accepts one bid and the project opens with the agreement filled in.</span></div>
+    </div>
+  </section>
+
+  <!-- Screen 2: job detail, signed out -->
+  <section class="scr g" id="job">
+    <div class="bar" style="margin:-20px 0 0;">
+      <button class="btn" data-go="home">← All jobs</button>
+      <a class="btn" href="#gate" data-go="gate">Sign in</a>
+    </div>
+    <div style="padding-top:20px;display:flex;justify-content:space-between;gap:10px;align-items:start"><h2 style="font-size:28px;font-weight:800">Interior painting, 3 bedrooms</h2></div>
+    <div class="meta"><span class="tag">Painting</span><span>Plano, TX 75023</span><span>·</span><span>Posted today</span></div>
+
+    <div class="panel">
+      <h3>Scope of work</h3>
+      <p class="mut">Walls and ceilings in 3 bedrooms and hallway · Patch small nail holes · Two coats · Color already chosen</p>
+      <p class="mut" style="margin-bottom:0">About 1,450 sq ft. Home is occupied during the work.</p>
+    </div>
+
+    <div class="panel">
+      <h3>AI price reference</h3>
+      <div class="range"><div class="track"><div class="fill" style="left:18%;right:30%"></div><div class="dot" style="left:48%"></div></div>
+        <div class="price">$3,200 – $4,600 <span class="mut" style="font-family:'IBM Plex Sans';font-weight:400;font-size:13px">likely $3,900</span></div></div>
+      <p class="mut" style="margin:8px 0 0;font-size:13px">A reference for this area, not a quote. Based on the scope and size listed.</p>
+    </div>
+
+    <div class="lock"><b>Hidden until you sign in:</b> photos, the homeowner's budget, and who else has bid.</div>
+
+    <button class="btn p full" data-go="gate">Sign in to bid on this job</button>
+    <div class="cap">Free for contractors to look and bid. You'll come right back to this job after signing in.</div>
+  </section>
+
+  <!-- Screen 3: gate -->
+  <section class="scr g" id="gate">
+    <div class="bar" style="margin:-20px 0 0;">
+      <button class="btn" data-go="job">← Back</button>
+      <div class="logo">JOB<b>FILE</b></div>
+    </div>
+    <div class="panel" style="margin-top:24px">
+      <div class="eyebrow">Sign in to continue</div>
+      <h2 style="font-size:26px;font-weight:800;margin:8px 0 6px">Bid on "Interior painting, 3 bedrooms"</h2>
+      <p class="mut">Use the same email sign-in as everyone on Jobfile. No password to remember.</p>
+      <label for="em" style="display:block;font-size:13px;font-weight:600;margin-top:14px">Email address</label>
+      <input class="field" id="em" type="email" placeholder="you@example.com" style="margin-top:6px">
+      <button class="btn p full" id="send">Email me a sign-in link</button>
+      <p class="cap" id="sent" hidden style="color:var(--gr)">Link sent. Open it on this phone and you'll land back on the job.</p>
+    </div>
+    <p class="cap">Homeowners: use the email address your contractor invited, or start a new project.</p>
+  </section>
+</div>
+
+<script>
+(function(){
+  var scr=document.querySelectorAll('.scr'),tabs=document.querySelectorAll('#tabs button');
+  function show(id){
+    scr.forEach(function(s){s.classList.toggle('on',s.id===id)});
+    tabs.forEach(function(t){t.classList.toggle('on',t.dataset.s===id)});
+    window.scrollTo(0,0);
+  }
+  document.addEventListener('click',function(e){
+    var g=e.target.closest('[data-go]');
+    if(g){e.preventDefault();show(g.dataset.go);return}
+    var t=e.target.closest('#tabs button');
+    if(t){show(t.dataset.s);return}
+    var c=e.target.closest('.chip');
+    if(c){
+      document.querySelectorAll('.chip').forEach(function(x){x.classList.toggle('on',x===c)});
+      var f=c.dataset.f,n=0;
+      document.querySelectorAll('#list .job').forEach(function(j){
+        var ok=f==='all'||j.dataset.type===f;j.hidden=!ok;if(ok)n++;
+      });
+      document.getElementById('count').textContent=n+(n===1?' open project':' open projects');
+    }
+  });
+  document.getElementById('send').addEventListener('click',function(){document.getElementById('sent').hidden=false});
+})();
+</script>
