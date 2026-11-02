@@ -106,13 +106,15 @@ export default async function Projects({ searchParams }: { searchParams: { error
     .from('notifications')
     .select('id,title,created_at,project_id,kind')
     .is('read_at', null)
-    .in('kind', ['change', 'agreement', 'payment', 'bid', 'job_match'])
+    .in('kind', ['change', 'agreement', 'payment', 'review', 'bid', 'job_match'])
     .gt('created_at', new Date(Date.now() - 14 * 86400000).toISOString())
     .order('created_at', { ascending: false })
     .limit(30);
   const jobs = (unread ?? []).filter((n: any) => n.kind === 'job_match').length;
   (unread ?? []).forEach((n: any) => {
     if (n.kind === 'job_match' || (n.kind === 'bid' && !n.project_id)) return;
+    // Only alerts that ask the person to do something. "Fully signed", "approved" and "payment received" are just news.
+    if (n.kind !== 'bid' && !/needs your approval|ready to review|signed the agreement|payment requested|payment sent|rate your experience/i.test(n.title)) return;
     needs.push({ key: n.id, title: n.title, sub: when(n.created_at), href: `/n/${n.id}`, go: n.kind === 'bid' ? 'Open' : 'Review', tone: n.kind === 'bid' ? 'won' : 'new' });
   });
   if (jobs > 0) needs.push({ key: 'jobs', title: `${jobs} new job${jobs === 1 ? '' : 's'} near you`, sub: 'Matched to your trades and area', href: '/n/jobs', go: 'View', tone: 'new' });
