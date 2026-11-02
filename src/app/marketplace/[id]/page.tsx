@@ -37,17 +37,18 @@ export default async function ListingPage({ params, searchParams }: { params: { 
   const myBid = companyId ? allBids.find((b) => b.company_id === companyId) : undefined;
 
   // For the homeowner: who each bidder is, their rating and whether their insurance is verified.
-  const info = new Map<string, { name: string; avg: number; count: number; insured: boolean; until: string }>();
+  const info = new Map<string, { name: string; avg: number; count: number; insured: boolean; until: string; logo: string }>();
   if (owner && visible.length) {
     const cids = Array.from(new Set(visible.map((b) => b.company_id)));
     const [{ data: cos }, { data: ins }] = await Promise.all([
-      db.from('companies').select('id,name').in('id', cids),
+      db.from('companies').select('id,name,logo_path').in('id', cids),
       db.from('company_insurance').select('company_id,status,expires_on').in('company_id', cids),
     ]);
+    const logoUrls = await signedUrls('company-photos', (cos ?? []).map((c: any) => c.logo_path as string).filter(Boolean));
     for (const c of cos ?? []) {
       const s = summarize(await companyReviews(c.id as string));
       const good = (ins ?? []).filter((i: any) => i.company_id === c.id && isCurrent(i)).map((i: any) => i.expires_on as string).sort();
-      info.set(c.id as string, { name: c.name as string, avg: s.avg, count: s.count, insured: good.length > 0, until: good[0] ?? '' });
+      info.set(c.id as string, { name: c.name as string, avg: s.avg, count: s.count, insured: good.length > 0, until: good[0] ?? '', logo: (c as any).logo_path ? logoUrls.get((c as any).logo_path as string) ?? '' : '' });
     }
   }
 
@@ -119,9 +120,19 @@ export default async function ListingPage({ params, searchParams }: { params: { 
             return (
               <div className="card" key={b.id} style={b.status === 'won' ? { borderColor: 'var(--ok)' } : undefined}>
                 <div className="row" style={{ justifyContent: 'space-between' }}>
-                  <span className="stack" style={{ gap: 2 }}>
-                    <b>{c?.name ?? 'Contractor'}</b>
-                    <Link href={`/contractors/${b.company_id}`} className="small" style={{ fontWeight: 700 }}>View profile ›</Link>
+                  <span className="row" style={{ gap: 12, flexWrap: 'nowrap', minWidth: 0 }}>
+                    {c?.logo ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={c.logo} alt="" width={48} height={48} style={{ borderRadius: 14, objectFit: 'cover', flex: 'none' }} />
+                    ) : (
+                      <span aria-hidden="true" style={{ width: 48, height: 48, borderRadius: 14, flex: 'none', display: 'grid', placeItems: 'center', background: 'var(--accent-soft, #f9efe4)', color: 'var(--accent, #cd7d2e)', fontWeight: 800, fontSize: 20 }}>
+                        {(c?.name ?? 'C').trim().charAt(0).toUpperCase()}
+                      </span>
+                    )}
+                    <span className="stack" style={{ gap: 2, minWidth: 0 }}>
+                      <b>{c?.name ?? 'Contractor'}</b>
+                      <Link href={`/contractors/${b.company_id}`} className="small" style={{ fontWeight: 700 }}>View profile ›</Link>
+                    </span>
                   </span>
                   {b.status === 'won' ? <span className="pill ok">Hired</span> : b.status === 'not_selected' ? <span className="pill">Not selected</span> : null}
                 </div>
