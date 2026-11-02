@@ -1,0 +1,139 @@
+<title>Projects Tabs Preview</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: the live Projects page (cream header, nav) with a tab row. A switch at the top previews the homeowner and contractor versions. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#cd7d2e;--orl:#f9efe4;--orb:#ecd4a8;--gr:#1f7a55;--grl:#d9f1e6;--rd:#b3261e;--rdl:#fde8e6;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--grl:#173a2c;--rdl:#47201e;--rd:#ff8f85;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--grl:#173a2c;--rdl:#47201e;--rd:#ff8f85;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh}
+.g{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;text-wrap:balance}
+.sw{display:flex;gap:6px;padding-block:10px;border-bottom:1px dashed var(--line)}
+.sw button{flex:1;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:9px 12px;border-radius:99px;font:500 13px 'IBM Plex Sans',system-ui,sans-serif;cursor:pointer}
+.sw button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.hd{border-bottom:1px solid var(--line);padding-block:12px;display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center}
+.logo{font:800 20px 'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.02em}.logo b{color:var(--or)}
+.nav{display:flex;flex-wrap:wrap;gap:4px 16px;align-items:center;font-size:14px;font-weight:600}
+.nav .on{color:var(--or)}
+.pill{font-size:13px;font-weight:600;padding:7px 14px;border-radius:99px;background:var(--orl);color:var(--or)}
+.body{padding-block:20px 40px;display:flex;flex-direction:column;gap:14px}
+h1{font-size:30px;font-weight:800}
+.mut{color:var(--mut);font-size:14px;line-height:1.5}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);overflow-x:auto}
+.tabs button{flex:0 0 auto;background:none;border:0;border-bottom:3px solid transparent;padding:11px 14px 10px;font:700 14px 'IBM Plex Sans',system-ui,sans-serif;color:var(--mut);min-height:44px;cursor:pointer;display:flex;gap:7px;align-items:center}
+.tabs button.on{color:var(--ink);border-bottom-color:var(--or)}
+.badge{font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px;background:var(--or);color:#fff}
+.badge.q{background:var(--line);color:var(--mut)}
+.view{display:none;flex-direction:column;gap:14px}.view.on{display:flex}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:18px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.tag{display:inline-block;font-size:12px;font-weight:600;padding:5px 11px;border-radius:99px;background:var(--orl);color:var(--or);border:1px solid var(--orb)}
+.tag.g{background:var(--grl);color:var(--gr);border-color:transparent}
+.tag.r{background:var(--rdl);color:var(--rd);border-color:transparent}
+.tag.n{background:var(--line);color:var(--mut);border-color:transparent}
+.btn{display:flex;align-items:center;justify-content:center;border-radius:99px;min-height:52px;padding:0 20px;font:600 16px 'IBM Plex Sans',system-ui,sans-serif;border:1px solid var(--or);background:var(--or);color:#fff;box-shadow:0 6px 16px #cd7d2e44;cursor:pointer}
+.btn.gh{background:var(--card);color:var(--ink);border-color:var(--line);box-shadow:none;min-height:46px;font-size:15px}
+.price{font:800 19px 'Bricolage Grotesque',system-ui,sans-serif;color:var(--or);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:99px;padding:8px 13px;font:500 13px 'IBM Plex Sans',system-ui,sans-serif;cursor:pointer}
+.chip.on{background:var(--orl);color:var(--or);border-color:var(--orb)}
+.sep{border-top:1px solid var(--line);padding-top:10px}
+.cap{font-size:12px;color:var(--mut);text-align:center;margin-top:4px}
+.note{font-size:12.5px;color:var(--mut);line-height:1.45}
+[hidden]{display:none!important}
+</style>
+
+<div class="wrap">
+  <div class="sw g"><button class="on" data-u="home">Homeowner view</button><button data-u="con">Contractor view</button></div>
+  <div class="hd g"><span class="logo">Job<b>file</b></span>
+    <nav class="nav"><span class="on">Projects</span><span>Marketplace</span><span>Settings</span><span class="pill">Sign out</span></nav></div>
+
+  <!-- HOMEOWNER -->
+  <div class="body g" id="home">
+    <div><h1>Projects</h1><div class="mut" style="margin-top:6px">Signed in as bestdfwcontractors@gmail.com</div></div>
+    <div class="tabs" data-for="h">
+      <button class="on" data-v="h-proj">Projects <span class="badge q">1</span></button>
+      <button data-v="h-post">Posted jobs <span class="badge">2 new bids</span></button>
+    </div>
+
+    <div class="view on" id="h-proj">
+      <button class="btn">Start a project and invite a contractor</button>
+      <div class="card"><div class="row"><h3 style="font-size:18px">Kitchen and walls painting</h3><span class="tag g">Active</span></div><div class="mut">727 plano tx · Nesty's Painting</div></div>
+      <div class="note">Recent alerts appear below, same as today.</div>
+    </div>
+
+    <div class="view" id="h-post">
+      <button class="btn">+ Post a project to the marketplace</button>
+      <div class="card"><div class="row"><span class="tag">Bathroom</span><span class="tag g">Open · 22 days left</span></div>
+        <h3 style="font-size:19px">Bathroom: Walk-in shower, Double vanity +2 more</h3>
+        <div class="mut">Plano, TX 75074 · 60 sq ft</div>
+        <div class="row sep"><span class="price">$12,400 – $18,900</span><span class="tag">2 new bids</span></div>
+        <div class="mut">3 bids · lowest $13,800 · highest $17,500</div>
+        <div class="btn gh">Compare bids</div></div>
+      <div class="card"><div class="row"><span class="tag">Painting</span><span class="tag g">Open · 9 days left</span></div>
+        <h3 style="font-size:19px">Painting: Walls, Ceilings +1 more</h3>
+        <div class="mut">Plano, TX 75074 · 1,800 sq ft</div>
+        <div class="row sep"><span class="price">$3,200 – $4,600</span><span class="tag n">No bids yet</span></div></div>
+      <div class="card"><div class="row"><span class="tag">Kitchen remodel</span><span class="tag">Hired</span></div>
+        <h3 style="font-size:19px">Kitchen remodel: Quartz, Tile backsplash</h3>
+        <div class="mut">Hired Alvarez Builders · $31,400</div>
+        <div class="btn gh">Open the project</div></div>
+    </div>
+  </div>
+
+  <!-- CONTRACTOR -->
+  <div class="body g" id="con" hidden>
+    <div><h1>Projects</h1><div class="mut" style="margin-top:6px">Signed in as nestor.rodriguez92@gmail.com</div></div>
+    <div class="tabs" data-for="c">
+      <button class="on" data-v="c-proj">Projects <span class="badge q">1</span></button>
+      <button data-v="c-bids">Bids <span class="badge q">4</span></button>
+    </div>
+
+    <div class="view on" id="c-proj">
+      <div class="card"><div class="row"><h3 style="font-size:18px">Kitchen and walls painting</h3><span class="tag g">Active</span></div><div class="mut">727 plano tx · Jerry still</div></div>
+      <div class="btn gh">Browse open jobs in the Marketplace</div>
+    </div>
+
+    <div class="view" id="c-bids">
+      <div class="chips" id="fl">
+        <button class="chip on" data-f="all">All</button><button class="chip" data-f="Waiting">Waiting</button><button class="chip" data-f="Won">Won</button><button class="chip" data-f="Not selected">Not selected</button><button class="chip" data-f="Withdrawn">Withdrawn</button>
+      </div>
+      <div class="card bid" data-s="Waiting"><div class="row"><span class="tag">Painting</span><span class="tag">Waiting</span></div>
+        <h3 style="font-size:19px">Painting: Walls, Ceilings +1 more</h3><div class="mut">Plano, TX 75074 · bid sent Nov 1</div>
+        <div class="row sep"><span class="mut">Your bid</span><span class="price">$3,900</span></div><div class="mut">AI range $3,200 – $4,600 · 3 bids total</div></div>
+      <div class="card bid" data-s="Won"><div class="row"><span class="tag">Kitchen remodel</span><span class="tag g">Won</span></div>
+        <h3 style="font-size:19px">Kitchen remodel: Quartz, Tile backsplash</h3><div class="mut">Frisco, TX 75034 · bid sent Oct 28</div>
+        <div class="row sep"><span class="mut">Your bid</span><span class="price">$31,400</span></div><div class="btn gh">Open the project</div></div>
+      <div class="card bid" data-s="Not selected"><div class="row"><span class="tag">Roofing</span><span class="tag n">Not selected</span></div>
+        <h3 style="font-size:19px">Roofing: Asphalt shingles</h3><div class="mut">McKinney, TX 75070 · bid sent Oct 25</div>
+        <div class="row sep"><span class="mut">Your bid</span><span class="price">$14,200</span></div></div>
+      <div class="card bid" data-s="Withdrawn"><div class="row"><span class="tag">Flooring</span><span class="tag r">Withdrawn</span></div>
+        <h3 style="font-size:19px">Flooring: Luxury vinyl plank</h3><div class="mut">Allen, TX 75013 · bid sent Oct 22</div>
+        <div class="row sep"><span class="mut">Your bid</span><span class="price">$4,800</span></div></div>
+    </div>
+  </div>
+  <div class="cap g" style="padding-bottom:30px">Sample jobs and amounts for this preview.</div>
+</div>
+
+<script>
+(function(){
+  var $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
+  $$('.sw button').forEach(function(b){b.addEventListener('click',function(){
+    $$('.sw button').forEach(function(x){x.classList.toggle('on',x===b)});
+    document.getElementById('home').hidden=b.dataset.u!=='home';
+    document.getElementById('con').hidden=b.dataset.u!=='con';
+  })});
+  $$('.tabs').forEach(function(t){$$('button',t).forEach(function(b){b.addEventListener('click',function(){
+    $$('button',t).forEach(function(x){x.classList.toggle('on',x===b)});
+    var root=t.parentElement;
+    $$('.view',root).forEach(function(v){v.classList.toggle('on',v.id===b.dataset.v)});
+  })})});
+  $$('#fl .chip').forEach(function(c){c.addEventListener('click',function(){
+    $$('#fl .chip').forEach(function(x){x.classList.toggle('on',x===c)});
+    $$('.bid').forEach(function(b){b.hidden=!(c.dataset.f==='all'||b.dataset.s===c.dataset.f)});
+  })});
+})();
+</script>
