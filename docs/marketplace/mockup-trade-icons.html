@@ -1,0 +1,73 @@
+<title>Trade Icons</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: phone screens in three tabs. One icon per trade, drawn as line icons that take the page colors. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#cd7d2e;--orl:#f9efe4;--orb:#ecd4a8;--gr:#1f7a55;--grl:#d9f1e6;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--grl:#173a2c;--gr:#6fd1a3;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--grl:#173a2c;--gr:#6fd1a3;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:14px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px}
+h1,h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;text-wrap:balance}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
+.mut{color:var(--mut);font-size:14px;line-height:1.5}.sm{font-size:12.5px}
+.sw{display:flex;gap:6px}.sw button{flex:1;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:10px 4px;border-radius:99px;font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:44px}.sw button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.picks{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.pick{border:1.5px solid var(--line);background:var(--card);color:var(--ink);border-radius:18px;padding:12px 4px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:84px}
+.pick.on{border-color:var(--or);background:var(--orl)}
+.ic{display:inline-grid;place-items:center;color:var(--or)}
+.ic svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.chip{display:inline-flex;align-items:center;gap:6px;background:var(--orl);border:1px solid var(--orb);color:var(--or);border-radius:99px;padding:5px 12px 5px 8px;font-size:13px;font-weight:600;width:max-content}
+.pill{font-size:12px;font-weight:600;padding:5px 11px;border-radius:99px;background:var(--grl);color:var(--gr)}
+.top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.price{font:800 20px 'Bricolage Grotesque',sans-serif;color:var(--or)}
+.sec[hidden]{display:none}
+.row{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+button:focus-visible{outline:2px solid var(--or);outline-offset:2px}
+</style>
+
+<div class="wrap">
+  <div class="note"><b>Mockup.</b> One line icon for each of the six trades, used in three places. Icons are drawn in the app's own colors, so they work in light and dark mode and need nothing to download.</div>
+  <div class="sw" id="sw"><button class="on" data-s="a" type="button">1 · Posting</button><button data-s="b" type="button">2 · Job board</button><button data-s="c" type="button">3 · Job page</button></div>
+
+  <div id="a" class="sec" style="display:flex;flex-direction:column;gap:14px">
+    <div class="card"><h2 style="font-size:22px">What kind of project?</h2><div class="mut sm">The picker the homeowner sees when posting. Tap one.</div><div class="picks" id="picks"></div></div>
+  </div>
+
+  <div id="b" class="sec" hidden style="flex-direction:column;gap:14px">
+    <div><h2 style="font-size:24px">Open near you</h2><div class="mut sm">Contractors can spot their trade at a glance.</div></div>
+    <div class="card"><div class="top"><span class="chip" data-t="Roofing"></span><span class="pill">Open</span></div><h3 style="font-size:18px">Roofing: Asphalt shingles, Fix leaks</h3><div class="mut sm">ZIP 75079 · 2,000 sq ft</div></div>
+    <div class="card"><div class="top"><span class="chip" data-t="Flooring"></span><span class="pill">Open</span></div><h3 style="font-size:18px">Flooring: Luxury vinyl plank, Remove old flooring</h3><div class="mut sm">ZIP 75078 · 600 sq ft</div></div>
+    <div class="card"><div class="top"><span class="chip" data-t="Painting"></span><span class="pill">Open</span></div><h3 style="font-size:18px">Painting: Walls, Trim and doors</h3><div class="mut sm">ZIP 75072 · 1,800 sq ft</div></div>
+    <div class="card"><div class="top"><span class="chip" data-t="Kitchen remodel"></span><span class="pill">Open</span></div><h3 style="font-size:18px">Kitchen remodel: Quartz, New lighting</h3><div class="mut sm">ZIP 75074 · 200 sq ft</div></div>
+  </div>
+
+  <div id="c" class="sec" hidden style="flex-direction:column;gap:14px">
+    <div class="card"><div class="top"><span class="chip" data-t="Bathroom"></span><span class="pill">Open for bids</span></div><h1 style="font-size:26px">Bathroom: Walk-in shower, Double vanity</h1><div class="mut sm">ZIP 75093 · 60 sq ft</div></div>
+    <div class="card"><div class="mut sm">Also used on Posted jobs, the Bids tab and the public job pages. All six icons:</div>
+      <div class="row" id="all"></div></div>
+  </div>
+</div>
+
+<script>
+var P={
+'Kitchen remodel':'<path d="M5 10h14v7a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3z"/><path d="M3 10h18"/><path d="M9 6c0-1.5 1-1.5 1-3"/><path d="M14 6c0-1.5 1-1.5 1-3"/>',
+'Bathroom':'<path d="M3 12h18v3a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4z"/><path d="M6 12V6a2 2 0 0 1 4 0"/><path d="M7 19l-1 2"/><path d="M17 19l1 2"/>',
+'Painting':'<rect x="4" y="4" width="14" height="6" rx="1"/><path d="M18 7h2v5H11v3"/><rect x="9.5" y="15" width="3" height="6" rx="1"/>',
+'Roofing':'<path d="M3 12l9-8 9 8"/><path d="M6 10v10h12V10"/><path d="M10 20v-5h4v5"/>',
+'Flooring':'<rect x="3" y="5" width="18" height="14" rx="1"/><path d="M3 10h18"/><path d="M3 15h18"/><path d="M9 5v5"/><path d="M15 10v5"/><path d="M9 15v4"/>',
+'Landscaping':'<path d="M5 19c0-8 5-14 14-14 0 9-6 14-14 14z"/><path d="M5 19l8-8"/>'};
+function icon(t,px){return '<span class="ic" style="width:'+px+'px;height:'+px+'px"><svg viewBox="0 0 24 24" aria-hidden="true">'+P[t]+'</svg></span>'}
+function $(i){return document.getElementById(i)}
+var first=true;
+Object.keys(P).forEach(function(t){
+  var b=document.createElement('button');b.type='button';b.className='pick'+(t==='Painting'?' on':'');b.innerHTML=icon(t,30)+'<span>'+t+'</span>';
+  b.onclick=function(){[].forEach.call($('picks').children,function(x){x.classList.toggle('on',x===b)})};$('picks').appendChild(b);
+  var s=document.createElement('span');s.className='chip';s.innerHTML=icon(t,18)+t;$('all').appendChild(s)});
+[].forEach.call(document.querySelectorAll('.chip[data-t]'),function(c){c.innerHTML=icon(c.dataset.t,18)+c.dataset.t});
+[].forEach.call($('sw').children,function(b){b.onclick=function(){
+  [].forEach.call($('sw').children,function(x){x.classList.toggle('on',x===b)});
+  ['a','b','c'].forEach(function(id){var e=$(id);e.hidden=id!==b.dataset.s;e.style.display=e.hidden?'none':'flex'});window.scrollTo(0,0)}});
+</script>
