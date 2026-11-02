@@ -24,7 +24,7 @@ export default async function Projects({ searchParams }: { searchParams: { error
     sb.from('company_members').select('company_id, companies(name)').eq('user_id', user.id),
     sb
       .from('notifications')
-      .select('id,title,created_at,project_id')
+      .select('id,title,created_at,project_id,kind')
       .order('created_at', { ascending: false })
       .limit(5),
   ]);
