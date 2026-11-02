@@ -8,7 +8,7 @@ const esc = (s: string) =>
 type SendResult = { ok: boolean; skipped?: string; error?: string };
 
 /** Send one email through Resend. Skips quietly when no API key is set. */
-export async function sendEmail(opts: { to: string; subject: string; text: string; link?: string }): Promise<SendResult> {
+export async function sendEmail(opts: { to: string; subject: string; text: string; link?: string; cta?: string }): Promise<SendResult> {
   const key = process.env.RESEND_API_KEY;
   const from = process.env.EMAIL_FROM;
   if (!key || !from) return { ok: false, skipped: 'Email is not configured' };
@@ -18,7 +18,7 @@ export async function sendEmail(opts: { to: string; subject: string; text: strin
     `<div style="font-weight:800;letter-spacing:.02em;color:#1B56E0;margin-bottom:16px">JOBFILE</div>` +
     `<p style="font-size:16px;line-height:1.5;white-space:pre-wrap">${esc(opts.text)}</p>` +
     (opts.link
-      ? `<p style="margin-top:24px"><a href="${esc(opts.link)}" style="background:#1B56E0;color:#fff;text-decoration:none;padding:12px 22px;border-radius:999px;font-weight:700;display:inline-block">Open the project</a></p>`
+      ? `<p style="margin-top:24px"><a href="${esc(opts.link)}" style="background:#1B56E0;color:#fff;text-decoration:none;padding:12px 22px;border-radius:999px;font-weight:700;display:inline-block">${esc(opts.cta ?? 'Open the project')}</a></p>`
       : '') +
     `<p style="color:#55657C;font-size:12px;margin-top:32px">You can change how you get alerts in Settings.</p></div>`;
 
@@ -67,6 +67,8 @@ type Alert = {
   body: string;
   /** Page to open instead of the project, for example /marketplace/bids. */
   path?: string;
+  /** Email button text. Defaults to "Open the project". */
+  cta?: string;
   /** Send email even if the person turned alerts off (admin notices). */
   force?: boolean;
   /** Skip email and text if this person already got one for this project in the last few minutes. */
@@ -113,7 +115,7 @@ export async function notifyUsers(a: Alert) {
       const errors: string[] = [];
 
       if (!quiet && (p.notify_email || a.force) && p.email) {
-        const r = await sendEmail({ to: p.email, subject: a.title, text: a.body, link });
+        const r = await sendEmail({ to: p.email, subject: a.title, text: a.body, link, cta: a.cta });
         if (r.ok) update.email_sent_at = new Date().toISOString();
         else if (r.error) errors.push(r.error);
       }

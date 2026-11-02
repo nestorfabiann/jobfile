@@ -4,6 +4,7 @@ import { randomUUID } from 'node:crypto';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 import { supabaseAdmin } from '@/lib/supabase/server';
+import { JOB_TYPES, marketplaceEnabled } from '@/lib/marketplace';
 import { cleanUrl, instagramUrl, intOrNull, INSURANCE_KINDS, LANGUAGES, myOwnedCompany, PAYMENTS, pickFrom, SERVICES, type InsuranceKind } from '@/lib/companyProfile';
 
 const IMG: Record<string, string> = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' };
@@ -40,6 +41,14 @@ export async function saveBusinessProfile(formData: FormData) {
     facebook: cleanUrl(txt(formData, 'facebook', 300)),
     instagram: instagramUrl(txt(formData, 'instagram', 300)),
     other_link: cleanUrl(txt(formData, 'other_link', 300)),
+    // Local matching fields, only when the marketplace section of the form was shown.
+    ...(marketplaceEnabled() && formData.get('matching') === '1'
+      ? {
+          business_zip: /^\d{5}$/.test(txt(formData, 'business_zip', 5)) ? txt(formData, 'business_zip', 5) : null,
+          trades: pickFrom(Object.keys(JOB_TYPES), formData.getAll('trades')),
+          job_alerts: formData.get('job_alerts') === 'on',
+        }
+      : {}),
   };
   const { error } = await supabaseAdmin().from('companies').update(row).eq('id', companyId);
   if (error) redirect('/settings/business?error=Could+not+save.+Check+that+the+database+step+was+run.');

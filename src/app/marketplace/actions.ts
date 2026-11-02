@@ -3,6 +3,7 @@
 import { randomUUID } from 'node:crypto';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
+import { alertMatchingContractors } from '@/lib/matching';
 import { requireUser } from '@/lib/session';
 import { supabaseAdmin } from '@/lib/supabase/server';
 import { notifyUsers } from '@/lib/notify';
@@ -111,8 +112,9 @@ export async function publishListing(formData: FormData) {
     budget_min_cents: bmin,
     budget_max_cents: bmax,
     ...(ref ? { ai_low_cents: ref.low * 100, ai_high_cents: ref.high * 100, ai_likely_cents: ref.likely * 100, ai_confidence: ref.confidence, ai_breakdown: ref.breakdown, ai_notes: ref.notes } : {}),
-  }).select('id').single();
+  }).select('id,homeowner_id,job_type,zip,city,items,ai_low_cents,ai_high_cents').single();
   if (error || !l) back('/marketplace/new', 'Could not post the project. Check that the database step was run.');
+  await alertMatchingContractors(l as any);
   revalidatePath('/marketplace');
   redirect(`/marketplace/${l.id}?posted=1`);
 }

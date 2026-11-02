@@ -5,7 +5,7 @@ import { supabaseAdmin } from '@/lib/supabase/server';
 import { WorkPhotoUploader, InsuranceUploader } from '@/components/BusinessUploaders';
 import { saveBusinessProfile, deleteBusinessPhoto, removeInsurance } from './actions';
 import BusinessTabs from '@/components/BusinessTabs';
-import { marketplaceEnabled } from '@/lib/marketplace';
+import { JOB_TYPES, marketplaceEnabled } from '@/lib/marketplace';
 
 export const dynamic = 'force-dynamic';
 
@@ -59,7 +59,7 @@ export default async function Business({ searchParams }: { searchParams: { saved
           </div>
         </fieldset>
         <div className="grid2">
-          <label className="fld">Service area (miles)<input name="service_radius_mi" inputMode="numeric" defaultValue={c?.service_radius_mi ?? ''} /></label>
+          <label className="fld">{marketplaceEnabled() ? 'How far you travel (miles from your ZIP)' : 'Service area (miles)'}<input name="service_radius_mi" inputMode="numeric" defaultValue={c?.service_radius_mi ?? ''} /></label>
           <label className="fld">Year started<input name="year_started" inputMode="numeric" defaultValue={c?.year_started ?? ''} placeholder="2016" /></label>
           <label className="fld">Crew size<input name="crew_size" inputMode="numeric" defaultValue={c?.crew_size ?? ''} /></label>
           <label className="fld">Workmanship warranty<input name="warranty" maxLength={120} defaultValue={c?.warranty ?? ''} placeholder="2 years" /></label>
@@ -74,6 +74,22 @@ export default async function Business({ searchParams }: { searchParams: { saved
           <legend className="small muted">Payment methods you accept</legend>
           <div className="chips">{PAYMENTS.map((s) => <label className="chip" key={s}><input type="checkbox" name="payments" value={s} defaultChecked={has(c?.payments, s)} /><span>{s}</span></label>)}</div>
         </fieldset>
+        {marketplaceEnabled() && (
+          <>
+            <h2>Where you work</h2>
+            <input type="hidden" name="matching" value="1" />
+            <label className="fld">Business ZIP code<input name="business_zip" inputMode="numeric" maxLength={5} defaultValue={c?.business_zip ?? ''} placeholder="75074" /></label>
+            <p className="muted small">Marketplace jobs show how far away they are, and you only get alerts for jobs inside your travel distance (25 miles if you leave it blank). Distances are straight-line estimates.</p>
+            <fieldset className="stack" style={{ border: 0, padding: 0, margin: 0 }}>
+              <legend className="small muted">Jobs you want (leave all unchecked to see every type)</legend>
+              <div className="chips">{Object.keys(JOB_TYPES).map((s) => <label className="chip" key={s}><input type="checkbox" name="trades" value={s} defaultChecked={has(c?.trades, s)} /><span>{s}</span></label>)}</div>
+            </fieldset>
+            <label className="row" style={{ alignItems: 'flex-start', flexWrap: 'nowrap' }}>
+              <input type="checkbox" name="job_alerts" defaultChecked={c?.job_alerts ?? true} />
+              <span>Alert me about new jobs<span className="muted small" style={{ display: 'block' }}>In the app and by email when a matching job is posted. At most 10 a day.</span></span>
+            </label>
+          </>
+        )}
         <h2>Find you online</h2>
         <div className="grid2">
           <label className="fld">Website<input name="website" defaultValue={c?.website ?? ''} placeholder="yourcompany.com" /></label>
