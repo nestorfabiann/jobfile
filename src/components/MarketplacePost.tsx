@@ -2,9 +2,11 @@
 
 import { useState } from 'react';
 import { getReference, publishListing, type RefResult } from '@/app/marketplace/actions';
+import RangeBar from '@/components/RangeBar';
 
 type Types = Record<string, { size: number; sizeLabel: string; groups: [string, string[]][] }>;
 const money = (n: number) => '$' + Math.round(n).toLocaleString('en-US');
+const digits = (v: string) => parseInt(v.replace(/\D/g, ''), 10) || 0;
 
 export default function MarketplacePost({ types, aiOn }: { types: Types; aiOn: boolean }) {
   const names = Object.keys(types);
@@ -34,6 +36,19 @@ export default function MarketplacePost({ types, aiOn }: { types: Types; aiOn: b
     setRef(r);
     setBmin(String(r.ref.low));
     setBmax(String(r.ref.high));
+  }
+
+  // Compares the homeowner's budget with the AI range, once a reference exists.
+  let check: { tone: 'ok' | 'warn'; text: string } | null = null;
+  if (ref) {
+    const lo = digits(bmin);
+    const hi = digits(bmax);
+    const top = hi || lo;
+    if (top) {
+      if (top < ref.ref.low) check = { tone: 'warn', text: 'Your budget is below the typical range. Contractors may bid higher, or ask to trim the scope.' };
+      else if ((lo && lo > ref.ref.high) || top > ref.ref.high * 1.15) check = { tone: 'ok', text: 'Your budget is above the typical range. You may get room for upgrades or a cushion for surprises.' };
+      else check = { tone: 'ok', text: 'Your budget is inside the typical range for this scope.' };
+    }
   }
 
   return (
@@ -87,6 +102,7 @@ export default function MarketplacePost({ types, aiOn }: { types: Types; aiOn: b
             <div className="box" style={{ background: 'var(--surface-2)' }}>
               <div className="small muted">Typical range for your scope ({ref.ref.confidence} confidence)</div>
               <div style={{ fontSize: 26, fontWeight: 800 }}>{money(ref.ref.low)} – {money(ref.ref.high)}</div>
+              <RangeBar price={ref.ref.likely} lo={ref.ref.low} hi={ref.ref.high} />
               <div className="small">Most likely about {money(ref.ref.likely)}</div>
               {ref.ref.breakdown.map((b) => (
                 <div className="row small" key={b.group} style={{ justifyContent: 'space-between', flexWrap: 'nowrap' }}><span>{b.group}</span><b>{money(b.low)}–{money(b.high)}</b></div>
@@ -104,6 +120,8 @@ export default function MarketplacePost({ types, aiOn }: { types: Types; aiOn: b
           <label className="fld">From<input name="budget_min" inputMode="numeric" value={bmin} onChange={(e) => setBmin(e.target.value)} placeholder="$20,000" /></label>
           <label className="fld">To<input name="budget_max" inputMode="numeric" value={bmax} onChange={(e) => setBmax(e.target.value)} placeholder="$30,000" /></label>
         </div>
+        {check ? <div className={`box ${check.tone}`}>{check.text}</div> : null}
+        {!ref && aiOn ? <p className="muted small">Tap the AI cost reference button above and these fill in for you. You can change them.</p> : null}
         <h2>Address and details</h2>
         <label className="fld">Street address (optional)<input name="address" maxLength={200} autoComplete="street-address" /></label>
         <p className="muted small">Contractors never see your street address. It is shared only with the contractor you hire.</p>
