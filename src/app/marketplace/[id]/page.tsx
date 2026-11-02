@@ -7,6 +7,7 @@ import { companyReviews, summarize } from '@/lib/reviews';
 import { fmtDate, isCurrent, signedUrls } from '@/lib/companyProfile';
 import { firstNameInitial, listingOpen, listingTitle, requireMarketplace, type Bid, type Listing } from '@/lib/marketplace';
 import RangeBar from '@/components/RangeBar';
+import AcceptBid from '@/components/AcceptBid';
 import ListingPhotoUploader from '@/components/ListingPhotoUploader';
 import { acceptBid, closeListing, deleteListingPhoto, placeBid, withdrawBid } from '../actions';
 
@@ -148,11 +149,7 @@ export default async function ListingPage({ params, searchParams }: { params: { 
                 {b.inclusions ? <p className="small"><b>Included:</b> {b.inclusions}</p> : null}
                 {b.note ? <p className="small" style={{ whiteSpace: 'pre-wrap' }}>{b.note}</p> : null}
                 {open && b.status === 'waiting' && (
-                  <form action={acceptBid} className="stack" style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                    <input type="hidden" name="bid_id" value={b.id} />
-                    <p className="muted small">Accepting opens a Jobfile project with this price and your scope filled in, and tells the other bidders. Nothing is charged. You both still review and sign the agreement.</p>
-                    <div className="row"><button className="btn" type="submit">Accept this bid</button></div>
-                  </form>
+                  <AcceptBid action={acceptBid} bidId={b.id} name={c?.name ?? 'this contractor'} price={dollars(b.price_cents)} />
                 )}
               </div>
             );

@@ -17,7 +17,7 @@ const addDays = (d: string, n: number) => {
 
 const STAGES = ['Agreement', 'Active', 'Closeout', 'Complete'];
 
-export default async function Overview({ params }: { params: { id: string } }) {
+export default async function Overview({ params, searchParams }: { params: { id: string }; searchParams: { hired?: string } }) {
   const { sb, user, project, role, contractorName, homeownerName } = await loadProject(params.id);
   const base = `/projects/${project.id}`;
   const other = role === 'contractor' ? 'homeowner' : 'contractor';
@@ -105,6 +105,22 @@ export default async function Overview({ params }: { params: { id: string } }) {
         <h2 style={{ fontSize: 26 }}>{project.name}</h2>
         <p>{role === 'homeowner' ? <Link href={`/contractors/${project.company_id}`} style={{ color: 'inherit' }}>{contractorName}</Link> : contractorName} · {homeownerName}</p>
       </section>
+
+      {role === 'homeowner' && searchParams.hired === '1' && (
+        <section className="card why" aria-label="What happens next">
+          <span className="pill ok" style={{ width: 'max-content' }}>You hired {contractorName}</span>
+          <h2 style={{ fontSize: 22 }}>What happens next</h2>
+          <ol className="stack" style={{ margin: 0, paddingLeft: 20, display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <li><b>{contractorName} reviews the agreement.</b> The scope and price are already filled in. They send it to you.</li>
+            <li><b>You read it and sign.</b> Then they sign, and the job is official.</li>
+            <li><b>{agr?.start_date ? `Work starts ${day(agr.start_date as string)}.` : 'Work starts on the date you agree.'}</b> Photos, payments and changes all stay in this project.</li>
+          </ol>
+          <div className="row">
+            <Link className="btn ghost" href={`${base}/agreement`}>Open the agreement</Link>
+            <Link className="btn ghost" href={base}>Message {contractorName}</Link>
+          </div>
+        </section>
+      )}
 
       <ol className="stages" aria-label="Project stage">
         {STAGES.map((s, i) => (

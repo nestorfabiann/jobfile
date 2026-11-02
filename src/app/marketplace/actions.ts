@@ -298,5 +298,5 @@ export async function acceptBid(formData: FormData) {
   await notifyUsers({ userIds: [bid.bidder_id], projectId: project.id, kind: 'bid', title: `You won ${title}: ${dollars(bid.price_cents)}`, body: 'The homeowner accepted your bid. The project is open with the scope and price filled in. Review the Agreement tab and send it for approval.' });
   await notifyUsers({ userIds: Array.from(new Set((lost ?? []).map((b) => b.bidder_id as string))), projectId: null, kind: 'bid', path: '/marketplace/bids', title: `${listingTitle(l)} went to another contractor`, body: 'Thanks for bidding. The homeowner chose a different bid.' });
   revalidatePath('/marketplace');
-  redirect(`/projects/${project.id}/overview`);
+  redirect(`/projects/${project.id}/overview?hired=1`);
 }
