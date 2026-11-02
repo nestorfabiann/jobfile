@@ -3,6 +3,7 @@ import { requireUser } from '@/lib/session';
 import { supabaseAdmin } from '@/lib/supabase/server';
 import KitchenArt from '@/components/KitchenArt';
 import { createCompany, createProject } from './actions';
+import { isExpired, type Invite } from '@/lib/invites';
 
 const TZ = 'America/Chicago';
 const when = (iso: string) =>
@@ -20,6 +21,15 @@ export default async function Projects({ searchParams }: { searchParams: { error
       .order('created_at', { ascending: false })
       .limit(5),
   ]);
+
+  // Invitations I sent, and invitations sent to my (confirmed) email address.
+  const nowIso = new Date().toISOString();
+  const { data: sentRows } = await supabaseAdmin().from('project_invites').select('*').eq('homeowner_id', user.id).eq('status', 'pending').gt('expires_at', nowIso).order('created_at', { ascending: false });
+  const { data: gotRows } = user.email && user.email_confirmed_at
+    ? await supabaseAdmin().from('project_invites').select('*').eq('contractor_email', user.email.toLowerCase()).eq('status', 'pending').gt('expires_at', nowIso).order('created_at', { ascending: false })
+    : { data: [] as Invite[] };
+  const sent = ((sentRows ?? []) as Invite[]).filter((i) => !isExpired(i));
+  const got = ((gotRows ?? []) as Invite[]).filter((i) => !isExpired(i));
 
   const company = (memberships ?? [])[0] as { company_id: string; companies?: { name?: string } } | undefined;
   const list = projects ?? [];
@@ -60,6 +70,32 @@ export default async function Projects({ searchParams }: { searchParams: { error
 
       {searchParams.error ? <div className="box bad">{searchParams.error}</div> : null}
 
+      {got.length > 0 && (
+        <section className="stack" aria-label="Invitations for you">
+          {got.map((i) => (
+            <Link key={i.id} href={`/invites/${i.id}`} className="card" style={{ borderLeft: '6px solid var(--accent)' }}>
+              <b>{i.homeowner_name || 'A homeowner'} invited you to {i.project_name}</b>
+              <span className="muted small">Tap to review and accept or decline.</span>
+            </Link>
+          ))}
+        </section>
+      )}
+
+      {sent.length > 0 && (
+        <section className="stack" aria-label="Invitations you sent">
+          {sent.map((i) => (
+            <Link key={i.id} href={`/invites/${i.id}`} className="card">
+              <div className="row" style={{ justifyContent: 'space-between' }}><b>{i.project_name}</b><span className="pill warn">Waiting for contractor</span></div>
+              <span className="muted small">Invited {i.contractor_name || i.contractor_email}</span>
+            </Link>
+          ))}
+        </section>
+      )}
+
+      {!company && (
+        <div className="row"><Link className="btn" href="/invites/new">Start a project and invite a contractor</Link></div>
+      )}
+
       {list.length > 0 && (
         <section className="stack" aria-label="Your projects">
           {list.map((p) => (
@@ -96,8 +132,8 @@ export default async function Projects({ searchParams }: { searchParams: { error
           <div className="card">
             <h2>I&rsquo;m a homeowner</h2>
             <p className="muted">
-              Your contractor opens the project and invites <b>{user.email}</b>. Once they do, it shows up here. If it doesn&rsquo;t,
-              ask them which email address they used.
+              Your contractor can open a project and invite <b>{user.email}</b>, or you can start one yourself and invite your contractor. If a contractor
+              invited you and nothing shows up, ask them which email address they used.
             </p>
           </div>
         </>
@@ -147,7 +183,7 @@ export default async function Projects({ searchParams }: { searchParams: { error
           <ul className="stack" style={{ listStyle: 'none', margin: 0, padding: 0 }}>
             {(alerts ?? []).map((a) => (
               <li key={a.id}>
-                <Link href={`/projects/${a.project_id}`}>{a.title}</Link>
+                <Link href={a.project_id ? `/projects/${a.project_id}` : '/projects'}>{a.title}</Link>
                 <span className="muted small" style={{ display: 'block' }}>{when(a.created_at)}</span>
               </li>
             ))}

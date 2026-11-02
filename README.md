@@ -153,3 +153,13 @@ Run `supabase/migrations/009_contractor_profile.sql` once. Company owners edit i
 - Work photos live in the private `company-photos` bucket and are shown through one-hour signed links.
 - To remove the feature: drop the three new tables and the added `companies` columns, delete the two buckets, and delete `src/app/settings/business`, `src/app/admin/verification`, `src/lib/companyProfile.ts` and the two components.
 - Not built: automatic expiry reminder emails. The badge simply disappears on the expiry date.
+
+## Homeowner-started projects (invite a contractor)
+
+Run `supabase/migrations/010_project_invites.sql` once. A homeowner (anyone who is not a company member) taps "Start a project and invite a contractor" on the Projects page (`/invites/new`). The details wait in `project_invites` until the contractor accepts at `/invites/[id]`. Accepting creates the normal project (the contractor's company, both people as members, the homeowner's description as the first message) and tells the homeowner.
+- Only the person who signs in with the invited email (confirmed) can see or accept the invite. Forwarded links do nothing for anyone else.
+- Limits: 5 waiting invites per homeowner, 10 new invites per 24 hours, 3 sends per invite (resend once an hour apart), invites expire after 14 days.
+- Contractors with no company type a company name when they accept; one is created for them.
+- Photos can be added once the project is open. Pre-accept photo upload is not built.
+- Not yet shown in the admin activity feed.
+- To remove: drop `project_invites`, delete `src/app/invites`, `src/lib/invites.ts`, and the invitation blocks in `src/app/projects/page.tsx`.
