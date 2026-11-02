@@ -1,0 +1,102 @@
+<title>Projects Page Order</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: contractor Projects page. New users keep the benefits card on top; anyone with a project sees Ongoing projects first and the card below. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#cd7d2e;--orl:#f9efe4;--orb:#ecd4a8;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh}
+.g{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0}
+.sw{display:flex;gap:6px;padding-block:10px;border-bottom:1px dashed var(--line)}
+.sw button{flex:1;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:9px 6px;border-radius:99px;font:500 12.5px 'IBM Plex Sans',system-ui,sans-serif;cursor:pointer}
+.sw button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.hd{border-bottom:1px solid var(--line);padding-block:12px;display:flex;justify-content:space-between;align-items:center}
+.logo{font:800 20px 'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.02em}.logo b{color:var(--or)}
+.menu{border:1px solid var(--line);background:var(--card);border-radius:99px;min-height:40px;padding:0 16px;font:600 14px 'IBM Plex Sans',system-ui,sans-serif;color:var(--ink)}
+.sec[hidden]{display:none}
+.body{padding-block:16px 40px;display:flex;flex-direction:column;gap:14px}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
+.mut{color:var(--mut);font-size:14px;line-height:1.5}.sm{font-size:12.5px}
+.tabs{display:flex;gap:8px;border-bottom:1px solid var(--line);padding-bottom:8px}
+.tabs span{font-size:14px;font-weight:600;padding:9px 14px;border-radius:12px;color:var(--mut)}
+.tabs .a{background:var(--orl);color:var(--or);border:1px solid var(--orb)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:18px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.why{border:1.5px solid var(--orb);background:linear-gradient(180deg,var(--orl),var(--card) 60%)}
+.lbl{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--or);font-weight:600}
+.btn{display:flex;align-items:center;justify-content:center;border-radius:99px;min-height:50px;padding:0 20px;font:600 15.5px 'IBM Plex Sans',system-ui,sans-serif;border:1px solid var(--or);background:var(--or);color:#fff;box-shadow:0 6px 16px #cd7d2e44;width:100%;cursor:pointer}
+.btn.gh{background:var(--card);color:var(--ink);border-color:var(--line);box-shadow:none}
+.proj{display:flex;gap:12px;align-items:center}
+.th{width:64px;height:64px;border-radius:14px;background:linear-gradient(135deg,#8a8f98,#4c525c);flex:none}
+.pl{font-size:12px;font-weight:600;padding:5px 11px;border-radius:99px;background:var(--orl);color:var(--or);border:1px solid var(--orb);margin-left:auto;flex:none}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.add{border:1px solid var(--orb);background:var(--orl);color:var(--or);border-radius:99px;min-height:40px;padding:0 14px;font:600 13.5px 'IBM Plex Sans',system-ui,sans-serif;cursor:pointer;white-space:nowrap}
+.fm{display:flex;flex-direction:column;gap:10px}.fm[hidden]{display:none}
+label{display:block;font-size:13px;font-weight:600;margin-bottom:4px}
+input[type=text],input[type=email]{width:100%;min-height:44px;border-radius:14px;border:1px solid var(--line);background:var(--bg);color:var(--ink);padding:0 14px;font:400 15px 'IBM Plex Sans',system-ui,sans-serif}
+.ben{display:flex;gap:12px;align-items:flex-start;font-size:14px}.ben .ic{width:36px;height:36px;border-radius:11px;background:var(--card);border:1px solid var(--orb);display:grid;place-items:center;flex:none}
+.ben p{margin:0}.ben span{display:block;color:var(--mut);font-size:12.5px}
+button:focus-visible{outline:2px solid var(--or);outline-offset:2px}
+</style>
+
+<div class="wrap">
+  <div class="sw g"><button class="on" data-s="a" type="button">1 · New user</button><button data-s="b" type="button">2 · Has a project</button></div>
+  <div class="hd g"><span class="logo">Job<b>file</b></span><span class="menu">Menu ☰</span></div>
+
+  <!-- 1 new -->
+  <div class="body g sec" id="a">
+    <div class="note"><b>No projects yet.</b> Nothing changes. The benefits card is first, because that is when someone needs the pitch.</div>
+    <h1 style="font-size:32px">Projects</h1>
+    <div class="card why">
+      <span class="lbl">Why run the job in Jobfile</span>
+      <h2 style="font-size:22px">Win the job, then run it without the paperwork</h2>
+      <div class="card" style="background:var(--card);border-color:var(--orb);padding:14px;gap:6px"><b style="font-size:15px">🤝 Already have a customer? Bring them here.</b><span class="mut sm">You do not need the marketplace.</span><button class="btn" type="button" style="margin-top:4px">Start a project</button></div>
+      <div class="ben"><span class="ic" style="display:grid">📄</span><p><b>Customers sign off before you start</b><span>Scope and price approved in writing.</span></p></div>
+      <div class="mut sm">…the other benefits, as today…</div>
+    </div>
+    <h2 style="font-size:24px">Ongoing projects</h2>
+    <div class="card"><span class="mut">No projects yet. Start one above.</span></div>
+  </div>
+
+  <!-- 2 has project -->
+  <div class="body g sec" id="b" hidden>
+    <div class="note"><b>Has a project.</b> The tabs are followed straight by <b>Ongoing projects</b>. A small <b>+ Start a project</b> sits in the heading row (tap it to open the form here). The benefits card moves below, unchanged, and still has its own Start a project button.</div>
+    <h1 style="font-size:32px">Projects</h1>
+    <div class="tabs"><span class="a">Projects 2</span><span>Bids</span></div>
+    <div class="row"><h2 style="font-size:24px">Ongoing projects</h2><button class="add" id="add" type="button" aria-expanded="false" aria-controls="fm">+ Start a project</button></div>
+    <div class="card fm" id="fm" hidden>
+      <div><label for="n">Project name</label><input id="n" type="text" placeholder="Kitchen remodel"></div>
+      <div><label for="a1">Job address</label><input id="a1" type="text" placeholder="412 Maple Court, Austin, TX"></div>
+      <div><label for="h">Homeowner name</label><input id="h" type="text" placeholder="Dana Whitfield"></div>
+      <div><label for="e">Homeowner email</label><input id="e" type="email" placeholder="dana@example.com"></div>
+      <button class="btn" type="button">Create project and invite homeowner</button>
+      <button class="btn gh" type="button" id="cx">Cancel</button>
+    </div>
+    <div class="card"><div class="proj"><div class="th"></div><div><b>Kitchen and walls painting</b><div class="mut sm">727 plano tx · Jerry still</div></div><span class="pl">Active</span></div></div>
+    <div class="card"><div class="proj"><div class="th" style="background:linear-gradient(135deg,#b98a5a,#6b4a2a)"></div><div><b>Kitchen remodel</b><div class="mut sm">TX 75074 · Homeowner</div></div><span class="pl">Active</span></div></div>
+    <div class="card why">
+      <div class="row"><span class="lbl">Why run the job in Jobfile</span><span class="mut sm">Hide</span></div>
+      <h2 style="font-size:22px">Win the job, then run it without the paperwork</h2>
+      <div class="card" style="background:var(--card);border-color:var(--orb);padding:14px;gap:6px"><b style="font-size:15px">🤝 Already have a customer? Bring them here.</b><span class="mut sm">You do not need the marketplace.</span><button class="btn" type="button" style="margin-top:4px">Start a project</button></div>
+      <div class="mut sm">…the six benefits, steps and “Finish your business profile”, as today…</div>
+    </div>
+    <div class="card"><h3 style="font-size:20px">Recent alerts</h3><span class="mut sm">…as today…</span></div>
+  </div>
+</div>
+
+<script>
+document.querySelectorAll('.sw button').forEach(function(b){
+  b.addEventListener('click',function(){
+    document.querySelectorAll('.sw button').forEach(function(x){x.classList.toggle('on',x===b)});
+    ['a','b'].forEach(function(id){document.getElementById(id).hidden=(id!==b.dataset.s)});
+    window.scrollTo(0,0);
+  });
+});
+var add=document.getElementById('add'),fm=document.getElementById('fm');
+function set(v){fm.hidden=!v;add.setAttribute('aria-expanded',String(v))}
+add.addEventListener('click',function(){set(fm.hidden)});
+document.getElementById('cx').addEventListener('click',function(){set(false)});
+</script>
