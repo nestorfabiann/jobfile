@@ -95,6 +95,8 @@ export default async function Projects({ searchParams }: { searchParams: { error
   const tabs = mk ? <ProjectsTabs active={tab === 'posted' ? 'extra' : 'projects'} role={company ? 'contractor' : 'homeowner'} projects={list.length} extra={extra} /> : null;
   const left = (l: Listing) => Math.max(0, Math.ceil((new Date(l.expires_at).getTime() - Date.now()) / 86400000));
 
+  const whyHidden = cookies().get('jf_why')?.value === 'hidden';
+
   if (tab === 'posted') {
     return (
       <>
@@ -139,7 +141,7 @@ export default async function Projects({ searchParams }: { searchParams: { error
         <p className="muted">Signed in as {user.email}</p>
       </div>
       {tabs}
-      <WhyJobfile role={company ? 'contractor' : 'homeowner'} hidden={cookies().get('jf_why')?.value === 'hidden'} marketplace={mk} />
+      <WhyJobfile role={company ? 'contractor' : 'homeowner'} hidden={whyHidden} marketplace={mk} />
 
       {searchParams.error ? <div className="box bad">{searchParams.error}</div> : null}
 
@@ -165,7 +167,8 @@ export default async function Projects({ searchParams }: { searchParams: { error
         </section>
       )}
 
-      {!company && (
+      {/* The benefits card already has this button while it is open. */}
+      {!company && whyHidden && (
         <div className="row"><Link className="btn" href="/invites/new">Start a project and invite a contractor</Link></div>
       )}
 
