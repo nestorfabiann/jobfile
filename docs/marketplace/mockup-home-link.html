@@ -1,0 +1,98 @@
+<title>Signed-in Home Link</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: signed-in header with a menu that includes Home, and the landing page as a signed-in person sees it. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#cd7d2e;--orl:#f9efe4;--orb:#ecd4a8;--gr:#1f7a55;--grl:#d9f1e6;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--grl:#173a2c;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--grl:#173a2c;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;position:relative}
+.g{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;text-wrap:balance}
+.sw{display:flex;gap:6px;padding-block:10px;border-bottom:1px dashed var(--line)}
+.sw button{flex:1;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:9px 6px;border-radius:99px;font:500 12.5px 'IBM Plex Sans',system-ui,sans-serif;cursor:pointer}
+.sw button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.hd{border-bottom:1px solid var(--line);padding-block:12px;display:flex;justify-content:space-between;align-items:center;gap:10px;position:relative}
+.logo{font:800 20px 'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.02em}.logo b{color:var(--or)}
+.menu{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:99px;min-height:40px;padding:0 16px;font:600 14px 'IBM Plex Sans',system-ui,sans-serif;cursor:pointer;display:flex;align-items:center;gap:8px}
+.pill{font-size:13px;font-weight:600;padding:9px 16px;border-radius:99px;background:var(--orl);color:var(--or);border:1px solid var(--orb);white-space:nowrap;cursor:pointer}
+.sheet{position:absolute;right:max(16px,env(safe-area-inset-right,0px));top:60px;width:230px;background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:0 12px 30px #0003;padding:8px;z-index:5}
+.sheet[hidden]{display:none}
+.sheet a{display:flex;justify-content:space-between;align-items:center;padding:12px;border-radius:12px;font-size:15px;font-weight:600;color:var(--ink);text-decoration:none;cursor:pointer}
+.sheet a.cur{background:var(--orl);color:var(--or)}
+.sheet hr{border:0;border-top:1px solid var(--line);margin:6px 4px}
+.body{padding-block:18px 90px;display:flex;flex-direction:column;gap:14px}
+.sec[hidden]{display:none}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
+.lbl{font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--or);font-weight:600}
+h1{font-size:32px;font-weight:800;line-height:1.05}h1 em{font-style:normal;color:var(--or)}
+.mut{color:var(--mut);font-size:15px;line-height:1.5}.sm{font-size:12.5px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:18px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.byo{border:1.5px solid var(--orb);background:linear-gradient(180deg,var(--orl),var(--card) 65%)}
+.btn{display:flex;align-items:center;justify-content:center;border-radius:99px;min-height:50px;padding:0 20px;font:600 15.5px 'IBM Plex Sans',system-ui,sans-serif;border:1px solid var(--or);background:var(--or);color:#fff;box-shadow:0 6px 16px #cd7d2e44;width:100%;cursor:pointer}
+.btn.gh{background:var(--card);color:var(--ink);border-color:var(--line);box-shadow:none}
+.tag{display:inline-block;font-size:12px;font-weight:600;padding:5px 11px;border-radius:99px;background:var(--grl);color:var(--gr);width:max-content}
+.job{display:flex;justify-content:space-between;gap:10px;align-items:center}
+.job b{font-size:15px}.job .p{font-weight:700;white-space:nowrap}
+.btn:focus-visible,.menu:focus-visible,.sw button:focus-visible,.pill:focus-visible{outline:2px solid var(--or);outline-offset:2px}
+</style>
+
+<div class="wrap">
+  <div class="sw g">
+    <button class="on" data-s="a" type="button">1 · Menu</button>
+    <button data-s="b" type="button">2 · Home page</button>
+  </div>
+
+  <!-- 1 menu -->
+  <div class="sec" id="a">
+    <div class="hd g"><span class="logo">Job<b>file</b></span><button class="menu" id="mbtn" type="button" aria-expanded="false" aria-controls="sheet">Menu <span aria-hidden="true">☰</span></button></div>
+    <div class="sheet" id="sheet" hidden>
+      <a class="cur" id="home">Home <span aria-hidden="true">⌂</span></a>
+      <a>Projects</a><a>Marketplace</a><a>Settings</a><a>Admin</a>
+      <hr><a>Sign out</a>
+    </div>
+    <div class="body g">
+      <div class="note"><b>Header.</b> Tap <b>Menu</b>. <b>Home</b> is first, then the usual links. The logo still goes to Projects, so nobody loses their place. Sign out moves into the menu, which frees the header on small phones. Tap <b>Home</b> to see the page.</div>
+      <h2 style="font-size:30px">Projects</h2>
+      <div class="mut sm">Signed in as nestor.rodriguez92@gmail.com</div>
+      <div class="card"><b>Kitchen and walls painting</b><span class="mut sm">727 plano tx · Jerry still</span></div>
+    </div>
+  </div>
+
+  <!-- 2 landing -->
+  <div class="sec" id="b" hidden>
+    <div class="hd g"><span class="logo">Job<b>file</b></span><span class="pill" id="goproj">Go to Projects →</span></div>
+    <div class="body g">
+      <div class="note"><b>Home, signed in.</b> The same page visitors see. Only the top button changes: <b>Sign in</b> becomes <b>Go to Projects</b>. The two big buttons skip the login step.</div>
+      <div><div class="lbl">Home improvement marketplace</div><h1 style="margin-top:10px">Post it. Compare bids. Build it <em>for a fair price.</em></h1></div>
+      <div class="mut">Homeowners post projects, local contractors bid, and our AI shows you what the job should cost in your area. Then Jobfile keeps the whole job organized.</div>
+      <button class="btn" type="button">Post a Project →</button>
+      <button class="btn gh" type="button">🔍 Find Work</button>
+      <div class="card byo">
+        <span class="tag">You do not need the marketplace</span>
+        <h2 style="font-size:23px">Already have a contractor or a customer?</h2>
+        <div class="mut sm">Jobfile works for any job, even if you never found each other here. Invite them by email and keep the whole job in one place.</div>
+        <button class="btn gh" type="button">Start a project</button>
+      </div>
+      <h3 style="font-size:22px">Open near you</h3>
+      <div class="card"><div class="job"><b>Interior painting · Plano</b><span class="p">$3,500 – $4,500</span></div><div class="mut sm">3 rooms · posted today</div></div>
+      <div class="card"><div class="job"><b>Fence repair · Frisco</b><span class="p">Budget not shared</span></div><div class="mut sm">Posted yesterday</div></div>
+      <div class="mut sm">…how it works and the rest of the page, same as today…</div>
+    </div>
+  </div>
+</div>
+
+<script>
+var sheet=document.getElementById('sheet'),mb=document.getElementById('mbtn');
+function show(id){
+  ['a','b'].forEach(function(x){document.getElementById(x).hidden=(x!==id)});
+  document.querySelectorAll('.sw button').forEach(function(b){b.classList.toggle('on',b.dataset.s===id)});
+  sheet.hidden=true;mb.setAttribute('aria-expanded','false');window.scrollTo(0,0);
+}
+document.querySelectorAll('.sw button').forEach(function(b){b.addEventListener('click',function(){show(b.dataset.s)})});
+mb.addEventListener('click',function(){var o=sheet.hidden;sheet.hidden=!o;mb.setAttribute('aria-expanded',String(o))});
+document.getElementById('home').addEventListener('click',function(){show('b')});
+document.getElementById('goproj').addEventListener('click',function(){show('a')});
+</script>
