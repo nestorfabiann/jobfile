@@ -39,7 +39,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         ) : (
           <header className="pubtop app">
             <div className="in pubtop-in">
-              <Link href="/projects" className="publogo">Job<b>file</b></Link>
+              <Link href="/" className="publogo">Job<b>file</b></Link>
               {user && <AppMenu marketplace={marketplaceEnabled()} admin={isAdminEmail(user.email, !!user.email_confirmed_at)} signOutAction={signOut} />}
             </div>
           </header>
