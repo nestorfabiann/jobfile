@@ -15,6 +15,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           ['/admin/verification', 'Insurance'],
           ['/admin/marketplace', 'Marketplace'],
           ['/admin/broadcast', 'Broadcast'],
+          ['/admin/area', 'By area'],
           ['/admin/audit', 'Audit log'],
         ].map(([href, label]) => (
           <Link key={href} href={href} className="btn ghost" style={{ minHeight: 36, padding: '6px 14px' }}>

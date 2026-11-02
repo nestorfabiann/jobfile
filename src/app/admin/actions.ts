@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { audit, isAdminEmail, requireAdmin } from '@/lib/admin';
 import { notifyUsers } from '@/lib/notify';
 import { supabaseAdmin } from '@/lib/supabase/server';
+import { miles, zipCoords } from '@/lib/matching';
 
 export type Result = { ok: true; message: string } | { ok: false; error: string };
 const MAX_RECIPIENTS = 200;
@@ -179,4 +180,89 @@ export async function adminCloseListing(formData: FormData) {
   }
   revalidatePath('/admin/marketplace');
   revalidatePath('/marketplace');
+}
+
+
+export type AreaPerson = { id: string; label: string; kind: 'contractor' | 'homeowner'; miles: number };
+export type AreaPreview = { ok: true; people: AreaPerson[]; capped: boolean } | { ok: false; error: string };
+
+/** Contractors by business ZIP, homeowners by the ZIP of a project they posted. Suspended accounts and the admin are left out. */
+async function peopleInArea(zip: string, radius: number, who: string, meId: string): Promise<AreaPreview> {
+  if (!/^\d{5}$/.test(zip)) return { ok: false, error: 'Enter a 5 digit ZIP code.' };
+  if (!(radius >= 1 && radius <= 100)) return { ok: false, error: 'Radius must be 1 to 100 miles.' };
+  if (!['contractors', 'homeowners', 'both'].includes(who)) return { ok: false, error: 'Pick who to message.' };
+  const db = supabaseAdmin();
+  const found: { id: string; zip: string; label: string; kind: 'contractor' | 'homeowner' }[] = [];
+
+  if (who !== 'homeowners') {
+    const { data: cos } = await db.from('companies').select('id,name,business_zip').not('business_zip', 'is', null).limit(2000);
+    const names = new Map(((cos ?? []) as any[]).map((c) => [c.id as string, c]));
+    if (names.size) {
+      const { data: mem } = await db.from('company_members').select('company_id,user_id').in('company_id', Array.from(names.keys()));
+      ((mem ?? []) as any[]).forEach((m) => {
+        const c: any = names.get(m.company_id);
+        if (c) found.push({ id: m.user_id, zip: c.business_zip, label: c.name || 'Contractor', kind: 'contractor' });
+      });
+    }
+  }
+  if (who !== 'contractors') {
+    const { data: ls } = await db.from('marketplace_listings').select('homeowner_id,zip').limit(5000);
+    ((ls ?? []) as any[]).forEach((l) => found.push({ id: l.homeowner_id, zip: l.zip, label: '', kind: 'homeowner' }));
+  }
+  if (!found.length) return { ok: true, people: [], capped: false };
+
+  const coords = await zipCoords([zip, ...found.map((f) => f.zip)]);
+  const center = coords.get(zip);
+  if (!center) return { ok: false, error: 'That ZIP code was not found.' };
+
+  const best = new Map<string, AreaPerson & { zip: string }>();
+  for (const f of found) {
+    const at = coords.get(f.zip);
+    if (!at || f.id === meId) continue;
+    const d = Math.round(miles(center, at));
+    if (d > radius) continue;
+    const prev = best.get(f.id);
+    if (!prev || d < prev.miles) best.set(f.id, { id: f.id, label: f.label, kind: f.kind, miles: d, zip: f.zip });
+  }
+  if (!best.size) return { ok: true, people: [], capped: false };
+
+  const { data: profs } = await db.from('profiles').select('id,email,banned_at').in('id', Array.from(best.keys()));
+  const people: AreaPerson[] = [];
+  ((profs ?? []) as any[]).forEach((p) => {
+    if (p.banned_at) return;
+    const b = best.get(p.id)!;
+    people.push({ id: b.id, kind: b.kind, miles: b.miles, label: b.label ? `${b.label} (${p.email})` : p.email });
+  });
+  people.sort((a, b) => a.miles - b.miles);
+  return { ok: true, people, capped: people.length > MAX_RECIPIENTS };
+}
+
+export async function previewArea(input: { zip: string; radius: number; who: string }): Promise<AreaPreview> {
+  const { user: me } = await requireAdmin();
+  return peopleInArea(String(input.zip ?? '').trim(), Number(input.radius), String(input.who ?? ''), me.id);
+}
+
+export async function sendArea(_: Result | null, f: FormData): Promise<Result> {
+  const { user: me } = await requireAdmin();
+  const zip = str(f, 'zip');
+  const radius = Number(str(f, 'radius'));
+  const who = str(f, 'who');
+  const title = str(f, 'title').slice(0, 120);
+  const body = str(f, 'body').slice(0, 2000);
+  const force = f.get('force') === 'on';
+  let skip: string[] = [];
+  try { skip = JSON.parse(str(f, 'skip') || '[]'); } catch { skip = []; }
+  if (!title || !body) return { ok: false, error: 'Add a subject and a message.' };
+
+  const r = await peopleInArea(zip, radius, who, me.id);
+  if (!r.ok) return { ok: false, error: r.error };
+  const skipSet = new Set(Array.isArray(skip) ? skip.map(String) : []);
+  const ids = r.people.map((p) => p.id).filter((id) => !skipSet.has(id));
+  if (!ids.length) return { ok: false, error: 'No one to send to.' };
+  if (ids.length > MAX_RECIPIENTS) return { ok: false, error: `That is ${ids.length} people. The limit is ${MAX_RECIPIENTS} per send. Use a smaller radius or skip some people.` };
+
+  await send(ids, title, body, null, force);
+  await audit(me, 'broadcast_area', { type: 'area', id: zip }, { title, recipients: ids.length, radius, who, force });
+  revalidatePath('/admin/audit');
+  return { ok: true, message: `Sent to ${ids.length} ${ids.length === 1 ? 'person' : 'people'}. Saved in the audit log.` };
 }
