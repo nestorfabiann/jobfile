@@ -13,6 +13,7 @@ import {
   requireMarketplace, scopeText, type Bid, type Listing,
 } from '@/lib/marketplace';
 import { aiConfigured, makeReference, type Reference } from '@/lib/marketplaceAI';
+import { hasContactInfo } from '@/lib/contactInfo';
 import { MAX_VIDEOS, MAX_VIDEO_BYTES, VIDEO_TYPES } from '@/lib/mediaLimits';
 
 const IMG: Record<string, string> = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' };
@@ -377,4 +378,49 @@ export async function acceptBid(formData: FormData) {
   await notifyUsers({ userIds: Array.from(new Set((lost ?? []).map((b) => b.bidder_id as string))), projectId: null, kind: 'bid', path: '/marketplace/bids', title: `${listingTitle(l)} went to another contractor`, body: 'Thanks for bidding. The homeowner chose a different bid.' });
   revalidatePath('/marketplace');
   redirect(`/projects/${project.id}/overview?hired=1`);
+}
+
+
+// ---------- Messages before a bid is accepted ----------
+
+/** Homeowner and bidding contractor can write short messages while the project is open and the bid is waiting. */
+export async function sendBidMessage(formData: FormData) {
+  requireMarketplace();
+  const { user } = await requireUser();
+  const listingId = String(formData.get('listing_id') ?? '');
+  const bidId = String(formData.get('bid_id') ?? '');
+  const path = `/marketplace/${listingId}`;
+  const l = await loadListing(listingId);
+  if (!l) redirect('/marketplace');
+  const db = supabaseAdmin();
+  const { data: bid } = await db.from('marketplace_bids').select('id,listing_id,bidder_id,company_id,status').eq('id', bidId).eq('listing_id', l.id).maybeSingle();
+  if (!bid) back(path, 'That bid was not found.');
+  const isOwner = l.homeowner_id === user.id;
+  const co = isOwner ? null : await myCompany(user.id);
+  if (!isOwner && !(co && co.companyId === bid.company_id)) back(path, 'You cannot message on this bid.');
+  const here = `${path}?open=${bid.id}`;
+  if (!listingOpen(l) || bid.status !== 'waiting') back(here, 'Messages are closed because this project or bid is no longer open.');
+
+  const body = txt(formData, 'body', 1000);
+  if (!body) back(here, 'Write a message first.');
+  if (hasContactInfo(body)) back(here, 'Phone numbers, emails and web links are not allowed until the bid is accepted. Ask your question here instead.');
+
+  const since = new Date(Date.now() - 86400000).toISOString();
+  const { count: today } = await db.from('marketplace_messages').select('id', { count: 'exact', head: true }).eq('bid_id', bid.id).eq('sender_id', user.id).gt('created_at', since);
+  if ((today ?? 0) >= 30) back(here, 'That is a lot of messages for one day. Try again tomorrow.');
+
+  // Only the first message in a row alerts the other side, so a back-and-forth does not flood their email.
+  const { count: waiting } = await db.from('marketplace_messages').select('id', { count: 'exact', head: true }).eq('bid_id', bid.id).eq('sender_id', user.id).is('read_at', null);
+  const { error } = await db.from('marketplace_messages').insert({ listing_id: l.id, bid_id: bid.id, sender_id: user.id, body });
+  if (error) back(here, 'Could not send. Try again.');
+  if ((waiting ?? 0) === 0) {
+    await notifyUsers({
+      userIds: [isOwner ? (bid.bidder_id as string) : l.homeowner_id],
+      projectId: null, kind: 'bid', path,
+      title: `New message about ${listingTitle(l)}`,
+      body: isOwner ? 'The homeowner sent you a message about your bid. Open the project to read and reply.' : `${co?.name ?? 'A contractor'} sent you a message about their bid. Open the project to read and reply.`,
+      cta: 'Read and reply',
+    });
+  }
+  redirect(`${here}#bid-${bid.id}`);
 }

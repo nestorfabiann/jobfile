@@ -9,6 +9,7 @@ import { fmtDate, isCurrent, signedUrls } from '@/lib/companyProfile';
 import { firstNameInitial, listingOpen, listingTitle, requireMarketplace, type Bid, type Listing } from '@/lib/marketplace';
 import RangeBar from '@/components/RangeBar';
 import AcceptBid from '@/components/AcceptBid';
+import BidThread, { type ThreadMsg } from '@/components/BidThread';
 import ListingPhotoUploader from '@/components/ListingPhotoUploader';
 import { acceptBid, closeListing, deleteListingPhoto, deleteListingVideo, placeBid, withdrawBid } from '../actions';
 
@@ -16,7 +17,7 @@ export const dynamic = 'force-dynamic';
 const when = (iso: string) => new Date(iso).toLocaleDateString('en-US', { timeZone: 'America/Chicago', month: 'short', day: 'numeric', year: 'numeric' });
 const range = (a: number | null, b: number | null) => [a, b].filter((x) => x != null).map((x) => dollars(x as number)).join(' – ');
 
-export default async function ListingPage({ params, searchParams }: { params: { id: string }; searchParams: { posted?: string; media?: string; bid?: string; error?: string } }) {
+export default async function ListingPage({ params, searchParams }: { params: { id: string }; searchParams: { open?: string; posted?: string; media?: string; bid?: string; error?: string } }) {
   requireMarketplace();
   const { user } = await requireUser();
   if (!/^[0-9a-f-]{36}$/i.test(params.id)) notFound();
@@ -39,6 +40,23 @@ export default async function ListingPage({ params, searchParams }: { params: { 
   const allBids = (bidRows ?? []) as Bid[];
   // The homeowner has now seen the bids; the Projects page stops calling them new. Ignored if the 014 column is not there yet.
   if (owner) await db.from('marketplace_listings').update({ bids_seen_at: new Date().toISOString() }).eq('id', l.id);
+  // Pre-accept messages. Homeowners see every bid's thread; a contractor sees only their own. Opening the page marks the other side's messages read.
+  const threadBids = owner ? allBids.filter((b) => b.status !== 'withdrawn').map((b) => b.id) : allBids.filter((b) => b.company_id === companyId).map((b) => b.id);
+  const msgRows = threadBids.length ? ((await db.from('marketplace_messages').select('id,bid_id,sender_id,body,created_at,read_at').in('bid_id', threadBids).order('created_at')).data ?? []) as any[] : [];
+  const unreadBy = new Map<string, number>();
+  msgRows.forEach((m) => { if (m.sender_id !== user.id && !m.read_at) unreadBy.set(m.bid_id, (unreadBy.get(m.bid_id) ?? 0) + 1); });
+  if (unreadBy.size) await db.from('marketplace_messages').update({ read_at: new Date().toISOString() }).in('bid_id', threadBids).neq('sender_id', user.id).is('read_at', null);
+  const thread = (bidId: string, other: string, bidOpen: boolean) => (
+    <BidThread
+      listingId={l.id}
+      bidId={bidId}
+      messages={msgRows.filter((m) => m.bid_id === bidId).map((m): ThreadMsg => ({ id: m.id, mine: m.sender_id === user.id, body: m.body, at: m.created_at }))}
+      unread={unreadBy.get(bidId) ?? 0}
+      canSend={open && bidOpen}
+      otherName={other}
+      open={searchParams.open === bidId}
+    />
+  );
   const visible = owner ? allBids.filter((b) => b.status !== 'withdrawn') : [];
   const myBid = companyId ? allBids.find((b) => b.company_id === companyId) : undefined;
 
@@ -169,6 +187,7 @@ export default async function ListingPage({ params, searchParams }: { params: { 
                 {high && <div className="box warn">This bid is well above the local range. Ask what makes it higher.</div>}
                 {b.inclusions ? <p className="small"><b>Included:</b> {b.inclusions}</p> : null}
                 {b.note ? <p className="small" style={{ whiteSpace: 'pre-wrap' }}>{b.note}</p> : null}
+                {thread(b.id, c?.name ?? 'the contractor', b.status === 'waiting')}
                 {open && b.status === 'waiting' && (
                   <AcceptBid action={acceptBid} bidId={b.id} name={c?.name ?? 'this contractor'} price={dollars(b.price_cents)} />
                 )}
@@ -201,6 +220,7 @@ export default async function ListingPage({ params, searchParams }: { params: { 
               <div className="row"><button className="btn" type="submit">{myBid && myBid.status === 'waiting' ? 'Update my bid' : 'Send bid'}</button></div>
             </form>
           ) : null}
+          {myBid && myBid.status !== 'withdrawn' && thread(myBid.id, 'the homeowner', myBid.status === 'waiting')}
           {open && myBid && myBid.status === 'waiting' && (
             <form action={withdrawBid}><input type="hidden" name="listing_id" value={l.id} /><button className="btn ghost" type="submit">Withdraw my bid</button></form>
           )}

@@ -74,6 +74,7 @@ export default async function Projects({ searchParams }: { searchParams: { error
   const mk = marketplaceEnabled();
   const posted: Listing[] = [];
   const stats = new Map<string, { n: number; lo: number; hi: number; fresh: number }>();
+  const myBidIds: string[] = [];
   let extra = 0;
   if (mk) {
     const db = supabaseAdmin();
@@ -81,9 +82,10 @@ export default async function Projects({ searchParams }: { searchParams: { error
       const { data: ls } = await db.from('marketplace_listings').select('*').eq('homeowner_id', user.id).order('created_at', { ascending: false }).limit(30);
       posted.push(...((ls ?? []) as Listing[]));
       if (posted.length) {
-        const { data: bs } = await db.from('marketplace_bids').select('listing_id,price_cents,status,created_at').in('listing_id', posted.map((l) => l.id));
+        const { data: bs } = await db.from('marketplace_bids').select('id,listing_id,price_cents,status,created_at').in('listing_id', posted.map((l) => l.id));
         (bs ?? []).forEach((b: any) => {
           if (b.status === 'withdrawn') return;
+          myBidIds.push(b.id);
           const c = stats.get(b.listing_id) ?? { n: 0, lo: Infinity, hi: 0, fresh: 0 };
           const lst = posted.find((x) => x.id === b.listing_id) as any;
           // Until the 014 column exists, nothing counts as new.
@@ -96,6 +98,8 @@ export default async function Projects({ searchParams }: { searchParams: { error
     } else {
       const { count } = await db.from('marketplace_bids').select('id', { count: 'exact', head: true }).eq('company_id', company.company_id).eq('status', 'waiting');
       extra = count ?? 0;
+      const { data: mine } = await db.from('marketplace_bids').select('id').eq('company_id', company.company_id).eq('status', 'waiting');
+      (mine ?? []).forEach((b: any) => myBidIds.push(b.id));
     }
   }
   const needs: NeedItem[] = [];
@@ -103,6 +107,19 @@ export default async function Projects({ searchParams }: { searchParams: { error
     const st = stats.get(l.id);
     if (listingOpen(l) && st && st.fresh > 0) needs.push({ key: `b${l.id}`, title: `${st.fresh} new bid${st.fresh === 1 ? '' : 's'} on ${listingTitle(l)}`, sub: `Lowest ${dollars(st.lo)} of ${st.n} bid${st.n === 1 ? '' : 's'}`, href: `/marketplace/${l.id}`, go: 'Compare', tone: 'new' });
   });
+  // Unread messages from the other side on bids that are still open.
+  if (mk && myBidIds.length) {
+    const { data: ms } = await supabaseAdmin().from('marketplace_messages').select('listing_id,bid_id').in('bid_id', myBidIds).neq('sender_id', user.id).is('read_at', null);
+    const perListing = new Map<string, number>();
+    (ms ?? []).forEach((m: any) => perListing.set(m.listing_id, (perListing.get(m.listing_id) ?? 0) + 1));
+    if (perListing.size) {
+      const { data: ls } = await supabaseAdmin().from('marketplace_listings').select('id,job_type,items').in('id', Array.from(perListing.keys()));
+      (ls ?? []).forEach((l: any) => {
+        const n = perListing.get(l.id) ?? 0;
+        needs.push({ key: `m${l.id}`, title: `${n} new message${n === 1 ? '' : 's'} about ${listingTitle(l)}`, sub: 'Before the bid is accepted', href: `/marketplace/${l.id}`, go: 'Read', tone: 'new' });
+      });
+    }
+  }
   const { data: unread } = await sb
     .from('notifications')
     .select('id,title,created_at,project_id,kind')
