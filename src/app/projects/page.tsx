@@ -136,6 +136,15 @@ export default async function Projects({ searchParams }: { searchParams: { error
     );
   }
 
+  const why = (
+    <WhyJobfile
+      role={company ? 'contractor' : 'homeowner'}
+      hidden={whyHidden}
+      marketplace={mk}
+      startForm={company ? <StartProjectForm companyId={company.company_id} companyName={company.companies?.name} open={!!searchParams.error} /> : undefined}
+    />
+  );
+
   return (
     <>
       <div className="stack">
@@ -143,12 +152,7 @@ export default async function Projects({ searchParams }: { searchParams: { error
         <p className="muted">Signed in as {user.email}</p>
       </div>
       {tabs}
-      <WhyJobfile
-        role={company ? 'contractor' : 'homeowner'}
-        hidden={whyHidden}
-        marketplace={mk}
-        startForm={company ? <StartProjectForm companyId={company.company_id} companyName={company.companies?.name} open={!!searchParams.error} /> : undefined}
-      />
+      {list.length === 0 && why}
 
       {searchParams.error ? <div className="box bad">{searchParams.error}</div> : null}
 
@@ -180,9 +184,13 @@ export default async function Projects({ searchParams }: { searchParams: { error
       )}
 
       {([['Ongoing projects', list.filter((p: any) => !p.completed_at)], ['Completed projects', list.filter((p: any) => p.completed_at)]] as [string, typeof list][]).map(([heading, rows]) =>
-        rows.length === 0 ? null : (
+        rows.length === 0 && !(company && heading === 'Ongoing projects' && list.length > 0) ? null : (
           <section className="stack" key={heading} aria-label={heading}>
-            <h2>{heading}</h2>
+            {company && heading === 'Ongoing projects' ? (
+              <StartProjectForm companyId={company.company_id} companyName={company.companies?.name} open={!!searchParams.error} heading={heading} />
+            ) : (
+              <h2>{heading}</h2>
+            )}
             {rows.map((p: any) => (
               <Link key={p.id} href={`/projects/${p.id}/overview`} className="card proj" style={{ flexDirection: 'row', alignItems: 'center' }}>
                 {covers.get(p.id) ? (
@@ -204,6 +212,8 @@ export default async function Projects({ searchParams }: { searchParams: { error
           </section>
         ),
       )}
+
+      {list.length > 0 && why}
 
       {!company && list.length === 0 && (
         <>
