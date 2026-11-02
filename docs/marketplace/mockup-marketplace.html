@@ -78,22 +78,24 @@ textarea{min-height:96px;resize:vertical}
 
 <!-- 2 POST -->
 <section class="scr" id="post">
- <div class="eyebrow">Homeowner</div><h2 style="font-size:30px;margin:6px 0 4px">Post a project</h2><div class="mut">Takes about 2 minutes.</div>
+ <div class="eyebrow">Homeowner</div><h2 style="font-size:30px;margin:6px 0 4px">Post a project</h2><div class="mut">Tap what you want done. No writing needed.</div>
  <label>What kind of job?</label>
- <div class="chips" id="cat"><button class="on">Kitchen remodel</button><button>Bathroom</button><button>Painting</button><button>Roofing</button><button>Flooring</button><button>Landscaping</button></div>
- <label>Describe the scope of work</label>
- <textarea id="scope">Gut and rebuild a 220 sq ft kitchen. New semi-custom cabinets, quartz counters, tile backsplash, new flooring and lighting.</textarea>
- <div class="row2"><div><label>Size (sq ft)</label><input id="sqft" value="220"></div><div><label>ZIP code</label><input id="zip" value="75074"></div></div>
+ <div class="chips" id="cat"></div>
+ <div id="groups"></div>
+ <div class="card" style="margin-top:16px"><div class="flex"><b>Your scope</b><span class="tag" id="cnt">0 selected</span></div>
+  <div id="sel" class="mut" style="margin-top:8px">Nothing picked yet. Tap items above.</div></div>
+ <div class="row2"><div><label id="szl">Size (sq ft)</label><input id="sqft" value="220" inputmode="numeric"></div><div><label>ZIP code</label><input id="zip" value="75074"></div></div>
+ <label>Anything else? (optional)</label><textarea id="scope" placeholder="Example: I want to start in January. Dogs at home."></textarea>
  <label>Photos</label><div class="card" style="margin:0;text-align:center;border-style:dashed;color:var(--mut)">📷 Add photos or a short video</div>
  <button class="btn p" id="getai">✦ Get AI cost reference</button>
- <div class="spin" id="spin"><i></i><div style="margin-top:10px">Checking local pricing for the scope…</div></div>
+ <div class="spin" id="spin"><i></i><div style="margin-top:10px">Checking local pricing for your scope…</div></div>
  <div id="aires" class="hide">
   <div class="card ai"><div class="tag">✦ AI Cost Reference · Plano, TX</div>
-   <div class="big" style="margin-top:12px">$24,000 – $38,000</div><div class="mut">Typical range for this scope in your area</div>
-   <div class="bar"><div class="rng" style="left:18%;right:22%"></div><div class="mk" style="left:52%"><span>Most likely ~$31k</span></div></div>
-   <div class="brk"><div><span>Cabinets &amp; install</span><b>$9k–$15k</b></div><div><span>Countertops</span><b>$3k–$6k</b></div><div><span>Flooring &amp; tile</span><b>$3k–$5k</b></div><div><span>Electrical &amp; lighting</span><b>$2k–$4k</b></div><div><span>Labor, demo &amp; permits</span><b>$7k–$8k</b></div></div>
-   <div class="note">Based on the scope you wrote and typical local pricing. It's a reference only, not a quote. Final price comes from contractor bids.</div></div>
-  <div class="card"><b>Your budget range</b><div class="row2" style="margin-top:10px"><input value="$24,000"><input value="$38,000"></div></div>
+   <div class="big" style="margin-top:12px" id="rng">$0</div><div class="mut">Typical range for the scope you picked</div>
+   <div class="bar"><div class="rng" style="left:18%;right:22%"></div><div class="mk" style="left:52%"><span id="likely">Most likely</span></div></div>
+   <div class="brk" id="brk"></div>
+   <div class="note">Sample numbers for this preview. The real version uses your scope, size and ZIP. It's a reference only, not a quote. Final price comes from contractor bids.</div></div>
+  <div class="card"><b>Your budget range</b><div class="row2" style="margin-top:10px"><input id="b1"><input id="b2"></div></div>
   <button class="btn p" id="publish">Publish project →</button>
  </div>
 </section>
@@ -147,7 +149,67 @@ function go(id){$$('.scr').forEach(e=>e.classList.toggle('on',e.id===id));$$('#s
 $$('[data-s]').forEach(b=>b.onclick=()=>go(b.dataset.s));$$('[data-go]').forEach(b=>b.onclick=()=>go(b.dataset.go));
 function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('on');setTimeout(()=>e.classList.remove('on'),2600)}
 $$('[data-toast]').forEach(b=>b.onclick=()=>toast(b.dataset.toast));
-$$('#cat button').forEach(b=>b.onclick=()=>{$$('#cat button').forEach(x=>x.classList.remove('on'));b.classList.add('on')});
-$('#getai').onclick=()=>{$('#aires').classList.add('hide');$('#spin').style.display='block';setTimeout(()=>{$('#spin').style.display='none';$('#aires').classList.remove('hide');$('#aires').scrollIntoView({behavior:'smooth'})},1400)};
+
+const D={
+"Kitchen remodel":{size:220,groups:[
+ ["Layout",[["Keep current layout",0,0],["Gut and rebuild",4000,6000],["Add an island",2500,5000]]],
+ ["Cabinets",[["New semi-custom cabinets",9000,15000],["Reface existing cabinets",4000,7000],["Paint existing cabinets",1500,3500]]],
+ ["Countertops",[["Quartz",3000,6000],["Granite",2800,5500],["Laminate",1000,2200]]],
+ ["Backsplash",[["Tile backsplash",1200,2800]]],
+ ["Flooring",[["New tile floor",2500,5000],["Luxury vinyl plank",1500,3200],["Hardwood",3500,6500]]],
+ ["Lighting and electrical",[["New lighting",800,2000],["Under-cabinet lights",400,1000],["Move outlets or add circuits",800,2500]]],
+ ["Plumbing and appliances",[["New sink and faucet",600,1500],["Install appliances (you supply)",300,900]]]]},
+"Bathroom":{size:60,groups:[
+ ["Shower or tub",[["Walk-in shower",4000,9000],["Replace the tub",2500,5500],["Shower over tub refresh",1500,3500],["Glass shower door",800,2000]]],
+ ["Vanity",[["Single vanity",900,2200],["Double vanity",1800,4200]]],
+ ["Tile",[["New tile floor",1500,3500],["Tile on shower walls",1500,4000]]],
+ ["Fixtures",[["New toilet",300,900],["Lighting and fan",400,1200]]],
+ ["Finish",[["Fresh paint",300,800]]]]},
+"Painting":{size:1800,ps:1,groups:[
+ ["Inside",[["Walls",1.5,3.5,1],["Ceilings",0.8,1.6,1],["Trim and doors",0.7,1.5,1],["Cabinets",1800,4000]]],
+ ["Outside",[["Exterior paint",2,4.5,1],["Pressure washing",200,500]]],
+ ["Prep",[["Drywall repair",300,1200],["Popcorn ceiling removal",1,2.2,1]]]]},
+"Roofing":{size:2000,ps:1,groups:[
+ ["Replace",[["Asphalt shingles",4.5,8,1],["Metal roof",9,16,1]]],
+ ["Repair",[["Fix leaks",400,1500],["Flashing and vents",300,900]]],
+ ["Add-ons",[["Gutters",800,2500]]]]},
+"Flooring":{size:600,ps:1,groups:[
+ ["New floor",[["Luxury vinyl plank",3,7,1],["Hardwood",8,15,1],["Tile",8,16,1],["Carpet",3,6,1]]],
+ ["Prep",[["Remove old flooring",1,2.5,1]]],
+ ["Finish",[["New baseboards",1.5,3,1]]]]},
+"Landscaping":{size:1500,ps:1,groups:[
+ ["Lawn",[["Sod",1.2,2.5,1],["Sprinkler system",2500,5500]]],
+ ["Hardscape",[["Patio pavers",14,28,1],["Fence",3000,8000]]],
+ ["Plants",[["Flower beds and mulch",600,2000],["Tree trimming",400,1500]]]]}
+};
+let cur="Kitchen remodel",pick={};
+const money=n=>'$'+Math.round(n/100)*100>=0?'$'+(Math.round(n/100)*100).toLocaleString():'';
+const sqft=()=>Math.max(1,parseInt($('#sqft').value.replace(/\D/g,''))||1);
+function cost(it){return it[3]?[it[1]*sqft(),it[2]*sqft()]:[it[1],it[2]]}
+function render(){
+ const d=D[cur];$('#groups').innerHTML=d.groups.map((g,gi)=>`<div style="margin-top:16px"><div style="font-weight:600;font-size:14px;margin-bottom:8px">${g[0]}</div><div class="chips">${g[1].map((it,ii)=>`<button data-k="${gi}.${ii}" class="${pick[gi+'.'+ii]?'on':''}">${pick[gi+'.'+ii]?'✓ ':'+ '}${it[0]}</button>`).join('')}</div></div>`).join('');
+ $$('#groups button').forEach(b=>b.onclick=()=>{pick[b.dataset.k]=!pick[b.dataset.k];render()});
+ const sel=[];d.groups.forEach((g,gi)=>g[1].forEach((it,ii)=>{if(pick[gi+'.'+ii])sel.push([g[0],it])}));
+ $('#cnt').textContent=sel.length+' selected';
+ $('#sel').innerHTML=sel.length?sel.map(x=>'• '+x[1][0]).join('<br>'):'Nothing picked yet. Tap items above.';
+ $('#szl').textContent=d.ps?'Size (sq ft)':'Size (sq ft, optional)';
+ return sel;
+}
+function setCat(c){cur=c;pick={};$('#sqft').value=D[c].size;$$('#cat button').forEach(b=>b.classList.toggle('on',b.textContent===c));$('#aires').classList.add('hide');render()}
+$('#cat').innerHTML=Object.keys(D).map(c=>`<button>${c}</button>`).join('');
+$$('#cat button').forEach(b=>b.onclick=()=>setCat(b.textContent));
+$('#sqft').oninput=()=>render();
+$('#getai').onclick=()=>{
+ const sel=render();if(!sel.length){toast('Pick at least one item first');return}
+ $('#aires').classList.add('hide');$('#spin').style.display='block';
+ setTimeout(()=>{
+  let lo=0,hi=0;const by={};sel.forEach(([g,it])=>{const c=cost(it);lo+=c[0];hi+=c[1];by[g]=by[g]||[0,0];by[g][0]+=c[0];by[g][1]+=c[1]});
+  const f=n=>'$'+(Math.round(n/100)*100).toLocaleString();
+  const mid=lo+(hi-lo)*0.55;
+  $('#rng').textContent=f(lo)+' – '+f(hi);$('#likely').textContent='Most likely ~'+f(mid);
+  $('#brk').innerHTML=Object.entries(by).map(([g,v])=>`<div><span>${g}</span><b>${f(v[0])}–${f(v[1])}</b></div>`).join('');
+  $('#b1').value=f(lo);$('#b2').value=f(hi);
+  $('#spin').style.display='none';$('#aires').classList.remove('hide');$('#aires').scrollIntoView({behavior:'smooth'})},1200)};
 $('#publish').onclick=()=>{toast('Published! Local contractors are notified.');setTimeout(()=>go('board'),1200)};
+setCat('Kitchen remodel');
 </script></body></html>

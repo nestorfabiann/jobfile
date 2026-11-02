@@ -23,3 +23,6 @@ Homeowners post projects. Local contractors bid. An AI cost reference shows the 
 4. Admin: listing/bid moderation, ban applies to bidding, add to audit log.
 5. Terms/privacy update before launch (AI estimate disclaimer, public ratings, admin access). Texas attorney review.
 6. Test on a Vercel preview branch before merging.
+
+## Update 2026-11-01: tap-to-pick scope
+The Post step now shows suggested scope items per job type (kitchen, bathroom, painting, roofing, flooring, landscaping), grouped (e.g. Cabinets, Countertops). Homeowners tap items instead of writing a description. The picked list plus an optional note becomes the project scope, and the AI cost reference is built from the picked items and the size. Prices in the mockup are sample numbers. The same picker could also be added to the live "Start a project" invite form.
