@@ -1,0 +1,86 @@
+<title>Needs You and New Bids</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: phone Projects screen. Role switch on top; "Needs you" card first, then tabs with badges, then project rows with status pills. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#cd7d2e;--orl:#f9efe4;--orb:#ecd4a8;--gr:#1f7a55;--grl:#d9f1e6;--bad:#b3261e;--badl:#fbe4e2;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--grl:#173a2c;--gr:#6fd1a3;--bad:#f2b8b5;--badl:#3d1f1d;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--grl:#173a2c;--gr:#6fd1a3;--bad:#f2b8b5;--badl:#3d1f1d;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:14px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px}
+h1,h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;text-wrap:balance}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
+.mut{color:var(--mut);font-size:14px;line-height:1.5}.sm{font-size:12.5px}
+.sw{display:flex;gap:6px}.sw button{flex:1;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:10px 6px;border-radius:99px;font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:44px}.sw button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.needs{background:var(--orl);border:1px solid var(--orb);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:6px}
+.needs h2{font-size:20px}.needs .cnt{color:var(--or)}
+.nrow{display:flex;gap:12px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px;text-decoration:none;color:inherit;min-height:56px;cursor:pointer;width:100%;text-align:left;font:inherit}
+.nrow b{display:block;font-size:14.5px}.nrow span.s{display:block;font-size:12.5px;color:var(--mut)}
+.nrow .go{margin-left:auto;color:var(--or);font-weight:600;font-size:13px;white-space:nowrap}
+.dot{flex:none;width:10px;height:10px;border-radius:50%;background:var(--or)}.dot.g{background:var(--gr)}
+.tabs{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.tab{display:flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--line);background:var(--card);border-radius:99px;min-height:46px;font:500 14.5px 'IBM Plex Sans',sans-serif;color:var(--ink)}
+.tab.on{background:var(--or);color:#fff;border-color:var(--or)}
+.badge{min-width:22px;height:22px;border-radius:99px;background:var(--bad);color:#fff;font-size:12px;font-weight:600;display:grid;place-items:center;padding:0 6px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:8px}
+.pill{display:inline-block;font-size:12px;font-weight:600;padding:4px 10px;border-radius:99px;width:max-content}
+.pill.new{background:var(--badl);color:var(--bad)}.pill.ok{background:var(--grl);color:var(--gr)}.pill.wait{background:var(--orl);color:var(--or)}
+.hide{display:none}
+.hint{font-size:12.5px;color:var(--mut)}
+button:focus-visible{outline:2px solid var(--or);outline-offset:2px}
+[hidden]{display:none!important}
+</style>
+
+<div class="wrap">
+  <div class="note"><b>Mockup, example data.</b> Three changes: a "Needs you" card at the top of Projects, red new-bid badges on the tabs and on each job, and (not visible here) email alerts once the domain is verified. Switch the role to see each side.</div>
+  <div class="sw" id="role"><button class="on" data-r="h" type="button">Homeowner</button><button data-r="c" type="button">Contractor</button></div>
+
+  <!-- HOMEOWNER -->
+  <div id="h" class="wrap-in" style="display:flex;flex-direction:column;gap:14px">
+    <h1 style="font-size:30px">Projects</h1>
+    <div class="needs">
+      <h2>Needs you <span class="cnt" id="hcnt">3</span></h2>
+      <button class="nrow" type="button" data-k="h"><span class="dot"></span><span><b>3 new bids on Kitchen remodel</b><span class="s">Lowest $18,400 · best rated 4.9</span></span><span class="go">Compare ›</span></button>
+      <button class="nrow" type="button" data-k="h"><span class="dot"></span><span><b>Sign the change order</b><span class="s">Bathroom tile upgrade · +$640</span></span><span class="go">Review ›</span></button>
+      <button class="nrow" type="button" data-k="h"><span class="dot"></span><span><b>Record the 2nd payment</b><span class="s">Fence repair · $1,800 due</span></span><span class="go">Open ›</span></button>
+      <div class="hint" id="hnone" hidden>You're all caught up.</div>
+    </div>
+    <div class="tabs">
+      <span class="tab on">Ongoing</span>
+      <span class="tab">Posted jobs <span class="badge">3</span></span>
+    </div>
+    <div class="card"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><h3 style="font-size:19px">Kitchen remodel · Plano</h3><span class="pill new">3 new bids</span></div><div class="mut sm">Open for bids · posted 2 days ago · 5 bids total</div></div>
+    <div class="card"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><h3 style="font-size:19px">Fence repair</h3><span class="pill wait">Payment due</span></div><div class="mut sm">Hired: Lone Star Fencing</div></div>
+  </div>
+
+  <!-- CONTRACTOR -->
+  <div id="c" style="display:none;flex-direction:column;gap:14px">
+    <h1 style="font-size:30px">Projects</h1>
+    <div class="needs">
+      <h2>Needs you <span class="cnt" id="ccnt">3</span></h2>
+      <button class="nrow" type="button" data-k="c"><span class="dot g"></span><span><b>You won Kitchen remodel · Plano</b><span class="s">Homeowner accepted your $18,400 bid</span></span><span class="go">Open ›</span></button>
+      <button class="nrow" type="button" data-k="c"><span class="dot"></span><span><b>2 new jobs near you</b><span class="s">Painting · 6 and 11 miles away</span></span><span class="go">View ›</span></button>
+      <button class="nrow" type="button" data-k="c"><span class="dot"></span><span><b>Agreement waiting for your signature</b><span class="s">Bathroom tile · Jerry Still</span></span><span class="go">Sign ›</span></button>
+      <div class="hint" id="cnone" hidden>You're all caught up.</div>
+    </div>
+    <div class="tabs">
+      <span class="tab on">Ongoing</span>
+      <span class="tab">Bids <span class="badge">2</span></span>
+    </div>
+    <div class="card"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><h3 style="font-size:19px">Bathroom tile</h3><span class="pill new">Needs signature</span></div><div class="mut sm">Homeowner: Jerry Still</div></div>
+    <div class="card"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><h3 style="font-size:19px">Deck staining</h3><span class="pill ok">On track</span></div><div class="mut sm">Final payment recorded Friday</div></div>
+  </div>
+
+  <div class="note"><b>How it works.</b> The card lists only things that wait on this person, newest first, and disappears when empty. Tap a row to go straight to the right tab (the same deep links alerts use now). Badges clear when the item is opened. Tap a row here to see it clear.</div>
+</div>
+
+<script>
+function $(i){return document.getElementById(i)}
+[].forEach.call($('role').children,function(b){b.onclick=function(){
+  [].forEach.call($('role').children,function(x){x.classList.toggle('on',x===b)});
+  $('h').style.display=b.dataset.r==='h'?'flex':'none';$('c').style.display=b.dataset.r==='c'?'flex':'none'}});
+[].forEach.call(document.querySelectorAll('.nrow'),function(r){r.onclick=function(){
+  var k=r.dataset.k;r.remove();var left=document.querySelectorAll('#'+k+' .nrow').length;
+  $(k+'cnt').textContent=left;$(k+'none').hidden=left>0}});
+</script>
