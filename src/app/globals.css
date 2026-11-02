@@ -144,7 +144,7 @@ body.pub {
   --bg: #faf8f4; --surface: #ffffff; --surface-2: #ffffff; --ink: #1b1a18; --ink-2: #6b655e; --line: #e4dfd6;
   --brand: #cd7d2e; --brand-2: #b36a22; --accent: #cd7d2e; --accent-fg: #ffffff;
   --warn: #8a5a1a; --warn-bg: #f9efe4; --ok: #1f7a55; --ok-bg: #d9f1e6;
-  --shadow: none; font-family: 'IBM Plex Sans', system-ui, sans-serif; padding-bottom: calc(84px + env(safe-area-inset-bottom, 0px));
+  --shadow: none; font-family: 'IBM Plex Sans', system-ui, sans-serif;
 }
 @media (prefers-color-scheme: dark) {
   body.pub {
@@ -179,3 +179,13 @@ body.pub .box.warn { background: #f9efe4; color: #6b4a1c; }
 .pubtabs a span { font-size: 20px; line-height: 1.2; }
 .pubtabs a[aria-current='page'] { color: var(--accent); }
 @media (prefers-color-scheme: dark) { .pubpill { background: #33281c; color: #e0933f; } }
+
+body.pub.withtabs { padding-bottom: calc(84px + env(safe-area-inset-bottom, 0px)); }
+.pubtop.app { position: static; }
+.pubtop-in { flex-wrap: wrap; gap: 8px 16px; }
+.pubnav { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 16px; }
+.pubnav a { color: var(--ink); font-weight: 600; font-size: 14px; text-decoration: none; padding: 6px 0; }
+.pubnav form { margin: 0; }
+body.pub .hero { background: linear-gradient(135deg, #cd7d2e, #a35f1d); }
+body.pub .ptabs a[aria-current='page'] { color: var(--ink); }
+body.pub .composer { box-shadow: 0 -10px 24px -14px rgba(27, 26, 24, 0.3); }
