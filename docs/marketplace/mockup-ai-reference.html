@@ -1,0 +1,119 @@
+<title>AI Cost Reference Preview</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: the AI cost reference step inside the Post a project form, in the live cream/orange look. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#cd7d2e;--orl:#f9efe4;--orb:#ecd4a8;--gr:#1f7a55;--grl:#d9f1e6;--rd:#b3261e;--rdl:#fde8e6;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--grl:#173a2c;--rdl:#47201e;--rd:#ff8f85;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--grl:#173a2c;--rdl:#47201e;--rd:#ff8f85;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:18px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px}
+h1,h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;text-wrap:balance}
+h1{font-size:30px;font-weight:800}h2{font-size:19px}
+.lbl{font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--or);font-weight:600}
+.mut{color:var(--mut);font-size:14px;line-height:1.5}.sm{font-size:13px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:18px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.card.ai{border-color:var(--orb)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:99px;padding:8px 13px;font:500 13px 'IBM Plex Sans',system-ui,sans-serif}
+.chip.on{background:var(--orl);color:var(--or);border-color:var(--orb)}
+.btn{display:flex;align-items:center;justify-content:center;border-radius:99px;min-height:52px;padding:0 20px;font:600 16px 'IBM Plex Sans',system-ui,sans-serif;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer;width:100%}
+.btn.p{background:var(--or);border-color:var(--or);color:#fff;box-shadow:0 6px 16px #cd7d2e44}
+.tag{display:inline-block;font-size:12px;font-weight:600;padding:5px 11px;border-radius:99px;background:var(--orl);color:var(--or);border:1px solid var(--orb);width:max-content}
+.big{font-family:'Bricolage Grotesque';font-weight:800;font-size:34px;letter-spacing:-.03em;line-height:1.05}
+.bar{position:relative;height:12px;border-radius:9px;background:var(--line);margin:34px 0 10px}
+.bar .rng{position:absolute;top:0;bottom:0;border-radius:9px;background:linear-gradient(90deg,#f0c78d,var(--or))}
+.bar .mk{position:absolute;top:-7px;width:4px;height:26px;background:var(--ink);border-radius:2px}
+.bar .mk span{position:absolute;top:-22px;left:50%;transform:translateX(-50%);font-size:11px;font-weight:600;white-space:nowrap}
+.ends{display:flex;justify-content:space-between;font-size:12px;color:var(--mut);font-variant-numeric:tabular-nums}
+.brk div{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:14px;font-variant-numeric:tabular-nums}.brk div:last-child{border:0}
+.note{font-size:12.5px;color:var(--mut);line-height:1.45}
+label{display:flex;flex-direction:column;gap:5px;font-size:12.5px;font-weight:700;color:var(--mut)}
+input{font:16px 'IBM Plex Sans',system-ui,sans-serif;color:var(--ink);background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;min-height:48px;width:100%}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.chk{display:none;border-radius:14px;padding:11px 14px;font-size:13.5px;line-height:1.4}
+.chk.on{display:block}
+.chk.in{background:var(--grl);color:var(--gr)}.chk.low{background:var(--rdl);color:var(--rd)}.chk.hi{background:var(--orl);color:#8a5a1a}
+@media (prefers-color-scheme:dark){.chk.hi{color:#e9c08a}}
+.spin{display:none;text-align:center;color:var(--mut);padding:10px}.spin i{display:inline-block;width:24px;height:24px;border:3px solid var(--line);border-top-color:var(--or);border-radius:50%;animation:s 1s linear infinite;vertical-align:middle;margin-right:8px}@keyframes s{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.spin i{animation:none}}
+[hidden]{display:none!important}
+.demo{font-size:12px;color:var(--mut);text-align:center}
+</style>
+
+<div class="wrap">
+  <div><div class="lbl">Post a project · step 3</div><h1 style="margin-top:6px">AI cost reference</h1></div>
+  <div class="demo">Sample numbers for this preview. Tap the button, then change the budget.</div>
+
+  <div class="card">
+    <h2>Your scope</h2>
+    <div class="chips"><span class="chip on">✓ Walk-in shower</span><span class="chip on">✓ Double vanity</span><span class="chip on">✓ New tile floor</span><span class="chip on">✓ Tile on shower walls</span><span class="chip on">✓ Lighting and fan</span></div>
+    <div class="mut sm">Bathroom · 60 sq ft · ZIP 75074</div>
+  </div>
+
+  <div class="card ai" id="ai">
+    <h2>AI cost reference</h2>
+    <p class="mut" style="margin:0">Get a typical local price range for the scope you picked. It is a reference only, not a quote.</p>
+    <button class="btn" id="go" type="button">✦ Get AI cost reference</button>
+    <div class="spin" id="spin"><i></i>Checking local pricing…</div>
+
+    <div id="res" hidden style="display:flex;flex-direction:column;gap:12px">
+      <span class="tag">✦ AI cost reference · Plano, TX · medium confidence</span>
+      <div><div class="big">$12,400 – $18,900</div><div class="mut" style="margin-top:4px">Typical range for the scope you picked</div></div>
+      <div>
+        <div class="bar"><div class="rng" style="left:18%;right:22%"></div><div class="mk" style="left:50%"><span>Most likely ~$15,200</span></div></div>
+        <div class="ends"><span>$12,400</span><span>$18,900</span></div>
+      </div>
+      <div class="brk">
+        <div><span>Shower or tub</span><b>$4,800–$9,000</b></div>
+        <div><span>Vanity</span><b>$1,800–$4,200</b></div>
+        <div><span>Tile</span><b>$3,000–$7,500</b></div>
+        <div><span>Fixtures</span><b>$400–$1,200</b></div>
+      </div>
+      <p class="note" style="margin:0">Based on typical North Texas labor and material costs for this scope and size. A reference only, not a quote. Final price comes from contractor bids.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Your budget (optional)</h2>
+    <div class="two">
+      <label>From<input id="b1" inputmode="numeric" value="" placeholder="$20,000"></label>
+      <label>To<input id="b2" inputmode="numeric" value="" placeholder="$30,000"></label>
+    </div>
+    <div class="chk in" id="c-in">Your budget is inside the typical range for this scope.</div>
+    <div class="chk low" id="c-low">Your budget is below the typical range. Contractors may bid higher, or ask to trim the scope.</div>
+    <div class="chk hi" id="c-hi">Your budget is above the typical range. You may get room for upgrades or a cushion for surprises.</div>
+    <div class="note" id="hint">Tap the AI cost reference button and these fill in for you. You can change them.</div>
+  </div>
+
+  <button class="btn p" type="button">Publish project</button>
+</div>
+
+<script>
+(function(){
+  var LO=12400,HI=18900;
+  var go=document.getElementById('go'),spin=document.getElementById('spin'),res=document.getElementById('res');
+  var b1=document.getElementById('b1'),b2=document.getElementById('b2');
+  function num(v){return parseInt(String(v).replace(/\D/g,''),10)||0}
+  function fmt(n){return n?'$'+n.toLocaleString('en-US'):''}
+  function check(){
+    var lo=num(b1.value),hi=num(b2.value),m=hi||lo;
+    ['c-in','c-low','c-hi'].forEach(function(i){document.getElementById(i).classList.remove('on')});
+    if(res.hidden||!m){return}
+    var top=hi||lo;
+    var id=top<LO?'c-low':(lo&&lo>HI?'c-hi':(top>HI*1.15?'c-hi':'c-in'));
+    document.getElementById(id).classList.add('on');
+  }
+  go.addEventListener('click',function(){
+    go.hidden=true;spin.style.display='block';
+    setTimeout(function(){
+      spin.style.display='none';res.hidden=false;
+      b1.value=fmt(LO);b2.value=fmt(HI);
+      document.getElementById('hint').textContent='Filled in from the AI range. You can change them.';
+      check();
+    },1100);
+  });
+  [b1,b2].forEach(function(i){i.addEventListener('input',check)});
+})();
+</script>
