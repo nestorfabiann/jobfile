@@ -1,3 +1,4 @@
+import TradeIcon from '@/components/TradeIcon';
 import Link from 'next/link';
 import { requireUser } from '@/lib/session';
 import { supabaseAdmin } from '@/lib/supabase/server';
@@ -144,7 +145,7 @@ export default async function Projects({ searchParams }: { searchParams: { error
           return (
             <div className="card" key={l.id}>
               <div className="row" style={{ justifyContent: 'space-between' }}>
-                <span className="pill">{l.job_type}</span>
+                <span className="pill"><TradeIcon trade={l.job_type} size={15} />{l.job_type}</span>
                 <span className={`pill ${open ? 'ok' : ''}`}>{l.status === 'awarded' ? 'Hired' : open ? `Open · ${left(l)} day${left(l) === 1 ? '' : 's'} left` : 'Closed'}</span>
               </div>
               <h3><Link href={`/marketplace/${l.id}`}>{listingTitle(l)}</Link></h3>

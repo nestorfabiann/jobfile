@@ -1,3 +1,4 @@
+import TradeIcon from '@/components/TradeIcon';
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 import { supabaseServer, supabaseAdmin } from '@/lib/supabase/server';
@@ -31,7 +32,7 @@ export default async function PublicJob({ params }: { params: { id: string } }) 
         <Link href="/jobs" className="small">‹ All jobs</Link>
         <h1>{listingTitle(l)}</h1>
         <div className="row">
-          <span className="pill">{l.job_type}</span>
+          <span className="pill"><TradeIcon trade={l.job_type} size={15} />{l.job_type}</span>
           <span className={`pill ${open ? 'ok' : ''}`}>{open ? 'Open for bids' : 'Closed'}</span>
         </div>
         <p className="muted small">{[l.city, `ZIP ${l.zip}`, l.size_sqft ? `${l.size_sqft.toLocaleString('en-US')} sq ft` : '', `${bids} bid${bids === 1 ? '' : 's'}`].filter(Boolean).join(' · ')}</p>

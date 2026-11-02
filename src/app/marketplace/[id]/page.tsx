@@ -1,3 +1,4 @@
+import TradeIcon from '@/components/TradeIcon';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { requireUser } from '@/lib/session';
@@ -66,7 +67,7 @@ export default async function ListingPage({ params, searchParams }: { params: { 
         <Link href={owner ? '/marketplace' : '/marketplace'} className="small">‹ Marketplace</Link>
         <h1>{listingTitle(l)}</h1>
         <div className="row">
-          <span className="pill">{l.job_type}</span>
+          <span className="pill"><TradeIcon trade={l.job_type} size={15} />{l.job_type}</span>
           <span className={`pill ${open ? 'ok' : ''}`}>{l.status === 'awarded' ? 'Hired' : open ? 'Open for bids' : 'Closed'}</span>
           {l.is_homestead && <span className="pill warn">Homestead</span>}
         </div>

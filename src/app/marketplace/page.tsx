@@ -1,3 +1,4 @@
+import TradeIcon from '@/components/TradeIcon';
 import Link from 'next/link';
 import { requireUser } from '@/lib/session';
 import { supabaseAdmin } from '@/lib/supabase/server';
@@ -92,7 +93,7 @@ export default async function Marketplace({ searchParams }: { searchParams: { ty
           <div className="chips" aria-label="Filter by job type">
             <Link className="chip" href={qs({ type: '' })}><span style={!type ? { background: 'var(--brand)', color: '#fff', borderColor: 'var(--brand)' } : undefined}>All</span></Link>
             {typeChips.map((t) => (
-              <Link className="chip" key={t} href={qs({ type: t })}><span style={type === t ? { background: 'var(--brand)', color: '#fff', borderColor: 'var(--brand)' } : undefined}>{t}</span></Link>
+              <Link className="chip" key={t} href={qs({ type: t })}><span style={type === t ? { background: 'var(--brand)', color: '#fff', borderColor: 'var(--brand)' } : undefined}><TradeIcon trade={t} size={15} />{t}</span></Link>
             ))}
           </div>
           {bizZip ? (
@@ -120,7 +121,7 @@ export default async function Marketplace({ searchParams }: { searchParams: { ty
         return (
           <Link key={l.id} href={`/marketplace/${l.id}`} className="card" style={{ color: 'inherit', textDecoration: 'none' }}>
             <div className="row" style={{ justifyContent: 'space-between' }}>
-              <span className="pill">{l.job_type}</span>
+              <span className="pill"><TradeIcon trade={l.job_type} size={15} />{l.job_type}</span>
               <span className={`pill ${open ? 'ok' : ''}`}>{status}</span>
             </div>
             <h3>{listingTitle(l)}</h3>

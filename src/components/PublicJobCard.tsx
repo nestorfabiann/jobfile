@@ -1,3 +1,4 @@
+import TradeIcon from '@/components/TradeIcon';
 import Link from 'next/link';
 import { dollars } from '@/lib/money';
 import { listingTitle } from '@/lib/marketplace';
@@ -10,7 +11,7 @@ export default function PublicJobCard({ l, bids }: { l: PublicListing; bids: num
   return (
     <Link href={`/jobs/${l.id}`} className="card" style={{ color: 'inherit', textDecoration: 'none' }}>
       <div className="row" style={{ justifyContent: 'space-between' }}>
-        <span className="pill">{l.job_type}</span>
+        <span className="pill"><TradeIcon trade={l.job_type} size={15} />{l.job_type}</span>
         <span className="pill ok">Open</span>
       </div>
       <h3 style={{ margin: 0 }}>{listingTitle(l)}</h3>

@@ -1,5 +1,6 @@
 'use client';
 
+import TradeIcon from '@/components/TradeIcon';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createListing, getReference, type RefResult } from '@/app/marketplace/actions';
@@ -92,7 +93,7 @@ export default function MarketplacePost({ types, aiOn }: { types: Types; aiOn: b
         <h2>What kind of job?</h2>
         <div className="chips" role="radiogroup" aria-label="Job type">
           {names.map((n) => (
-            <label className="chip" key={n}><input type="radio" name="_type" checked={type === n} onChange={() => chooseType(n)} /><span>{n}</span></label>
+            <label className="chip" key={n}><input type="radio" name="_type" checked={type === n} onChange={() => chooseType(n)} /><span><TradeIcon trade={n} size={18} />{n}</span></label>
           ))}
         </div>
       </div>
