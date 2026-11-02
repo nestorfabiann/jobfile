@@ -1,0 +1,130 @@
+<title>Job Matching Preview</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: three steps of local job matching in the live cream/orange look: contractor sets area and trades, board shows distance, alert arrives when a match is posted. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#cd7d2e;--orl:#f9efe4;--orb:#ecd4a8;--gr:#1f7a55;--grl:#d9f1e6;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--grl:#173a2c;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--grl:#173a2c;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh}
+.g{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;text-wrap:balance}
+.sw{display:flex;gap:6px;padding-block:10px;border-bottom:1px dashed var(--line);overflow-x:auto}
+.sw button{flex:0 0 auto;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:9px 13px;border-radius:99px;font:500 13px 'IBM Plex Sans',system-ui,sans-serif;cursor:pointer;white-space:nowrap}
+.sw button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.hd{border-bottom:1px solid var(--line);padding-block:12px;display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center}
+.logo{font:800 20px 'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.02em}.logo b{color:var(--or)}
+.nav{display:flex;flex-wrap:wrap;gap:4px 16px;align-items:center;font-size:14px;font-weight:600}
+.pill{font-size:13px;font-weight:600;padding:7px 14px;border-radius:99px;background:var(--orl);color:var(--or)}
+.body{padding-block:18px 40px;display:flex;flex-direction:column;gap:14px}
+h1{font-size:28px;font-weight:800;line-height:1.1}
+.mut{color:var(--mut);font-size:14px;line-height:1.5}.sm{font-size:12.5px}
+.lbl{font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--or);font-weight:600}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:18px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.card.ai{border-color:var(--orb)}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.tag{display:inline-block;font-size:12px;font-weight:600;padding:5px 11px;border-radius:99px;background:var(--orl);color:var(--or);border:1px solid var(--orb);width:max-content}
+.tag.g{background:var(--grl);color:var(--gr);border-color:transparent}
+.price{font:800 19px 'Bricolage Grotesque',system-ui,sans-serif;color:var(--or);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:99px;padding:8px 13px;font:500 13px 'IBM Plex Sans',system-ui,sans-serif;cursor:pointer}
+.chip.on{background:var(--orl);color:var(--or);border-color:var(--orb)}
+label.f{display:flex;flex-direction:column;gap:5px;font-size:12.5px;font-weight:700;color:var(--mut)}
+input[type=text]{font:16px 'IBM Plex Sans',system-ui,sans-serif;color:var(--ink);background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;min-height:48px;width:100%}
+.btn{display:flex;align-items:center;justify-content:center;border-radius:99px;min-height:50px;padding:0 20px;font:600 15px 'IBM Plex Sans',system-ui,sans-serif;border:1px solid var(--or);background:var(--or);color:#fff;box-shadow:0 6px 16px #cd7d2e44;width:100%;cursor:pointer}
+.btn.gh{background:var(--card);color:var(--ink);border-color:var(--line);box-shadow:none}
+.tg{display:flex;justify-content:space-between;align-items:flex-start;gap:14px}
+.sw2{flex:none;width:50px;height:30px;border-radius:99px;background:var(--line);border:0;position:relative;cursor:pointer;padding:0}
+.sw2::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:left .15s}
+.sw2[aria-pressed=true]{background:var(--or)}.sw2[aria-pressed=true]::after{left:23px}
+.dist{font-size:13px;font-weight:700;color:var(--gr)}
+.mail{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#fff;color:#1b1a18}
+.mail .h{background:#f4f1ea;padding:10px 14px;font-size:12px;color:#6b655e;line-height:1.5}
+.mail .b{padding:14px;font-size:14px;line-height:1.5;display:flex;flex-direction:column;gap:8px}
+.mail .bt{display:inline-block;background:#cd7d2e;color:#fff;border-radius:99px;padding:10px 18px;font-weight:600;width:max-content}
+.note{font-size:12px;color:var(--mut);line-height:1.45}
+[hidden]{display:none!important}
+</style>
+
+<div class="wrap">
+  <div class="sw g" id="sw"><button class="on" data-s="s1">1 · My area and trades</button><button data-s="s2">2 · Board with distance</button><button data-s="s3">3 · New-job alert</button></div>
+  <div class="hd g"><span class="logo">Job<b>file</b></span><nav class="nav"><span>Projects</span><span>Marketplace</span><span>Settings</span><span class="pill">Sign out</span></nav></div>
+
+  <!-- 1 profile settings -->
+  <div class="body g" id="s1">
+    <div><div class="lbl">Settings · Business profile</div><h1 style="margin-top:6px">Where you work</h1><div class="mut" style="margin-top:6px">Jobfile shows you jobs in your area and alerts you to new ones.</div></div>
+    <div class="card">
+      <label class="f">Business ZIP code<input type="text" value="75074" inputmode="numeric"></label>
+      <div><div class="mut" style="font-weight:700;margin-bottom:8px">How far will you travel?</div>
+        <div class="chips" id="rad"><button class="chip" type="button">10 mi</button><button class="chip on" type="button">25 mi</button><button class="chip" type="button">50 mi</button><button class="chip" type="button">100 mi</button></div></div>
+      <div class="note">Distances are straight-line from your ZIP code, so they are close estimates, not driving miles.</div>
+    </div>
+    <div class="card">
+      <div class="mut" style="font-weight:700">Jobs you want</div>
+      <div class="chips" id="trades"><button class="chip on" type="button">✓ Painting</button><button class="chip on" type="button">✓ Flooring</button><button class="chip" type="button">+ Kitchen remodel</button><button class="chip" type="button">+ Bathroom</button><button class="chip" type="button">+ Roofing</button><button class="chip" type="button">+ Landscaping</button></div>
+      <div class="note">Already filled in from the services on your profile. Change them any time.</div>
+    </div>
+    <div class="card">
+      <div class="tg"><div><b>Alert me about new jobs</b><div class="mut sm" style="margin-top:3px">In the app and by email when a matching job is posted.</div></div><button class="sw2" type="button" aria-pressed="true" aria-label="Alert me about new jobs" id="alertSw"></button></div>
+    </div>
+    <button class="btn" type="button" id="save">Save</button>
+    <div class="card ai" id="saved" hidden><span class="tag g" style="width:max-content">Saved</span><div class="mut">You will see Painting and Flooring jobs within <b id="rtxt">25</b> miles of 75074.</div></div>
+  </div>
+
+  <!-- 2 board -->
+  <div class="body g" id="s2" hidden>
+    <div><div class="lbl">Contractor</div><h1 style="margin-top:6px">Projects near you</h1><div class="mut" style="margin-top:6px">Painting and Flooring within <b id="rt2">25</b> miles of 75074.</div></div>
+    <div class="chips" id="fil"><button class="chip" data-m="10" type="button">10 mi</button><button class="chip on" data-m="25" type="button">25 mi</button><button class="chip" data-m="50" type="button">50 mi</button><button class="chip" data-m="999" type="button">Any distance</button></div>
+    <div class="row"><span class="mut sm">Sorted by: <b>Closest</b></span><span class="mut sm" id="cnt"></span></div>
+    <div id="list" style="display:flex;flex-direction:column;gap:12px">
+      <div class="card" data-d="4"><div class="row"><span class="tag">Painting</span><span class="dist">4 mi away</span></div><h3 style="font-size:19px">Painting: Walls, Ceilings +1 more</h3><div class="mut sm">Plano, TX 75023 · 1,800 sq ft · 2 bids</div><div class="row" style="border-top:1px solid var(--line);padding-top:10px"><span class="price">$3,200 – $4,600</span><span class="mut sm">AI reference</span></div></div>
+      <div class="card" data-d="9"><div class="row"><span class="tag">Flooring</span><span class="dist">9 mi away</span></div><h3 style="font-size:19px">Flooring: Luxury vinyl plank</h3><div class="mut sm">Frisco, TX 75034 · 600 sq ft · 0 bids</div><div class="row" style="border-top:1px solid var(--line);padding-top:10px"><span class="price">$2,900 – $5,200</span><span class="mut sm">AI reference</span></div></div>
+      <div class="card" data-d="22"><div class="row"><span class="tag">Painting</span><span class="dist">22 mi away</span></div><h3 style="font-size:19px">Painting: Exterior paint</h3><div class="mut sm">McKinney, TX 75070 · 2,400 sq ft · 1 bid</div><div class="row" style="border-top:1px solid var(--line);padding-top:10px"><span class="price">$5,400 – $9,800</span><span class="mut sm">AI reference</span></div></div>
+      <div class="card" data-d="41"><div class="row"><span class="tag">Painting</span><span class="dist" style="color:var(--mut)">41 mi away</span></div><h3 style="font-size:19px">Painting: Walls, Trim and doors</h3><div class="mut sm">Denton, TX 76201 · 1,500 sq ft · 3 bids</div><div class="row" style="border-top:1px solid var(--line);padding-top:10px"><span class="price">$2,600 – $4,000</span><span class="mut sm">AI reference</span></div></div>
+      <div class="card" data-d="180"><div class="row"><span class="tag">Flooring</span><span class="dist" style="color:var(--mut)">180 mi away</span></div><h3 style="font-size:19px">Flooring: Hardwood</h3><div class="mut sm">Austin, TX 78704 · 900 sq ft · 5 bids</div><div class="row" style="border-top:1px solid var(--line);padding-top:10px"><span class="price">$7,200 – $13,500</span><span class="mut sm">AI reference</span></div></div>
+    </div>
+    <div class="card ai" id="empty" hidden><div class="mut">No matching jobs in that distance. Try a wider distance.</div></div>
+    <div class="note">Roofing, kitchen and bathroom jobs are hidden because you didn't pick them. You can change that in Settings.</div>
+  </div>
+
+  <!-- 3 alert -->
+  <div class="body g" id="s3" hidden>
+    <div><div class="lbl">When a homeowner posts</div><h1 style="margin-top:6px">You get an alert</h1><div class="mut" style="margin-top:6px">Only contractors whose area and trades match are alerted.</div></div>
+    <div class="card"><div class="mut" style="font-weight:700">In the app · Recent alerts</div>
+      <div style="display:flex;flex-direction:column;gap:3px"><span style="color:var(--or);text-decoration:underline;font-weight:600">New Painting job 4 miles away: Walls, Ceilings +1 more</span><span class="mut sm">Today, 8:41 AM</span></div></div>
+    <div class="card"><div class="mut" style="font-weight:700">By email</div>
+      <div class="mail"><div class="h">From: Jobfile &lt;noreply@yourdomain.com&gt;<br>Subject: New Painting job 4 miles away in Plano</div>
+        <div class="b"><b>A homeowner in Plano, TX 75023 posted a project.</b><span>Painting: Walls, Ceilings, Drywall repair · 1,800 sq ft</span><span>AI price reference: $3,200 – $4,600</span><span class="bt">View job and bid</span><span style="font-size:12px;color:#6b655e">You get this because you chose Painting jobs within 25 miles. Turn alerts off in Settings.</span></div></div>
+      <div class="note">Emails reach only your test address until a domain is verified in Resend. The in-app alert works now.</div></div>
+    <div class="card ai"><div class="mut"><b>Fair to everyone:</b> contractors get at most one alert per job, and no more than 10 alerts a day. Homeowners never see who was alerted.</div></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var $=function(i){return document.getElementById(i)},all=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
+  all('#sw button').forEach(function(b){b.addEventListener('click',function(){
+    all('#sw button').forEach(function(x){x.classList.toggle('on',x===b)});
+    ['s1','s2','s3'].forEach(function(i){$(i).hidden=i!==b.dataset.s});window.scrollTo(0,0);
+  })});
+  all('#rad .chip').forEach(function(c){c.addEventListener('click',function(){all('#rad .chip').forEach(function(x){x.classList.toggle('on',x===c)})})});
+  all('#trades .chip').forEach(function(c){c.addEventListener('click',function(){
+    var on=c.classList.toggle('on'),t=c.textContent.replace(/^[✓+]\s*/,'');c.textContent=(on?'✓ ':'+ ')+t;
+  })});
+  $('alertSw').addEventListener('click',function(){var s=$('alertSw');s.setAttribute('aria-pressed',s.getAttribute('aria-pressed')==='true'?'false':'true')});
+  $('save').addEventListener('click',function(){
+    var on=all('#rad .chip.on')[0];$('rtxt').textContent=on.textContent.replace(/\D/g,'');$('saved').hidden=false;
+  });
+  function filt(m){
+    var n=0;all('#list .card').forEach(function(c){var ok=parseInt(c.dataset.d,10)<=m;c.hidden=!ok;if(ok)n++});
+    $('cnt').textContent=n+(n===1?' job':' jobs');$('empty').hidden=n>0;
+    $('rt2').textContent=m>=999?'any':m;
+  }
+  all('#fil .chip').forEach(function(c){c.addEventListener('click',function(){
+    all('#fil .chip').forEach(function(x){x.classList.toggle('on',x===c)});filt(parseInt(c.dataset.m,10));
+  })});
+  filt(25);
+})();
+</script>
