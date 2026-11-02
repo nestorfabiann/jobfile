@@ -68,6 +68,88 @@ export const JOB_TYPES: Record<string, { size: number; sizeLabel: string; groups
       ['Plants', ['Flower beds and mulch', 'Tree trimming']],
     ],
   },
+  Plumbing: {
+    size: 1800, sizeLabel: 'Home size (sq ft)',
+    groups: [
+      ['Water heater', ['Tank water heater', 'Tankless water heater']],
+      ['Repairs', ['Fix a leak', 'Clear or repair a drain', 'Repair or replace a pipe']],
+      ['Fixtures', ['New faucets', 'New toilet', 'New sink', 'Garbage disposal']],
+      ['Larger work', ['Repipe the house', 'New water softener or filter']],
+    ],
+  },
+  Electrical: {
+    size: 1800, sizeLabel: 'Home size (sq ft)',
+    groups: [
+      ['Panel and power', ['Panel upgrade', 'Add circuits', 'Whole-home surge protector']],
+      ['Outlets and switches', ['New outlets', 'GFCI outlets', 'Dimmers or smart switches']],
+      ['Lighting and fans', ['Recessed lighting', 'New light fixtures', 'Ceiling fans', 'Outdoor lighting']],
+      ['Add-ons', ['EV charger', 'Generator hookup']],
+    ],
+  },
+  HVAC: {
+    size: 1800, sizeLabel: 'Home size (sq ft)',
+    groups: [
+      ['Replace', ['New AC unit', 'New furnace', 'Full system (AC and furnace)', 'Heat pump']],
+      ['Repair and tune-up', ['Repair my system', 'Seasonal tune-up']],
+      ['Air flow', ['New or repaired ductwork', 'Duct cleaning', 'Smart thermostat']],
+    ],
+  },
+  'Windows and doors': {
+    size: 1800, sizeLabel: 'Home size (sq ft)',
+    groups: [
+      ['Windows', ['Replace windows', 'Energy-efficient windows', 'Window screens']],
+      ['Doors', ['Entry door', 'Patio or sliding door', 'Interior doors', 'Storm door']],
+      ['Finish', ['New trim and casing', 'Seal and caulk']],
+    ],
+  },
+  'Siding and exterior': {
+    size: 1800, sizeLabel: 'Home size (sq ft)',
+    groups: [
+      ['Siding', ['Replace siding', 'Repair siding', 'Fiber cement', 'Vinyl', 'Brick or stone veneer']],
+      ['Trim', ['Soffit and fascia', 'Exterior trim']],
+      ['Water', ['New gutters', 'Gutter guards']],
+    ],
+  },
+  Fencing: {
+    size: 1500, sizeLabel: 'Yard size (sq ft)',
+    groups: [
+      ['New fence', ['Wood fence', 'Vinyl fence', 'Metal or wrought iron', 'Chain link']],
+      ['Gates', ['Walk gate', 'Driveway gate']],
+      ['Repair', ['Repair sections', 'Replace posts', 'Stain or seal']],
+    ],
+  },
+  'Decks and patios': {
+    size: 200, sizeLabel: 'Deck or patio size (sq ft)',
+    groups: [
+      ['Build', ['New wood deck', 'New composite deck', 'Covered patio', 'Pergola']],
+      ['Repair', ['Repair deck boards', 'Replace railings', 'Replace stairs']],
+      ['Finish', ['Stain or seal', 'Add lighting']],
+    ],
+  },
+  'Concrete and driveways': {
+    size: 400, sizeLabel: 'Area (sq ft)',
+    groups: [
+      ['New', ['Driveway', 'Walkway', 'Patio slab', 'Garage slab']],
+      ['Repair', ['Fix cracks', 'Level a sunken slab', 'Replace a section']],
+      ['Finish', ['Stamped or decorative', 'Seal the surface']],
+    ],
+  },
+  'Drywall and carpentry': {
+    size: 400, sizeLabel: 'Area (sq ft)',
+    groups: [
+      ['Drywall', ['Repair holes or water damage', 'Hang new drywall', 'Texture and finish']],
+      ['Trim', ['Baseboards', 'Crown molding', 'Door and window casing']],
+      ['Custom', ['Built-in shelves', 'Hang or replace doors', 'Wall paneling']],
+    ],
+  },
+  Garage: {
+    size: 400, sizeLabel: 'Garage size (sq ft)',
+    groups: [
+      ['Door', ['Replace the garage door', 'Repair the garage door', 'New opener']],
+      ['Floor', ['Epoxy floor coating', 'Repair the floor']],
+      ['Storage', ['Shelving and cabinets', 'Overhead racks']],
+    ],
+  },
 };
 
 /** Keeps only items that really exist for that job type, so nothing made up gets stored. */
