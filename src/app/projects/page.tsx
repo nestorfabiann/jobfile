@@ -18,7 +18,7 @@ export default async function Projects({ searchParams }: { searchParams: { error
   const { sb, user } = await requireUser();
 
   const [{ data: projects }, { data: memberships }, { data: alerts }] = await Promise.all([
-    sb.from('projects').select('id,name,address,homeowner_name,created_at').order('created_at', { ascending: false }),
+    sb.from('projects').select('id,name,address,homeowner_name,created_at,closeout_started_at,completed_at').order('created_at', { ascending: false }),
     sb.from('company_members').select('company_id, companies(name)').eq('user_id', user.id),
     sb
       .from('notifications')
@@ -172,24 +172,30 @@ export default async function Projects({ searchParams }: { searchParams: { error
         <div className="row"><Link className="btn" href="/invites/new">Start a project and invite a contractor</Link></div>
       )}
 
-      {list.length > 0 && (
-        <section className="stack" aria-label="Your projects">
-          {list.map((p) => (
-            <Link key={p.id} href={`/projects/${p.id}/overview`} className="card proj" style={{ flexDirection: 'row', alignItems: 'center' }}>
-              {covers.get(p.id) ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={covers.get(p.id)} alt="" width={72} height={72} style={{ borderRadius: 14, objectFit: 'cover', flex: 'none' }} />
-              ) : (
-                <KitchenArt />
-              )}
-              <div className="stack" style={{ gap: 4, flex: 1, minWidth: 0 }}>
-                <h3>{p.name}</h3>
-                <span className="muted small">{[p.address, p.homeowner_name].filter(Boolean).join(' · ') || 'No address yet'}</span>
-              </div>
-              <span aria-hidden="true">›</span>
-            </Link>
-          ))}
-        </section>
+      {([['Ongoing projects', list.filter((p: any) => !p.completed_at)], ['Completed projects', list.filter((p: any) => p.completed_at)]] as [string, typeof list][]).map(([heading, rows]) =>
+        rows.length === 0 ? null : (
+          <section className="stack" key={heading} aria-label={heading}>
+            <h2>{heading}</h2>
+            {rows.map((p: any) => (
+              <Link key={p.id} href={`/projects/${p.id}/overview`} className="card proj" style={{ flexDirection: 'row', alignItems: 'center' }}>
+                {covers.get(p.id) ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={covers.get(p.id)} alt="" width={72} height={72} style={{ borderRadius: 14, objectFit: 'cover', flex: 'none' }} />
+                ) : (
+                  <KitchenArt />
+                )}
+                <div className="stack" style={{ gap: 4, flex: 1, minWidth: 0 }}>
+                  <div className="row" style={{ justifyContent: 'space-between', flexWrap: 'nowrap' }}>
+                    <h3>{p.name}</h3>
+                    <span className={`pill ${p.completed_at ? 'ok' : p.closeout_started_at ? 'warn' : ''}`}>{p.completed_at ? 'Completed' : p.closeout_started_at ? 'Closeout' : 'Active'}</span>
+                  </div>
+                  <span className="muted small">{[p.address, p.homeowner_name].filter(Boolean).join(' · ') || 'No address yet'}</span>
+                </div>
+                <span aria-hidden="true">›</span>
+              </Link>
+            ))}
+          </section>
+        ),
       )}
 
       {!company && list.length === 0 && (
