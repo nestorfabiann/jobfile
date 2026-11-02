@@ -7,6 +7,7 @@ import { isExpired, type Invite } from '@/lib/invites';
 import { dollars } from '@/lib/money';
 import { listingOpen, listingTitle, marketplaceEnabled, type Bid, type Listing } from '@/lib/marketplace';
 import ProjectsTabs from '@/components/ProjectsTabs';
+import NeedsYou, { type NeedItem } from '@/components/NeedsYou';
 import WhyJobfile from '@/components/WhyJobfile';
 import StartProjectForm from '@/components/StartProjectForm';
 import { alertHref } from '@/lib/alertPath';
@@ -71,7 +72,7 @@ export default async function Projects({ searchParams }: { searchParams: { error
   // Marketplace tabs: homeowners see the jobs they posted, contractors link to their bids.
   const mk = marketplaceEnabled();
   const posted: Listing[] = [];
-  const stats = new Map<string, { n: number; lo: number; hi: number }>();
+  const stats = new Map<string, { n: number; lo: number; hi: number; fresh: number }>();
   let extra = 0;
   if (mk) {
     const db = supabaseAdmin();
@@ -79,20 +80,44 @@ export default async function Projects({ searchParams }: { searchParams: { error
       const { data: ls } = await db.from('marketplace_listings').select('*').eq('homeowner_id', user.id).order('created_at', { ascending: false }).limit(30);
       posted.push(...((ls ?? []) as Listing[]));
       if (posted.length) {
-        const { data: bs } = await db.from('marketplace_bids').select('listing_id,price_cents,status').in('listing_id', posted.map((l) => l.id));
+        const { data: bs } = await db.from('marketplace_bids').select('listing_id,price_cents,status,created_at').in('listing_id', posted.map((l) => l.id));
         (bs ?? []).forEach((b: any) => {
           if (b.status === 'withdrawn') return;
-          const c = stats.get(b.listing_id) ?? { n: 0, lo: Infinity, hi: 0 };
+          const c = stats.get(b.listing_id) ?? { n: 0, lo: Infinity, hi: 0, fresh: 0 };
+          const lst = posted.find((x) => x.id === b.listing_id) as any;
+          // Until the 014 column exists, nothing counts as new.
+          if (lst && 'bids_seen_at' in lst && new Date(b.created_at) > new Date(lst.bids_seen_at ?? lst.created_at)) c.fresh += 1;
           c.n += 1; c.lo = Math.min(c.lo, b.price_cents); c.hi = Math.max(c.hi, b.price_cents);
           stats.set(b.listing_id, c);
         });
-        posted.forEach((l) => { if (listingOpen(l)) extra += stats.get(l.id)?.n ?? 0; });
+        posted.forEach((l) => { if (listingOpen(l)) extra += stats.get(l.id)?.fresh ?? 0; });
       }
     } else {
       const { count } = await db.from('marketplace_bids').select('id', { count: 'exact', head: true }).eq('company_id', company.company_id).eq('status', 'waiting');
       extra = count ?? 0;
     }
   }
+  const needs: NeedItem[] = [];
+  posted.forEach((l) => {
+    const st = stats.get(l.id);
+    if (listingOpen(l) && st && st.fresh > 0) needs.push({ key: `b${l.id}`, title: `${st.fresh} new bid${st.fresh === 1 ? '' : 's'} on ${listingTitle(l)}`, sub: `Lowest ${dollars(st.lo)} of ${st.n} bid${st.n === 1 ? '' : 's'}`, href: `/marketplace/${l.id}`, go: 'Compare', tone: 'new' });
+  });
+  const { data: unread } = await sb
+    .from('notifications')
+    .select('id,title,created_at,project_id,kind')
+    .is('read_at', null)
+    .in('kind', ['change', 'agreement', 'payment', 'bid', 'job_match'])
+    .gt('created_at', new Date(Date.now() - 14 * 86400000).toISOString())
+    .order('created_at', { ascending: false })
+    .limit(30);
+  const jobs = (unread ?? []).filter((n: any) => n.kind === 'job_match').length;
+  (unread ?? []).forEach((n: any) => {
+    if (n.kind === 'job_match' || (n.kind === 'bid' && !n.project_id)) return;
+    needs.push({ key: n.id, title: n.title, sub: when(n.created_at), href: `/n/${n.id}`, go: n.kind === 'bid' ? 'Open' : 'Review', tone: n.kind === 'bid' ? 'won' : 'new' });
+  });
+  if (jobs > 0) needs.push({ key: 'jobs', title: `${jobs} new job${jobs === 1 ? '' : 's'} near you`, sub: 'Matched to your trades and area', href: '/n/jobs', go: 'View', tone: 'new' });
+  const needsCard = <NeedsYou items={needs.slice(0, 6)} />;
+
   const tab = mk && !company && searchParams.tab === 'posted' ? 'posted' : 'projects';
   const tabs = mk ? <ProjectsTabs active={tab === 'posted' ? 'extra' : 'projects'} role={company ? 'contractor' : 'homeowner'} projects={list.length} extra={extra} /> : null;
   const left = (l: Listing) => Math.max(0, Math.ceil((new Date(l.expires_at).getTime() - Date.now()) / 86400000));
@@ -106,6 +131,7 @@ export default async function Projects({ searchParams }: { searchParams: { error
           <h1>Projects</h1>
           <p className="muted">Signed in as {user.email}</p>
         </div>
+        {needsCard}
         {tabs}
         <div className="row"><Link className="btn" href="/marketplace/new">+ Post a project to the marketplace</Link></div>
         {posted.length === 0 && <div className="card"><p className="muted">You have not posted a job yet. Post one and local contractors can send you bids.</p></div>}
@@ -123,7 +149,7 @@ export default async function Projects({ searchParams }: { searchParams: { error
               <p className="muted small">{[l.city, `ZIP ${l.zip}`, l.size_sqft ? `${l.size_sqft.toLocaleString('en-US')} sq ft` : ''].filter(Boolean).join(' · ')}</p>
               <div className="row" style={{ justifyContent: 'space-between', borderTop: '1px solid var(--line)', paddingTop: 10 }}>
                 <b style={{ color: 'var(--accent)', fontSize: 18 }}>{hasAI ? `${dollars(l.ai_low_cents as number)} – ${dollars(l.ai_high_cents as number)}` : 'No AI range'}</b>
-                <span className="pill">{st ? `${st.n} bid${st.n === 1 ? '' : 's'}` : 'No bids yet'}</span>
+                <span className="pill">{st ? `${st.n} bid${st.n === 1 ? '' : 's'}${st.fresh ? ` · ${st.fresh} new` : ''}` : 'No bids yet'}</span>
               </div>
               {st && <p className="muted small">Lowest {dollars(st.lo)} · highest {dollars(st.hi)}</p>}
               <div className="row">
@@ -151,6 +177,7 @@ export default async function Projects({ searchParams }: { searchParams: { error
         <h1>Projects</h1>
         <p className="muted">Signed in as {user.email}</p>
       </div>
+      {needsCard}
       {tabs}
       {list.length === 0 && why}
 

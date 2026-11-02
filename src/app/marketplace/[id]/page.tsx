@@ -36,6 +36,8 @@ export default async function ListingPage({ params, searchParams }: { params: { 
   const photoUrls = await signedUrls('listing-photos', (photoRows ?? []).map((p) => p.path as string));
   const videoUrls = await signedUrls('listing-videos', (videoRows ?? []).map((v) => v.path as string));
   const allBids = (bidRows ?? []) as Bid[];
+  // The homeowner has now seen the bids; the Projects page stops calling them new. Ignored if the 014 column is not there yet.
+  if (owner) await db.from('marketplace_listings').update({ bids_seen_at: new Date().toISOString() }).eq('id', l.id);
   const visible = owner ? allBids.filter((b) => b.status !== 'withdrawn') : [];
   const myBid = companyId ? allBids.find((b) => b.company_id === companyId) : undefined;
 
