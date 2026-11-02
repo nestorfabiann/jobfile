@@ -9,6 +9,16 @@ import { fmtDate, INSURANCE_KINDS, isCurrent, signedUrls, type InsuranceKind } f
 
 export const dynamic = 'force-dynamic';
 
+/** Small flags for the languages a contractor speaks (England and Spain). Drawn as SVG so they look the same on every device. */
+function Flag({ lang }: { lang: string }) {
+  const box = { width: 20, height: 14, viewBox: '0 0 20 14', 'aria-hidden': true, style: { borderRadius: 2, flex: 'none' as const, boxShadow: '0 0 0 1px rgba(0,0,0,.18)' } };
+  if (lang === 'English')
+    return (<svg {...box}><rect width="20" height="14" fill="#fff" /><rect x="8.5" width="3" height="14" fill="#cf142b" /><rect y="5.5" width="20" height="3" fill="#cf142b" /></svg>);
+  if (lang === 'Español')
+    return (<svg {...box}><rect width="20" height="14" fill="#c60b1e" /><rect y="3.5" width="20" height="7" fill="#ffc400" /></svg>);
+  return null;
+}
+
 /** Small line icons for the contractor's links. */
 function LinkIcon({ name, size = 18 }: { name: string; size?: number }) {
   const common = { width: size, height: size, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const, 'aria-hidden': true };
@@ -59,7 +69,7 @@ export default async function Profile({ params, searchParams }: { params: { id: 
         </div>
         <div className="row">
           {verified.length > 0 && <span className="pill ok" style={{ gap: 6, alignItems: 'center' }}><LinkIcon name="Document" size={14} />Insurance verified until {fmtDate(verified.map((v) => v.expires_on).sort()[0])}</span>}
-          {(c.languages ?? []).map((l: string) => <span className="pill" key={l}>{l}</span>)}
+          {(c.languages ?? []).map((l: string) => <span className="pill" key={l} style={{ gap: 6, alignItems: 'center' }}><Flag lang={l} />{l}</span>)}
         </div>
       </div>
       {(c.about || (c.services ?? []).length > 0) && (
