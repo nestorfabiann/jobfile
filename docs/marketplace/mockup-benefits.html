@@ -1,0 +1,100 @@
+<title>Why Jobfile Preview</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: the signed-in Projects page with a "Why run it in Jobfile" card at the top. Switch between homeowner and contractor wording. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#cd7d2e;--orl:#f9efe4;--orb:#ecd4a8;--gr:#1f7a55;--grl:#d9f1e6;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--grl:#173a2c;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--grl:#173a2c;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh}
+.g{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;text-wrap:balance}
+.sw{display:flex;gap:6px;padding-block:10px;border-bottom:1px dashed var(--line)}
+.sw button{flex:1;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:9px 12px;border-radius:99px;font:500 13px 'IBM Plex Sans',system-ui,sans-serif;cursor:pointer}
+.sw button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.hd{border-bottom:1px solid var(--line);padding-block:12px;display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center}
+.logo{font:800 20px 'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.02em}.logo b{color:var(--or)}
+.nav{display:flex;flex-wrap:wrap;gap:4px 16px;align-items:center;font-size:14px;font-weight:600}
+.pill{font-size:13px;font-weight:600;padding:7px 14px;border-radius:99px;background:var(--orl);color:var(--or)}
+.body{padding-block:18px 40px;display:flex;flex-direction:column;gap:14px}
+h1{font-size:30px;font-weight:800}
+.mut{color:var(--mut);font-size:14px;line-height:1.5}.sm{font-size:12.5px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:18px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.why{border:1.5px solid var(--orb);background:linear-gradient(180deg,var(--orl),var(--card) 55%)}
+.lbl{font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--or);font-weight:600}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.x{background:none;border:0;color:var(--mut);font:600 13px 'IBM Plex Sans',system-ui,sans-serif;cursor:pointer;padding:6px 0}
+.ben{display:grid;gap:12px}
+.ben div{display:flex;gap:12px;align-items:flex-start}
+.ben i{flex:none;width:38px;height:38px;border-radius:12px;background:var(--card);border:1px solid var(--orb);display:grid;place-items:center;font-style:normal;font-size:18px}
+.ben b{font-size:14.5px;display:block}
+.ben span{font-size:13px;color:var(--mut);line-height:1.45;display:block;margin-top:1px}
+.steps{display:flex;gap:6px;flex-wrap:wrap}
+.step{font-size:12px;font-weight:600;padding:6px 11px;border-radius:99px;background:var(--card);border:1px solid var(--line)}
+.btn{display:flex;align-items:center;justify-content:center;border-radius:99px;min-height:50px;padding:0 20px;font:600 15px 'IBM Plex Sans',system-ui,sans-serif;border:1px solid var(--or);background:var(--or);color:#fff;box-shadow:0 6px 16px #cd7d2e44;width:100%;cursor:pointer}
+.btn.gh{background:var(--card);color:var(--ink);border-color:var(--line);box-shadow:none}
+.tag{display:inline-block;font-size:12px;font-weight:600;padding:5px 11px;border-radius:99px;background:var(--grl);color:var(--gr);width:max-content}
+.mini{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 18px;border-radius:99px;border:1px solid var(--orb);background:var(--orl);color:var(--or);font-weight:600;font-size:14px;cursor:pointer;width:100%;font-family:inherit}
+.note{font-size:12px;color:var(--mut);text-align:center}
+[hidden]{display:none!important}
+</style>
+
+<div class="wrap">
+  <div class="sw g"><button class="on" data-u="h">Homeowner</button><button data-u="c">Contractor</button></div>
+  <div class="hd g"><span class="logo">Job<b>file</b></span><nav class="nav"><span>Projects</span><span>Marketplace</span><span>Settings</span><span class="pill">Sign out</span></nav></div>
+
+  <div class="body g">
+    <div><h1>Projects</h1><div class="mut" style="margin-top:6px" id="who">Signed in as bestdfwcontractors@gmail.com</div></div>
+
+    <div class="card why" id="why">
+      <div class="row"><span class="lbl">Why run the job in Jobfile</span><button class="x" type="button" id="hide">Hide</button></div>
+      <h2 style="font-size:23px" id="ttl">One shared record that protects you both</h2>
+      <div class="ben" id="ben"></div>
+      <div class="steps" id="steps"></div>
+      <button class="btn" type="button" id="cta"></button>
+    </div>
+
+    <button class="mini" type="button" id="show" hidden><span>Why run the job in Jobfile?</span><span>Show ›</span></button>
+
+    <div id="listH" class="card"><div class="row"><b style="font-size:17px">Kitchen and walls painting</b><span class="tag">Active</span></div><div class="mut sm">727 plano tx · Jerry still</div></div>
+    <div class="note">Your projects and alerts continue below, same as today.</div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var $=function(i){return document.getElementById(i)};
+  var D={
+    h:{who:'Signed in as bestdfwcontractors@gmail.com',ttl:'One shared record that protects you both',
+      ben:[['📄','Price and scope agreed in writing','You and your contractor both approve the scope and price before work starts, so nobody argues about what was promised later.'],
+           ['📷','Dated photos of the work','Progress photos pile up in one place, with the date on each one. Useful for you, and for any dispute.'],
+           ['💵','Payments tracked, never in doubt','Every payment request and payment is recorded against the agreed milestones, so you always know what is paid and what is left. Jobfile does not move money.'],
+           ['✏️','Changes in writing','Extra work becomes a change order you approve first, so the final bill has no surprises.'],
+           ['💬','All messages in one place','No lost texts. The whole conversation stays with the job.'],
+           ['⭐','Honest ratings','After the job, you both rate each other. Good contractors earn a public record.']],
+      steps:['1 Pick a contractor','2 Agree price and scope','3 Track the work','4 Close out and rate'],cta:'Start a project and invite a contractor'},
+    c:{who:'Signed in as nestor.rodriguez92@gmail.com',ttl:'Win the job, then run it without the paperwork',
+      ben:[['📄','Customers sign off before you start','Scope and price approved in writing, so you get paid for what was agreed.'],
+           ['💵','Request payments by milestone','Ask for each payment when the work is done. Both sides see what is paid and what is next.'],
+           ['✏️','Change orders you can bill','Extra work is approved before you do it, with the price attached.'],
+           ['📷','Proof of the work','Dated photos show what you finished and when.'],
+           ['🛡️','A profile that wins bids','Insurance badge, work photos and real ratings show up on every bid you send.'],
+           ['📍','Jobs near you','Local jobs come to you, with an AI price reference to help you bid fairly.']],
+      steps:['1 Finish your profile','2 Bid on local jobs','3 Run the job here','4 Get rated'],cta:'Finish your business profile'}
+  };
+  function draw(k){
+    var d=D[k];$('who').textContent=d.who;$('ttl').textContent=d.ttl;$('cta').textContent=d.cta;
+    $('ben').innerHTML=d.ben.map(function(b){return '<div><i>'+b[0]+'</i><p style="margin:0"><b>'+b[1]+'</b><span>'+b[2]+'</span></p></div>'}).join('');
+    $('steps').innerHTML=d.steps.map(function(s){return '<span class="step">'+s+'</span>'}).join('');
+    $('why').hidden=false;$('show').hidden=true;
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('.sw button'),function(b){b.addEventListener('click',function(){
+    Array.prototype.forEach.call(document.querySelectorAll('.sw button'),function(x){x.classList.toggle('on',x===b)});draw(b.dataset.u);
+  })});
+  $('hide').addEventListener('click',function(){$('why').hidden=true;$('show').hidden=false});
+  $('show').addEventListener('click',function(){$('why').hidden=false;$('show').hidden=true});
+  draw('h');
+})();
+</script>
