@@ -4,12 +4,15 @@ import { supabaseAdmin } from '@/lib/supabase/server';
 import KitchenArt from '@/components/KitchenArt';
 import { createCompany, createProject } from './actions';
 import { isExpired, type Invite } from '@/lib/invites';
+import { dollars } from '@/lib/money';
+import { listingOpen, listingTitle, marketplaceEnabled, type Bid, type Listing } from '@/lib/marketplace';
+import ProjectsTabs from '@/components/ProjectsTabs';
 
 const TZ = 'America/Chicago';
 const when = (iso: string) =>
   new Date(iso).toLocaleString('en-US', { timeZone: TZ, month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
 
-export default async function Projects({ searchParams }: { searchParams: { error?: string } }) {
+export default async function Projects({ searchParams }: { searchParams: { error?: string; tab?: string } }) {
   const { sb, user } = await requireUser();
 
   const [{ data: projects }, { data: memberships }, { data: alerts }] = await Promise.all([
@@ -61,12 +64,79 @@ export default async function Projects({ searchParams }: { searchParams: { error
     }
   }
 
+  // Marketplace tabs: homeowners see the jobs they posted, contractors link to their bids.
+  const mk = marketplaceEnabled();
+  const posted: Listing[] = [];
+  const stats = new Map<string, { n: number; lo: number; hi: number }>();
+  let extra = 0;
+  if (mk) {
+    const db = supabaseAdmin();
+    if (!company) {
+      const { data: ls } = await db.from('marketplace_listings').select('*').eq('homeowner_id', user.id).order('created_at', { ascending: false }).limit(30);
+      posted.push(...((ls ?? []) as Listing[]));
+      if (posted.length) {
+        const { data: bs } = await db.from('marketplace_bids').select('listing_id,price_cents,status').in('listing_id', posted.map((l) => l.id));
+        (bs ?? []).forEach((b: any) => {
+          if (b.status === 'withdrawn') return;
+          const c = stats.get(b.listing_id) ?? { n: 0, lo: Infinity, hi: 0 };
+          c.n += 1; c.lo = Math.min(c.lo, b.price_cents); c.hi = Math.max(c.hi, b.price_cents);
+          stats.set(b.listing_id, c);
+        });
+        posted.forEach((l) => { if (listingOpen(l)) extra += stats.get(l.id)?.n ?? 0; });
+      }
+    } else {
+      const { count } = await db.from('marketplace_bids').select('id', { count: 'exact', head: true }).eq('company_id', company.company_id).eq('status', 'waiting');
+      extra = count ?? 0;
+    }
+  }
+  const tab = mk && !company && searchParams.tab === 'posted' ? 'posted' : 'projects';
+  const tabs = mk ? <ProjectsTabs active={tab === 'posted' ? 'extra' : 'projects'} role={company ? 'contractor' : 'homeowner'} projects={list.length} extra={extra} /> : null;
+  const left = (l: Listing) => Math.max(0, Math.ceil((new Date(l.expires_at).getTime() - Date.now()) / 86400000));
+
+  if (tab === 'posted') {
+    return (
+      <>
+        <div className="stack">
+          <h1>Projects</h1>
+          <p className="muted">Signed in as {user.email}</p>
+        </div>
+        {tabs}
+        <div className="row"><Link className="btn" href="/marketplace/new">+ Post a project to the marketplace</Link></div>
+        {posted.length === 0 && <div className="card"><p className="muted">You have not posted a job yet. Post one and local contractors can send you bids.</p></div>}
+        {posted.map((l) => {
+          const open = listingOpen(l);
+          const st = stats.get(l.id);
+          const hasAI = l.ai_low_cents != null && l.ai_high_cents != null;
+          return (
+            <div className="card" key={l.id}>
+              <div className="row" style={{ justifyContent: 'space-between' }}>
+                <span className="pill">{l.job_type}</span>
+                <span className={`pill ${open ? 'ok' : ''}`}>{l.status === 'awarded' ? 'Hired' : open ? `Open · ${left(l)} day${left(l) === 1 ? '' : 's'} left` : 'Closed'}</span>
+              </div>
+              <h3><Link href={`/marketplace/${l.id}`}>{listingTitle(l)}</Link></h3>
+              <p className="muted small">{[l.city, `ZIP ${l.zip}`, l.size_sqft ? `${l.size_sqft.toLocaleString('en-US')} sq ft` : ''].filter(Boolean).join(' · ')}</p>
+              <div className="row" style={{ justifyContent: 'space-between', borderTop: '1px solid var(--line)', paddingTop: 10 }}>
+                <b style={{ color: 'var(--accent)', fontSize: 18 }}>{hasAI ? `${dollars(l.ai_low_cents as number)} – ${dollars(l.ai_high_cents as number)}` : 'No AI range'}</b>
+                <span className="pill">{st ? `${st.n} bid${st.n === 1 ? '' : 's'}` : 'No bids yet'}</span>
+              </div>
+              {st && <p className="muted small">Lowest {dollars(st.lo)} · highest {dollars(st.hi)}</p>}
+              <div className="row">
+                {l.status === 'awarded' && l.project_id ? <Link className="btn ghost" href={`/projects/${l.project_id}/overview`}>Open the project</Link> : <Link className="btn ghost" href={`/marketplace/${l.id}`}>{st ? 'Compare bids' : 'View job'}</Link>}
+              </div>
+            </div>
+          );
+        })}
+      </>
+    );
+  }
+
   return (
     <>
       <div className="stack">
         <h1>Projects</h1>
         <p className="muted">Signed in as {user.email}</p>
       </div>
+      {tabs}
 
       {searchParams.error ? <div className="box bad">{searchParams.error}</div> : null}
 

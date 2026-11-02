@@ -5,6 +5,7 @@ import { supabaseAdmin } from '@/lib/supabase/server';
 import { dollars } from '@/lib/money';
 import { firstNameInitial, listingOpen, listingTitle, requireMarketplace, type Bid, type Listing } from '@/lib/marketplace';
 import BusinessTabs from '@/components/BusinessTabs';
+import ProjectsTabs from '@/components/ProjectsTabs';
 import RangeBar from '@/components/RangeBar';
 import { withdrawBid } from '../actions';
 
@@ -36,6 +37,7 @@ export default async function MyBids({ searchParams }: { searchParams: { f?: str
 
   return (
     <>
+      <ProjectsTabs active="extra" role="contractor" projects={0} extra={n('waiting')} />
       <div className="stack">
         <h1>Business profile</h1>
         <BusinessTabs active="bids" />
