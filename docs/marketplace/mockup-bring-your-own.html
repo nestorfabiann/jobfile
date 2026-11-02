@@ -1,0 +1,95 @@
+<title>Bring Your Own Preview</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: two places that say "you don't need the marketplace": the public landing page, and the signed-in benefits card. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#cd7d2e;--orl:#f9efe4;--orb:#ecd4a8;--gr:#1f7a55;--grl:#d9f1e6;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--grl:#173a2c;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--grl:#173a2c;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh}
+.g{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;text-wrap:balance}
+.sw{display:flex;gap:6px;padding-block:10px;border-bottom:1px dashed var(--line)}
+.sw button{flex:1;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:9px 12px;border-radius:99px;font:500 13px 'IBM Plex Sans',system-ui,sans-serif;cursor:pointer}
+.sw button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.hd{border-bottom:1px solid var(--line);padding-block:12px;display:flex;justify-content:space-between;align-items:center}
+.logo{font:800 20px 'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.02em}.logo b{color:var(--or)}
+.pill{font-size:13px;font-weight:600;padding:7px 14px;border-radius:99px;background:var(--orl);color:var(--or)}
+.body{padding-block:20px 40px;display:flex;flex-direction:column;gap:14px}
+.lbl{font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--or);font-weight:600}
+h1{font-size:34px;font-weight:800;line-height:1.05}h1 em{font-style:normal;color:var(--or)}
+.mut{color:var(--mut);font-size:15px;line-height:1.5}.sm{font-size:12.5px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:18px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.byo{border:1.5px solid var(--orb);background:linear-gradient(180deg,var(--orl),var(--card) 60%)}
+.btn{display:flex;align-items:center;justify-content:center;border-radius:99px;min-height:52px;padding:0 20px;font:600 16px 'IBM Plex Sans',system-ui,sans-serif;border:1px solid var(--or);background:var(--or);color:#fff;box-shadow:0 6px 16px #cd7d2e44;width:100%;cursor:pointer}
+.btn.gh{background:var(--card);color:var(--ink);border-color:var(--line);box-shadow:none}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ic{width:46px;height:46px;border-radius:14px;background:var(--orl);display:grid;place-items:center;font-size:22px}
+.flow{display:grid;gap:10px}
+.flow div{display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.45}
+.flow b{flex:none;width:26px;height:26px;border-radius:50%;background:var(--or);color:#fff;display:grid;place-items:center;font-size:13px}
+.tag{display:inline-block;font-size:12px;font-weight:600;padding:5px 11px;border-radius:99px;background:var(--grl);color:var(--gr);width:max-content}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.step{font-size:12px;font-weight:600;padding:6px 11px;border-radius:99px;background:var(--card);border:1px solid var(--line)}
+.sec[hidden]{display:none}
+.nav{display:flex;flex-wrap:wrap;gap:4px 16px;align-items:center;font-size:14px;font-weight:600}
+</style>
+
+<div class="wrap">
+  <div class="sw g"><button class="on" data-s="a">1 · Public landing</button><button data-s="b">2 · After sign-in</button></div>
+
+  <!-- 1 public landing -->
+  <div class="sec" id="a">
+    <div class="hd g"><span class="logo">Job<b>file</b></span><span class="pill">Sign in</span></div>
+    <div class="body g">
+      <div><div class="lbl">Home improvement marketplace</div>
+        <h1 style="margin-top:10px">Post it. Compare bids. Build it <em>for a fair price.</em></h1></div>
+      <button class="btn" type="button">Post a Project →</button>
+      <button class="btn gh" type="button">🔍 Find Work</button>
+
+      <div class="card byo">
+        <span class="tag">You do not need the marketplace</span>
+        <h2 style="font-size:24px">Already have a contractor or a customer?</h2>
+        <div class="mut">Jobfile works for any job, even if you never found each other here. Invite them by email and keep the whole job in one place.</div>
+        <div class="flow">
+          <div><b>1</b><span><b style="all:unset;font-weight:700">Start the project.</b> Add the job name and who it is with.</span></div>
+          <div><b>2</b><span><b style="all:unset;font-weight:700">Send an invite.</b> They get an email and join with one tap. Nothing to download.</span></div>
+          <div><b>3</b><span><b style="all:unset;font-weight:700">Run it together.</b> Price and scope, photos, payments, change orders and messages.</span></div>
+        </div>
+        <div class="two"><button class="btn gh" type="button" style="font-size:14px;min-height:48px">I'm a homeowner</button><button class="btn gh" type="button" style="font-size:14px;min-height:48px">I'm a contractor</button></div>
+        <div class="sm mut">Free to start. The person you invite does not need an account first.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2 signed-in card -->
+  <div class="sec" id="b" hidden>
+    <div class="hd g"><span class="logo">Job<b>file</b></span><nav class="nav"><span>Projects</span><span>Marketplace</span><span>Settings</span></nav></div>
+    <div class="body g">
+      <div><h2 style="font-size:30px;font-weight:800">Projects</h2><div class="mut sm" style="margin-top:6px">Signed in as bestdfwcontractors@gmail.com</div></div>
+      <div class="card byo">
+        <div class="lbl">Why run the job in Jobfile</div>
+        <h2 style="font-size:23px">One shared record that protects you both</h2>
+        <div class="card" style="background:var(--card);border-color:var(--orb);padding:14px;gap:6px">
+          <b style="font-size:15px">🤝 Already hired someone? Bring them here.</b>
+          <span class="mut sm">You do not need the marketplace. Invite your contractor by email and Jobfile keeps the agreement, photos, payments and messages for the job you already have.</span>
+        </div>
+        <div class="mut sm">…the six benefits continue here, same as today…</div>
+        <button class="btn" type="button">Start a project and invite a contractor</button>
+      </div>
+      <div class="card"><div class="row"><b style="font-size:17px">Kitchen and walls painting</b><span class="tag">Active</span></div><div class="mut sm">727 plano tx · Jerry still</div></div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var b=document.querySelectorAll('.sw button');
+  Array.prototype.forEach.call(b,function(x){x.addEventListener('click',function(){
+    Array.prototype.forEach.call(b,function(y){y.classList.toggle('on',y===x)});
+    document.getElementById('a').hidden=x.dataset.s!=='a';document.getElementById('b').hidden=x.dataset.s!=='b';window.scrollTo(0,0);
+  })});
+})();
+</script>
