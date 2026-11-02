@@ -9,6 +9,18 @@ import { fmtDate, INSURANCE_KINDS, isCurrent, signedUrls, type InsuranceKind } f
 
 export const dynamic = 'force-dynamic';
 
+/** Small line icons for the contractor's links. */
+function LinkIcon({ name }: { name: string }) {
+  const common = { width: 18, height: 18, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const, 'aria-hidden': true };
+  if (name === 'Facebook')
+    return (<svg {...common}><circle cx="12" cy="12" r="10" /><path d="M15.5 8h-1.6A2.4 2.4 0 0 0 11.5 10.4V21M8.5 13h6.5" /></svg>);
+  if (name === 'Instagram')
+    return (<svg {...common}><rect x="3" y="3" width="18" height="18" rx="5" /><circle cx="12" cy="12" r="4" /><circle cx="17.3" cy="6.7" r="0.6" fill="currentColor" /></svg>);
+  if (name === 'Website')
+    return (<svg {...common}><circle cx="12" cy="12" r="10" /><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20" /></svg>);
+  return (<svg {...common}><path d="M12 2l3 6.5 7 .9-5.1 4.9 1.3 7-6.2-3.4L5.8 21.3l1.3-7L2 9.4l7-.9z" /></svg>);
+}
+
 export default async function Profile({ params, searchParams }: { params: { id: string }; searchParams: { reported?: string } }) {
   await requireUser();
   const db = supabaseAdmin();
@@ -83,7 +95,7 @@ export default async function Profile({ params, searchParams }: { params: { id: 
           <h2>Find them online</h2>
           <p className="muted small">These links are added by the contractor and open other websites.</p>
           <div className="row">
-            {links.map(([label, url]) => <a key={label} className="btn ghost" href={url} target="_blank" rel="noopener noreferrer nofollow">{label}</a>)}
+            {links.map(([label, url]) => <a key={label} className="btn ghost" href={url} target="_blank" rel="noopener noreferrer nofollow" style={{ gap: 8 }}><LinkIcon name={label} />{label}</a>)}
           </div>
         </div>
       )}
