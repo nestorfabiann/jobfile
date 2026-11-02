@@ -1,4 +1,4 @@
-import { barPos } from '@/lib/marketplace';
+import { barPos } from '@/lib/barPos';
 
 /** Shows where a price sits against the AI range. The pale band is the AI range; the dark mark is the price. */
 export default function RangeBar({ price, lo, hi }: { price: number; lo: number; hi: number }) {
