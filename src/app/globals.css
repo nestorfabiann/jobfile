@@ -199,3 +199,7 @@ body.pub .composer { box-shadow: 0 -10px 24px -14px rgba(27, 26, 24, 0.3); }
   .why-mini { border-color: #5a4426; background: #33281c; }
 }
 .why-num { flex: none; width: 26px; height: 26px; border-radius: 50%; background: var(--accent); color: #fff; display: grid; place-items: center; font-size: 13px; font-weight: 700; }
+
+/* Start a project: button that opens the form in place */
+.startp>summary{list-style:none;cursor:pointer}
+.startp>summary::-webkit-details-marker{display:none}

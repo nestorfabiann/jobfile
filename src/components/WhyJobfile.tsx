@@ -1,10 +1,11 @@
 import Link from 'next/link';
+import type { ReactNode } from 'react';
 import { setWhy } from '@/app/projects/actions';
 
 type Item = [string, string, string];
 
 /** Benefits card at the top of Projects. Open until the person hides it; the choice is remembered in a cookie. */
-export default function WhyJobfile({ role, hidden, marketplace }: { role: 'homeowner' | 'contractor'; hidden: boolean; marketplace: boolean }) {
+export default function WhyJobfile({ role, hidden, marketplace, startForm }: { role: 'homeowner' | 'contractor'; hidden: boolean; marketplace: boolean; startForm?: ReactNode }) {
   const home = role === 'homeowner';
   const items: Item[] = home
     ? [
@@ -27,10 +28,19 @@ export default function WhyJobfile({ role, hidden, marketplace }: { role: 'homeo
 
   if (hidden) {
     return (
-      <form action={setWhy}>
-        <input type="hidden" name="show" value="1" />
-        <button type="submit" className="why-mini"><span>Why run the job in Jobfile?</span><span>Show ›</span></button>
-      </form>
+      <>
+        {startForm ? (
+          <section className="card why" aria-label="Bring your own customer" style={{ gap: 10 }}>
+            <b>🤝 Already have a customer? Bring them here.</b>
+            <span className="muted small">You do not need the marketplace.</span>
+            {startForm}
+          </section>
+        ) : null}
+        <form action={setWhy}>
+          <input type="hidden" name="show" value="1" />
+          <button type="submit" className="why-mini"><span>Why run the job in Jobfile?</span><span>Show ›</span></button>
+        </form>
+      </>
     );
   }
   return (
@@ -43,6 +53,7 @@ export default function WhyJobfile({ role, hidden, marketplace }: { role: 'homeo
       <div className="card" style={{ background: 'var(--surface)', borderColor: '#ecd4a8', padding: 14, gap: 6 }}>
         <b>{home ? '🤝 Already hired someone? Bring them here.' : '🤝 Already have a customer? Bring them here.'}</b>
         <span className="muted small">You do not need the marketplace. {home ? 'Invite your contractor by email and Jobfile keeps the agreement, photos, payments and messages for the job you already have.' : 'Start a project and invite your customer by email. Jobfile keeps the agreement, photos, payments and messages for the job you already have.'}</span>
+        {startForm}
       </div>
       <div className="stack" style={{ gap: 12 }}>
         {items.map(([icon, title, text]) => (

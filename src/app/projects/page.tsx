@@ -2,12 +2,13 @@ import Link from 'next/link';
 import { requireUser } from '@/lib/session';
 import { supabaseAdmin } from '@/lib/supabase/server';
 import KitchenArt from '@/components/KitchenArt';
-import { createCompany, createProject } from './actions';
+import { createCompany } from './actions';
 import { isExpired, type Invite } from '@/lib/invites';
 import { dollars } from '@/lib/money';
 import { listingOpen, listingTitle, marketplaceEnabled, type Bid, type Listing } from '@/lib/marketplace';
 import ProjectsTabs from '@/components/ProjectsTabs';
 import WhyJobfile from '@/components/WhyJobfile';
+import StartProjectForm from '@/components/StartProjectForm';
 import { cookies } from 'next/headers';
 
 const TZ = 'America/Chicago';
@@ -141,7 +142,12 @@ export default async function Projects({ searchParams }: { searchParams: { error
         <p className="muted">Signed in as {user.email}</p>
       </div>
       {tabs}
-      <WhyJobfile role={company ? 'contractor' : 'homeowner'} hidden={whyHidden} marketplace={mk} />
+      <WhyJobfile
+        role={company ? 'contractor' : 'homeowner'}
+        hidden={whyHidden}
+        marketplace={mk}
+        startForm={company ? <StartProjectForm companyId={company.company_id} companyName={company.companies?.name} open={!!searchParams.error} /> : undefined}
+      />
 
       {searchParams.error ? <div className="box bad">{searchParams.error}</div> : null}
 
@@ -219,44 +225,6 @@ export default async function Projects({ searchParams }: { searchParams: { error
             </p>
           </div>
         </>
-      )}
-
-      {company && (
-        <form action={createProject} className="card">
-          <h2>New project</h2>
-          <p className="muted small">{company.companies?.name}</p>
-          <input type="hidden" name="company_id" value={company.company_id} />
-          <div className="grid2">
-            <label className="fld">
-              Project name
-              <input name="name" required placeholder="Kitchen remodel" />
-            </label>
-            <label className="fld">
-              Job address
-              <input name="address" placeholder="412 Maple Court, Austin, TX" autoComplete="street-address" />
-            </label>
-            <label className="fld">
-              Homeowner name
-              <input name="homeowner_name" placeholder="Dana Whitfield" autoComplete="off" />
-            </label>
-            <label className="fld">
-              Homeowner email
-              <input name="homeowner_email" type="email" required placeholder="dana@example.com" autoComplete="off" />
-            </label>
-          </div>
-          <label className="row" style={{ alignItems: 'flex-start', flexWrap: 'nowrap' }}>
-            <input type="checkbox" name="is_homestead" />
-            <span>
-              This is the owner&rsquo;s homestead.
-              <span className="muted small" style={{ display: 'block' }}>
-                Texas has extra contract rules for homestead jobs. Jobfile will track them.
-              </span>
-            </span>
-          </label>
-          <div className="row">
-            <button className="btn" type="submit">Create project and invite homeowner</button>
-          </div>
-        </form>
       )}
 
       {(alerts ?? []).length > 0 && (
