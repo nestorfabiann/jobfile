@@ -1,0 +1,62 @@
+<title>Social Sign-in Preview</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: the signed-out sign-in page in the live cream/orange look, with Google and Facebook buttons above the email link. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#cd7d2e;--orl:#f9efe4;--orb:#ecd4a8;--gr:#1f7a55;--grl:#d9f1e6;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--grl:#173a2c;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--grl:#173a2c;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-bottom:40px}
+.g{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;text-wrap:balance}
+.hd{border-bottom:1px solid var(--line);padding-block:12px;display:flex;justify-content:space-between;align-items:center}
+.logo{font:800 20px 'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.02em}.logo b{color:var(--or)}
+.pill{font-size:13px;font-weight:600;padding:7px 14px;border-radius:99px;background:var(--orl);color:var(--or)}
+.body{padding-block:22px;display:flex;flex-direction:column;gap:14px}
+h1{font-size:30px;font-weight:800;line-height:1.1}
+.mut{color:var(--mut);font-size:14px;line-height:1.5}.sm{font-size:12.5px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:18px;display:flex;flex-direction:column;gap:12px}
+.sb{display:flex;align-items:center;justify-content:center;gap:12px;min-height:52px;border-radius:99px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:600 16px 'IBM Plex Sans',system-ui,sans-serif;cursor:pointer;width:100%}
+.sb svg{width:20px;height:20px;flex:none}
+.sb.fb{background:#1877f2;border-color:#1877f2;color:#fff}
+.or{display:flex;align-items:center;gap:12px;color:var(--mut);font-size:12.5px}.or::before,.or::after{content:"";flex:1;border-top:1px solid var(--line)}
+label{display:flex;flex-direction:column;gap:5px;font-size:12.5px;font-weight:700;color:var(--mut)}
+input{font:16px 'IBM Plex Sans',system-ui,sans-serif;color:var(--ink);background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;min-height:48px;width:100%}
+.btn{display:flex;align-items:center;justify-content:center;border-radius:99px;min-height:52px;font:600 16px 'IBM Plex Sans',system-ui,sans-serif;border:1px solid var(--or);background:var(--or);color:#fff;box-shadow:0 6px 16px #cd7d2e44;width:100%;cursor:pointer}
+.tag{display:inline-block;font-size:12px;font-weight:600;padding:5px 11px;border-radius:99px;background:var(--grl);color:var(--gr);width:max-content}
+.toast{background:var(--ink);color:var(--bg);border-radius:14px;padding:12px 16px;font-size:14px;line-height:1.4}
+.note{font-size:12px;color:var(--mut);line-height:1.5}
+[hidden]{display:none!important}
+</style>
+
+<div class="wrap">
+  <div class="hd g"><span class="logo">Job<b>file</b></span><span class="pill">Sign in</span></div>
+  <div class="body g">
+    <div><h1>Sign in to Jobfile</h1><div class="mut" style="margin-top:8px">Contractors and homeowners use the same sign-in. No password to remember.</div></div>
+    <div class="card">
+      <button class="sb" type="button" data-t="Opens Google. You pick your account, then land back in Jobfile.">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5a5.6 5.6 0 0 1-2.4 3.6v3h3.9c2.3-2.1 3.5-5.2 3.5-8.8z"/><path fill="#34A853" d="M12 24c3.2 0 6-1.1 7.9-2.9l-3.9-3c-1.1.7-2.5 1.2-4 1.2-3.100 0-5.700-2.100-6.600-4.900H1.400v3.100A12 12 0 0 0 12 24z"/><path fill="#FBBC05" d="M5.400 14.300a7.200 7.200 0 0 1 0-4.600V6.600H1.400a12 12 0 0 0 0 10.800l4-3.100z"/><path fill="#EA4335" d="M12 4.800c1.800 0 3.300.6 4.600 1.800l3.400-3.400A12 12 0 0 0 1.400 6.600l4 3.100C6.300 6.900 8.900 4.800 12 4.800z"/></svg>
+        Continue with Google</button>
+      <button class="sb fb" type="button" data-t="Opens Facebook. You approve, then land back in Jobfile.">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#fff" d="M24 12a12 12 0 1 0-13.900 11.900v-8.400H7.100V12h3V9.400c0-3 1.800-4.700 4.500-4.700 1.300 0 2.700.2 2.700.2v3h-1.500c-1.500 0-2 .9-2 1.900V12h3.400l-.5 3.500h-2.900v8.400A12 12 0 0 0 24 12z"/></svg>
+        Continue with Facebook</button>
+      <div class="or">or use your email</div>
+      <label>Email address<input type="email" placeholder="you@example.com"></label>
+      <button class="btn" type="button" data-t="We email you a sign-in link. Works once.">Email me a sign-in link</button>
+      <div class="toast" id="t" hidden></div>
+    </div>
+    <div class="card" style="border-color:var(--orb)">
+      <span class="tag">Same account either way</span>
+      <div class="mut">If you already signed in by email with the same address, Google or Facebook opens that same account. Your projects, bids and profile are all still there.</div>
+    </div>
+    <div class="note">Jobfile only receives your name and email from Google or Facebook. It never posts for you and never sees your password.</div>
+  </div>
+</div>
+<script>
+(function(){
+  var t=document.getElementById('t');
+  Array.prototype.forEach.call(document.querySelectorAll('[data-t]'),function(b){b.addEventListener('click',function(){t.textContent=b.dataset.t;t.hidden=false})});
+})();
+</script>
