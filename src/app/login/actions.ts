@@ -23,3 +23,20 @@ export async function sendLink(formData: FormData) {
   if (error) redirect(`/login?error=send&email=${encodeURIComponent(email)}${nq}`);
   redirect(`/login?sent=1&email=${encodeURIComponent(email)}${nq}`);
 }
+
+/** Sign in or sign up with a Google account. Needs the Google provider switched on in Supabase. */
+export async function signInWithGoogle(formData: FormData) {
+  if (process.env.GOOGLE_LOGIN_ENABLED !== 'true') redirect('/login?error=google');
+  const next = safeNext(formData.get('next'));
+  if (next) cookies().set(NEXT_COOKIE, next, { httpOnly: true, secure: true, sameSite: 'lax', maxAge: 3600, path: '/' });
+  const nq = next ? `&next=${encodeURIComponent(next)}` : '';
+
+  const host = headers().get('x-forwarded-host') || headers().get('host');
+  const origin = host ? `https://${host}` : process.env.APP_URL || '';
+  const { data, error } = await supabaseServer().auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: `${origin}/auth/confirm`, queryParams: { prompt: 'select_account' } },
+  });
+  if (error || !data?.url) redirect(`/login?error=google${nq}`);
+  redirect(data.url);
+}
