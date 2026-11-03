@@ -8,6 +8,7 @@ import { marketplaceEnabled } from '@/lib/marketplace';
 import PubTabs from '@/components/PubTabs';
 import AppMenu from '@/components/AppMenu';
 import AppTabs from '@/components/AppTabs';
+import { needsCount } from '@/lib/needsCount';
 
 export const metadata: Metadata = {
   title: 'Jobfile',
@@ -23,18 +24,15 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   // Everyone gets the warm marketplace look (cream, orange, Bricolage headings). Signed-out visitors also get a bottom tab bar.
   const tabs = !user && marketplaceEnabled();
 
-  // Signed-in tab bar: contractors see Find work, everyone else sees Post. The badge counts unread alerts.
+  // Signed-in tab bar: contractors see Find work, everyone else sees Post. The badge matches the "Needs you" card.
   let contractor = false;
   let waiting = 0;
   if (user) {
     try {
       const db = supabaseAdmin();
-      const [m, n] = await Promise.all([
-        db.from('company_members').select('company_id', { count: 'exact', head: true }).eq('user_id', user.id),
-        db.from('notifications').select('id', { count: 'exact', head: true }).eq('user_id', user.id).is('read_at', null),
-      ]);
+      const m = await db.from('company_members').select('company_id', { count: 'exact', head: true }).eq('user_id', user.id);
       contractor = (m.count ?? 0) > 0;
-      waiting = n.count ?? 0;
+      waiting = await needsCount(user.id);
     } catch { /* the bar still shows, without the badge */ }
   }
 
