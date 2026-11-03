@@ -34,6 +34,10 @@ h1,h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-
 .open{display:flex;justify-content:space-between;gap:10px;align-items:center;border:1px solid var(--line);border-radius:16px;padding:10px 12px;background:var(--bg)}
 .open b{font-size:14px}
 .tbd{font-size:12px;color:var(--warn);background:var(--orl);border:1px solid var(--orb);border-radius:8px;padding:2px 7px;font-weight:600;white-space:nowrap}
+.stats{display:flex;justify-content:space-around;text-align:center}.stats b{display:block;font:800 28px 'Bricolage Grotesque',sans-serif;color:var(--or)}.stats span{color:var(--mut);font-size:13px}
+.okp{display:inline-block;width:max-content;background:var(--grl);color:var(--gr);font-size:12.5px;font-weight:600;border-radius:99px;padding:5px 12px}
+.why{background:linear-gradient(var(--orl),var(--card));border-color:var(--orb)}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line);min-height:56px;font-size:15px}
 .sec[hidden]{display:none}
 .tabs{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);padding:8px max(16px,env(safe-area-inset-right,0px)) calc(8px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));display:flex;justify-content:center}
 .tabs div{width:100%;max-width:430px;display:grid;grid-template-columns:repeat(3,1fr);text-align:center;font-size:12px;color:var(--mut);font-weight:600}.tabs b{color:var(--or)}
@@ -41,7 +45,7 @@ button:focus-visible{outline:2px solid var(--or);outline-offset:2px}
 </style>
 
 <div class="wrap">
-  <div class="note"><b>Mockup, example data.</b> Changes to the signed-out home page: two equal buttons, then a switch between "For homeowners" and "For contractors". Tap the switch. Items marked <span class="tbd">You decide</span> need a decision from you before they go live.</div>
+  <div class="note"><b>Mockup, example data.</b> Changes to the signed-out home page, top to bottom: two equal buttons, your stats row, a switch between "For contractors" and "For homeowners", then the "Already have a contractor or a customer?" card (both sides see it) and open jobs. Tap the switch. Items marked <span class="tbd">You decide</span> need a decision from you before they go live.</div>
 
   <div class="top"><span class="logo">Job<b>file</b></span><span class="pill">Sign in</span></div>
 
@@ -55,6 +59,8 @@ button:focus-visible{outline:2px solid var(--or);outline-offset:2px}
     <button class="btn" type="button">Post a project →</button>
     <button class="btn two" type="button">Find work near you →</button>
   </div>
+
+  <div class="stats" aria-label="Jobfile so far"><div><b>4</b><span>Projects posted</span></div><div><b>1</b><span>Local pros</span></div></div>
 
   <div class="seg" id="seg" role="tablist" aria-label="Who is this for">
     <button class="on" role="tab" data-s="c" type="button">For contractors</button>
@@ -92,13 +98,6 @@ button:focus-visible{outline:2px solid var(--or);outline-offset:2px}
       <span class="mut sm">Example bid card. Insurance and ratings come from your profile.</span>
     </div>
 
-    <div class="card">
-      <h3 style="font-size:18px">Open near you <span class="mut sm" style="font-weight:400">· browse without an account</span></h3>
-      <div class="open"><div><b>Kitchen remodel · Plano</b><div class="mut sm">Remodeling · 3 bids</div></div><span class="tag">Open</span></div>
-      <div class="open"><div><b>Fence repair · Frisco</b><div class="mut sm">Fencing · 1 bid</div></div><span class="tag">Open</span></div>
-      <button class="btn two" type="button">See all open jobs →</button>
-    </div>
-
     <div class="card" style="gap:8px">
       <h3 style="font-size:18px">The small print, in plain words</h3>
       <div class="ben" style="grid-template-columns:1fr"><div><b>What does it cost?</b> <span class="tbd">You decide</span><span class="mut sm" style="display:block">Today the page says "Free to start." Decide the exact words for contractors before this goes live, for example "Free to bid and to run your jobs."</span></div></div>
@@ -106,7 +105,6 @@ button:focus-visible{outline:2px solid var(--or);outline-offset:2px}
     </div>
 
     <button class="btn" type="button">Create your contractor profile →</button>
-    <div class="mut sm" style="text-align:center">Already have a customer? <b style="color:var(--ink)">Bring them here</b>. They do not need the marketplace.</div>
   </div>
 
   <div id="h" class="sec" hidden style="flex-direction:column;gap:14px">
@@ -120,6 +118,26 @@ button:focus-visible{outline:2px solid var(--or);outline-offset:2px}
     </div>
     <div class="note">The homeowner benefits list (agreement in writing, dated photos, payments tracked, changes in writing) is the next mockup. This mockup is only the contractor side plus the shared top.</div>
   </div>
+
+  <section class="card why" aria-label="Bring your own contractor or customer">
+    <span class="okp">You do not need the marketplace</span>
+    <h2 style="font-size:24px">Already have a contractor or a customer?</h2>
+    <p class="mut" style="margin:0">Jobfile works for any job, even if you never found each other here. Invite them by email and keep the whole job in one place.</p>
+    <div class="step"><i>1</i><div><b>Start the project.</b> <span class="mut sm">Add the job name and who it is with.</span></div></div>
+    <div class="step"><i>2</i><div><b>Send an invite.</b> <span class="mut sm">They get an email and join with one tap. Nothing to download.</span></div></div>
+    <div class="step"><i>3</i><div><b>Run it together.</b> <span class="mut sm">Price and scope, photos, payments, change orders and messages.</span></div></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><button class="btn ghost" type="button">I'm a homeowner</button><button class="btn ghost" type="button">I'm a contractor</button></div>
+    <p class="mut sm" style="margin:0">Free to start. The person you invite does not need an account first. <span class="tbd">You decide</span></p>
+  </section>
+
+    <div class="card">
+      <h2 style="font-size:22px">Open near you <span class="mut sm" style="font-weight:400">· browse without an account</span></h2>
+      <div class="open"><div><b>Kitchen remodel · Plano</b><div class="mut sm">Remodeling · 3 bids</div></div><span class="tag">Open</span></div>
+      <div class="open"><div><b>Fence repair · Frisco</b><div class="mut sm">Fencing · 1 bid</div></div><span class="tag">Open</span></div>
+      <button class="btn two" type="button">See all open jobs →</button>
+    </div>
+
+
 </div>
 
 <div class="tabs"><div><span>🏠 <b>Home</b></span><span>🔨 Open jobs</span><span>🔑 Sign in</span></div></div>
