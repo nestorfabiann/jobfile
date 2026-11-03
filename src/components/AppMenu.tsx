@@ -32,7 +32,11 @@ export default function AppMenu({ marketplace, contractor, admin, signOutAction 
     ['/help', 'Help and contact', 'help'],
     ...(admin ? ([['/admin', 'Admin', 'adm']] as [string, string, string][]) : []),
   ];
-  const current = (href: string) => (href === '/' ? path === '/' : path === href || path.startsWith(`${href}/`));
+  const current = (href: string) => {
+    if (href === '/') return path === '/';
+    if (href === '/settings' && path.startsWith('/settings/business')) return false; // Business profile has its own row
+    return path === href || path.startsWith(`${href}/`);
+  };
 
   return (
     <div className="appmenu" ref={box}>
