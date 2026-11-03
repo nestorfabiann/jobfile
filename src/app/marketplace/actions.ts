@@ -274,6 +274,9 @@ export async function placeBid(formData: FormData) {
   if (!co) back(path, 'Set up your company on the Projects page before bidding.');
   if (l.homeowner_id === user.id) back(path, 'You cannot bid on your own project.');
   if (!listingOpen(l)) back(path, 'This project is no longer taking bids.');
+  // An admin can hide a business from the marketplace (017). It cannot place new bids while hidden.
+  const { data: hc } = await supabaseAdmin().from('companies').select('*').eq('id', co.companyId).maybeSingle<any>();
+  if (hc?.hidden_at) back(path, 'Your business is hidden from the marketplace right now, so you cannot place new bids. Contact Jobfile for help.');
 
   const price = parseDollars(txt(formData, 'price', 20));
   if (price < 100_00 || price > 10_000_000_00) back(path, 'Enter your price in dollars (for example 31400).');

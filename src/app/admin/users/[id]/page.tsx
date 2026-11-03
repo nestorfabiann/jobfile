@@ -5,6 +5,8 @@ import { loadFeed, lookups } from '@/lib/adminFeed';
 import AdminFeed from '@/components/AdminFeed';
 import { BanForm, MessageForm } from '@/components/AdminForms';
 import { banUser, sendBroadcast, unbanUser } from '../../actions';
+import { EditForm, ActionRow, NoteForm } from '@/components/AdminProfileForms';
+import { editUser, signOutEverywhere, alertsOff, deleteUser, addNote } from '../../profileActions';
 
 export const dynamic = 'force-dynamic';
 
@@ -32,6 +34,7 @@ export default async function UserPage({ params }: { params: { id: string } }) {
   const events = await loadFeed({ userId: u.id, limit: 50 });
   const names = await lookups(events);
   const isAdmin = isAdminEmail(u.email);
+  const { data: notes } = await db.from('admin_notes').select('id,body,author_email,created_at').eq('subject_type', 'user').eq('subject_id', u.id).order('created_at', { ascending: false }).limit(50);
 
   return (
     <>
@@ -43,10 +46,38 @@ export default async function UserPage({ params }: { params: { id: string } }) {
         </div>
         <div className="small muted">
           {u.full_name || 'No name set'} · {u.phone || 'No phone'} · joined {new Date(u.created_at).toLocaleDateString('en-US')}
-          {companies?.length ? ` · Company: ${companies.map((c) => c.name).join(', ')}` : ''}
+          {companies?.length ? ' · Company: ' : ''}{(companies ?? []).map((c, i) => (<span key={c.id}>{i ? ', ' : ''}<Link href={`/admin/companies/${c.id}`}>{c.name}</Link></span>))}
         </div>
         {u.banned_at && <div className="small">Reason: {u.ban_reason || '—'}</div>}
       </div>
+
+      {!isAdmin && (
+        <>
+          <h2>Profile</h2>
+          <div className="card">
+            <EditForm
+              title={u.email}
+              action={editUser}
+              hidden={{ user_id: u.id }}
+              fields={[
+                { name: 'full_name', label: 'Name', value: u.full_name ?? '' },
+                { name: 'phone', label: 'Phone', value: u.phone ?? '', inputMode: 'tel' },
+                { name: 'email', label: 'Email', value: u.email ?? '', inputMode: 'email', hint: 'Changing an email signs the person out. They sign in again with the new address. The old one is kept in the audit log.' },
+              ]}
+            />
+          </div>
+          {u.id !== me.id && (
+            <>
+              <h2>Actions</h2>
+              <div className="card">
+                <ActionRow label="Sign out everywhere" desc="Ends every session. They can sign in again." button="Sign out" action={signOutEverywhere} hidden={{ user_id: u.id }} />
+                <ActionRow label="Turn alerts off" desc="Stops email and text alerts, for example after bounces." button="Turn off" action={alertsOff} hidden={{ user_id: u.id }} />
+                <ActionRow label="Delete account" desc="Only if they have no projects, company or posted jobs. Otherwise suspend." button="Delete" danger action={deleteUser} hidden={{ user_id: u.id }} />
+              </div>
+            </>
+          )}
+        </>
+      )}
 
       <h2>Projects</h2>
       <div className="card" style={{ gap: 6 }}>
@@ -69,6 +100,15 @@ export default async function UserPage({ params }: { params: { id: string } }) {
           </div>
         </>
       )}
+
+      <h2>Private notes</h2>
+      <div className="card">
+        <p className="small muted" style={{ margin: 0 }}>Only admins see these. They are never shown to the person.</p>
+        {(notes ?? []).map((n: any) => (
+          <div key={n.id} className="box" style={{ background: 'var(--surface-2)' }}><b>{new Date(n.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} · {n.author_email}:</b> {n.body}</div>
+        ))}
+        <NoteForm type="user" id={u.id} action={addNote} />
+      </div>
 
       <h2>Message this person</h2>
       <div className="card">

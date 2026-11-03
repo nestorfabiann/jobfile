@@ -5,6 +5,7 @@ import { supabaseAdmin } from '@/lib/supabase/server';
 import Stars from '@/components/Stars';
 import { companyReviews, HOME_CATS, summarize } from '@/lib/reviews';
 import { reportReview } from './actions';
+import { isAdminEmail } from '@/lib/admin';
 import { fmtDate, INSURANCE_KINDS, isCurrent, signedUrls, type InsuranceKind } from '@/lib/companyProfile';
 
 export const dynamic = 'force-dynamic';
@@ -34,10 +35,15 @@ function LinkIcon({ name, size = 18 }: { name: string; size?: number }) {
 }
 
 export default async function Profile({ params, searchParams }: { params: { id: string }; searchParams: { reported?: string } }) {
-  await requireUser();
+  const { user } = await requireUser();
   const db = supabaseAdmin();
   const { data: c } = await db.from('companies').select('*').eq('id', params.id).maybeSingle<any>();
   if (!c) notFound();
+  // A business an admin has hidden is visible only to its own people and to admins.
+  if (c.hidden_at && !isAdminEmail(user.email, !!user.email_confirmed_at)) {
+    const { data: me } = await db.from('company_members').select('user_id').eq('company_id', c.id).eq('user_id', user.id).maybeSingle();
+    if (!me) notFound();
+  }
   const [{ data: photos }, { data: ins }] = await Promise.all([
     db.from('company_photos').select('id,path,caption').eq('company_id', c.id).order('created_at'),
     db.from('company_insurance').select('kind,status,expires_on').eq('company_id', c.id),
@@ -66,6 +72,7 @@ export default async function Profile({ params, searchParams }: { params: { id: 
           {/* eslint-disable-next-line @next/next/no-img-element */}
           {c.logo_path && urls.get(c.logo_path) ? <img src={urls.get(c.logo_path)} alt="" width={64} height={64} style={{ borderRadius: 16, objectFit: 'cover', flex: 'none' }} /> : null}
           <h1>{c.name}</h1>
+          {c.verified_at ? <span className="pill ok" style={{ width: 'max-content' }}>✓ Verified by Jobfile</span> : null}
         </div>
         <div className="row">
           {verified.length > 0 && <span className="pill ok" style={{ gap: 6, alignItems: 'center' }}><LinkIcon name="Document" size={14} />Insurance verified until {fmtDate(verified.map((v) => v.expires_on).sort()[0])}</span>}

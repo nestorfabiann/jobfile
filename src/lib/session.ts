@@ -11,6 +11,22 @@ export async function requireUser() {
   if (!user) redirect('/login');
   const { data: prof } = await sb.from('profiles').select('banned_at').eq('id', user.id).maybeSingle();
   if (prof?.banned_at) redirect('/banned');
+  // "Sign out everywhere" by an admin: a session issued before that moment is ended. Skipped until the 017 column exists.
+  try {
+    const { data: rv } = await sb.from('profiles').select('sessions_revoked_at').eq('id', user.id).maybeSingle();
+    const at = (rv as { sessions_revoked_at?: string | null } | null)?.sessions_revoked_at;
+    if (at) {
+      const { data: { session } } = await sb.auth.getSession();
+      const part = session?.access_token?.split('.')[1];
+      const iat = part ? (JSON.parse(Buffer.from(part, 'base64url').toString()) as { iat?: number }).iat : undefined;
+      if (iat && iat * 1000 < new Date(at).getTime()) {
+        await sb.auth.signOut();
+        redirect('/login');
+      }
+    }
+  } catch (e) {
+    if ((e as { digest?: string })?.digest?.startsWith('NEXT_REDIRECT')) throw e;
+  }
   return { sb, user };
 }
 
