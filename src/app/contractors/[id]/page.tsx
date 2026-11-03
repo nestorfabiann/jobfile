@@ -10,6 +10,30 @@ import { fmtDate, INSURANCE_KINDS, isCurrent, signedUrls, type InsuranceKind } f
 
 export const dynamic = 'force-dynamic';
 
+/** Small flags for the languages a contractor speaks (US for English, Mexico for Español). Drawn as SVG so they look the same on every device. */
+function Flag({ lang }: { lang: string }) {
+  const box = { width: 22, height: 15, viewBox: '0 0 22 15', 'aria-hidden': true, style: { borderRadius: 3, flex: 'none', boxShadow: '0 0 0 1px rgba(0,0,0,.12)' } } as const;
+  if (lang === 'English')
+    return (
+      <svg {...box}>
+        <rect width="22" height="15" fill="#fff" />
+        <g fill="#b22234">{[0, 2.3, 4.6, 6.9, 9.2, 11.5, 13.8].map((y) => <rect key={y} y={y} width="22" height="1.15" />)}</g>
+        <rect width="9.5" height="8.1" fill="#3c3b6e" />
+        <g fill="#fff">{[[2, 1.8], [4.7, 1.8], [7.4, 1.8], [3.3, 4], [6, 4], [2, 6.2], [4.7, 6.2], [7.4, 6.2]].map(([x, y]) => <circle key={`${x}-${y}`} cx={x} cy={y} r=".45" />)}</g>
+      </svg>
+    );
+  if (lang === 'Español')
+    return (
+      <svg {...box}>
+        <rect width="22" height="15" fill="#fff" />
+        <rect width="7.3" height="15" fill="#006847" />
+        <rect x="14.7" width="7.3" height="15" fill="#ce1126" />
+        <circle cx="11" cy="7.5" r="2" fill="#8a6d3b" opacity=".75" />
+      </svg>
+    );
+  return null;
+}
+
 /** Small line icons for the contractor's links. */
 function LinkIcon({ name, size = 18 }: { name: string; size?: number }) {
   const common = { width: size, height: size, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const, 'aria-hidden': true };
@@ -74,7 +98,16 @@ export default async function Profile({ params, searchParams }: { params: { id: 
             {verified.length > 0 && <span className="pill ok">✓ Insured until {fmtDate(verified.map((v) => v.expires_on).sort()[0])}</span>}
           </div>
         )}
-        {(c.languages ?? []).length > 0 && <div className="muted" style={{ fontSize: 14.5 }}>Speaks {(c.languages as string[]).join(' and ')}</div>}
+        {(c.languages ?? []).length > 0 && (
+          <div className="row muted" style={{ gap: 8, fontSize: 14.5, alignItems: 'center' }}>
+            <span>Speaks</span>
+            {(c.languages as string[]).map((l) => (
+              <span key={l} className="row" style={{ gap: 7, flexWrap: 'nowrap', border: '1px solid var(--line)', background: 'var(--surface)', color: 'var(--ink)', borderRadius: 99, padding: '6px 12px 6px 8px', fontSize: 14, fontWeight: 500 }}>
+                <Flag lang={l} />{l}
+              </span>
+            ))}
+          </div>
+        )}
       </div>
       {(c.about || (c.services ?? []).length > 0) && (
         <div className="card">
