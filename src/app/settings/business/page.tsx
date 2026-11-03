@@ -5,6 +5,8 @@ import { supabaseAdmin } from '@/lib/supabase/server';
 import { WorkPhotoUploader, InsuranceUploader } from '@/components/BusinessUploaders';
 import { saveBusinessProfile, deleteBusinessPhoto, removeInsurance } from './actions';
 import BusinessTabs from '@/components/BusinessTabs';
+import ProfileMeter from '@/components/ProfileMeter';
+import { profileMeter } from '@/lib/profileMeter';
 import { JOB_TYPES, marketplaceEnabled } from '@/lib/marketplace';
 
 export const dynamic = 'force-dynamic';
@@ -25,8 +27,7 @@ export default async function Business({ searchParams }: { searchParams: { saved
   const insBy = new Map((ins ?? []).map((i: any) => [i.kind as string, i]));
   const has = (arr: string[] | null | undefined, v: string) => (arr ?? []).includes(v);
 
-  const checks = [!!c?.about, (c?.services ?? []).length > 0, (photos ?? []).length >= 6, [...insBy.values()].some((i: any) => isCurrent(i)), !!(c?.website || c?.facebook || c?.instagram || c?.other_link), !!c?.logo_path, !!(c?.warranty || c?.hours)];
-  const pct = Math.round((checks.filter(Boolean).length / checks.length) * 100);
+  const pm = await profileMeter(me.companyId);
 
   return (
     <>
@@ -39,15 +40,11 @@ export default async function Business({ searchParams }: { searchParams: { saved
       {searchParams.saved ? <div className="box ok">Saved.</div> : null}
       {searchParams.error ? <div className="box bad">{searchParams.error}</div> : null}
 
-      <div className="card">
-        <div className="row" style={{ justifyContent: 'space-between' }}><b>Profile strength</b><b>{pct}%</b></div>
-        <div style={{ height: 8, borderRadius: 8, background: 'var(--line)', overflow: 'hidden' }}><div style={{ width: `${pct}%`, height: '100%', background: 'var(--accent)' }} /></div>
-        <p className="muted small">Add a logo, a description, 6 or more photos, a link, and verified insurance to reach 100%.</p>
-        <Link className="btn ghost" href={`/contractors/${me.companyId}`}>Preview public page</Link>
-      </div>
+      <ProfileMeter pct={pm.pct} items={pm.items} always />
+      <Link className="btn ghost" href={`/contractors/${me.companyId}`}>Preview public page</Link>
 
       <form action={saveBusinessProfile} className="card">
-        <h2>About your business</h2>
+        <h2 id="bp-about" style={{ scrollMarginTop: 80 }}>About your business</h2>
         <label className="fld">Business name<input name="name" defaultValue={c?.name ?? ''} maxLength={120} required /></label>
         <label className="fld">Description (up to 800 characters)<textarea name="about" rows={5} maxLength={800} defaultValue={c?.about ?? ''} /></label>
         <fieldset className="stack" style={{ border: 0, padding: 0, margin: 0 }}>
@@ -76,7 +73,7 @@ export default async function Business({ searchParams }: { searchParams: { saved
         </fieldset>
         {marketplaceEnabled() && (
           <>
-            <h2>Where you work</h2>
+            <h2 id="bp-where" style={{ scrollMarginTop: 80 }}>Where you work</h2>
             <input type="hidden" name="matching" value="1" />
             <label className="fld">Business ZIP code<input name="business_zip" inputMode="numeric" maxLength={5} defaultValue={c?.business_zip ?? ''} placeholder="75074" /></label>
             <p className="muted small">Marketplace jobs show how far away they are, and you only get alerts for jobs inside your travel distance (25 miles if you leave it blank). Distances are straight-line estimates.</p>
@@ -101,14 +98,14 @@ export default async function Business({ searchParams }: { searchParams: { saved
       </form>
 
       <div className="card">
-        <h2>Logo</h2>
+        <h2 id="bp-logo" style={{ scrollMarginTop: 80 }}>Logo</h2>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         {c?.logo_path && urls.get(c.logo_path) ? <img src={urls.get(c.logo_path)} alt="" width={72} height={72} style={{ borderRadius: 16, objectFit: 'cover' }} /> : <p className="muted small">No logo yet.</p>}
         <WorkPhotoUploader kind="logo" label="Choose a logo image" />
       </div>
 
       <div className="card">
-        <h2>Photos of your work ({(photos ?? []).length}/24)</h2>
+        <h2 id="bp-photos" style={{ scrollMarginTop: 80 }}>Photos of your work ({(photos ?? []).length}/24)</h2>
         <p className="muted small">Only upload photos of your own work. Avoid showing house numbers, faces or license plates.</p>
         <div className="grid2" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(110px, 1fr))' }}>
           {(photos ?? []).map((p) => (
@@ -125,7 +122,7 @@ export default async function Business({ searchParams }: { searchParams: { saved
       </div>
 
       <div className="card">
-        <h2>Proof of insurance</h2>
+        <h2 id="bp-ins" style={{ scrollMarginTop: 80 }}>Proof of insurance</h2>
         <p className="muted small">Your certificate is private. Only you and Jobfile admins can open the file. Homeowners see only an &ldquo;Insurance verified&rdquo; badge and the expiry date, after an admin approves it. The badge is not a guarantee, so homeowners should still confirm coverage themselves.</p>
       </div>
       {(Object.keys(INSURANCE_KINDS) as InsuranceKind[]).map((k) => {

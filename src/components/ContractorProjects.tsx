@@ -17,7 +17,6 @@ export default function ContractorProjects(p: {
   companyId: string;
   companyName: string;
   needsCard: React.ReactNode;
-  meter?: React.ReactNode;
   invites: React.ReactNode;
   alerts: React.ReactNode;
   error?: string;
@@ -56,7 +55,6 @@ export default function ContractorProjects(p: {
 
       {p.error ? <div className="box bad">{p.error}</div> : null}
       {p.needsCard}
-      {p.meter}
       {p.invites}
 
       {first && (
