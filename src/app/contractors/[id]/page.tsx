@@ -10,16 +10,6 @@ import { fmtDate, INSURANCE_KINDS, isCurrent, signedUrls, type InsuranceKind } f
 
 export const dynamic = 'force-dynamic';
 
-/** Small flags for the languages a contractor speaks (England and Spain). Drawn as SVG so they look the same on every device. */
-function Flag({ lang }: { lang: string }) {
-  const box = { width: 20, height: 14, viewBox: '0 0 20 14', 'aria-hidden': true, style: { borderRadius: 2, flex: 'none' as const, boxShadow: '0 0 0 1px rgba(0,0,0,.18)' } };
-  if (lang === 'English')
-    return (<svg {...box}><rect width="20" height="14" fill="#fff" /><rect x="8.5" width="3" height="14" fill="#cf142b" /><rect y="5.5" width="20" height="3" fill="#cf142b" /></svg>);
-  if (lang === 'Español')
-    return (<svg {...box}><rect width="20" height="14" fill="#c60b1e" /><rect y="3.5" width="20" height="7" fill="#ffc400" /></svg>);
-  return null;
-}
-
 /** Small line icons for the contractor's links. */
 function LinkIcon({ name, size = 18 }: { name: string; size?: number }) {
   const common = { width: size, height: size, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const, 'aria-hidden': true };
@@ -62,22 +52,29 @@ export default async function Profile({ params, searchParams }: { params: { id: 
   ].filter(([, v]) => !!v) as [string, string][];
   const reviews = await companyReviews(c.id);
   const s = summarize(reviews);
+  const years = c.year_started ? new Date().getFullYear() - Number(c.year_started) : 0;
+  const factLine = [s.count > 0 ? `★ ${s.avg.toFixed(1)} · ${s.count} review${s.count > 1 ? 's' : ''}` : '', years >= 1 ? `${years} year${years > 1 ? 's' : ''}` : ''].filter(Boolean).join(' · ');
   const month = (iso: string) => new Date(iso).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
 
   return (
     <>
-      <div className="stack">
+      <div className="stack" style={{ gap: 16 }}>
         <Link href="/projects" className="small">‹ All projects</Link>
-        <div className="row" style={{ flexWrap: 'nowrap' }}>
+        <div className="row" style={{ flexWrap: 'nowrap', gap: 14, alignItems: 'center' }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          {c.logo_path && urls.get(c.logo_path) ? <img src={urls.get(c.logo_path)} alt="" width={64} height={64} style={{ borderRadius: 16, objectFit: 'cover', flex: 'none' }} /> : null}
-          <h1>{c.name}</h1>
-          {c.verified_at ? <span className="pill ok" style={{ width: 'max-content' }}>✓ Verified by Jobfile</span> : null}
+          {c.logo_path && urls.get(c.logo_path) ? <img src={urls.get(c.logo_path)} alt="" width={72} height={72} style={{ borderRadius: 18, objectFit: 'cover', flex: 'none' }} /> : null}
+          <div style={{ minWidth: 0 }}>
+            <h1 style={{ margin: 0 }}>{c.name}</h1>
+            {factLine ? <div className="muted small" style={{ marginTop: 4, fontSize: 14.5 }}>{factLine}</div> : null}
+          </div>
         </div>
-        <div className="row">
-          {verified.length > 0 && <span className="pill ok" style={{ gap: 6, alignItems: 'center' }}><LinkIcon name="Document" size={14} />Insurance verified until {fmtDate(verified.map((v) => v.expires_on).sort()[0])}</span>}
-          {(c.languages ?? []).map((l: string) => <span className="pill" key={l} style={{ gap: 6, alignItems: 'center' }}><Flag lang={l} />{l}</span>)}
-        </div>
+        {(c.verified_at || verified.length > 0) && (
+          <div className="row" style={{ gap: 8 }}>
+            {c.verified_at ? <span className="pill ok">✓ Verified by Jobfile</span> : null}
+            {verified.length > 0 && <span className="pill ok">✓ Insured until {fmtDate(verified.map((v) => v.expires_on).sort()[0])}</span>}
+          </div>
+        )}
+        {(c.languages ?? []).length > 0 && <div className="muted" style={{ fontSize: 14.5 }}>Speaks {(c.languages as string[]).join(' and ')}</div>}
       </div>
       {(c.about || (c.services ?? []).length > 0) && (
         <div className="card">
