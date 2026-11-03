@@ -1,0 +1,81 @@
+<title>Insured Badge on Bids</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: the homeowner's list of bids. A badge sits under the contractor name; tapping it explains what "verified" covers. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#cd7d2e;--orl:#f9efe4;--orb:#ecd4a8;--gr:#1f7a55;--grl:#d9f1e6;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--grl:#173a2c;--gr:#6fd1a3;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--grl:#173a2c;--gr:#6fd1a3;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:14px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px}
+h1,h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;text-wrap:balance}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
+.mut{color:var(--mut);font-size:14px;line-height:1.5}.sm{font-size:12.5px}
+.sw{display:flex;gap:6px}.sw button{flex:1;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:10px 4px;border-radius:99px;font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:44px}.sw button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.who{display:flex;gap:12px;align-items:center}
+.av{flex:none;width:48px;height:48px;border-radius:14px;background:var(--orl);color:var(--or);display:grid;place-items:center;font:800 20px 'Bricolage Grotesque',sans-serif}
+.price{font:800 26px 'Bricolage Grotesque',sans-serif}
+.badge{display:inline-flex;align-items:center;gap:6px;width:max-content;border:0;cursor:pointer;font:600 12.5px 'IBM Plex Sans',sans-serif;padding:6px 12px 6px 9px;border-radius:99px;min-height:32px}
+.badge svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.badge.ok{background:var(--grl);color:var(--gr)}
+.badge.wait{background:var(--orl);color:var(--or)}
+.badge.none{background:transparent;color:var(--mut);border:1px dashed var(--line);cursor:default;font-weight:500}
+.tog{display:flex;align-items:center;gap:10px;min-height:44px;font-size:14px}.tog input{width:22px;height:22px;accent-color:var(--or)}
+.sheet{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:18px;display:flex;flex-direction:column;gap:10px;box-shadow:0 10px 30px #0002}
+.sheet ul{margin:0;padding-left:18px;font-size:14px;line-height:1.55}
+.btn{display:flex;align-items:center;justify-content:center;border-radius:99px;min-height:48px;padding:0 16px;font:600 15px 'IBM Plex Sans',sans-serif;border:1px solid var(--or);background:var(--or);color:#fff;cursor:pointer;width:100%}
+.btn.gh{background:var(--orl);color:var(--or);border-color:var(--orb)}
+.sec[hidden]{display:none}.off{display:none}
+button:focus-visible,input:focus-visible{outline:2px solid var(--or);outline-offset:2px}
+</style>
+
+<div class="wrap">
+  <div class="note"><b>Mockup, example data.</b> Today the card has a small green line only when insurance is current. This makes it a clear badge, adds a quiet "pending" state, lets a homeowner tap to see what it means, and adds an "Insured only" filter.</div>
+  <div class="sw" id="sw"><button class="on" data-s="a" type="button">1 · Bids</button><button data-s="b" type="button">2 · Tap badge</button><button data-s="c" type="button">3 · Contractor</button></div>
+
+  <div id="a" class="sec" style="display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><h2 style="font-size:22px">3 bids</h2>
+      <label class="tog"><input type="checkbox" id="only"><span>Insured only</span></label></div>
+    <div class="card" data-i="ok"><div class="who"><span class="av">N</span><div><b>Nesty's Painting</b><div class="mut sm">★ 4.9 · 12 reviews</div></div></div>
+      <button class="badge ok" type="button" data-open="1"><svg viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 4.5-3.2 7.8-8 9-4.8-1.2-8-4.5-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg>Insured · verified to Mar 14, 2027</button>
+      <div class="price">$18,400</div><div class="mut sm">2 weeks · starts Nov 12</div></div>
+    <div class="card" data-i="wait"><div class="who"><span class="av">L</span><div><b>Lone Star Remodeling</b><div class="mut sm">No reviews yet</div></div></div>
+      <button class="badge wait" type="button" data-open="2"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Insurance under review</button>
+      <div class="price">$16,900</div><div class="mut sm">3 weeks · starts Nov 20</div></div>
+    <div class="card" data-i="none"><div class="who"><span class="av">F</span><div><b>Frisco Home Pros</b><div class="mut sm">★ 4.6 · 3 reviews</div></div></div>
+      <span class="badge none">No insurance on file</span>
+      <div class="price">$15,200</div><div class="mut sm">4 weeks · starts Dec 1</div></div>
+  </div>
+
+  <div id="b" class="sec" hidden style="flex-direction:column;gap:14px">
+    <div class="note">What opens when a homeowner taps the badge. It says exactly what Jobfile checked, and what it did not.</div>
+    <div class="sheet">
+      <h2 style="font-size:20px">Insured · verified by Jobfile</h2>
+      <ul>
+        <li>Nesty's Painting uploaded an insurance certificate and Jobfile reviewed it.</li>
+        <li>Coverage on file: General liability. The certificate runs to Mar 14, 2027.</li>
+        <li>The badge disappears automatically if the certificate expires.</li>
+      </ul>
+      <div class="mut sm">This is not a guarantee of coverage or a background check. Before work starts, ask the contractor to confirm the policy covers your job.</div>
+      <button class="btn gh" type="button">Got it</button>
+    </div>
+  </div>
+
+  <div id="c" class="sec" hidden style="flex-direction:column;gap:14px">
+    <div class="note">What a contractor without a badge sees on their own bid form: a short nudge, since a verified badge helps them stand out.</div>
+    <div class="card"><h2 style="font-size:20px">Place a bid</h2>
+      <div style="background:var(--orl);border:1px solid var(--orb);border-radius:16px;padding:12px 14px;font-size:14px;line-height:1.5"><b>Add your insurance to show a verified badge on your bids.</b><br>Homeowners see it next to your name. Upload your certificate in Settings &gt; Business profile.</div>
+      <button class="btn gh" type="button">Upload insurance</button>
+      <div class="mut sm">Only shown to contractors without current verified insurance.</div></div>
+  </div>
+</div>
+<script>
+function $(i){return document.getElementById(i)}
+$('only').onchange=function(){[].forEach.call(document.querySelectorAll('#a .card'),function(c){c.classList.toggle('off',$('only').checked&&c.dataset.i!=='ok')})};
+[].forEach.call(document.querySelectorAll('[data-open]'),function(b){b.onclick=function(){$('sw').children[1].click()}});
+[].forEach.call($('sw').children,function(b){b.onclick=function(){
+  [].forEach.call($('sw').children,function(x){x.classList.toggle('on',x===b)});
+  ['a','b','c'].forEach(function(id){var e=$(id);e.hidden=id!==b.dataset.s;e.style.display=e.hidden?'none':'flex'});window.scrollTo(0,0)}});
+</script>
