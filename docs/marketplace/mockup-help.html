@@ -1,0 +1,121 @@
+<title>Jobfile Help</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: one phone column. Four tabs: Menu, Help form, Quick answers, Admin inbox. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#cd7d2e;--orl:#f9efe4;--orb:#ecd4a8;--gr:#1f7a55;--grl:#d9f1e6;--am:#9a5b00;--aml:#fbeccd;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--gr:#6fd1a3;--grl:#173a2c;--am:#f0b95a;--aml:#3a2e12;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--gr:#6fd1a3;--grl:#173a2c;--am:#f0b95a;--aml:#3a2e12;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:14px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px}
+h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;text-wrap:balance}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
+.mut{color:var(--mut);font-size:13.5px;line-height:1.45}
+.sw{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.sw button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:8px 2px;border-radius:99px;font:500 12.5px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:44px}.sw button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.mi{display:flex;align-items:center;gap:12px;padding:13px 4px;border-bottom:1px solid var(--line);font-size:15.5px;min-height:48px}
+.mi:last-child{border-bottom:0}
+.mi .ic{width:30px;height:30px;border-radius:10px;background:var(--orl);color:var(--or);display:grid;place-items:center;flex:none;font-size:15px;font-weight:700}
+.mi.new .ic{background:var(--or);color:#fff}
+.tag{margin-left:auto;font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:99px;background:var(--grl);color:var(--gr)}
+.q{display:flex;flex-direction:column;gap:7px}
+.q label,.q .lb{font-size:14px;font-weight:600}
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:99px;padding:9px 14px;font:500 14px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:40px}
+.chip.on{background:var(--orl);border-color:var(--or);color:var(--or)}
+textarea,input[type=text]{width:100%;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:14px;padding:11px 12px;font:15px 'IBM Plex Sans',sans-serif;min-height:44px}
+textarea{min-height:110px;resize:vertical}
+.btn{display:flex;align-items:center;justify-content:center;border-radius:99px;min-height:50px;padding:0 18px;font:700 15.5px 'IBM Plex Sans',sans-serif;border:1px solid var(--or);background:var(--or);color:#fff;cursor:pointer;width:100%}
+.ok{background:var(--grl);border-radius:14px;padding:12px;font-size:14px;line-height:1.45;color:var(--gr);font-weight:600}
+details{border:1px solid var(--line);background:var(--card);border-radius:16px;padding:12px 14px}
+summary{font-weight:600;font-size:14.5px;cursor:pointer;min-height:24px}
+details p{margin:8px 0 0;font-size:13.5px;line-height:1.5;color:var(--mut)}
+.msg{display:flex;flex-direction:column;gap:6px;border:1px solid var(--line);border-radius:16px;padding:12px;background:var(--card)}
+.msg .top{display:flex;justify-content:space-between;gap:8px;align-items:baseline;font-size:13px}
+.pill{display:inline-block;width:max-content;font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:99px;background:var(--aml);color:var(--am)}
+.pill.g{background:var(--grl);color:var(--gr)}
+.pill.o{background:var(--orl);color:var(--or)}
+.sec[hidden]{display:none}
+</style>
+<div class="wrap">
+  <div class="note"><b>Mockup.</b> A Help section so homeowners and contractors can ask for help, plus what you see in Admin when a message arrives. Tap the tabs, and try the form.</div>
+  <div class="sw" id="sw">
+    <button data-s="menu" class="on" type="button">Menu</button>
+    <button data-s="form" type="button">Ask us</button>
+    <button data-s="faq" type="button">Answers</button>
+    <button data-s="adm" type="button">Admin</button>
+  </div>
+
+  <div id="menu" class="sec" style="display:flex;flex-direction:column;gap:14px">
+    <h2 style="font-size:24px">Menu</h2>
+    <div class="card" style="gap:0;padding:8px 16px">
+      <div class="mi"><span class="ic">J</span>My projects</div>
+      <div class="mi"><span class="ic">B</span>Business profile</div>
+      <div class="mi"><span class="ic">S</span>Settings</div>
+      <div class="mi new"><span class="ic">?</span>Help and contact<span class="tag">New</span></div>
+      <div class="mi"><span class="ic">X</span>Sign out</div>
+    </div>
+    <div class="note" style="border-style:solid">Also: a small "Need help?" link on the sign-in page, under the buttons, that opens the same Help page.</div>
+  </div>
+
+  <div id="form" class="sec" hidden style="flex-direction:column;gap:14px">
+    <h2 style="font-size:24px">How can we help?</h2>
+    <span class="mut">We read every message and reply inside Jobfile, usually within one business day.</span>
+    <div class="card" id="fcard">
+      <div class="q"><div class="lb">What is this about?</div>
+        <div class="chips" id="topic"><button class="chip on" type="button">A question</button><button class="chip" type="button">Something is not working</button><button class="chip" type="button">An idea</button><button class="chip" type="button">Report a person or post</button></div></div>
+      <div class="q"><div class="lb">Which project?</div>
+        <div class="chips" id="proj"><button class="chip on" type="button">None, it is general</button><button class="chip" type="button">Kitchen remodel, 75205</button><button class="chip" type="button">Interior painting, 75093</button></div></div>
+      <div class="q"><label for="msg">Tell us what happened</label><textarea id="msg" placeholder="What did you try, and what did you see?"></textarea></div>
+      <span class="mut">We attach your name, account email and the page you were on, so you do not have to type them.</span>
+      <button class="btn" type="button" id="send">Send message</button>
+    </div>
+    <div class="ok" id="done" hidden>Sent. We will reply here in Jobfile, and you will get an alert when we do.</div>
+  </div>
+
+  <div id="faq" class="sec" hidden style="flex-direction:column;gap:10px">
+    <h2 style="font-size:24px">Quick answers</h2>
+    <span class="mut">Shown above the form on the Help page, so many people find the answer first.</span>
+    <details><summary>Is Jobfile really free?</summary><p>Yes. Free to join, no subscription, no fees at all.</p></details>
+    <details><summary>How do I post a job?</summary><p>Tap Post, pick the kind of job, tap what you want done, and add photos. Local contractors send bids.</p></details>
+    <details><summary>Who can see my address?</summary><p>Only the contractor you hire. Contractors who bid see your ZIP code and first name.</p></details>
+    <details><summary>How do payments work?</summary><p>Jobfile records milestone payments. You pay your contractor directly, and both sides confirm it in the record.</p></details>
+    <details><summary>A contractor asked for my phone number</summary><p>You do not have to share it before you hire someone. Keep chatting in Jobfile, and report anything that feels off.</p></details>
+    <details><summary>How do I change or delete my account?</summary><p>Menu, then Settings. Deleting removes your account and your posts.</p></details>
+    <div class="note" style="border-style:solid">You write the answers, I draft them. They live in one file, so you can change the wording any time.</div>
+  </div>
+
+  <div id="adm" class="sec" hidden style="flex-direction:column;gap:12px">
+    <h2 style="font-size:24px">Admin: Help inbox</h2>
+    <span class="mut">Appears in the Needs attention queue and as its own tab, newest first. Open ones are at the top.</span>
+    <div class="msg">
+      <div class="top"><b>Jerry S. (homeowner)</b><span class="mut">12 min ago</span></div>
+      <div><span class="pill">Something is not working</span> <span class="pill o">Kitchen remodel, 75205</span></div>
+      <span style="font-size:14px;line-height:1.45">I cannot upload a video, it keeps saying it failed.</span>
+      <span class="mut" style="font-size:12.5px">Page: Post a project · iPhone Safari</span>
+      <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="chip on" type="button">Reply</button><button class="chip" type="button">Open their profile</button><button class="chip" type="button">Mark done</button></div>
+    </div>
+    <div class="msg">
+      <div class="top"><b>Garcia Roofing (contractor)</b><span class="mut">Yesterday</span></div>
+      <div><span class="pill g">A question</span></div>
+      <span style="font-size:14px;line-height:1.45">Can I add a second trade to my profile?</span>
+      <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="chip" type="button">Reply</button><button class="chip" type="button">Mark done</button></div>
+    </div>
+    <div class="msg" style="opacity:.7">
+      <div class="top"><b>Maria L. (homeowner)</b><span class="mut">2 days ago</span></div>
+      <div><span class="pill g">Done</span> <span class="pill">An idea</span></div>
+      <span style="font-size:14px;line-height:1.45">It would be nice to share a project with my husband.</span>
+    </div>
+    <div class="note" style="border-style:solid">Reports about a person or post are marked red and sit above everything else. They also give you the quick actions you already have (hide a company, ban an account).</div>
+  </div>
+</div>
+<script>
+var sw=document.getElementById('sw');
+[].forEach.call(sw.children,function(b){b.onclick=function(){
+  [].forEach.call(sw.children,function(x){x.classList.toggle('on',x===b)});
+  ['menu','form','faq','adm'].forEach(function(id){var e=document.getElementById(id);e.hidden=id!==b.dataset.s;e.style.display=e.hidden?'none':'flex'});
+  window.scrollTo(0,0);}});
+['topic','proj'].forEach(function(id){var g=document.getElementById(id);g.addEventListener('click',function(e){var b=e.target.closest('.chip');if(!b)return;[].forEach.call(g.children,function(x){x.classList.toggle('on',x===b)})})});
+document.getElementById('send').onclick=function(){document.getElementById('done').hidden=false;document.getElementById('fcard').hidden=true};
+</script>
