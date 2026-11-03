@@ -24,6 +24,7 @@ export default function AppMenu({ marketplace, admin, signOutAction }: { marketp
     ['/', 'Home'],
     ['/projects', 'Projects'],
     ...(marketplace ? ([['/marketplace', 'Marketplace']] as [string, string][]) : []),
+    ...(marketplace ? ([['/find', 'Find contractors']] as [string, string][]) : []),
     ['/settings', 'Settings'],
     ['/invite', 'Invite friends'],
     ['/help', 'Help and contact'],

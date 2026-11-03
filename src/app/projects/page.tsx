@@ -18,7 +18,6 @@ import StartProjectForm from '@/components/StartProjectForm';
 import { alertHref } from '@/lib/alertPath';
 import { cookies } from 'next/headers';
 import ZipCard from '@/components/ZipCard';
-import { nearbyContractors } from '@/lib/nearby';
 import HomeownerProjects from '@/components/HomeownerProjects';
 import { homeownerSummaries, contractorSummaries } from '@/lib/homeSummary';
 import ContractorProjects from '@/components/ContractorProjects';
@@ -173,8 +172,7 @@ export default async function Projects({ searchParams }: { searchParams: { error
     const { data: zp } = await supabaseAdmin().from('profiles').select('*').eq('id', user.id).maybeSingle();
     if (zp && 'zip' in zp) {
       const zip = (zp.zip as string | null) ?? null;
-      if (zip) zipCard = <ZipCard zip={zip} near={await nearbyContractors(zip)} />;
-      else if (cookies().get('jf_zip_skip')?.value !== '1') zipCard = <ZipCard zip={null} near={null} error={searchParams.zip_error} />;
+      if (!zip && cookies().get('jf_zip_skip')?.value !== '1') zipCard = <ZipCard zip={null} near={null} error={searchParams.zip_error} />;
     }
   }
 
