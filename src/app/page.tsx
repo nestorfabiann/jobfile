@@ -34,7 +34,7 @@ export default async function Home() {
         </h1>
         <p className="muted" style={{ fontSize: 17 }}>Homeowners post projects and compare bids from local contractors. Contractors find nearby work and keep the paperwork, photos and payments in one shared record.</p>
       </div>
-      <Link className="btn accent" href={signedIn ? '/marketplace/new' : `/login?next=${encodeURIComponent('/marketplace/new')}`}>Post a Project →</Link>
+      <Link className="btn accent" href={signedIn ? '/marketplace/new' : `/login?next=${encodeURIComponent('/marketplace/new')}`}>Get bids on your project →</Link>
       <Link className="btn" style={{ background: 'var(--ink)', borderColor: 'var(--ink)', color: 'var(--bg)' }} href={signedIn ? '/marketplace' : '/jobs'}>Find Work near you →</Link>
 
       {nums.length > 0 && (
