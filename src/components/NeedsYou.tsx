@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { ageOf, type NeedIcon, type NeedItem } from '@/lib/needs';
 
 const ICONS: Record<NeedIcon, JSX.Element> = {
+  done: <><circle cx="12" cy="12" r="9" /><path d="M8 12l3 3 5-6" /></>,
   sign: <><path d="M4 20h4L19 9l-4-4L4 16z" /><path d="M14 6l4 4" /></>,
   co: <><path d="M7 3h8l4 4v14H7z" /><path d="M15 3v4h4" /><path d="M10 13h6" /><path d="M10 17h6" /></>,
   pay: <><rect x="3" y="6" width="18" height="12" rx="2" /><circle cx="12" cy="12" r="2.5" /></>,

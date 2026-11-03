@@ -3,7 +3,7 @@ import { dollars } from '@/lib/money';
 import { alertHref } from '@/lib/alertPath';
 import { milestoneAmounts, totals, type ChangeOrder, type Item, type Milestone } from '@/lib/agreement';
 
-export type NeedIcon = 'sign' | 'co' | 'pay' | 'bid' | 'msg' | 'star' | 'job';
+export type NeedIcon = 'sign' | 'co' | 'pay' | 'bid' | 'msg' | 'star' | 'job' | 'done';
 export type NeedItem = { key: string; icon: NeedIcon; title: string; sub: string; href: string; go: string; at: string };
 
 /** "Today", "Waiting 1 day", "Waiting 4 days", and whether it has waited long enough to flag. */
@@ -38,8 +38,12 @@ export async function projectTasks(userId: string, projects: P[], myCompanyIds: 
     return (m as any)?.role === 'contractor' ? 'contractor' : 'homeowner';
   };
 
+  // Homeowners asking a contractor to close out a job (kept for 14 days, until the job is complete).
+  const { data: fin } = await db.from('notifications').select('project_id,created_at').eq('user_id', userId).eq('kind', 'finish_request').in('project_id', ids).gt('created_at', new Date(Date.now() - 14 * 86400000).toISOString()).order('created_at', { ascending: false });
   const out: NeedItem[] = [];
   for (const p of active) {
+    const f = (fin ?? []).find((x: any) => x.project_id === p.id) as any;
+    if (f) out.push({ key: `fin-${p.id}`, icon: 'done', title: 'Homeowner says the work is finished', sub: `${p.name} · Mark it complete to open ratings`, href: alertHref(p.id, 'finish_request'), go: 'Review', at: f.created_at });
     const role = roleOf(p);
     const ag: any = (ags ?? []).find((a: any) => a.project_id === p.id);
     const signed = new Set((sigs ?? []).filter((s: any) => s.project_id === p.id).map((s: any) => s.role as string));

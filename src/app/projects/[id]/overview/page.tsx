@@ -5,7 +5,8 @@ import AutoRefresh from '@/components/AutoRefresh';
 import KitchenArt from '@/components/KitchenArt';
 import { dollars, signedDollars, daysText } from '@/lib/money';
 import { milestoneAmounts, totals, type ChangeOrder, type Item, type Milestone } from '@/lib/agreement';
-import { setStage } from './actions';
+import { setStage, requestFinish } from './actions';
+import FinishCard from '@/components/FinishCard';
 
 const TZ = 'America/Chicago';
 const day = (d: string) => new Date(`${d.slice(0, 10)}T12:00:00`).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
@@ -92,6 +93,16 @@ export default async function Overview({ params, searchParams }: { params: { id:
     (signedUrls ?? []).forEach((s) => s.path && s.signedUrl && urls.set(s.path, s.signedUrl));
   }
 
+  const allPaid = pms.length === 0 || pms.every((m) => m.pay_status === 'confirmed');
+  const checks = [
+    { ok: allPaid, text: allPaid ? 'Final payment confirmed received' : 'Some payments are not confirmed yet' },
+    { ok: openFixes === 0 && awaitingConfirm === 0, text: openFixes === 0 && awaitingConfirm === 0 ? 'No open punch-list items' : `${openFixes + awaitingConfirm} punch-list item${openFixes + awaitingConfirm === 1 ? '' : 's'} still open` },
+  ];
+  let asked = false;
+  if (executed && role === 'homeowner' && !project.completed_at) {
+    const { count } = await supabaseAdmin().from('notifications').select('id', { count: 'exact', head: true }).eq('project_id', project.id).eq('kind', 'finish_request').gt('created_at', new Date(Date.now() - 86400000).toISOString());
+    asked = (count ?? 0) > 0;
+  }
   const pct = t.total > 0 ? Math.min(100, Math.round((confirmed / t.total) * 100)) : 0;
   const finish = agr?.end_date ? (t.days ? addDays(agr.end_date as string, t.days) : day(agr.end_date as string)) : null;
 
@@ -130,6 +141,20 @@ export default async function Overview({ params, searchParams }: { params: { id:
           </li>
         ))}
       </ol>
+
+      {executed && (
+        <FinishCard
+          role={role}
+          projectId={project.id}
+          completed={!!project.completed_at}
+          closeoutStarted={!!project.closeout_started_at}
+          checks={checks}
+          otherName={role === 'contractor' ? homeownerName : contractorName}
+          asked={asked}
+          setStage={setStage}
+          requestFinish={requestFinish}
+        />
+      )}
 
       <section className="card" aria-label="Needs your attention">
         <h2>Needs your attention</h2>
@@ -200,26 +225,6 @@ export default async function Overview({ params, searchParams }: { params: { id:
         {fixes.length > 0 && <p className="muted small">{openFixes} open · {awaitingConfirm} waiting to be confirmed · {fixes.length - openFixes - awaitingConfirm} done</p>}
       </section>
 
-      {role === 'contractor' && executed && (
-        <section className="card" aria-label="Job stage">
-          <h2>Job stage</h2>
-          {!project.closeout_started_at && (
-            <p className="muted small">Start closeout when the work is substantially done: final walkthrough, punch list, final payment.</p>
-          )}
-          {project.closeout_started_at && !project.completed_at && (
-            <p className="muted small">
-              Before marking complete: finish the punch list, record the final payment, and for Texas jobs get the bills-paid affidavit and
-              lien releases (not tracked in Jobfile yet).
-            </p>
-          )}
-          <form action={setStage} className="row">
-            <input type="hidden" name="project_id" value={project.id} />
-            {!project.closeout_started_at && <button className="btn" name="to" value="closeout">Start closeout</button>}
-            {project.closeout_started_at && !project.completed_at && <button className="btn accent" name="to" value="complete">Mark complete</button>}
-            {(project.closeout_started_at || project.completed_at) && <button className="btn ghost" name="to" value="reopen">Move back to active</button>}
-          </form>
-        </section>
-      )}
     </>
   );
 }

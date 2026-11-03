@@ -6,6 +6,7 @@ const TAB: Record<string, string> = {
   payment: '/payments',
   review: '/rating',
   stage: '/overview',
+  finish_request: '/overview',
 };
 
 export function alertHref(projectId: string | null | undefined, kind: string | null | undefined): string {

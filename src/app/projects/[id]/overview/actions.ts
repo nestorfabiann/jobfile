@@ -24,8 +24,9 @@ export async function setStage(formData: FormData) {
     await admin.from('projects').update({ closeout_started_at: now }).eq('id', project.id);
     title = 'Closeout started on';
     body = 'The work is substantially done. Use the Photos tab for the final walkthrough punch list and the Payments tab for the final payment.';
-  } else if (to === 'complete' && project.closeout_started_at && !project.completed_at) {
-    await admin.from('projects').update({ completed_at: now }).eq('id', project.id);
+  } else if (to === 'complete' && !project.completed_at) {
+    // Closeout is optional: the contractor can mark the job complete straight from active.
+    await admin.from('projects').update({ completed_at: now, closeout_started_at: project.closeout_started_at ?? now }).eq('id', project.id);
     title = 'Project marked complete:';
     body = 'The contractor marked this project complete. Open the Ratings tab to rate your experience. Ratings are shown once you both rate.';
   } else if (to === 'reopen' && (project.closeout_started_at || project.completed_at)) {
@@ -45,4 +46,27 @@ export async function setStage(formData: FormData) {
   revalidatePath(`/projects/${project.id}`, 'layout');
   // Take the contractor straight to the rating form.
   if (to === 'complete') redirect(`/projects/${project.id}/rating?done=1`);
+}
+
+
+/** The homeowner asks the contractor to mark the job complete. Once a day per project. */
+export async function requestFinish(formData: FormData) {
+  const projectId = String(formData.get('project_id') ?? '');
+  const { role, user, project } = await loadProject(projectId);
+  if (role !== 'homeowner' || project.completed_at) return;
+  const admin = supabaseAdmin();
+  const { data: agr } = await admin.from('agreements').select('executed_at').eq('project_id', project.id).maybeSingle();
+  if (!agr?.executed_at) return;
+  const since = new Date(Date.now() - 86400000).toISOString();
+  const { count } = await admin.from('notifications').select('id', { count: 'exact', head: true }).eq('project_id', project.id).eq('kind', 'finish_request').gt('created_at', since);
+  if ((count ?? 0) > 0) return;
+  await notifyOtherSide({
+    projectId: project.id,
+    senderId: user.id,
+    senderRole: role,
+    kind: 'finish_request',
+    title: (n) => `The homeowner says the work is finished on ${n}`,
+    body: 'Open the project and mark it complete if the work is done. Marking it complete opens ratings for both sides.',
+  });
+  revalidatePath(`/projects/${project.id}`, 'layout');
 }
