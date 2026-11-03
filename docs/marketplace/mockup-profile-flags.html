@@ -1,0 +1,56 @@
+<title>Profile Language Flags</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: one phone column. Three tabs show the language line three ways: plain text (live now), small flags in the line, flag chips. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#cd7d2e;--orl:#f9efe4;--orb:#ecd4a8;--gr:#1f7a55;--grl:#d9f1e6;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--gr:#6fd1a3;--grl:#173a2c;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--gr:#6fd1a3;--grl:#173a2c;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:14px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px;margin-bottom:12px}.note b{color:var(--ink)}
+.sw{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:18px}.sw button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:8px 2px;border-radius:99px;font:500 12.5px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:44px}.sw button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+h1{font:800 30px/1.08 'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.035em;margin:0}
+.top{display:flex;gap:14px;align-items:center;margin-top:16px}
+.logo{width:72px;height:72px;border-radius:18px;background:linear-gradient(135deg,#d9c9a8,#9b8b73);flex:none;display:grid;place-items:center;color:#fff;font-weight:800;font-size:26px}
+.rating{color:var(--mut);font-size:14.5px;margin-top:4px}
+.trust{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;padding:7px 12px;border-radius:99px;background:var(--grl);color:var(--gr);white-space:nowrap}
+.lang{margin-top:14px;color:var(--mut);font-size:14.5px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.lang .fl{display:inline-flex;align-items:center;gap:6px}
+.chipl{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:99px;padding:6px 12px 6px 8px;font-size:14px;font-weight:500}
+svg.fl{width:22px;height:15px;border-radius:3px;flex:none;box-shadow:0 0 0 1px rgba(0,0,0,.12)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:24px;padding:18px;margin-top:18px;font-size:16px;line-height:1.55}
+.sec[hidden]{display:none}
+</style>
+<div class="wrap">
+  <div class="note"><b>Mockup.</b> Three ways to show languages under the Verified and Insured pills. Tap a tab to compare. Flags are drawn small and sharp, and there is no England flag.</div>
+  <div class="sw" id="sw"><button data-s="a" type="button">Plain (live now)</button><button data-s="b" class="on" type="button">Flags in line</button><button data-s="c" type="button">Flag chips</button></div>
+
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+    <symbol id="us" viewBox="0 0 22 15"><rect width="22" height="15" fill="#fff"/><g fill="#b22234"><rect y="0" width="22" height="1.15"/><rect y="2.3" width="22" height="1.15"/><rect y="4.6" width="22" height="1.15"/><rect y="6.9" width="22" height="1.15"/><rect y="9.2" width="22" height="1.15"/><rect y="11.5" width="22" height="1.15"/><rect y="13.8" width="22" height="1.2"/></g><rect width="9.5" height="8.1" fill="#3c3b6e"/><g fill="#fff"><circle cx="2" cy="1.8" r=".45"/><circle cx="4.7" cy="1.8" r=".45"/><circle cx="7.4" cy="1.8" r=".45"/><circle cx="3.3" cy="4" r=".45"/><circle cx="6" cy="4" r=".45"/><circle cx="2" cy="6.2" r=".45"/><circle cx="4.7" cy="6.2" r=".45"/><circle cx="7.4" cy="6.2" r=".45"/></g></symbol>
+    <symbol id="mx" viewBox="0 0 22 15"><rect width="22" height="15" fill="#fff"/><rect width="7.3" height="15" fill="#006847"/><rect x="14.7" width="7.3" height="15" fill="#ce1126"/><circle cx="11" cy="7.5" r="2" fill="#8a6d3b" opacity=".75"/></symbol>
+    <symbol id="es" viewBox="0 0 22 15"><rect width="22" height="15" fill="#c60b1e"/><rect y="3.75" width="22" height="7.5" fill="#ffc400"/></symbol>
+  </defs></svg>
+
+  <a style="color:var(--or);font-size:14px;text-decoration:underline" href="#">‹ All projects</a>
+  <div class="top"><div class="logo">NR</div><div><h1>Nesty's Painting</h1><div class="rating">★ 5.0 · 1 review · 8 years</div></div></div>
+  <div class="trust"><span class="pill">✓ Verified by Jobfile</span><span class="pill">✓ Insured until Nov 12, 2026</span></div>
+
+  <div id="a" class="sec" hidden><div class="lang">Speaks English and Español</div></div>
+
+  <div id="b" class="sec"><div class="lang"><span>Speaks</span><span class="fl"><svg class="fl"><use href="#us"/></svg>English</span><span>and</span><span class="fl"><svg class="fl"><use href="#mx"/></svg>Español</span></div></div>
+
+  <div id="c" class="sec" hidden><div class="lang" style="gap:8px"><span>Speaks</span><span class="chipl"><svg class="fl"><use href="#us"/></svg>English</span><span class="chipl"><svg class="fl"><use href="#mx"/></svg>Español</span></div></div>
+
+  <div class="card">We are a family-owned business with 10 years of experience. We love our community and assisting our customers!</div>
+
+  <div class="note" style="margin-top:24px"><b>Notes:</b> I used a US flag for English and a Mexico flag for Español, since those fit Texas better than England and Spain. A flag stands for a country, not a language, so some people may read it as "from the US" or "from Mexico". The words next to each flag keep it clear. If you prefer Spain's flag, it is one swap. No SQL.</div>
+</div>
+<script>
+var sw=document.getElementById('sw');
+[].forEach.call(sw.children,function(b){b.onclick=function(){
+  [].forEach.call(sw.children,function(x){x.classList.toggle('on',x===b)});
+  ['a','b','c'].forEach(function(id){document.getElementById(id).hidden=id!==b.dataset.s})}});
+</script>
