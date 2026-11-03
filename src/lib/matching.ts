@@ -55,7 +55,7 @@ export async function alertMatchingContractors(l: NewListing) {
   try {
     const db = supabaseAdmin();
     const { data: cos } = await db.from('companies').select('*').eq('job_alerts', true).not('business_zip', 'is', null).limit(500);
-    const candidates = ((cos ?? []) as any[]).filter((c) => !c.hidden_at && !(c.trades ?? []).length || (c.trades as string[]).includes(l.job_type));
+    const candidates = ((cos ?? []) as any[]).filter((c) => !c.hidden_at && (!(c.trades ?? []).length || (c.trades as string[]).includes(l.job_type)));
     if (!candidates.length) return;
     const coords = await zipCoords([l.zip, ...candidates.map((c) => c.business_zip as string)]);
     const here = coords.get(l.zip);

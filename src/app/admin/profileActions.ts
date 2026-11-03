@@ -51,12 +51,12 @@ async function userGuard(f: FormData) {
   const { data: u } = await db.from('profiles').select('id,email').eq('id', id).maybeSingle();
   if (!u) return { err: fail('User not found.') } as const;
   if (id === me.id || isAdminEmail(u.email)) return { err: fail('This cannot be done to an admin account.') } as const;
-  return { me, db, id, reason, u } as const;
+  return { err: undefined, me, db, id, reason, u } as const;
 }
 
 export async function signOutEverywhere(_: Result | null, f: FormData): Promise<Result> {
   const g = await userGuard(f);
-  if ('err' in g) return g.err;
+  if (g.err) return g.err;
   await g.db.from('profiles').update({ sessions_revoked_at: new Date().toISOString() }).eq('id', g.id);
   await audit(g.me, 'sign_out_everywhere', { type: 'user', id: g.id }, { reason: g.reason, email: g.u.email });
   return { ok: true, message: 'Done. Their open sessions end the next time they load a page.' };
@@ -64,7 +64,7 @@ export async function signOutEverywhere(_: Result | null, f: FormData): Promise<
 
 export async function alertsOff(_: Result | null, f: FormData): Promise<Result> {
   const g = await userGuard(f);
-  if ('err' in g) return g.err;
+  if (g.err) return g.err;
   await g.db.from('profiles').update({ notify_email: false, notify_sms: false }).eq('id', g.id);
   await audit(g.me, 'alerts_off', { type: 'user', id: g.id }, { reason: g.reason, email: g.u.email });
   revalidatePath(`/admin/users/${g.id}`);
@@ -74,7 +74,7 @@ export async function alertsOff(_: Result | null, f: FormData): Promise<Result> 
 /** Deletes an account only when nothing depends on it. Otherwise suspend instead. */
 export async function deleteUser(_: Result | null, f: FormData): Promise<Result> {
   const g = await userGuard(f);
-  if ('err' in g) return g.err;
+  if (g.err) return g.err;
   const c = async (table: string, col: string) => (await g.db.from(table).select('*', { count: 'exact', head: true }).eq(col, g.id)).count ?? 0;
   const used = (await c('project_members', 'user_id')) + (await c('company_members', 'user_id')) + (await c('marketplace_listings', 'homeowner_id'));
   if (used > 0) return fail('This person has projects, a company or posted jobs. Suspend them instead.');
@@ -107,12 +107,12 @@ async function companyGuard(f: FormData) {
   const { data: mem } = await db.from('company_members').select('user_id,role').eq('company_id', id);
   const owners = (mem ?? []).filter((m: any) => m.role === 'owner').map((m: any) => m.user_id as string);
   const everyone = (mem ?? []).map((m: any) => m.user_id as string);
-  return { me, db, id, reason, c, owners, everyone, mem: (mem ?? []) as { user_id: string; role: string }[] } as const;
+  return { err: undefined, me, db, id, reason, c, owners, everyone, mem: (mem ?? []) as { user_id: string; role: string }[] } as const;
 }
 
 export async function editCompany(_: Result | null, f: FormData): Promise<Result> {
   const g = await companyGuard(f);
-  if ('err' in g) return g.err;
+  if (g.err) return g.err;
   const trades = str(f, 'trades').split(',').map((t) => t.trim()).filter(Boolean);
   const bad = trades.filter((t) => !JOB_TYPES[t]);
   if (bad.length) return fail(`Not a trade on Jobfile: ${bad.join(', ')}.`);
@@ -136,7 +136,7 @@ export async function editCompany(_: Result | null, f: FormData): Promise<Result
 
 export async function setVerified(_: Result | null, f: FormData): Promise<Result> {
   const g = await companyGuard(f);
-  if ('err' in g) return g.err;
+  if (g.err) return g.err;
   const on = !g.c.verified_at;
   const { error } = await g.db.from('companies').update({ verified_at: on ? new Date().toISOString() : null }).eq('id', g.id);
   if (error) return fail('Could not save. Run the 017 SQL step first.');
@@ -147,7 +147,7 @@ export async function setVerified(_: Result | null, f: FormData): Promise<Result
 
 export async function setHidden(_: Result | null, f: FormData): Promise<Result> {
   const g = await companyGuard(f);
-  if ('err' in g) return g.err;
+  if (g.err) return g.err;
   const on = !g.c.hidden_at;
   const { error } = await g.db.from('companies').update(on ? { hidden_at: new Date().toISOString(), hidden_reason: g.reason } : { hidden_at: null, hidden_reason: '' }).eq('id', g.id);
   if (error) return fail('Could not save. Run the 017 SQL step first.');
@@ -159,7 +159,7 @@ export async function setHidden(_: Result | null, f: FormData): Promise<Result> 
 
 export async function removeLogo(_: Result | null, f: FormData): Promise<Result> {
   const g = await companyGuard(f);
-  if ('err' in g) return g.err;
+  if (g.err) return g.err;
   if (!g.c.logo_path) return fail('There is no logo.');
   await g.db.storage.from('company-photos').remove([g.c.logo_path as string]);
   await g.db.from('companies').update({ logo_path: null }).eq('id', g.id);
@@ -171,7 +171,7 @@ export async function removeLogo(_: Result | null, f: FormData): Promise<Result>
 
 export async function removePhoto(_: Result | null, f: FormData): Promise<Result> {
   const g = await companyGuard(f);
-  if ('err' in g) return g.err;
+  if (g.err) return g.err;
   const pid = str(f, 'photo_id');
   const { data: ph } = await g.db.from('company_photos').select('path').eq('id', pid).eq('company_id', g.id).maybeSingle();
   if (!ph) return fail('Photo not found.');
@@ -185,7 +185,7 @@ export async function removePhoto(_: Result | null, f: FormData): Promise<Result
 
 export async function moveOwner(_: Result | null, f: FormData): Promise<Result> {
   const g = await companyGuard(f);
-  if ('err' in g) return g.err;
+  if (g.err) return g.err;
   const to = str(f, 'new_owner');
   if (!g.mem.some((m) => m.user_id === to)) return fail('Pick a person who works at this company.');
   await g.db.from('company_members').update({ role: 'staff' }).eq('company_id', g.id).eq('role', 'owner');

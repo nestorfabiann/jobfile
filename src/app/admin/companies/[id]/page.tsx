@@ -19,7 +19,7 @@ export default async function AdminCompany({ params }: { params: { id: string } 
   ]);
   const ids = (mem ?? []).map((m: any) => m.user_id as string);
   const { data: people } = ids.length ? await db.from('profiles').select('id,email,full_name').in('id', ids) : { data: [] as any[] };
-  const who = new Map((people ?? []).map((p: any) => [p.id, p]));
+  const who = new Map<string, any>((people ?? []).map((p: any) => [p.id as string, p] as [string, any]));
   const owner = (mem ?? []).find((m: any) => m.role === 'owner') as any;
   const urls = await signedUrls('company-photos', (photos ?? []).map((p: any) => p.path as string));
   const insured = (ins ?? []).some((i: any) => i.status === 'approved' && (!i.expires_on || new Date(i.expires_on) > new Date()));
