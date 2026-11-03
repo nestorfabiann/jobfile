@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import type { EmailOtpType } from '@supabase/supabase-js';
-import { supabaseServer } from '@/lib/supabase/server';
+import { supabaseServer, supabaseAdmin } from '@/lib/supabase/server';
 import { NEXT_COOKIE, safeNext } from '@/lib/nextPath';
 import { REF_COOKIE, recordJoin } from '@/lib/referrals';
 
@@ -14,6 +14,7 @@ export async function GET(req: NextRequest) {
   const done = async () => {
     try {
       const { data: { user } } = await supabaseServer().auth.getUser();
+      if (user) { try { await supabaseAdmin().from('usage_events').insert({ user_id: user.id, kind: 'signin', page: '' }); } catch { /* usage table not set up yet */ } }
       if (user) await recordJoin({ id: user.id, created_at: user.created_at }, req.cookies.get(REF_COOKIE)?.value);
     } catch { /* never block sign-in */ }
     const res = NextResponse.redirect(new URL(dest, base));

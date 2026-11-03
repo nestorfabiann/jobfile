@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { isAdminEmail, requireAdmin } from '@/lib/admin';
 import { loadFeed, lookups } from '@/lib/adminFeed';
+import { ago, avgVisitMs, DAY, fmtDuration, loadEvents, visitsOf } from '@/lib/usageStats';
 import AdminFeed from '@/components/AdminFeed';
 import { BanForm, MessageForm } from '@/components/AdminForms';
 import { banUser, sendBroadcast, unbanUser } from '../../actions';
@@ -33,6 +34,11 @@ export default async function UserPage({ params }: { params: { id: string } }) {
 
   const events = await loadFeed({ userId: u.id, limit: 50 });
   const names = await lookups(events);
+  const uev = await loadEvents(db, null, u.id);
+  const uvisits = visitsOf(uev);
+  const recentVisits = uvisits.filter((v) => v.start > Date.now() - 30 * DAY);
+  const lastEv = uev.length ? uev[uev.length - 1].created_at : null;
+  const recentPages = uev.filter((e) => e.kind === 'view').slice(-12).reverse();
   const isAdmin = isAdminEmail(u.email);
   let invitedBy = '';
   try {
@@ -125,6 +131,18 @@ export default async function UserPage({ params }: { params: { id: string } }) {
       <h2>Message this person</h2>
       <div className="card">
         <MessageForm action={sendBroadcast} audience="user" target={u.id} />
+      </div>
+
+      <h2>Usage</h2>
+      <div className="card">
+        <div className="row" style={{ justifyContent: 'space-between' }}><span>Sign-ins</span><b>{uev.filter((e) => e.kind === 'signin').length}</b></div>
+        <div className="row" style={{ justifyContent: 'space-between' }}><span>Last seen</span><b>{ago(lastEv)}</b></div>
+        <div className="row" style={{ justifyContent: 'space-between' }}><span>Visits (30 days)</span><b>{recentVisits.length}</b></div>
+        <div className="row" style={{ justifyContent: 'space-between' }}><span>Avg. visit</span><b>{fmtDuration(avgVisitMs(recentVisits))}</b></div>
+        {recentPages.length > 0 && <>
+          <h3 style={{ margin: 0 }}>Recent pages</h3>
+          {recentPages.map((e, i) => <div key={i} className="row" style={{ justifyContent: 'space-between', borderTop: '1px solid var(--line)', paddingTop: 6 }}><span>{e.page}</span><span className="muted small">{new Date(e.created_at).toLocaleString('en-US', { timeZone: 'America/Chicago', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}</span></div>)}
+        </>}
       </div>
 
       <h2>Their activity</h2>
