@@ -1,0 +1,69 @@
+<title>Contractor Projects Spacing</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: one phone column. Two tabs, Today and Proposed, same content with different spacing and a side-by-side button row. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#cd7d2e;--orl:#f9efe4;--orb:#ecd4a8;--gr:#1f7a55;--grl:#d9f1e6;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--gr:#6fd1a3;--grl:#173a2c;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--gr:#6fd1a3;--grl:#173a2c;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:14px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px;margin-bottom:12px}.note b{color:var(--ink)}
+.sw{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-bottom:16px}.sw button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:8px 2px;border-radius:99px;font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:44px}.sw button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+h1,h2{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0}
+.pg{display:flex;flex-direction:column;gap:14px}
+.pg.new{gap:28px}
+.hello h1{font-size:34px;line-height:1.05}.hello p{margin:8px 0 0;color:var(--mut);font-size:16px}
+.actions{display:flex;flex-direction:column;gap:10px}
+.btn{display:flex;align-items:center;justify-content:center;border-radius:99px;min-height:52px;padding:0 18px;font:700 16px 'IBM Plex Sans',sans-serif;border:1.5px solid var(--or);background:var(--or);color:#fff}
+.btn.ghost{background:var(--card);color:var(--ink);border-color:var(--line);width:max-content}
+.row2{display:grid;grid-template-columns:1.25fr 1fr;gap:10px}.row2 .btn{width:100%;font-size:15.5px}
+.hint{font-size:14.5px;line-height:1.5;color:var(--mut);margin:0}.hint b{color:var(--ink)}
+.caught{color:var(--gr);font-weight:600;font-size:14.5px}
+.pg.new .caught{font-size:13.5px;font-weight:500}
+.sec h2{font-size:24px}.sec .count{color:var(--mut);float:right;font-size:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:26px;padding:16px;display:flex;flex-direction:column;gap:14px;margin-top:14px}
+.top{display:flex;gap:14px;align-items:center}.th{width:64px;height:64px;border-radius:16px;background:linear-gradient(135deg,#d9c9a8,#9b8b73);flex:none}
+.top b{font:800 19px 'Bricolage Grotesque',sans-serif;letter-spacing:-.02em;display:block}.top span{color:var(--mut);font-size:14.5px}
+.bar{height:10px;border-radius:99px;background:var(--line);overflow:hidden}.bar i{display:block;width:18%;height:100%;background:var(--or)}
+.meta{display:flex;justify-content:space-between;align-items:center;gap:8px;color:var(--mut);font-size:15px}
+.pill{font-size:13px;font-weight:700;padding:7px 14px;border-radius:99px;background:var(--grl);color:var(--gr)}
+.next{font-size:14.5px;font-weight:600;color:var(--mut);line-height:1.45;padding-top:2px}
+.pg.new .card{margin-top:16px;padding:18px}
+.old-only{display:block}.new-only{display:none}
+.pg.new .old-only{display:none}.pg.new .new-only{display:block}
+.pg.new .new-flex{display:grid}.new-flex{display:none}.pg.new .old-flex{display:none}.old-flex{display:flex}
+</style>
+<div class="wrap">
+  <div class="note"><b>Mockup.</b> Contractor Projects page. Same content, with better grouping. The hint moves out of the page (it stays inside the form). Flip between the tabs to compare.</div>
+  <div class="sw" id="sw"><button data-v="old" type="button">Today</button><button data-v="new" class="on" type="button">Proposed</button></div>
+  <div class="pg new" id="pg">
+    <div class="hello"><h1>Hi Nestor</h1><p>Nesty's Painting · here is your work at a glance.</p></div>
+
+    <div class="actions">
+      <div class="old-flex" style="flex-direction:column;gap:10px"><div class="btn">Find work</div><div class="btn ghost">Start a project</div></div>
+      <div class="row2 new-flex"><div class="btn">Find work</div><div class="btn ghost" style="width:100%">Start a project</div></div>
+      <p class="hint old-only"><b>Already have a customer?</b> Add them by email, even if they are not on Jobfile yet. They get an invite to join the project.</p>
+      <div class="caught">✓ You're all caught up</div>
+    </div>
+
+    <div class="sec">
+      <h2>Ongoing projects <span class="count">1</span></h2>
+      <div class="card">
+        <div class="top"><div class="th"></div><div><b>Kitchen and walls painting</b><span>Jerry still · 727 plano tx</span></div></div>
+        <div class="bar"><i></i></div>
+        <div class="meta"><span class="pill">Work in progress</span><span>$1,001.60 of $5,508 paid</span></div>
+        <div class="next old-only">Next: Next payment to request: Midpoint, materials on site</div>
+        <div class="next new-only">Next: request the Midpoint payment (materials on site)</div>
+      </div>
+    </div>
+  </div>
+  <div class="note" style="margin-top:24px"><b>What changes:</b> Find work and Start a project share one row. The "Already have a customer?" hint is removed from the page (it stays in the form, where it matters). The gap between groups doubles. "All caught up" becomes a quieter line. The duplicate "Next: Next payment" wording is fixed. No SQL.</div>
+</div>
+<script>
+var sw=document.getElementById('sw'),pg=document.getElementById('pg');
+[].forEach.call(sw.children,function(b){b.onclick=function(){
+  [].forEach.call(sw.children,function(x){x.classList.toggle('on',x===b)});
+  pg.classList.toggle('new',b.dataset.v==='new')}});
+</script>
