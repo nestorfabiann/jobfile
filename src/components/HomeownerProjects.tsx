@@ -73,6 +73,46 @@ export default function HomeownerProjects(p: {
         </div>
       )}
 
+      {ongoing.length > 0 && (
+        <section className="stack" aria-label="Hired and ongoing">
+          <div className="row" style={{ justifyContent: 'space-between', flexWrap: 'nowrap' }}><h2>Hired and ongoing</h2><span className="muted small">{ongoing.length}</span></div>
+          {ongoing.map((x) => {
+            const s = p.summaries.get(x.id);
+            return (
+              <Link key={x.id} href={`/projects/${x.id}/overview`} className="card" style={{ textDecoration: 'none', color: 'var(--ink)' }}>
+                <div className="row" style={{ flexWrap: 'nowrap' }}>
+                  <Thumb id={x.id} />
+                  <div style={{ minWidth: 0, flex: 1 }}>
+                    <b style={{ display: 'block', lineHeight: 1.3 }}>{x.name}</b>
+                    {s?.contractor ? (
+                      <span className="row" style={{ gap: 6, marginTop: 4, flexWrap: 'nowrap' }}>
+                        <span aria-hidden="true" style={{ width: 22, height: 22, borderRadius: '50%', background: 'var(--accent)', color: '#fff', display: 'inline-grid', placeItems: 'center', fontSize: 11, fontWeight: 700, flex: 'none' }}>{s.contractor.trim()[0]?.toUpperCase()}</span>
+                        <span className="muted small" style={{ minWidth: 0 }}>{s.contractor}</span>
+                      </span>
+                    ) : <span className="muted small">{x.address || 'No address yet'}</span>}
+                  </div>
+                  <span aria-hidden="true">›</span>
+                </div>
+                {s && (
+                  <>
+                    <div className="bar" role="img" aria-label={`${s.pct} percent`}><span style={{ width: `${s.pct}%` }} /></div>
+                    <div className="row" style={{ justifyContent: 'space-between' }}>
+                      <span className={`pill ${x.closeout_started_at ? 'warn' : 'ok'}`}>{s.stage}</span>
+                      {s.payTotal > 0 && <span className="muted small">{s.payDone} of {s.payTotal} payments recorded</span>}
+                    </div>
+                    {s.next && (
+                      <div style={{ borderRadius: 12, padding: '8px 10px', fontSize: 14, fontWeight: 600, lineHeight: 1.35, background: s.action ? 'var(--warn-bg, #fbeccd)' : 'var(--surface-2)', color: s.action ? 'var(--warn, #9a5b00)' : 'var(--ink-2)' }}>
+                        Next: {s.next}
+                      </div>
+                    )}
+                  </>
+                )}
+              </Link>
+            );
+          })}
+        </section>
+      )}
+
       {(waiting.length > 0 || p.drafts.length > 0) && (
         <section className="stack" aria-label="Waiting for bids">
           <div className="row" style={{ justifyContent: 'space-between', flexWrap: 'nowrap' }}><h2>Waiting for bids</h2><span className="muted small">{waiting.length}</span></div>
@@ -114,46 +154,6 @@ export default function HomeownerProjects(p: {
             );
           })}
           <Link href="/projects?tab=posted" className="muted small">See all your posted jobs</Link>
-        </section>
-      )}
-
-      {ongoing.length > 0 && (
-        <section className="stack" aria-label="Hired and ongoing">
-          <div className="row" style={{ justifyContent: 'space-between', flexWrap: 'nowrap' }}><h2>Hired and ongoing</h2><span className="muted small">{ongoing.length}</span></div>
-          {ongoing.map((x) => {
-            const s = p.summaries.get(x.id);
-            return (
-              <Link key={x.id} href={`/projects/${x.id}/overview`} className="card" style={{ textDecoration: 'none', color: 'var(--ink)' }}>
-                <div className="row" style={{ flexWrap: 'nowrap' }}>
-                  <Thumb id={x.id} />
-                  <div style={{ minWidth: 0, flex: 1 }}>
-                    <b style={{ display: 'block', lineHeight: 1.3 }}>{x.name}</b>
-                    {s?.contractor ? (
-                      <span className="row" style={{ gap: 6, marginTop: 4, flexWrap: 'nowrap' }}>
-                        <span aria-hidden="true" style={{ width: 22, height: 22, borderRadius: '50%', background: 'var(--accent)', color: '#fff', display: 'inline-grid', placeItems: 'center', fontSize: 11, fontWeight: 700, flex: 'none' }}>{s.contractor.trim()[0]?.toUpperCase()}</span>
-                        <span className="muted small" style={{ minWidth: 0 }}>{s.contractor}</span>
-                      </span>
-                    ) : <span className="muted small">{x.address || 'No address yet'}</span>}
-                  </div>
-                  <span aria-hidden="true">›</span>
-                </div>
-                {s && (
-                  <>
-                    <div className="bar" role="img" aria-label={`${s.pct} percent`}><span style={{ width: `${s.pct}%` }} /></div>
-                    <div className="row" style={{ justifyContent: 'space-between' }}>
-                      <span className={`pill ${x.closeout_started_at ? 'warn' : 'ok'}`}>{s.stage}</span>
-                      {s.payTotal > 0 && <span className="muted small">{s.payDone} of {s.payTotal} payments recorded</span>}
-                    </div>
-                    {s.next && (
-                      <div style={{ borderRadius: 12, padding: '8px 10px', fontSize: 14, fontWeight: 600, lineHeight: 1.35, background: s.action ? 'var(--warn-bg, #fbeccd)' : 'var(--surface-2)', color: s.action ? 'var(--warn, #9a5b00)' : 'var(--ink-2)' }}>
-                        Next: {s.next}
-                      </div>
-                    )}
-                  </>
-                )}
-              </Link>
-            );
-          })}
         </section>
       )}
 
