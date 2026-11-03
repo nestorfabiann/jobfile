@@ -47,6 +47,14 @@ export async function saveSettings(formData: FormData) {
     .eq('id', user.id);
   if (error) redirect('/settings?error=Could+not+save+your+settings.');
 
+  // ZIP and the tips switch live in the 020 columns. Saved separately so settings still work until that step is run.
+  const zipRaw = String(formData.get('zip') ?? '').replace(/\D/g, '');
+  if (formData.has('zip') && zipRaw && !/^\d{5}$/.test(zipRaw)) redirect('/settings?error=Enter+a+5+digit+ZIP+code.');
+  const extra: Record<string, unknown> = {};
+  if (formData.has('zip')) extra.zip = zipRaw || null;
+  if (formData.has('marketing_email') || formData.has('zip')) extra.marketing_email = formData.get('marketing_email') === 'on';
+  if (Object.keys(extra).length) await sb.from('profiles').update(extra).eq('id', user.id);
+
   revalidatePath('/settings');
   redirect('/settings?saved=1');
 }

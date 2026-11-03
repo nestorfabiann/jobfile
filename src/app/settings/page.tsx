@@ -10,7 +10,7 @@ export default async function Settings({ searchParams }: { searchParams: { saved
   const owned = await myOwnedCompany();
   const { data: p } = await sb
     .from('profiles')
-    .select(tOn ? 'full_name,phone,notify_email,notify_sms,sms_consent_at,language,auto_translate' : 'full_name,phone,notify_email,notify_sms,sms_consent_at')
+    .select('*')
     .eq('id', user.id)
     .single<any>();
 
@@ -48,6 +48,14 @@ export default async function Settings({ searchParams }: { searchParams: { saved
           </label>
         </div>
 
+        {p && 'zip' in p && (
+          <label className="fld">
+            Your ZIP code
+            <input name="zip" defaultValue={p?.zip ?? ''} inputMode="numeric" maxLength={5} pattern="[0-9]{5}" placeholder="75074" autoComplete="postal-code" />
+            <span className="muted small">Used to show contractors near you. Your street address is never shared.</span>
+          </label>
+        )}
+
         {tOn && (
           <>
             <h2>Language</h2>
@@ -62,6 +70,16 @@ export default async function Settings({ searchParams }: { searchParams: { saved
             <label className="row" style={{ flexWrap: 'nowrap' }}>
               <input type="checkbox" name="auto_translate" defaultChecked={p?.auto_translate ?? true} />
               <span>Translate new messages automatically</span>
+            </label>
+          </>
+        )}
+
+        {p && 'marketing_email' in p && (
+          <>
+            <h2>Tips and local news</h2>
+            <label className="row" style={{ flexWrap: 'nowrap', alignItems: 'flex-start' }}>
+              <input type="checkbox" name="marketing_email" defaultChecked={p?.marketing_email ?? true} />
+              <span className="small">Email me when contractors join my area or a project could get bids. Messages about your own projects always still arrive.</span>
             </label>
           </>
         )}

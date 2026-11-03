@@ -17,6 +17,7 @@ export default function AreaMessage() {
   const [err, setErr] = useState('');
   const [busy, setBusy] = useState(false);
   const [capped, setCapped] = useState(false);
+  const [noZip, setNoZip] = useState(0);
   const [skip, setSkip] = useState<Record<string, boolean>>({});
   const [confirming, setConfirming] = useState(false);
   const [r, run] = useFormState(sendArea, null);
@@ -31,14 +32,14 @@ export default function AreaMessage() {
       const res = await previewArea({ zip, radius, who });
       if (mine !== seq.current) return;
       setBusy(false);
-      if (res.ok) { setPeople(res.people); setCapped(res.capped); setErr(''); } else { setPeople([]); setErr(res.error); }
+      if (res.ok) { setPeople(res.people); setCapped(res.capped); setNoZip(res.noZip); setErr(''); } else { setPeople([]); setErr(res.error); }
     }, 350);
     return () => clearTimeout(t);
   }, [zip, radius, who]);
 
   const chosen = people.filter((p) => !skip[p.id]);
   const skipIds = JSON.stringify(Object.keys(skip).filter((k) => skip[k]));
-  const note = who === 'contractors' ? "Uses each contractor's business ZIP." : who === 'homeowners' ? 'Homeowners who posted a project in this area. Accounts without a posted project have no ZIP.' : 'Both groups, counted together.';
+  const note = who === 'contractors' ? "Uses each contractor's business ZIP." : who === 'homeowners' ? 'Homeowners with a ZIP in this area, whether or not they have posted a project.' : 'Both groups, counted together.';
 
   return (
     <form action={run} className="stack" style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -68,6 +69,11 @@ export default function AreaMessage() {
       <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
         <h2>3 · Matches</h2>
         <div><b style={{ fontSize: 32 }}>{busy ? '…' : chosen.length}</b> <span className="muted">{chosen.length === 1 ? 'person matches' : 'people match'}</span></div>
+        {chosen.length > 0 && who !== 'contractors' ? (
+          <p className="muted small" style={{ margin: 0 }}>
+            {chosen.filter((p) => p.kind === 'homeowner' && !p.posted).length} homeowners have not posted a project · {chosen.filter((p) => p.tipsOff).length} turned off tips and local news (in-app alert only, unless you tick the email box below)
+          </p>
+        ) : null}
         {err ? <p className="small" style={{ color: 'var(--bad)', margin: 0 }}>{err}</p> : null}
         {capped ? <p className="small" style={{ color: 'var(--bad)', margin: 0 }}>More than 200 match. Use a smaller radius or skip people before sending.</p> : null}
         {zip.length === 5 && !busy && !err && !people.length ? <p className="muted small" style={{ margin: 0 }}>No one in this area. Try a bigger radius.</p> : null}
@@ -75,13 +81,20 @@ export default function AreaMessage() {
           <div style={{ maxHeight: 260, overflow: 'auto', border: '1px solid var(--line)', borderRadius: 14 }}>
             {people.map((p) => (
               <div key={p.id} style={{ display: 'flex', justifyContent: 'space-between', gap: 10, padding: '10px 12px', borderBottom: '1px solid var(--line)', alignItems: 'center', opacity: skip[p.id] ? 0.45 : 1 }}>
-                <span style={{ minWidth: 0, overflowWrap: 'anywhere', textDecoration: skip[p.id] ? 'line-through' : 'none' }}>{p.label}{p.kind === 'homeowner' ? ' · homeowner' : ''}</span>
+                <span style={{ minWidth: 0, overflowWrap: 'anywhere', textDecoration: skip[p.id] ? 'line-through' : 'none' }}>{p.label}{p.kind === 'homeowner' ? ` · homeowner${p.posted ? '' : ' · no project yet'}` : ''}{p.tipsOff ? ' · tips off' : ''}</span>
                 <span className="muted small" style={{ whiteSpace: 'nowrap' }}>{p.miles} mi <button type="button" className="btn ghost" style={{ minHeight: 30, padding: '2px 10px', marginLeft: 6 }} onClick={() => setSkip((s) => ({ ...s, [p.id]: !s[p.id] }))}>{skip[p.id] ? 'Include' : 'Skip'}</button></span>
               </div>
             ))}
           </div>
         )}
       </div>
+
+      {who !== 'contractors' && noZip > 0 ? (
+        <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+          <b>Homeowners without a ZIP: {noZip}</b>
+          <span className="muted small">They skipped the question or have not seen it yet. They are asked at sign-in.</span>
+        </div>
+      ) : null}
 
       <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
         <h2>4 · Message</h2>

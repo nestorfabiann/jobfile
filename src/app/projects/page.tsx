@@ -17,12 +17,14 @@ import WhyJobfile from '@/components/WhyJobfile';
 import StartProjectForm from '@/components/StartProjectForm';
 import { alertHref } from '@/lib/alertPath';
 import { cookies } from 'next/headers';
+import ZipCard from '@/components/ZipCard';
+import { nearbyContractors } from '@/lib/nearby';
 
 const TZ = 'America/Chicago';
 const when = (iso: string) =>
   new Date(iso).toLocaleString('en-US', { timeZone: TZ, month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
 
-export default async function Projects({ searchParams }: { searchParams: { error?: string; tab?: string } }) {
+export default async function Projects({ searchParams }: { searchParams: { error?: string; tab?: string; zip_error?: string } }) {
   const { sb, user } = await requireUser();
 
   const [{ data: projects }, { data: memberships }, { data: alerts }] = await Promise.all([
@@ -160,6 +162,18 @@ export default async function Projects({ searchParams }: { searchParams: { error
 
   const whyHidden = cookies().get('jf_why')?.value === 'hidden';
 
+  // Homeowners are asked for a ZIP once per sign-in (skipping lasts until the browser session ends).
+  // Skipped quietly until the 020 column exists.
+  let zipCard: React.ReactNode = null;
+  if (mk && !company) {
+    const { data: zp } = await supabaseAdmin().from('profiles').select('*').eq('id', user.id).maybeSingle();
+    if (zp && 'zip' in zp) {
+      const zip = (zp.zip as string | null) ?? null;
+      if (zip) zipCard = <ZipCard zip={zip} near={await nearbyContractors(zip)} />;
+      else if (cookies().get('jf_zip_skip')?.value !== '1') zipCard = <ZipCard zip={null} near={null} error={searchParams.zip_error} />;
+    }
+  }
+
   if (tab === 'posted') {
     return (
       <>
@@ -228,6 +242,7 @@ export default async function Projects({ searchParams }: { searchParams: { error
         <p className="muted">Signed in as {user.email}</p>
       </div>
       {needsCard}
+      {zipCard}
       {tabs}
       {list.length === 0 && why}
 

@@ -80,9 +80,21 @@ async function audienceIds(audience: string, target: string): Promise<string[]> 
 }
 
 async function send(ids: string[], title: string, body: string, projectId: string | null, force: boolean) {
+  // People who turned off "tips and local news" get the in-app alert only, unless this is a forced account or safety notice.
+  // Until the 020 column exists, nobody counts as opted out.
+  let off = new Set<string>();
+  if (!force) {
+    const { data: offs } = await supabaseAdmin().from('profiles').select('id,marketing_email').in('id', ids);
+    off = new Set(((offs ?? []) as any[]).filter((p) => p.marketing_email === false).map((p) => p.id as string));
+  }
+  const loud = ids.filter((id) => !off.has(id));
+  const quiet = ids.filter((id) => off.has(id));
   // Small batches keep us under email provider rate limits and the function time limit.
-  for (let i = 0; i < ids.length; i += 10) {
-    await notifyUsers({ userIds: ids.slice(i, i + 10), projectId, kind: 'admin', title, body, force });
+  for (let i = 0; i < loud.length; i += 10) {
+    await notifyUsers({ userIds: loud.slice(i, i + 10), projectId, kind: 'admin', title, body, force });
+  }
+  for (let i = 0; i < quiet.length; i += 10) {
+    await notifyUsers({ userIds: quiet.slice(i, i + 10), projectId, kind: 'admin', title, body, inAppOnly: true });
   }
 }
 
@@ -183,10 +195,10 @@ export async function adminCloseListing(formData: FormData) {
 }
 
 
-export type AreaPerson = { id: string; label: string; kind: 'contractor' | 'homeowner'; miles: number };
-export type AreaPreview = { ok: true; people: AreaPerson[]; capped: boolean } | { ok: false; error: string };
+export type AreaPerson = { id: string; label: string; kind: 'contractor' | 'homeowner'; miles: number; posted?: boolean; tipsOff?: boolean };
+export type AreaPreview = { ok: true; people: AreaPerson[]; capped: boolean; noZip: number } | { ok: false; error: string };
 
-/** Contractors by business ZIP, homeowners by the ZIP of a project they posted. Suspended accounts and the admin are left out. */
+/** Contractors by business ZIP, homeowners by their own ZIP or the ZIP of a project they posted. Suspended accounts and the admin are left out. */
 async function peopleInArea(zip: string, radius: number, who: string, meId: string): Promise<AreaPreview> {
   if (!/^\d{5}$/.test(zip)) return { ok: false, error: 'Enter a 5 digit ZIP code.' };
   if (!(radius >= 1 && radius <= 100)) return { ok: false, error: 'Radius must be 1 to 100 miles.' };
@@ -205,11 +217,22 @@ async function peopleInArea(zip: string, radius: number, who: string, meId: stri
       });
     }
   }
+  const posters = new Set<string>();
+  let noZip = 0;
   if (who !== 'contractors') {
     const { data: ls } = await db.from('marketplace_listings').select('homeowner_id,zip').limit(5000);
-    ((ls ?? []) as any[]).forEach((l) => found.push({ id: l.homeowner_id, zip: l.zip, label: '', kind: 'homeowner' }));
+    ((ls ?? []) as any[]).forEach((l) => { posters.add(l.homeowner_id as string); found.push({ id: l.homeowner_id, zip: l.zip, label: '', kind: 'homeowner' }); });
+    // Homeowners who gave a ZIP on their profile (020). Contractors are not counted as homeowners.
+    const { data: mems } = await db.from('company_members').select('user_id').limit(5000);
+    const staff = new Set(((mems ?? []) as any[]).map((m) => m.user_id as string));
+    const { data: all } = await db.from('profiles').select('*').limit(5000);
+    ((all ?? []) as any[]).forEach((p) => {
+      if (staff.has(p.id) || p.banned_at) return;
+      if (p.zip) found.push({ id: p.id, zip: p.zip, label: '', kind: 'homeowner' });
+      else if (!posters.has(p.id) && 'zip' in p && p.id !== meId) noZip += 1;
+    });
   }
-  if (!found.length) return { ok: true, people: [], capped: false };
+  if (!found.length) return { ok: true, people: [], capped: false, noZip };
 
   const coords = await zipCoords([zip, ...found.map((f) => f.zip)]);
   const center = coords.get(zip);
@@ -224,17 +247,17 @@ async function peopleInArea(zip: string, radius: number, who: string, meId: stri
     const prev = best.get(f.id);
     if (!prev || d < prev.miles) best.set(f.id, { id: f.id, label: f.label, kind: f.kind, miles: d, zip: f.zip });
   }
-  if (!best.size) return { ok: true, people: [], capped: false };
+  if (!best.size) return { ok: true, people: [], capped: false, noZip };
 
-  const { data: profs } = await db.from('profiles').select('id,email,banned_at').in('id', Array.from(best.keys()));
+  const { data: profs } = await db.from('profiles').select('*').in('id', Array.from(best.keys()));
   const people: AreaPerson[] = [];
   ((profs ?? []) as any[]).forEach((p) => {
     if (p.banned_at) return;
     const b = best.get(p.id)!;
-    people.push({ id: b.id, kind: b.kind, miles: b.miles, label: b.label ? `${b.label} (${p.email})` : p.email });
+    people.push({ id: b.id, kind: b.kind, miles: b.miles, label: b.label ? `${b.label} (${p.email})` : p.email, posted: posters.has(b.id), tipsOff: p.marketing_email === false });
   });
   people.sort((a, b) => a.miles - b.miles);
-  return { ok: true, people, capped: people.length > MAX_RECIPIENTS };
+  return { ok: true, people, capped: people.length > MAX_RECIPIENTS, noZip };
 }
 
 export async function previewArea(input: { zip: string; radius: number; who: string }): Promise<AreaPreview> {

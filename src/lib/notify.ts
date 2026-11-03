@@ -1,6 +1,7 @@
 import { supabaseAdmin } from './supabase/server';
 import { alertHref } from '@/lib/alertPath';
 
+import { unsubLink } from '@/lib/unsub';
 const APP_URL = () => (process.env.APP_URL || 'http://localhost:3000').replace(/\/$/, '');
 
 const esc = (s: string) =>
@@ -9,7 +10,7 @@ const esc = (s: string) =>
 type SendResult = { ok: boolean; skipped?: string; error?: string };
 
 /** Send one email through Resend. Skips quietly when no API key is set. */
-export async function sendEmail(opts: { to: string; subject: string; text: string; link?: string; cta?: string }): Promise<SendResult> {
+export async function sendEmail(opts: { to: string; subject: string; text: string; link?: string; cta?: string; unsubscribe?: string }): Promise<SendResult> {
   const key = process.env.RESEND_API_KEY;
   const from = process.env.EMAIL_FROM;
   if (!key || !from) return { ok: false, skipped: 'Email is not configured' };
@@ -21,13 +22,15 @@ export async function sendEmail(opts: { to: string; subject: string; text: strin
     (opts.link
       ? `<p style="margin-top:24px"><a href="${esc(opts.link)}" style="background:#1B56E0;color:#fff;text-decoration:none;padding:12px 22px;border-radius:999px;font-weight:700;display:inline-block">${esc(opts.cta ?? 'Open the project')}</a></p>`
       : '') +
-    `<p style="color:#55657C;font-size:12px;margin-top:32px">You can change how you get alerts in Settings.</p></div>`;
+    `<p style="color:#55657C;font-size:12px;margin-top:32px">You can change how you get alerts in Settings.` +
+    (opts.unsubscribe ? ` <a href="${esc(opts.unsubscribe)}" style="color:#55657C">Unsubscribe from tips and local news</a>.` : '') +
+    `</p></div>`;
 
   try {
     const r = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ from, to: [opts.to], subject: opts.subject, html, text: `${opts.text}\n\n${opts.link ?? ''}` }),
+      body: JSON.stringify({ from, to: [opts.to], subject: opts.subject, html, text: `${opts.text}\n\n${opts.link ?? ''}${opts.unsubscribe ? `\n\nUnsubscribe from tips and local news: ${opts.unsubscribe}` : ''}`, ...(opts.unsubscribe ? { headers: { 'List-Unsubscribe': `<${opts.unsubscribe}>` } } : {}) }),
     });
     if (!r.ok) return { ok: false, error: `Email failed (${r.status}): ${(await r.text()).slice(0, 200)}` };
     return { ok: true };
@@ -74,6 +77,8 @@ type Alert = {
   force?: boolean;
   /** Skip email and text if this person already got one for this project in the last few minutes. */
   throttle?: boolean;
+  /** Admin tips and local news: in-app only, no email or text. */
+  inAppOnly?: boolean;
 };
 
 /**
@@ -115,12 +120,12 @@ export async function notifyUsers(a: Alert) {
       const update: Record<string, string> = {};
       const errors: string[] = [];
 
-      if (!quiet && (p.notify_email || a.force) && p.email) {
-        const r = await sendEmail({ to: p.email, subject: a.title, text: a.body, link, cta: a.cta });
+      if (!quiet && !a.inAppOnly && (p.notify_email || a.force) && p.email) {
+        const r = await sendEmail({ to: p.email, subject: a.title, text: a.body, link, cta: a.cta, unsubscribe: a.kind === 'admin' ? unsubLink(APP_URL(), p.id as string) : undefined });
         if (r.ok) update.email_sent_at = new Date().toISOString();
         else if (r.error) errors.push(r.error);
       }
-      if (!quiet && p.notify_sms && p.phone && p.sms_consent_at) {
+      if (!quiet && !a.inAppOnly && p.notify_sms && p.phone && p.sms_consent_at) {
         // Texts carry no message content. The details stay behind the login.
         const r = await sendSms({ to: p.phone, text: `${a.title}\n${link}\nReply STOP to opt out.` });
         if (r.ok) update.sms_sent_at = new Date().toISOString();
