@@ -1,0 +1,90 @@
+<title>AI Limits and Upgrade</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: one phone column. Four tabs: limit reached, credit packs, Plus plan, usage in Settings. Prices are examples only. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#cd7d2e;--orl:#f9efe4;--orb:#ecd4a8;--gr:#1f7a55;--grl:#d9f1e6;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--gr:#6fd1a3;--grl:#173a2c;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--gr:#6fd1a3;--grl:#173a2c;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:14px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px}
+h1,h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;text-wrap:balance}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
+.mut{color:var(--mut);font-size:14px;line-height:1.5}
+.sw{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.sw button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:8px 2px;border-radius:99px;font:500 12.5px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:44px}.sw button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.card.hi{background:var(--orl);border-color:var(--orb)}
+.btn{display:flex;align-items:center;justify-content:center;border-radius:99px;min-height:50px;padding:0 18px;font:700 15.5px 'IBM Plex Sans',sans-serif;border:1px solid var(--or);background:var(--or);color:#fff;cursor:pointer;width:100%}
+.btn.ghost{background:var(--card);color:var(--ink);border-color:var(--line)}
+.pill{width:max-content;font-size:12px;font-weight:700;padding:4px 10px;border-radius:99px;background:var(--orl);color:var(--or);border:1px solid var(--orb)}
+.pill.g{background:var(--grl);color:var(--gr);border-color:transparent}
+.bar{height:8px;border-radius:99px;background:var(--line);overflow:hidden}.bar i{display:block;height:100%;background:var(--or);border-radius:99px}
+.pack{display:flex;justify-content:space-between;align-items:center;gap:10px;border:1.5px solid var(--line);border-radius:18px;padding:14px;background:var(--card)}
+.pack.best{border-color:var(--or);background:var(--orl)}
+.pack b{font:800 20px 'Bricolage Grotesque',sans-serif}
+.ck{display:flex;gap:10px;font-size:14.5px;line-height:1.45}.ck span:first-child{color:var(--gr);font-weight:700}
+.kv{display:flex;justify-content:space-between;gap:10px;font-size:14.5px;padding:8px 0;border-bottom:1px solid var(--line)}.kv:last-child{border-bottom:0}
+.sec[hidden]{display:none}
+.ex{font-size:12px;color:var(--mut)}
+</style>
+<div class="wrap">
+  <div class="note"><b>Mockup.</b> What paid AI extras could look like. Prices are examples, not decisions. Posting, bidding and running a project stay free. Only the optional AI extras past the free daily amount would cost anything.</div>
+  <div class="sw" id="sw"><button data-s="limit" class="on" type="button">Limit</button><button data-s="packs" type="button">Credits</button><button data-s="plus" type="button">Plus</button><button data-s="use" type="button">Usage</button></div>
+
+  <div id="limit" class="sec" style="display:flex;flex-direction:column;gap:14px">
+    <h1 style="font-size:26px">Design ideas</h1>
+    <div class="card hi">
+      <span class="pill">Free ideas used for today</span>
+      <h3 style="font-size:20px">You have used your 3 free ideas today</h3>
+      <div class="bar"><i style="width:100%"></i></div>
+      <span class="mut">Your free ideas come back tomorrow. Need more right now?</span>
+      <button class="btn" type="button">Get 20 more ideas for $5</button>
+      <button class="btn ghost" type="button">See all options</button>
+      <span class="ex">Cost reference and Check my post are not affected. Your project, bids and messages stay free.</span>
+    </div>
+  </div>
+
+  <div id="packs" class="sec" hidden style="flex-direction:column;gap:12px">
+    <h1 style="font-size:26px">AI credits</h1>
+    <span class="mut">Buy once, use any time. No subscription. A design idea uses 1 credit. A cost reference or post check uses a fraction of one.</span>
+    <div class="pack"><div><b>10 credits</b><div class="mut">$3 · 30 cents each</div></div><button class="btn" style="width:auto;min-height:44px" type="button">Buy</button></div>
+    <div class="pack best"><div><span class="pill g">Best value</span><b style="display:block;margin-top:6px">20 credits</b><div class="mut">$5 · 25 cents each</div></div><button class="btn" style="width:auto;min-height:44px" type="button">Buy</button></div>
+    <div class="pack"><div><b>60 credits</b><div class="mut">$12 · 20 cents each</div></div><button class="btn" style="width:auto;min-height:44px" type="button">Buy</button></div>
+    <span class="ex">Credits never expire. Paid securely by card. Receipts go to your email.</span>
+  </div>
+
+  <div id="plus" class="sec" hidden style="flex-direction:column;gap:12px">
+    <h1 style="font-size:26px">Jobfile Plus</h1>
+    <div class="card hi">
+      <span class="pill">Example: $9 a month</span>
+      <div class="ck"><span>✓</span><span>30 design ideas a month (instead of 3 a day)</span></div>
+      <div class="ck"><span>✓</span><span>Higher daily limit on cost references and post checks</span></div>
+      <div class="ck"><span>✓</span><span>Save and compare all your designs</span></div>
+      <div class="ck"><span>✓</span><span>Cancel any time, from Settings</span></div>
+      <button class="btn" type="button">Start Plus</button>
+    </div>
+    <div class="note" style="border-style:solid">Everything free today stays free: posting, bids, messages, agreements, photos, payments records, ratings. Contractors keep "Free to join. No fees at all." because joining, bidding and winning jobs never cost anything.</div>
+  </div>
+
+  <div id="use" class="sec" hidden style="flex-direction:column;gap:12px">
+    <h1 style="font-size:26px">Settings</h1>
+    <div class="card">
+      <h3 style="font-size:18px">AI use</h3>
+      <div class="kv"><span>Free ideas left today</span><b>1 of 3</b></div>
+      <div class="kv"><span>Credits</span><b>12</b></div>
+      <div class="kv"><span>Plan</span><b>Free</b></div>
+      <button class="btn ghost" type="button">Buy credits</button>
+      <button class="btn ghost" type="button">See Jobfile Plus</button>
+    </div>
+  </div>
+
+  <div class="note" style="border-style:solid"><b>Not decided:</b> whether to charge, how much, and which features. We would first log the real cost per user, then pick prices. Building it later needs Stripe, a balance table (SQL), and updated Terms and Privacy pages.</div>
+</div>
+<script>
+var sw=document.getElementById('sw');
+[].forEach.call(sw.children,function(b){b.onclick=function(){
+  [].forEach.call(sw.children,function(x){x.classList.toggle('on',x===b)});
+  ['limit','packs','plus','use'].forEach(function(id){var e=document.getElementById(id);e.hidden=id!==b.dataset.s;e.style.display=e.hidden?'none':'flex'});
+  window.scrollTo(0,0)}});
+</script>
