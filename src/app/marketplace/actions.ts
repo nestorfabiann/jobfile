@@ -73,6 +73,16 @@ const bad = (error: string): { ok: false; error: string } => ({ ok: false, error
 
 /** Creates the listing and tells the matching contractors. The browser then uploads any photos and videos and opens the page. */
 export async function createListing(formData: FormData): Promise<CreateResult> {
+  try {
+    return await createListingInner(formData);
+  } catch (e: any) {
+    if (e?.digest) throw e; // redirects and not-found pass through
+    console.error('createListing failed', e);
+    return bad(`Could not post the project (${String(e?.message ?? 'unknown error').slice(0, 140)}).`);
+  }
+}
+
+async function createListingInner(formData: FormData): Promise<CreateResult> {
   requireMarketplace();
   const { user } = await requireUser();
   const db = supabaseAdmin();
