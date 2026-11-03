@@ -1,0 +1,158 @@
+<title>Contractor Projects</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: one phone column. Tabs compare today's contractor page, the proposed one, and a contractor's first visit. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#cd7d2e;--orl:#f9efe4;--orb:#ecd4a8;--gr:#1f7a55;--grl:#d9f1e6;--am:#9a5b00;--aml:#fbeccd;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--gr:#6fd1a3;--grl:#173a2c;--am:#f0b95a;--aml:#3a2e12;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--gr:#6fd1a3;--grl:#173a2c;--am:#f0b95a;--aml:#3a2e12;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:14px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px}
+h1,h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;text-wrap:balance}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
+.mut{color:var(--mut);font-size:13.5px;line-height:1.45}
+.sw{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.sw button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:8px 2px;border-radius:99px;font:500 12.5px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:44px}.sw button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.btn{display:flex;align-items:center;justify-content:center;border-radius:99px;min-height:50px;padding:0 18px;font:700 15.5px 'IBM Plex Sans',sans-serif;border:1px solid var(--or);background:var(--or);color:#fff;cursor:pointer;width:100%;text-align:center}
+.btn.ghost{background:transparent;color:var(--or)}
+.btn.sm{min-height:40px;font-size:14px;width:auto;padding:0 16px}
+.acts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pill{display:inline-block;width:max-content;font-size:12px;font-weight:700;padding:4px 10px;border-radius:99px;background:var(--orl);color:var(--or);border:1px solid var(--orb)}
+.pill.g{background:var(--grl);color:var(--gr);border-color:transparent}
+.pill.a{background:var(--aml);color:var(--am);border-color:transparent}
+.badge{display:inline-grid;place-items:center;min-width:24px;height:24px;border-radius:99px;background:var(--or);color:#fff;font-size:12.5px;font-weight:700;padding:0 7px}
+.badge.o{background:var(--orl);color:var(--or);border:1px solid var(--orb)}
+.tabs{display:flex;gap:14px;border-bottom:1px solid var(--line);padding-bottom:10px;align-items:center}
+.tabs span{font-weight:600;font-size:15px;color:var(--mut);display:inline-flex;gap:8px;align-items:center}
+.tabs span.on{color:var(--or)}
+.row{display:flex;gap:12px;align-items:center}
+.thumb{width:64px;height:64px;border-radius:14px;flex:none;background:linear-gradient(135deg,#d9c9a8,#9b8b73)}
+.thumb.k{background:linear-gradient(135deg,#9fb4d9,#3e5aa8)}
+.thumb.w{background:linear-gradient(135deg,#c9d9a8,#6f8b4a)}
+.bar{height:8px;border-radius:99px;background:var(--line);overflow:hidden}.bar i{display:block;height:100%;background:var(--gr);border-radius:99px}
+.next{background:var(--aml);color:var(--am);border-radius:12px;padding:8px 10px;font-size:13.5px;font-weight:600;line-height:1.35}
+.next.q{background:var(--bg);color:var(--mut);border:1px solid var(--line)}
+.sh{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.sh h2{font-size:19px}
+.money{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.money div{border:1px solid var(--line);background:var(--card);border-radius:16px;padding:10px 12px;display:flex;flex-direction:column;gap:2px}
+.money b{font:800 21px 'Bricolage Grotesque',sans-serif;letter-spacing:-.02em}
+.money span{font-size:12px;color:var(--mut)}
+details.c{border:1px solid var(--line);border-radius:18px;background:var(--card);padding:12px 14px}
+details.c summary{font-weight:600;font-size:15px;cursor:pointer;min-height:26px;display:flex;justify-content:space-between;gap:8px}
+.link{background:none;border:0;color:var(--or);font:600 14px 'IBM Plex Sans',sans-serif;padding:8px 0;cursor:pointer;min-height:40px}
+.chips{display:flex;gap:7px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:99px;padding:8px 13px;font:500 13.5px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:38px}
+.chip.on{background:var(--orl);border-color:var(--or);color:var(--or)}
+.quiet{font-size:13.5px;color:var(--gr);font-weight:700}
+.sec[hidden]{display:none}
+</style>
+<div class="wrap">
+  <div class="note"><b>Mockup.</b> The Projects page for a contractor. Compare today's page with the proposed one, and see what a contractor with nothing yet gets. On the Proposed tab, the switch shows the page with and without something waiting.</div>
+  <div class="sw" id="sw">
+    <button data-s="now" type="button">Today</button>
+    <button data-s="new" class="on" type="button">Proposed</button>
+    <button data-s="first" type="button">First visit</button>
+  </div>
+
+  <div id="now" class="sec" hidden style="flex-direction:column;gap:14px">
+    <h1 style="font-size:30px">Projects</h1>
+    <span class="mut" style="font-size:15px">Signed in as nesty@example.com</span>
+    <div class="card" style="background:var(--grl);border-color:transparent;padding:18px"><b style="color:var(--gr);font-size:17px">You're all caught up</b><span class="mut">Nothing is waiting on you right now.</span></div>
+    <div class="tabs"><span class="on">Projects <i class="badge o">2</i></span><span>Bids <i class="badge">1</i></span></div>
+    <div class="sh"><h2 style="font-size:22px">Ongoing projects</h2><button class="btn ghost sm" type="button">+ Start a project</button></div>
+    <div class="card"><div class="row"><div class="thumb"></div><div style="flex:1;min-width:0"><b style="font-size:16px">Kitchen and walls painting</b><div class="mut">727 plano tx · Jerry still</div></div><span class="pill">Active</span></div></div>
+    <h2 style="font-size:22px">Completed projects</h2>
+    <div class="card"><div class="row"><div class="thumb k"></div><div style="flex:1;min-width:0"><b style="font-size:16px">Kitchen remodel</b><div class="mut">TX 75074</div></div><span class="pill g">Completed</span></div></div>
+  </div>
+
+  <div id="new" class="sec" style="display:flex;flex-direction:column;gap:14px">
+    <div>
+      <h1 style="font-size:30px">Hi Nesty</h1>
+      <span class="mut" style="font-size:15px">Nesty's Painting · here is your work at a glance.</span>
+    </div>
+    <div class="acts"><button class="btn" type="button">Find work</button><button class="btn ghost" type="button">Start a project</button></div>
+    <div class="chips" id="wsw"><button class="chip on" data-w="1" type="button">Something is waiting</button><button class="chip" data-w="0" type="button">Nothing waiting</button></div>
+
+    <div id="need" class="card" style="background:var(--orl);border-color:var(--orb)">
+      <div class="sh"><h2>Needs you</h2><span class="badge">2</span></div>
+      <div class="next">Confirm payment received: Milestone 1, $3,100</div>
+      <button class="btn sm" type="button" style="width:100%">Confirm payment</button>
+      <div class="next">Jerry S. viewed your bid on the roofing job</div>
+      <button class="btn ghost sm" type="button" style="width:100%">Open the bid</button>
+    </div>
+    <div id="quiet" class="quiet" hidden>✓ You're all caught up</div>
+
+    <div class="money" aria-label="Money">
+      <div><b>$12,400</b><span>Collected so far</span></div>
+      <div><b>$3,100</b><span>Waiting to be paid</span></div>
+    </div>
+    <button class="link" type="button" style="text-align:left;padding-top:0">Open My money ›</button>
+
+    <div class="sh"><h2>Your bids</h2><span class="mut">2 waiting</span></div>
+    <div class="card">
+      <div class="row"><div class="thumb w"></div><div style="flex:1;min-width:0"><b style="font-size:16px">Roofing: asphalt shingles</b><div class="mut">ZIP 75074 · your bid $18,400</div></div></div>
+      <div class="row" style="justify-content:space-between"><span class="pill g">Homeowner viewed it</span><span class="mut">2 days ago</span></div>
+    </div>
+    <div class="card">
+      <div class="row"><div class="thumb"></div><div style="flex:1;min-width:0"><b style="font-size:16px">Bathroom: walk-in shower</b><div class="mut">ZIP 75093 · your bid $9,800</div></div></div>
+      <div class="row" style="justify-content:space-between"><span class="pill">Waiting</span><span class="mut">Sent today</span></div>
+    </div>
+    <button class="link" type="button" style="text-align:left;padding-top:0">See all bids ›</button>
+
+    <div class="sh"><h2>Ongoing projects</h2><span class="mut">2</span></div>
+    <div class="card">
+      <div class="row"><div class="thumb"></div><div style="flex:1;min-width:0"><b style="font-size:16px">Kitchen and walls painting</b><div class="mut">Jerry S. · 727 plano tx</div></div></div>
+      <div class="bar" role="img" aria-label="55 percent"><i style="width:55%"></i></div>
+      <div class="row" style="justify-content:space-between"><span class="pill g">Work in progress</span><span class="mut">$3,100 of $7,400 paid</span></div>
+      <div class="next" id="nx">Next: confirm the payment Jerry recorded</div>
+    </div>
+    <div class="card">
+      <div class="row"><div class="thumb k"></div><div style="flex:1;min-width:0"><b style="font-size:16px">Bathroom refresh</b><div class="mut">Maria L. · 14 oak lane</div></div></div>
+      <div class="bar" role="img" aria-label="15 percent"><i style="width:15%"></i></div>
+      <div class="row" style="justify-content:space-between"><span class="pill a">Agreement</span><span class="mut">Not signed yet</span></div>
+      <div class="next q">Next: waiting for Maria to sign</div>
+    </div>
+
+    <details class="c">
+      <summary><span>Completed</span><span class="mut">1</span></summary>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:12px">
+        <div class="row"><div class="thumb k"></div><div style="flex:1;min-width:0"><b style="font-size:16px">Kitchen remodel</b><div class="mut">TX 75074 · finished Oct 14</div></div></div>
+        <div class="row" style="justify-content:space-between"><span class="pill g">Rated 5.0 by the homeowner</span></div>
+      </div>
+    </details>
+
+    <div class="card" style="gap:6px"><b>Know a contractor who needs work?</b><span class="mut">Jobfile is free to join. Send it to a friend in the trades.</span><button class="link" type="button" style="text-align:left">Invite a contractor</button></div>
+    <div class="note" style="border-style:solid">What changed: a friendly greeting, Find work and Start a project side by side, a short money line, your bids on the main page instead of behind a tab, and each project showing progress and a Next step written for a contractor (send the agreement, request a payment, confirm one received, answer a change order). The email line and big "all caught up" box are gone, and Completed folds away.</div>
+  </div>
+
+  <div id="first" class="sec" hidden style="flex-direction:column;gap:14px">
+    <div>
+      <h1 style="font-size:30px">Welcome, Nesty's Painting</h1>
+      <span class="mut" style="font-size:15px">Find jobs near you, bid on them, and run the work without the paperwork. It is free.</span>
+    </div>
+    <div class="acts"><button class="btn" type="button">Find work</button><button class="btn ghost" type="button">Start a project</button></div>
+    <div class="card"><b>Get started</b>
+      <div class="row"><span class="badge o">1</span><span>Finish your business profile so homeowners trust your bids</span></div>
+      <div class="row"><span class="badge o">2</span><span>Look through jobs near you and send a bid</span></div>
+      <div class="row"><span class="badge o">3</span><span>Got a customer already? Start a project and invite them</span></div>
+    </div>
+    <button class="link" type="button" style="text-align:left">Finish my business profile ›</button>
+    <div class="note" style="border-style:solid">With no bids or projects yet, the page points to the three steps that bring in work. The money line appears after the first payment.</div>
+  </div>
+</div>
+<script>
+var sw=document.getElementById('sw');
+[].forEach.call(sw.children,function(b){b.onclick=function(){
+  [].forEach.call(sw.children,function(x){x.classList.toggle('on',x===b)});
+  ['now','new','first'].forEach(function(id){var e=document.getElementById(id);e.hidden=id!==b.dataset.s;e.style.display=e.hidden?'none':'flex'});
+  window.scrollTo(0,0)}});
+var w=document.getElementById('wsw');
+[].forEach.call(w.children,function(b){b.onclick=function(){
+  [].forEach.call(w.children,function(x){x.classList.toggle('on',x===b)});
+  var on=b.dataset.w==='1';
+  document.getElementById('need').hidden=!on;document.getElementById('quiet').hidden=on;
+  document.getElementById('nx').textContent=on?'Next: confirm the payment Jerry recorded':'Next: request the next payment when the walls are done';
+}});
+</script>
