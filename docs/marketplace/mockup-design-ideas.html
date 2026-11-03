@@ -12,7 +12,7 @@ body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans
 h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;text-wrap:balance}
 .note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
 .mut{color:var(--mut);font-size:13.5px;line-height:1.45}
-.sw{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.sw button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:8px 2px;border-radius:99px;font:500 12.5px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:44px}.sw button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.sw{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}.fr{border:1px solid var(--line);border-radius:20px;padding:12px;background:var(--bg);display:flex;flex-direction:column;gap:10px}.fr .hd{font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);font-weight:600}.entry{background:var(--orl);border:1px solid var(--orb);border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:8px}.entry b{font:800 16px 'Bricolage Grotesque',sans-serif;letter-spacing:-.02em}.mini{display:flex;align-items:center;gap:12px;padding:11px 4px;border-bottom:1px solid var(--line);font-size:15px;min-height:44px}.mini:last-child{border-bottom:0}.mini.new{font-weight:600}.mini .ic{width:28px;height:28px;border-radius:9px;background:var(--orl);color:var(--or);display:grid;place-items:center;font-size:14px;font-weight:700;flex:none}.tg{margin-left:auto;font-size:11px;font-weight:700;padding:3px 8px;border-radius:99px;background:var(--grl);color:var(--gr)}.sbtn{border:1px solid var(--line);background:var(--card);border-radius:99px;padding:9px 14px;font:500 14px 'IBM Plex Sans',sans-serif;display:inline-flex;gap:8px}.sw button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:8px 2px;border-radius:99px;font:500 12.5px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:44px}.sw button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 .card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px}
 .q{display:flex;flex-direction:column;gap:7px}
 .lb{font-size:14px;font-weight:600}
@@ -44,6 +44,7 @@ textarea{width:100%;border:1px solid var(--line);background:var(--bg);color:var(
     <button data-s="st" type="button">2 Style</button>
     <button data-s="re" type="button">3 Ideas</button>
     <button data-s="us" type="button">4 Use it</button>
+    <button data-s="wh" type="button">Where</button>
   </div>
 
   <!-- 1 -->
@@ -114,6 +115,39 @@ textarea{width:100%;border:1px solid var(--line);background:var(--bg);color:var(
       <span class="mut">A small picture with the label "Homeowner's idea, not a plan". It sits next to your real photos so bidders know what you are picturing. It never appears as a price or a promise.</span>
     </div>
   </div>
+
+  <!-- WHERE -->
+  <div id="wh" class="sec" hidden style="flex-direction:column;gap:14px">
+    <h2 style="font-size:24px">Where homeowners see it</h2>
+    <span class="mut">Four entry points. Contractors never see any of them.</span>
+
+    <div class="fr"><div class="hd">1 · Post tab (main spot)</div>
+      <div class="entry"><b>Not sure what you want yet?</b><span class="mut" style="color:var(--ink)">See your new space first, then post it with one tap.</span><button class="btn" type="button" style="min-height:44px" data-go="up">Try design ideas</button></div>
+      <h3 style="font-size:18px">What kind of job?</h3>
+      <div class="chips"><span class="sbtn">Kitchen remodel</span><span class="sbtn">Bathroom</span><span class="sbtn">Painting</span><span class="sbtn">Roofing</span></div>
+      <span class="mut">The card sits above the job types. When they tap Use this idea, they return here with the scope filled in.</span>
+    </div>
+
+    <div class="fr"><div class="hd">2 · Projects tab</div>
+      <div class="entry"><b>Picture your new kitchen</b><span class="mut" style="color:var(--ink)">Upload a photo and try a few looks. Free.</span><button class="btn ghost" type="button" style="min-height:44px" data-go="up">Try design ideas</button></div>
+      <span class="mut">Shows for homeowners who have not posted yet, next to the ZIP card. After they post, it changes to "Try new ideas for this room" on that project.</span>
+    </div>
+
+    <div class="fr"><div class="hd">3 · Menu</div>
+      <div class="card" style="gap:0;padding:6px 14px">
+        <div class="mini"><span class="ic">S</span>Settings</div>
+        <div class="mini new"><span class="ic">D</span>Design ideas<span class="tg">New</span></div>
+        <div class="mini"><span class="ic">I</span>Invite friends</div>
+        <div class="mini"><span class="ic">?</span>Help and contact</div>
+      </div>
+      <span class="mut">For people who come back later or want to try another room.</span>
+    </div>
+
+    <div class="fr"><div class="hd">4 · Signed-out landing, homeowner tab</div>
+      <div class="entry"><b>See your new kitchen before you hire</b><span class="mut" style="color:var(--ink)">Upload a photo, pick a look, and see ideas. Free for homeowners.</span><button class="btn" type="button" style="min-height:44px">Sign in to try it</button></div>
+      <span class="mut">A teaser only. Each design costs money, so visitors sign in first. It also gives people a reason to create an account.</span>
+    </div>
+  </div>
 </div>
 <script>
 var C={cab:{White:'#f4f1ea','Sage green':'#8fa88b',Navy:'#2b3f5c','Natural oak':'#b98a55'},ctr:{'White quartz':'#ece9e4','Black granite':'#2a2a2c','Butcher block':'#c79a62'},flr:{'Light wood':'#d9b98a','Gray tile':'#9a9a9a','Dark wood':'#6b4a30'},wal:{'Warm white':'#f1eadf','Soft gray':'#cfd1d2','Pale blue':'#c7d8e3'}};
@@ -145,9 +179,10 @@ document.getElementById('style').addEventListener('click',function(e){var b=e.ta
  [].forEach.call(this.children,function(x){x.classList.toggle('on',x===b)});S=JSON.parse(JSON.stringify(P[b.dataset.v]));['cab','ctr','flr','wal'].forEach(chips);draw()});
 document.getElementById('space').addEventListener('click',function(e){var b=e.target.closest('.chip');if(!b)return;[].forEach.call(this.children,function(x){x.classList.toggle('on',x===b)})});
 var sw=document.getElementById('sw');
-function show(s){[].forEach.call(sw.children,function(x){x.classList.toggle('on',x.dataset.s===s)});['up','st','re','us'].forEach(function(id){var e=document.getElementById(id);e.hidden=id!==s;e.style.display=e.hidden?'none':'flex'});window.scrollTo(0,0)}
+function show(s){[].forEach.call(sw.children,function(x){x.classList.toggle('on',x.dataset.s===s)});['up','st','re','us','wh'].forEach(function(id){var e=document.getElementById(id);e.hidden=id!==s;e.style.display=e.hidden?'none':'flex'});window.scrollTo(0,0)}
 [].forEach.call(sw.children,function(b){b.onclick=function(){show(b.dataset.s)}});
 document.getElementById('go1').onclick=function(){show('st')};
+[].forEach.call(document.querySelectorAll('[data-go]'),function(b){b.onclick=function(){show(b.dataset.go)}});
 document.getElementById('go2').onclick=function(){show('re')};
 draw();
 </script>
