@@ -1,0 +1,147 @@
+<title>Next Features Preview</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: one phone column. Six tabs: profile meter, verified badge on bids, schedule, project record PDF, Spanish, design ideas. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#cd7d2e;--orl:#f9efe4;--orb:#ecd4a8;--gr:#1f7a55;--grl:#d9f1e6;--am:#9a5b00;--aml:#fbeccd;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--gr:#6fd1a3;--grl:#173a2c;--am:#f0b95a;--aml:#3a2e12;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--gr:#6fd1a3;--grl:#173a2c;--am:#f0b95a;--aml:#3a2e12;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:14px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px}
+h1,h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;text-wrap:balance}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
+.mut{color:var(--mut);font-size:14px;line-height:1.5}.sm{font-size:12.5px}
+.sw{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.sw button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:8px 2px;border-radius:99px;font:500 12.5px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:44px}.sw button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.sec{display:flex;flex-direction:column;gap:14px}.sec[hidden]{display:none}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.card.hi{background:var(--orl);border-color:var(--orb)}
+.btn{display:flex;align-items:center;justify-content:center;border-radius:99px;min-height:48px;padding:0 18px;font:700 15px 'IBM Plex Sans',sans-serif;border:1px solid var(--or);background:var(--or);color:#fff;cursor:pointer;width:100%}
+.btn.ghost{background:var(--card);color:var(--ink);border-color:var(--line)}
+.btn.s{min-height:40px;font-size:14px;width:auto;padding:0 14px}
+.pill{width:max-content;font-size:12px;font-weight:700;padding:4px 10px;border-radius:99px;background:var(--orl);color:var(--or);border:1px solid var(--orb)}
+.pill.g{background:var(--grl);color:var(--gr);border-color:transparent}.pill.a{background:var(--aml);color:var(--am);border-color:transparent}
+.bar{height:10px;border-radius:99px;background:var(--line);overflow:hidden}.bar i{display:block;height:100%;background:var(--or);border-radius:99px}
+.row{display:flex;gap:10px;align-items:center}
+.chk{display:flex;gap:10px;align-items:center;font-size:14.5px;padding:9px 0;border-bottom:1px solid var(--line)}.chk:last-child{border-bottom:0}
+.dot{width:22px;height:22px;border-radius:50%;flex:none;display:grid;place-items:center;font-size:13px;font-weight:700;border:1.5px solid var(--line);color:var(--mut)}.dot.ok{background:var(--gr);border-color:var(--gr);color:#fff}
+.chk b{flex:1;font-weight:600}.chk a{color:var(--or);font-weight:600;font-size:13.5px;text-decoration:none;white-space:nowrap}
+.logo{width:44px;height:44px;border-radius:12px;background:var(--or);color:#fff;display:grid;place-items:center;font-weight:700;flex:none}
+.tl{display:flex;flex-direction:column;gap:0}
+.tli{display:flex;gap:12px;padding-bottom:16px;position:relative}.tli:last-child{padding-bottom:0}
+.tli:before{content:'';position:absolute;left:10px;top:24px;bottom:0;width:2px;background:var(--line)}.tli:last-child:before{display:none}
+.tli .dot{margin-top:2px}.tli b{display:block;font-size:15px}.tli span{font-size:13.5px;color:var(--mut)}
+.msg{max-width:84%;padding:10px 12px;border-radius:16px;font-size:14.5px;line-height:1.45}
+.msg.in{background:var(--card);border:1px solid var(--line);align-self:flex-start}.msg.out{background:var(--orl);border:1px solid var(--orb);align-self:flex-end}
+.es{font-size:12.5px;color:var(--mut);margin-top:5px;padding-top:5px;border-top:1px dashed var(--line)}
+.ph{height:120px;border-radius:14px;background:linear-gradient(135deg,#d9c9a8,#9b8b73);display:grid;place-items:center;color:#fff;font-weight:600;font-size:13px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+</style>
+<div class="wrap">
+  <div class="note"><b>Mockup.</b> Five ideas on one page. Tap a tab. Nothing here is built, and each one would still be approved and built separately.</div>
+  <div class="sw" id="sw">
+    <button data-s="meter" class="on" type="button">Profile meter</button><button data-s="badge" type="button">Verified badge</button><button data-s="sched" type="button">Schedule</button>
+    <button data-s="rec" type="button">Project record</button><button data-s="es" type="button">Español</button><button data-s="des" type="button">Design ideas</button>
+  </div>
+
+  <!-- 1 -->
+  <div id="meter" class="sec">
+    <div class="card hi">
+      <div class="row" style="justify-content:space-between"><h3 style="font-size:19px">Your profile is 70% done</h3><span class="pill">Contractor</span></div>
+      <div class="bar"><i style="width:70%"></i></div>
+      <span class="mut">Complete profiles get picked more often. Homeowners compare profiles before they choose.</span>
+    </div>
+    <div class="card" style="padding-block:6px">
+      <div class="chk"><span class="dot ok">✓</span><b>Business name and trades</b></div>
+      <div class="chk"><span class="dot ok">✓</span><b>Service area and ZIP</b></div>
+      <div class="chk"><span class="dot ok">✓</span><b>Company logo</b></div>
+      <div class="chk"><span class="dot ok">✓</span><b>3 or more work photos</b></div>
+      <div class="chk"><span class="dot"> </span><b>Insurance certificate</b><a href="#">Add</a></div>
+      <div class="chk"><span class="dot"> </span><b>Short "About us" text</b><a href="#">Write</a></div>
+      <div class="chk"><span class="dot"> </span><b>Years in business</b><a href="#">Add</a></div>
+    </div>
+    <div class="note" style="border-style:solid">Shows on the contractor Projects page until it reaches 100%, then it disappears. Each missing item is one tap to fix.</div>
+  </div>
+
+  <!-- 2 -->
+  <div id="badge" class="sec" hidden>
+    <span class="mut">A bid card as the homeowner sees it, with trust signals in one row.</span>
+    <div class="card">
+      <div class="row"><span class="logo">N</span><div style="flex:1"><b style="font-size:16px">Nesty's Painting</b><div class="mut sm">5.0 stars (12) · 8 miles · 14 Jobfile jobs</div></div></div>
+      <div class="row" style="flex-wrap:wrap;gap:6px"><span class="pill g">✓ Verified by Jobfile</span><span class="pill g">Insured</span><span class="pill">Replies in about 2 hours</span></div>
+      <div class="row" style="justify-content:space-between"><div><div class="mut sm">Bid</div><b style="font:800 26px 'Bricolage Grotesque'">$5,508</b></div><span class="pill a">Starts in 2 weeks</span></div>
+      <div class="mut sm"><b style="color:var(--ink)">Includes:</b> labor, paint, primer, cleanup. <b style="color:var(--ink)">Not included:</b> drywall repair.</div>
+      <div class="row"><button class="btn ghost s" style="flex:1" type="button">View profile</button><button class="btn s" style="flex:1" type="button">Message</button></div>
+    </div>
+    <div class="note" style="border-style:solid"><b>New:</b> Verified badge (set by Jobfile staff), reply speed, number of completed Jobfile jobs, and a plain "Includes / Not included" line so bids can be compared fairly. Later: a "Texas licensed" check for electrical, plumbing and HVAC.</div>
+  </div>
+
+  <!-- 3 -->
+  <div id="sched" class="sec" hidden>
+    <h2 style="font-size:24px">Schedule</h2>
+    <span class="mut">Kitchen and walls painting · both sides see the same dates.</span>
+    <div class="card hi"><span class="pill">Next up</span><b style="font-size:17px">Tue, Nov 11: Work starts</b><span class="mut">Nesty's Painting arrives about 8:00 AM. Reminder goes out the day before.</span>
+      <div class="row"><button class="btn s" type="button">Confirm</button><button class="btn ghost s" type="button">Ask to move</button></div></div>
+    <div class="card">
+      <div class="tl">
+        <div class="tli"><span class="dot ok">✓</span><div><b>Agreement signed</b><span>Nov 3</span></div></div>
+        <div class="tli"><span class="dot ok">✓</span><div><b>Deposit recorded</b><span>Nov 4 · $1,001.60</span></div></div>
+        <div class="tli"><span class="dot"> </span><div><b>Work starts</b><span>Nov 11</span></div></div>
+        <div class="tli"><span class="dot"> </span><div><b>Midpoint payment</b><span>About Nov 14, materials on site</span></div></div>
+        <div class="tli"><span class="dot"> </span><div><b>Estimated finish</b><span>Nov 21</span></div></div>
+      </div>
+    </div>
+    <div class="note" style="border-style:solid"><b>Reminders:</b> a day before start, on payment dates, and when a date moves ("Nesty's Painting asked to move the start to Nov 12. Approve?"). Alerts come by in-app, email and text. Add to phone calendar with one tap.</div>
+  </div>
+
+  <!-- 4 -->
+  <div id="rec" class="sec" hidden>
+    <h2 style="font-size:24px">Project record</h2>
+    <span class="mut">Everything about the job in one file you can keep, print or send.</span>
+    <div class="card hi">
+      <b style="font-size:17px">Kitchen and walls painting</b>
+      <div class="mut sm">Jerry still · Nesty's Painting · Nov 3 to Nov 21</div>
+      <button class="btn" type="button">Download project record (PDF)</button>
+    </div>
+    <div class="card" style="padding-block:6px">
+      <div class="chk"><span class="dot ok">✓</span><b>Signed agreement and scope</b></div>
+      <div class="chk"><span class="dot ok">✓</span><b>Change orders (1)</b></div>
+      <div class="chk"><span class="dot ok">✓</span><b>Payments recorded ($1,001.60 of $5,508)</b></div>
+      <div class="chk"><span class="dot ok">✓</span><b>Photos (24) with dates</b></div>
+      <div class="chk"><span class="dot ok">✓</span><b>Messages (38)</b></div>
+      <div class="chk"><span class="dot ok">✓</span><b>Schedule and key dates</b></div>
+    </div>
+    <div class="note" style="border-style:solid">One PDF with a cover page, the dated timeline, and every section above. Useful for a dispute, an insurance claim, a home sale or tax records. Today only the agreement can be exported.</div>
+  </div>
+
+  <!-- 5 -->
+  <div id="es" class="sec" hidden>
+    <div class="card">
+      <h3 style="font-size:18px">Language</h3>
+      <span class="mut">Settings. I read and write in:</span>
+      <div class="row"><button class="btn s" style="flex:1" type="button">Español</button><button class="btn ghost s" style="flex:1" type="button">English</button></div>
+      <span class="mut sm">Messages from the other person are translated for you. They see what you wrote, in their language.</span>
+    </div>
+    <div class="card" style="gap:8px">
+      <h3 style="font-size:16px">Messages</h3>
+      <div class="msg in">Buenos días, llegamos mañana a las 8 para empezar la pintura.<div class="es">Good morning, we arrive tomorrow at 8 to start the painting. · <b>Translated by AI</b></div></div>
+      <div class="msg out">Perfecto, gracias. ¿Necesita que mueva los muebles?</div>
+    </div>
+    <div class="note" style="border-style:solid"><b>Step 1 (already built, turned off):</b> messages translate between English and Spanish. Needs a switch and the AI key. <b>Step 2 (bigger):</b> the app's buttons and menus in Spanish too, starting with the landing page, the post form and the Projects pages.</div>
+  </div>
+
+  <!-- 6 -->
+  <div id="des" class="sec" hidden>
+    <span class="mut">Already mocked up in detail earlier. The short version:</span>
+    <div class="card hi"><b style="font-size:17px">See your kitchen with new cabinets</b><span class="mut">Upload a photo, choose a style and finishes, and get AI ideas for the space.</span><button class="btn" type="button">Try design ideas</button></div>
+    <div class="grid2"><div class="ph">Your photo</div><div class="ph" style="background:linear-gradient(135deg,#a9b8a1,#6f8068)">AI idea: Modern</div></div>
+    <div class="row" style="flex-wrap:wrap;gap:6px"><span class="pill">Modern</span><span class="pill">Farmhouse</span><span class="pill">Traditional</span><span class="pill">Coastal</span></div>
+    <span class="mut sm">Labeled "AI idea, not a plan, not a price." "Use this idea" fills in the project post. 3 free ideas a day. Needs an image service account first.</span>
+  </div>
+</div>
+<script>
+var sw=document.getElementById('sw'),ids=['meter','badge','sched','rec','es','des'];
+[].forEach.call(sw.children,function(b){b.onclick=function(){
+  [].forEach.call(sw.children,function(x){x.classList.toggle('on',x===b)});
+  ids.forEach(function(id){document.getElementById(id).hidden=id!==b.dataset.s});window.scrollTo(0,0)}});
+</script>
