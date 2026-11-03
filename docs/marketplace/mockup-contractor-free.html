@@ -1,0 +1,55 @@
+<title>Contractor Free</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: before and after of the contractor side of the landing page, with the free message. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#cd7d2e;--orl:#f9efe4;--orb:#ecd4a8;--gr:#1f7a55;--grl:#d9f1e6;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--gr:#6fd1a3;--grl:#173a2c;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--gr:#6fd1a3;--grl:#173a2c;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:14px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px}
+h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
+.mut{color:var(--mut);font-size:14px;line-height:1.45}
+.sw{display:grid;grid-template-columns:1fr 1fr;gap:6px}.sw button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:10px 2px;border-radius:99px;font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:44px}.sw button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.row{display:flex;gap:12px;align-items:flex-start}
+.ic{width:38px;height:38px;border-radius:12px;background:var(--orl);color:var(--or);display:grid;place-items:center;flex:none;font-size:18px}
+.btn{display:flex;align-items:center;justify-content:center;border-radius:99px;min-height:52px;padding:0 18px;font:700 16px 'IBM Plex Sans',sans-serif;border:1px solid var(--or);background:var(--or);color:#fff;cursor:pointer;width:100%}
+.free{display:inline-block;width:max-content;font-size:12.5px;font-weight:700;padding:5px 12px;border-radius:99px;background:var(--grl);color:var(--gr)}
+.freebox{background:var(--grl);border-color:transparent}
+.freebox h3{color:var(--gr)}
+.sec[hidden]{display:none}
+</style>
+<div class="wrap">
+  <div class="note"><b>Mockup.</b> The contractor side of the landing page. Flip between what it looks like now and the version that leads with "free." Wording: <b>free to join, no subscription, no fees at all</b>.</div>
+  <div class="sw" id="sw"><button data-s="a" type="button">Now</button><button class="on" data-s="b" type="button">With free message</button></div>
+
+  <div id="a" class="sec" hidden style="flex-direction:column;gap:14px">
+    <h2 style="font-size:26px">Win the job, then run it without the paperwork</h2>
+    <div class="card"><h3 style="font-size:18px">How it works for contractors</h3><span class="mut">1 Set up your business profile · 2 Bid on jobs near you · 3 Get the job in writing · 4 Request payment as you go</span></div>
+    <div class="card"><h3 style="font-size:18px">Why contractors use Jobfile</h3><span class="mut">A profile that wins bids · Jobs near you · AI price reference · Payments by milestone · Change orders you can bill · Ratings you earn</span></div>
+    <div class="card"><h3 style="font-size:18px">Your customers' privacy</h3><span class="mut">Homeowner addresses, names and phone numbers stay private until a bid is accepted. Free to start.</span></div>
+    <button class="btn" type="button">Create your contractor profile →</button>
+  </div>
+
+  <div id="b" class="sec" style="display:flex;flex-direction:column;gap:14px">
+    <h2 style="font-size:26px">Win the job, then run it without the paperwork</h2>
+    <span class="free">Free for contractors</span>
+    <div class="card freebox">
+      <h3 style="font-size:20px">Free to join. No subscription. No fees at all.</h3>
+      <span class="mut" style="color:var(--ink)">No monthly or yearly charge, no fee to bid, and nothing taken from the jobs you win.</span>
+    </div>
+    <div class="card"><h3 style="font-size:18px">How it works for contractors</h3><span class="mut">1 Set up your business profile · 2 Bid on jobs near you · 3 Get the job in writing · 4 Request payment as you go</span></div>
+    <div class="card"><h3 style="font-size:18px">Why contractors use Jobfile</h3><span class="mut">A profile that wins bids · Jobs near you · AI price reference · Payments by milestone · Change orders you can bill · Ratings you earn</span></div>
+    <div class="card"><h3 style="font-size:18px">Your customers' privacy</h3><span class="mut">Homeowner addresses, names and phone numbers stay private until a bid is accepted.</span></div>
+    <button class="btn" type="button">Create your free contractor profile →</button>
+    <div class="note" style="border-style:solid">Changes: a green "Free for contractors" tag and a "Free to join" box at the top, the button now says "free," and "Free to start" at the bottom is removed so the message is stated once, clearly. The homeowner side keeps its own "Free for homeowners" tag. The money tracker, bids, and everything else on the contractor side stay as they are.</div>
+  </div>
+</div>
+<script>
+var sw=document.getElementById('sw');
+[].forEach.call(sw.children,function(b){b.onclick=function(){[].forEach.call(sw.children,function(x){x.classList.toggle('on',x===b)});
+ ['a','b'].forEach(function(id){var e=document.getElementById(id);e.hidden=id!==b.dataset.s;e.style.display=e.hidden?'none':'flex'});window.scrollTo(0,0)}});
+</script>
