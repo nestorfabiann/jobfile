@@ -12,7 +12,7 @@ import { firstNameInitial, listingOpen, listingTitle, marketplaceEnabled, type B
 import ProjectsTabs from '@/components/ProjectsTabs';
 import NeedsYou from '@/components/NeedsYou';
 import { projectTasks, type NeedItem } from '@/lib/needs';
-import { unseenViews } from '@/lib/bidViews';
+import { unseenViews, viewStatus } from '@/lib/bidViews';
 import WhyJobfile from '@/components/WhyJobfile';
 import StartProjectForm from '@/components/StartProjectForm';
 import { alertHref } from '@/lib/alertPath';
@@ -20,7 +20,9 @@ import { cookies } from 'next/headers';
 import ZipCard from '@/components/ZipCard';
 import { nearbyContractors } from '@/lib/nearby';
 import HomeownerProjects from '@/components/HomeownerProjects';
-import { homeownerSummaries } from '@/lib/homeSummary';
+import { homeownerSummaries, contractorSummaries } from '@/lib/homeSummary';
+import ContractorProjects from '@/components/ContractorProjects';
+import { moneyFor } from '@/lib/expenses';
 
 const TZ = 'America/Chicago';
 const when = (iso: string) =>
@@ -156,7 +158,7 @@ export default async function Projects({ searchParams }: { searchParams: { error
   if (jobAlerts.length > 0) needs.push({ key: 'jobs', icon: 'job', title: `${jobAlerts.length} new job${jobAlerts.length === 1 ? '' : 's'} near you`, sub: 'Matched to your trades and area', href: '/n/jobs', go: 'View', at: (jobAlerts[0] as any).created_at });
   needs.sort((x, y) => new Date(x.at).getTime() - new Date(y.at).getTime());
   const hasAnything = list.length > 0 || posted.length > 0 || !!company;
-  const needsCard = <NeedsYou items={needs.slice(0, 8)} caughtUp={hasAnything} compact={mk && !company} />;
+  const needsCard = <NeedsYou items={needs.slice(0, 8)} caughtUp={hasAnything} compact={mk} />;
 
   const tab = mk && !company && searchParams.tab === 'posted' ? 'posted' : 'projects';
   const tabs = mk ? <ProjectsTabs active={tab === 'posted' ? 'extra' : 'projects'} role={company ? 'contractor' : 'homeowner'} projects={list.length} extra={extra} /> : null;
@@ -228,45 +230,88 @@ export default async function Projects({ searchParams }: { searchParams: { error
     );
   }
 
+  const invitesBlock = (
+    <>
+      {got.length > 0 && (
+        <section className="stack" aria-label="Invitations for you">
+          {got.map((i) => (
+            <Link key={i.id} href={`/invites/${i.id}`} className="card" style={{ borderLeft: '6px solid var(--accent)' }}>
+              <b>{i.homeowner_name || 'A homeowner'} invited you to {i.project_name}</b>
+              <span className="muted small">Tap to review and accept or decline.</span>
+            </Link>
+          ))}
+        </section>
+      )}
+      {sent.length > 0 && (
+        <section className="stack" aria-label="Invitations you sent">
+          {sent.map((i) => (
+            <Link key={i.id} href={`/invites/${i.id}`} className="card">
+              <div className="row" style={{ justifyContent: 'space-between' }}><b>{i.project_name}</b><span className="pill warn">Waiting for contractor</span></div>
+              <span className="muted small">Invited {i.contractor_name || i.contractor_email}</span>
+            </Link>
+          ))}
+        </section>
+      )}
+    </>
+  );
+  const alertsBlock = (alerts ?? []).length > 0 ? (
+    <section className="card" aria-label="Recent alerts">
+      <h2>Recent alerts</h2>
+      <ul className="stack" style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+        {(alerts ?? []).map((a) => (
+          <li key={a.id}>
+            <Link href={alertHref(a.project_id, a.kind)}>{a.title}</Link>
+            <span className="muted small" style={{ display: 'block' }}>{when(a.created_at)}</span>
+          </li>
+        ))}
+      </ul>
+    </section>
+  ) : null;
+
+  // Contractors: ongoing work first, then bids and money.
+  if (mk && company) {
+    const db2 = supabaseAdmin();
+    const summaries = await contractorSummaries(list as any);
+    const money = await moneyFor(db2, (list as any[]).map((x) => x.id as string));
+    let collected = 0;
+    let toCollect = 0;
+    (list as any[]).forEach((x) => {
+      const m = money.get(x.id);
+      if (!m) return;
+      collected += m.received;
+      if (!x.completed_at) toCollect += m.toCollect;
+    });
+    const { data: bidRows } = await db2.from('marketplace_bids').select('*').eq('company_id', company.company_id).eq('status', 'waiting').order('created_at', { ascending: false }).limit(5);
+    const brs = (bidRows ?? []) as any[];
+    const lids = Array.from(new Set(brs.map((b) => b.listing_id as string)));
+    const { data: lrows } = lids.length ? await db2.from('marketplace_listings').select('*').in('id', lids) : { data: [] as any[] };
+    const lmap = new Map<string, Listing>(((lrows ?? []) as Listing[]).map((l) => [l.id, l] as [string, Listing]));
+    const bids = brs.filter((b) => lmap.has(b.listing_id)).map((b) => ({ id: b.id as string, price_cents: b.price_cents as number, created_at: b.created_at as string, listing: lmap.get(b.listing_id) as Listing, view: viewStatus(b) }));
+    const { data: me } = await sb.from('profiles').select('full_name').eq('id', user.id).maybeSingle();
+    const firstName = String((me as any)?.full_name ?? '').trim().split(/\s+/)[0] ?? '';
+    return (
+      <ContractorProjects
+        firstName={firstName}
+        companyId={company.company_id}
+        companyName={company.companies?.name ?? ''}
+        needsCard={needsCard}
+        invites={invitesBlock}
+        alerts={alertsBlock}
+        error={searchParams.error}
+        projects={list as any}
+        covers={covers}
+        summaries={summaries}
+        bids={bids}
+        waitingCount={extra}
+        collected={collected}
+        toCollect={toCollect}
+        hasInvites={got.length + sent.length > 0}
+      />
+    );
+  }
+
   // Homeowners get a page ordered by their journey. Contractors keep the page below.
   if (mk && !company) {
-    const invitesBlock = (
-      <>
-        {got.length > 0 && (
-          <section className="stack" aria-label="Invitations for you">
-            {got.map((i) => (
-              <Link key={i.id} href={`/invites/${i.id}`} className="card" style={{ borderLeft: '6px solid var(--accent)' }}>
-                <b>{i.homeowner_name || 'A homeowner'} invited you to {i.project_name}</b>
-                <span className="muted small">Tap to review and accept or decline.</span>
-              </Link>
-            ))}
-          </section>
-        )}
-        {sent.length > 0 && (
-          <section className="stack" aria-label="Invitations you sent">
-            {sent.map((i) => (
-              <Link key={i.id} href={`/invites/${i.id}`} className="card">
-                <div className="row" style={{ justifyContent: 'space-between' }}><b>{i.project_name}</b><span className="pill warn">Waiting for contractor</span></div>
-                <span className="muted small">Invited {i.contractor_name || i.contractor_email}</span>
-              </Link>
-            ))}
-          </section>
-        )}
-      </>
-    );
-    const alertsBlock = (alerts ?? []).length > 0 ? (
-      <section className="card" aria-label="Recent alerts">
-        <h2>Recent alerts</h2>
-        <ul className="stack" style={{ listStyle: 'none', margin: 0, padding: 0 }}>
-          {(alerts ?? []).map((a) => (
-            <li key={a.id}>
-              <Link href={alertHref(a.project_id, a.kind)}>{a.title}</Link>
-              <span className="muted small" style={{ display: 'block' }}>{when(a.created_at)}</span>
-            </li>
-          ))}
-        </ul>
-      </section>
-    ) : null;
     const summaries = await homeownerSummaries(list as any);
     const doneIds = (list as any[]).filter((x) => x.completed_at).map((x) => x.id as string);
     const rated = new Set<string>();

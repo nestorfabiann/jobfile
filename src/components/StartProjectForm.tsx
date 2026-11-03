@@ -1,7 +1,7 @@
 import { createProject } from '@/app/projects/actions';
 
 /** Contractor "Start a project" button that opens the new-project form in place (no client JS needed). */
-export default function StartProjectForm({ companyId, companyName, open, heading }: { companyId: string; companyName?: string | null; open?: boolean; heading?: string }) {
+export default function StartProjectForm({ companyId, companyName, open, heading, ghost }: { companyId: string; companyName?: string | null; open?: boolean; heading?: string; ghost?: boolean }) {
   return (
     <details className={heading ? 'startp startp-head' : 'startp'} open={open}>
       {heading ? (
@@ -10,7 +10,7 @@ export default function StartProjectForm({ companyId, companyName, open, heading
           <span className="pill-add">+ Start a project</span>
         </summary>
       ) : (
-        <summary className="btn">Start a project</summary>
+        <summary className={ghost ? 'btn ghost' : 'btn'}>Start a project</summary>
       )}
       <form action={createProject} className="stack" style={{ marginTop: 12 }}>
         {companyName ? <p className="muted small">{companyName}</p> : null}
