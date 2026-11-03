@@ -1,0 +1,101 @@
+<title>Final Lien Release</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Layout: four phone states for the final lien release: contractor prepares it after completion, the blocked case when the final payment is not confirmed, the homeowner's received copy, and the contractor's Needs you row. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#cd7d2e;--orl:#f9efe4;--orb:#ecd4a8;--gr:#1f7a55;--grl:#d9f1e6;--bad:#b3261e;--badl:#fbe4e2;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--grl:#173a2c;--gr:#6fd1a3;--bad:#f2b8b5;--badl:#3d1f1d;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--grl:#173a2c;--gr:#6fd1a3;--bad:#f2b8b5;--badl:#3d1f1d;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:14px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px}
+h1,h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;text-wrap:balance}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
+.mut{color:var(--mut);font-size:14px;line-height:1.5}.sm{font-size:12.5px}
+.sw{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.sw button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:10px 2px;border-radius:99px;font:500 12.5px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:44px}.sw button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.hi{background:var(--orl);border:1px solid var(--orb)}
+.btn{display:flex;align-items:center;justify-content:center;border-radius:99px;min-height:50px;padding:0 18px;font:600 15.5px 'IBM Plex Sans',sans-serif;border:1px solid var(--or);background:var(--or);color:#fff;cursor:pointer;width:100%}
+.btn.gh{background:transparent;color:var(--ink);border-color:var(--line)}.btn:disabled{opacity:.45;cursor:not-allowed}
+.check{display:flex;gap:10px;align-items:flex-start;font-size:14px}.check i{flex:none;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-size:13px;background:var(--grl);color:var(--gr)}.check i.no{background:var(--line);color:var(--mut)}
+.doc{background:#fff;color:#1b1a18;border:1px solid var(--line);border-radius:6px;padding:14px;font:12.5px/1.55 'IBM Plex Mono',ui-monospace,monospace;display:flex;flex-direction:column;gap:8px}
+.doc h3{font:700 13px 'IBM Plex Mono',monospace;letter-spacing:0;text-transform:uppercase}
+.doc dl{display:grid;grid-template-columns:auto 1fr;gap:3px 12px;margin:0}.doc dt{color:#6b655e}.doc dd{margin:0;font-weight:500;overflow-wrap:anywhere}
+.ph{border:1px dashed #cd7d2e;background:#f9efe4;color:#8a4f10;border-radius:4px;padding:6px 8px}
+.sign{border-top:1px solid #1b1a18;padding-top:6px;font-family:'Bricolage Grotesque',serif;font-size:20px}
+.fld{display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:600}.fld input{font:500 16px 'IBM Plex Sans',sans-serif;min-height:46px;border:1.5px solid var(--line);border-radius:10px;padding:0 12px;background:var(--bg);color:var(--ink)}
+.ok{background:var(--grl);color:var(--gr);border-radius:14px;padding:12px;font-size:14px;line-height:1.45}
+.warn{background:var(--badl);color:var(--bad);border-radius:14px;padding:12px;font-size:14px;line-height:1.45}
+.task{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:6px}
+.age{display:inline-block;width:max-content;font-size:11.5px;font-weight:600;padding:2px 8px;border-radius:99px;background:var(--orl);color:var(--or)}
+.pill{display:inline-block;border-radius:99px;padding:3px 10px;font-size:12px;font-weight:600;background:var(--grl);color:var(--gr);width:max-content}
+.sec[hidden]{display:none}
+button:focus-visible,input:focus-visible{outline:2px solid var(--or);outline-offset:2px}
+</style>
+
+<div class="wrap">
+  <div class="note"><b>Mockup, example data.</b> The final lien release for a Texas job, in four states. <b>Legal text:</b> the release must follow the wording in the Texas statute. In the live app that wording would be loaded by your attorney, the same way the Texas disclosure text works today. The boxed placeholder in the document below stands for it.</div>
+  <div class="sw" id="sw"><button class="on" data-s="a" type="button">1 · Prepare</button><button data-s="b" type="button">2 · Not paid</button><button data-s="c" type="button">3 · Homeowner</button><button data-s="d" type="button">4 · Needs you</button></div>
+
+  <!-- 1 contractor prepares -->
+  <div id="a" class="sec" style="display:flex;flex-direction:column;gap:14px">
+    <div class="ok"><b>Project marked complete.</b> One more step: send Jerry the final lien release.</div>
+    <div class="card hi">
+      <h2 style="font-size:20px">Final lien release</h2>
+      <span class="mut sm">Unconditional waiver and release on final payment. It says you have been paid in full and give up lien rights on this job. Check each line, then sign.</span>
+      <div class="check"><i>✓</i><span>Final payment confirmed received ($1,001.60)</span></div>
+      <div class="check"><i>✓</i><span>All payments on the schedule confirmed</span></div>
+    </div>
+    <div class="doc" id="doc">
+      <h3>Unconditional waiver and release on final payment</h3>
+      <dl><dt>Project</dt><dd>Kitchen and walls painting</dd><dt>Property</dt><dd>727 Plano TX</dd><dt>Owner</dt><dd>Jerry Still</dd><dt>Contractor</dt><dd>Nesty's Painting</dd><dt>Amount paid</dt><dd>$1,001.60 final · $4,500.00 contract total</dd><dt>Date</dt><dd>Nov 2, 2026</dd></dl>
+      <div class="ph">[Statutory release wording, Texas Property Code s. 53.284, loaded by attorney. Not shown until loaded.]</div>
+      <div class="sign" id="sig">&nbsp;</div>
+    </div>
+    <label class="fld" for="nm">Type your full name to sign<input id="nm" placeholder="Nestor Rodriguez" autocomplete="off"></label>
+    <label class="check" for="ag" style="cursor:pointer"><input id="ag" type="checkbox" style="width:22px;height:22px;accent-color:var(--or);margin:0"><span>I am authorized to sign for Nesty's Painting, and I have been paid the amount shown.</span></label>
+    <button class="btn" id="send" type="button" disabled>Sign and send to Jerry</button>
+    <div class="ok" id="sent" hidden>Sent. Jerry can now see and download the release in the project. It is saved with a time stamp.</div>
+    <div class="note" style="border-style:solid">Your release covers your own claim only. Subcontractors and suppliers you hired give their own releases to you.</div>
+  </div>
+
+  <!-- 2 not paid -->
+  <div id="b" class="sec" hidden style="flex-direction:column;gap:14px">
+    <div class="card hi">
+      <h2 style="font-size:20px">Final lien release</h2>
+      <div class="check"><i class="no">•</i><span>Final payment is not confirmed received yet</span></div>
+      <div class="warn">An unconditional release says you were paid. Do not sign it until the money is in. Texas also forbids requiring someone to sign one before payment.</div>
+      <button class="btn" type="button">Prepare a conditional release instead</button>
+      <span class="mut sm">A conditional release only takes effect once you are paid the amount shown. Use it when the homeowner wants paperwork before the final check clears.</span>
+      <button class="btn gh" type="button">Go to Payments</button>
+    </div>
+  </div>
+
+  <!-- 3 homeowner -->
+  <div id="c" class="sec" hidden style="flex-direction:column;gap:14px">
+    <div class="ok"><b>Project complete.</b> Nesty's Painting sent you the final lien release.</div>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><h2 style="font-size:20px">Final lien release</h2><span class="pill">Signed</span></div>
+      <span class="mut sm">Signed by Nestor Rodriguez for Nesty's Painting on Nov 2, 2026 at 3:12 PM.</span>
+      <div class="doc"><h3>Unconditional waiver and release on final payment</h3><dl><dt>Owner</dt><dd>Jerry Still</dd><dt>Contractor</dt><dd>Nesty's Painting</dd><dt>Amount paid</dt><dd>$1,001.60 final</dd></dl><div class="ph">[Statutory release wording]</div><div class="sign">Nestor Rodriguez</div></div>
+      <button class="btn" type="button">Download PDF</button>
+      <span class="mut sm">Keep this for your records. It lives on the Payments tab for as long as the project does.</span>
+    </div>
+    <div class="note" style="border-style:solid">Jobfile stores and delivers the release. It does not give legal advice, and it does not check that the contractor's subcontractors and suppliers were paid.</div>
+  </div>
+
+  <!-- 4 needs you -->
+  <div id="d" class="sec" hidden style="flex-direction:column;gap:14px">
+    <h2 style="font-size:22px">Needs you <span style="color:var(--or)">1</span></h2>
+    <div class="task"><b>Send the final lien release</b><span class="mut sm">Kitchen and walls painting · Project is complete</span><span class="age">Waiting 1 day</span><button class="btn" type="button" style="min-height:42px;align-self:flex-end;width:auto">Prepare</button></div>
+    <div class="note" style="border-style:solid">The row stays until the release is signed and sent. If the contractor has not sent it after 3 days, the homeowner sees a "Ask for the lien release" button on the Payments tab, like the "work is finished" request.</div>
+  </div>
+</div>
+<script>
+function $(i){return document.getElementById(i)}
+function ready(){$('send').disabled=!($('nm').value.trim().length>2&&$('ag').checked);$('sig').textContent=$('nm').value.trim()||' '}
+$('nm').oninput=ready;$('ag').onchange=ready;
+$('send').onclick=function(){this.disabled=true;$('sent').hidden=false};
+[].forEach.call($('sw').children,function(b){b.onclick=function(){[].forEach.call($('sw').children,function(x){x.classList.toggle('on',x===b)});
+ ['a','b','c','d'].forEach(function(id){var e=$(id);e.hidden=id!==b.dataset.s;e.style.display=e.hidden?'none':'flex'});window.scrollTo(0,0)}});
+</script>
