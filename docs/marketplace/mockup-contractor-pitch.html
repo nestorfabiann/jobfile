@@ -1,0 +1,131 @@
+<title>Contractor Pitch Landing</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: signed-out landing on a phone. Hero with two equal buttons, then a For homeowners / For contractors switch that swaps the how-it-works steps and the benefits. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#cd7d2e;--orl:#f9efe4;--orb:#ecd4a8;--gr:#1f7a55;--grl:#d9f1e6;--warn:#8a5a00;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--grl:#173a2c;--gr:#6fd1a3;--warn:#e8c27a;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--grl:#173a2c;--gr:#6fd1a3;--warn:#e8c27a;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:14px 90px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px}
+h1,h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;text-wrap:balance}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
+.mut{color:var(--mut);font-size:14px;line-height:1.5}.sm{font-size:12.5px}
+.top{display:flex;justify-content:space-between;align-items:center}
+.logo{font:800 22px 'Bricolage Grotesque',sans-serif;letter-spacing:-.03em}.logo b{color:var(--or)}
+.pill{border:1px solid var(--line);background:var(--card);border-radius:99px;padding:8px 14px;font-size:13.5px;font-weight:600;min-height:40px;display:inline-flex;align-items:center}
+.lbl{font-size:11.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--or)}
+.btn{display:flex;align-items:center;justify-content:center;border-radius:99px;min-height:52px;padding:0 18px;font:600 16px 'IBM Plex Sans',sans-serif;border:1px solid var(--or);background:var(--or);color:#fff;cursor:pointer;width:100%;text-align:center}
+.btn.two{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:var(--line);border-radius:99px;padding:4px}
+.seg button{border:0;background:transparent;color:var(--mut);border-radius:99px;min-height:46px;font:600 14.5px 'IBM Plex Sans',sans-serif;cursor:pointer}
+.seg button.on{background:var(--card);color:var(--ink);box-shadow:0 1px 4px #0002}
+.step{display:grid;grid-template-columns:34px 1fr;gap:10px;align-items:start}.step i{font:800 15px 'Bricolage Grotesque',sans-serif;font-style:normal;width:34px;height:34px;border-radius:50%;background:var(--orl);color:var(--or);display:grid;place-items:center}
+.step b{display:block;font-size:15px}
+.ben{display:grid;grid-template-columns:36px 1fr;gap:10px;align-items:start}
+.ic{width:36px;height:36px;border-radius:12px;background:var(--orl);color:var(--or);display:grid;place-items:center}.ic svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.ben b{display:block;font-size:15px}
+.bid{border:1px solid var(--line);border-radius:18px;padding:12px;display:flex;flex-direction:column;gap:6px;background:var(--bg)}
+.badge{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;border-radius:99px;padding:3px 9px;background:var(--grl);color:var(--gr);width:max-content}
+.price{font:800 24px 'Bricolage Grotesque',sans-serif}
+.tag{display:inline-block;font-size:11.5px;font-weight:600;border-radius:99px;padding:2px 9px;background:var(--orl);color:var(--or);border:1px solid var(--orb)}
+.open{display:flex;justify-content:space-between;gap:10px;align-items:center;border:1px solid var(--line);border-radius:16px;padding:10px 12px;background:var(--bg)}
+.open b{font-size:14px}
+.tbd{font-size:12px;color:var(--warn);background:var(--orl);border:1px solid var(--orb);border-radius:8px;padding:2px 7px;font-weight:600;white-space:nowrap}
+.sec[hidden]{display:none}
+.tabs{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);padding:8px max(16px,env(safe-area-inset-right,0px)) calc(8px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));display:flex;justify-content:center}
+.tabs div{width:100%;max-width:430px;display:grid;grid-template-columns:repeat(3,1fr);text-align:center;font-size:12px;color:var(--mut);font-weight:600}.tabs b{color:var(--or)}
+button:focus-visible{outline:2px solid var(--or);outline-offset:2px}
+</style>
+
+<div class="wrap">
+  <div class="note"><b>Mockup, example data.</b> Changes to the signed-out home page: two equal buttons, then a switch between "For homeowners" and "For contractors". Tap the switch. Items marked <span class="tbd">You decide</span> need a decision from you before they go live.</div>
+
+  <div class="top"><span class="logo">Job<b>file</b></span><span class="pill">Sign in</span></div>
+
+  <div style="display:flex;flex-direction:column;gap:8px">
+    <span class="lbl">Home improvement marketplace</span>
+    <h1 style="font-size:36px;line-height:1.05">Post it. Bid on it. Run the job in one place.</h1>
+    <p class="mut" style="font-size:16px;margin:0">Homeowners post projects and compare bids from local contractors. Contractors find nearby work and keep the paperwork, photos and payments in one shared record.</p>
+  </div>
+
+  <div style="display:grid;gap:10px">
+    <button class="btn" type="button">Post a project →</button>
+    <button class="btn two" type="button">Find work near you →</button>
+  </div>
+
+  <div class="seg" id="seg" role="tablist" aria-label="Who is this for">
+    <button class="on" role="tab" data-s="c" type="button">For contractors</button>
+    <button role="tab" data-s="h" type="button">For homeowners</button>
+  </div>
+
+  <div id="c" class="sec" style="display:flex;flex-direction:column;gap:14px">
+    <h2 style="font-size:24px">Win the job, then run it without the paperwork</h2>
+
+    <div class="card">
+      <h3 style="font-size:18px">How it works for contractors</h3>
+      <div class="step"><i>1</i><div><b>Set up your business profile</b><span class="mut sm">Add your trades, service area, logo, work photos and insurance.</span></div></div>
+      <div class="step"><i>2</i><div><b>Bid on jobs near you</b><span class="mut sm">Browse open projects by trade and ZIP. Get an alert when a new one matches.</span></div></div>
+      <div class="step"><i>3</i><div><b>Get the job in writing</b><span class="mut sm">When a homeowner accepts, price and scope are set up for both of you to approve.</span></div></div>
+      <div class="step"><i>4</i><div><b>Request payment as you go</b><span class="mut sm">Ask for each milestone. Both sides see what is paid and what is next.</span></div></div>
+    </div>
+
+    <div class="card">
+      <h3 style="font-size:18px">Why contractors use Jobfile</h3>
+      <div class="ben"><span class="ic"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/><path d="M9 12l2 2 4-4"/></svg></span><div><b>A profile that wins bids</b><span class="mut sm">Your insurance badge, work photos and real ratings show on every bid you send.</span></div></div>
+      <div class="ben"><span class="ic"><svg viewBox="0 0 24 24"><path d="M12 21s7-6 7-11a7 7 0 0 0-14 0c0 5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg></span><div><b>Jobs near you</b><span class="mut sm">Pick your trades and area. New matching projects come to you.</span></div></div>
+      <div class="ben"><span class="ic"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/></svg></span><div><b>Payments by milestone</b><span class="mut sm">Request each payment when the work is done. Jobfile records them. It does not hold or move your money.</span></div></div>
+      <div class="ben"><span class="ic"><svg viewBox="0 0 24 24"><path d="M7 3h8l4 4v14H7z"/><path d="M15 3v4h4"/><path d="M10 13h6M10 17h6"/></svg></span><div><b>Change orders you can bill</b><span class="mut sm">Extra work is approved with the price attached before you start it.</span></div></div>
+      <div class="ben"><span class="ic"><svg viewBox="0 0 24 24"><path d="M12 3l2.6 5.6 6 .7-4.4 4.1 1.2 6-5.4-3-5.4 3 1.2-6L3.4 9.3l6-.7z"/></svg></span><div><b>Ratings you earn</b><span class="mut sm">Finish a job and the homeowner rates you. Good work builds a public record.</span></div></div>
+    </div>
+
+    <div class="card">
+      <h3 style="font-size:18px">What a homeowner sees when you bid</h3>
+      <div class="bid">
+        <div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><b>Your Company Name</b><span class="mut sm">★ 4.9 (12)</span></div>
+        <span class="badge">✓ Insured to Mar 2027</span>
+        <div class="price">$18,400</div>
+        <div class="mut sm">2 weeks · Starts Nov 12</div>
+      </div>
+      <span class="mut sm">Example bid card. Insurance and ratings come from your profile.</span>
+    </div>
+
+    <div class="card">
+      <h3 style="font-size:18px">Open near you <span class="mut sm" style="font-weight:400">· browse without an account</span></h3>
+      <div class="open"><div><b>Kitchen remodel · Plano</b><div class="mut sm">Remodeling · 3 bids</div></div><span class="tag">Open</span></div>
+      <div class="open"><div><b>Fence repair · Frisco</b><div class="mut sm">Fencing · 1 bid</div></div><span class="tag">Open</span></div>
+      <button class="btn two" type="button">See all open jobs →</button>
+    </div>
+
+    <div class="card" style="gap:8px">
+      <h3 style="font-size:18px">The small print, in plain words</h3>
+      <div class="ben" style="grid-template-columns:1fr"><div><b>What does it cost?</b> <span class="tbd">You decide</span><span class="mut sm" style="display:block">Today the page says "Free to start." Decide the exact words for contractors before this goes live, for example "Free to bid and to run your jobs."</span></div></div>
+      <div class="ben" style="grid-template-columns:1fr"><div><b>Your customers' privacy</b><span class="mut sm" style="display:block">Homeowner addresses, names and phone numbers stay private until a bid is accepted.</span></div></div>
+    </div>
+
+    <button class="btn" type="button">Create your contractor profile →</button>
+    <div class="mut sm" style="text-align:center">Already have a customer? <b style="color:var(--ink)">Bring them here</b>. They do not need the marketplace.</div>
+  </div>
+
+  <div id="h" class="sec" hidden style="flex-direction:column;gap:14px">
+    <h2 style="font-size:24px">One shared record that protects you both</h2>
+    <div class="card">
+      <h3 style="font-size:18px">How it works for homeowners</h3>
+      <div class="step"><i>1</i><div><b>Post your project</b><span class="mut sm">Tap the work you want done, add photos, set a budget range.</span></div></div>
+      <div class="step"><i>2</i><div><b>Compare bids</b><span class="mut sm">See price, time, ratings and insurance side by side.</span></div></div>
+      <div class="step"><i>3</i><div><b>Agree in writing</b><span class="mut sm">Accept a bid and approve the price and scope together.</span></div></div>
+      <div class="step"><i>4</i><div><b>Track the work</b><span class="mut sm">Photos, payments, changes and messages stay with the job.</span></div></div>
+    </div>
+    <div class="note">The homeowner benefits list (agreement in writing, dated photos, payments tracked, changes in writing) is the next mockup. This mockup is only the contractor side plus the shared top.</div>
+  </div>
+</div>
+
+<div class="tabs"><div><span>🏠 <b>Home</b></span><span>🔨 Open jobs</span><span>🔑 Sign in</span></div></div>
+<script>
+var seg=document.getElementById('seg');
+[].forEach.call(seg.children,function(b){b.onclick=function(){
+  [].forEach.call(seg.children,function(x){x.classList.toggle('on',x===b)});
+  ['c','h'].forEach(function(id){var e=document.getElementById(id);e.hidden=id!==b.dataset.s;e.style.display=e.hidden?'none':'flex'});}});
+</script>
