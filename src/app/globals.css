@@ -224,3 +224,15 @@ body.pub .composer { box-shadow: 0 -10px 24px -14px rgba(27, 26, 24, 0.3); }
 .skel{background:linear-gradient(90deg,var(--line),var(--surface-2,#f9efe4),var(--line));background-size:200% 100%;animation:skel 1.3s linear infinite}
 @keyframes skel{to{background-position:-200% 0}}
 @media (prefers-reduced-motion:reduce){.skel{animation:none}}
+
+/* Signed-in bottom tab bar */
+.apptabs { position: fixed; left: 0; right: 0; bottom: 0; z-index: 6; background: var(--surface); border-top: 1px solid var(--line); padding: 6px max(8px, env(safe-area-inset-right, 0px)) calc(6px + env(safe-area-inset-bottom, 0px)) max(8px, env(safe-area-inset-left, 0px)); display: flex; justify-content: center; }
+.apptabs-in { width: 100%; max-width: 560px; display: grid; gap: 2px; }
+.apptab { position: relative; border: 0; background: transparent; color: var(--ink-2); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-height: 58px; border-radius: 14px; font: 600 11.5px 'IBM Plex Sans', system-ui, sans-serif; text-decoration: none; cursor: pointer; }
+.apptab.on { color: var(--accent); }
+.apptab.on::before { content: ''; position: absolute; top: 0; width: 28px; height: 3px; border-radius: 0 0 3px 3px; background: var(--accent); }
+.apptabs-dot { position: absolute; top: 5px; left: calc(50% + 6px); min-width: 18px; height: 18px; border-radius: 99px; background: var(--bad); color: #fff; font-size: 11px; font-weight: 700; display: grid; place-items: center; padding: 0 5px; }
+.apptabs-shade { position: fixed; inset: 0; z-index: 7; background: rgba(0, 0, 0, 0.4); }
+.apptabs-sheet { position: fixed; left: 0; right: 0; bottom: 0; z-index: 8; background: var(--surface); border-radius: 24px 24px 0 0; padding: 14px max(16px, env(safe-area-inset-right, 0px)) calc(84px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); display: flex; flex-direction: column; max-width: 560px; margin: 0 auto; }
+.apptabs-sheet a, .apptabs-sheet button { display: flex; align-items: center; min-height: 50px; border: 0; border-bottom: 1px solid var(--line); background: transparent; font: 500 16px inherit; font-family: inherit; color: var(--ink); text-decoration: none; width: 100%; text-align: left; cursor: pointer; }
+.apptabs-sheet form { margin: 0; } .apptabs-sheet form button { color: var(--bad); border-bottom: 0; }
