@@ -141,6 +141,7 @@ export default async function ListingPage({ params, searchParams }: { params: { 
             {rows.some((r) => r.unsure) ? <p className="muted small" style={{ margin: 0 }}>Items marked &quot;Not sure&quot; are flagged so you can raise them in your bid note or ask before bidding.</p> : null}
           </>
         ) : null}
+        {rows.length === 0 ? <p className="muted small" style={{ margin: 0 }}>{owner ? 'No detail answers were saved with this project.' : 'The homeowner did not answer the detail questions. You can ask before bidding, or raise anything unclear in your bid note.'}</p> : null}
         {l.details ? <p style={{ whiteSpace: 'pre-wrap' }}><b>Notes:</b> {l.details}</p> : null}
         {budget ? <p><b>Homeowner budget:</b> {budget}</p> : null}
         {owner && l.address ? <p className="muted small">Your address ({l.address}) is shared only with the contractor you hire.</p> : null}
