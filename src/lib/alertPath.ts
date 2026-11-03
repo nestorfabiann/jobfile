@@ -10,6 +10,7 @@ const TAB: Record<string, string> = {
 };
 
 export function alertHref(projectId: string | null | undefined, kind: string | null | undefined): string {
+  if (kind === 'help') return '/help';
   if (!projectId) return '/projects';
   return `/projects/${projectId}${TAB[kind ?? ''] ?? ''}`;
 }

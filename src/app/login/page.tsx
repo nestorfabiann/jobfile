@@ -58,6 +58,7 @@ export default function Login({ searchParams }: { searchParams: { sent?: string;
           </button>
         </div>
         <p className="muted small">Homeowners: use the email address your contractor invited.</p>
+        <p className="muted small"><a href="/help">Need help?</a></p>
       </form>
     </>
   );

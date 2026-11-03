@@ -25,6 +25,7 @@ export default function AppMenu({ marketplace, admin, signOutAction }: { marketp
     ['/projects', 'Projects'],
     ...(marketplace ? ([['/marketplace', 'Marketplace']] as [string, string][]) : []),
     ['/settings', 'Settings'],
+    ['/help', 'Help and contact'],
     ...(admin ? ([['/admin', 'Admin']] as [string, string][]) : []),
   ];
   const current = (href: string) => (href === '/' ? path === '/' : path === href || path.startsWith(`${href}/`));

@@ -37,6 +37,7 @@ export default function AppTabs({ contractor, marketplace, waiting, admin, signO
   const links: [string, string][] = [
     ...(marketplace ? ([['/marketplace', 'Marketplace']] as [string, string][]) : []),
     ['/settings', 'Settings'],
+    ['/help', 'Help and contact'],
     ...(contractor ? ([['/settings/business', 'Business profile']] as [string, string][]) : []),
     ...(admin ? ([['/admin', 'Admin']] as [string, string][]) : []),
   ];

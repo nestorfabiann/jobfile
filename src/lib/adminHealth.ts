@@ -13,18 +13,21 @@ export async function attentionItems(db: Db): Promise<Attention[]> {
   const now = Date.now();
   const out: Attention[] = [];
 
-  const [ins, rev, failed, ags, lst] = await Promise.all([
+  const [ins, rev, failed, ags, lst, hlp] = await Promise.all([
     db.from('company_insurance').select('id,kind,uploaded_at,companies(name)').eq('status', 'pending').order('uploaded_at').limit(20),
     db.from('reviews').select('id,report_reason,reported_at').not('reported_at', 'is', null).is('hidden_at', null).order('reported_at').limit(20),
     db.from('notifications').select('id,created_at').not('error', 'is', null).gt('created_at', new Date(now - 7 * D).toISOString()).order('created_at').limit(200),
     db.from('agreements').select('project_id,sent_at,projects(name)').not('sent_at', 'is', null).is('executed_at', null).lt('sent_at', new Date(now - 7 * D).toISOString()).order('sent_at').limit(20),
     db.from('marketplace_listings').select('*').eq('status', 'open').gt('expires_at', new Date(now).toISOString()).lt('created_at', new Date(now - 48 * H).toISOString()).order('created_at').limit(100),
+    db.from('help_messages').select('id,topic,body,created_at').is('done_at', null).order('created_at').limit(20),
   ]);
 
   (ins.data ?? []).forEach((i: any) => out.push({ key: `ins-${i.id}`, title: 'Review insurance certificate', sub: `${i.companies?.name ?? 'A company'}`, href: '/admin/verification', go: 'Review', at: i.uploaded_at }));
   (rev.data ?? []).forEach((r: any) => out.push({ key: `rev-${r.id}`, title: 'Reported review', sub: r.report_reason ? `"${String(r.report_reason).slice(0, 60)}"` : 'No reason given', href: '/admin/reviews', go: 'Open', at: r.reported_at }));
   if ((failed.data ?? []).length) out.push({ key: 'failed', title: `${failed.data!.length} alert${failed.data!.length === 1 ? '' : 's'} failed to send`, sub: 'Last 7 days', href: '/admin/activity', go: 'Check', at: (failed.data as any[])[0].created_at });
   (ags.data ?? []).forEach((a: any) => out.push({ key: `ag-${a.project_id}`, title: 'Agreement unsigned for 7 days', sub: a.projects?.name ?? 'Project', href: `/admin/projects/${a.project_id}`, go: 'Open', at: a.sent_at }));
+
+  (hlp.data ?? []).forEach((h: any) => out.push({ key: `help-${h.id}`, title: h.topic === 'report' ? 'Report from a user' : 'Help message', sub: `"${String(h.body).slice(0, 60)}"`, href: '/admin/help', go: 'Reply', at: h.created_at }));
 
   const open = (lst.data ?? []) as Listing[];
   if (open.length) {
