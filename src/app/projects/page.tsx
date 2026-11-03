@@ -8,10 +8,11 @@ import { deleteDraft } from '@/app/marketplace/actions';
 import { cleanDraft } from '@/lib/drafts';
 import { isExpired, type Invite } from '@/lib/invites';
 import { dollars } from '@/lib/money';
-import { listingOpen, listingTitle, marketplaceEnabled, type Bid, type Listing } from '@/lib/marketplace';
+import { firstNameInitial, listingOpen, listingTitle, marketplaceEnabled, type Bid, type Listing } from '@/lib/marketplace';
 import ProjectsTabs from '@/components/ProjectsTabs';
 import NeedsYou from '@/components/NeedsYou';
 import { projectTasks, type NeedItem } from '@/lib/needs';
+import { unseenViews } from '@/lib/bidViews';
 import WhyJobfile from '@/components/WhyJobfile';
 import StartProjectForm from '@/components/StartProjectForm';
 import { alertHref } from '@/lib/alertPath';
@@ -116,6 +117,12 @@ export default async function Projects({ searchParams }: { searchParams: { error
     const st = stats.get(l.id);
     if (listingOpen(l) && st && st.fresh > 0) needs.push({ key: `b${l.id}`, icon: 'bid', title: `${st.fresh} new bid${st.fresh === 1 ? '' : 's'} on ${listingTitle(l)}`, sub: `Lowest ${dollars(st.lo)} of ${st.n} bid${st.n === 1 ? '' : 's'}`, href: `/marketplace/${l.id}`, go: 'Compare', at: st.freshAt });
   });
+  // A homeowner viewed a bid for the first time (until the contractor opens it).
+  if (mk && company) {
+    (await unseenViews(supabaseAdmin(), company.company_id)).forEach(({ bid, listing }) => {
+      needs.push({ key: `v${bid.id}`, icon: 'bid', title: `${firstNameInitial(listing.homeowner_name) || 'A homeowner'} viewed your bid`, sub: `${listingTitle(listing)} · ${dollars(bid.price_cents)}`, href: `/marketplace/${listing.id}`, go: 'Open', at: bid.first_viewed_at });
+    });
+  }
   // Unread messages from the other side on bids that are still open.
   if (mk && myBidIds.length) {
     const { data: ms } = await supabaseAdmin().from('marketplace_messages').select('listing_id,bid_id,created_at').in('bid_id', myBidIds).neq('sender_id', user.id).is('read_at', null).order('created_at');

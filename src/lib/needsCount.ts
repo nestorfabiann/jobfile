@@ -1,6 +1,7 @@
 import { supabaseServer, supabaseAdmin } from '@/lib/supabase/server';
 import { listingOpen, marketplaceEnabled, type Listing } from '@/lib/marketplace';
 import { projectTasks } from '@/lib/needs';
+import { unseenViews } from '@/lib/bidViews';
 
 /**
  * How many rows the "Needs you" card on Projects shows for this person (the card lists at most 8).
@@ -33,6 +34,7 @@ export async function needsCount(userId: string): Promise<number> {
         n += fresh.size;
       }
     } else {
+      n += (await unseenViews(db, companyIds[0])).length;
       const { data: mine } = await db.from('marketplace_bids').select('id').eq('company_id', companyIds[0]).eq('status', 'waiting');
       (mine ?? []).forEach((b: any) => myBidIds.push(b.id));
     }

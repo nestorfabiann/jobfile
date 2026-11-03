@@ -7,6 +7,7 @@ import { firstNameInitial, listingOpen, listingTitle, requireMarketplace, type B
 import BusinessTabs from '@/components/BusinessTabs';
 import ProjectsTabs from '@/components/ProjectsTabs';
 import RangeBar from '@/components/RangeBar';
+import { viewStatus } from '@/lib/bidViews';
 import { withdrawBid } from '../actions';
 
 export const dynamic = 'force-dynamic';
@@ -73,6 +74,7 @@ export default async function MyBids({ searchParams }: { searchParams: { f?: str
               <span><span className="muted small">Your bid</span><br /><b style={{ fontSize: 22 }}>{dollars(b.price_cents)}</b></span>
               <span className="muted small" style={{ textAlign: 'right' }}>{b.status === 'waiting' ? 'Sent' : LABEL[b.status]} {when(b.updated_at)}</span>
             </div>
+            {b.status === 'waiting' && (() => { const v = viewStatus(b as any); return <div className={`pill ${v.tone === 'hot' ? 'ok' : v.tone === 'seen' ? 'warn' : ''}`} style={{ alignSelf: 'flex-start', whiteSpace: 'normal' }}>{v.text}</div>; })()}
             {ai && <RangeBar price={b.price_cents} lo={l.ai_low_cents as number} hi={l.ai_high_cents as number} />}
             {(l.budget_min_cents || l.budget_max_cents) && <p className="muted small">Homeowner budget {[l.budget_min_cents, l.budget_max_cents].filter((x) => x != null).map((x) => dollars(x as number)).join(' – ')}{ai ? ` · AI range ${dollars(l.ai_low_cents as number)} – ${dollars(l.ai_high_cents as number)}` : ''}</p>}
             {b.status === 'not_selected' && <p className="muted small">The winning price is not shown.</p>}

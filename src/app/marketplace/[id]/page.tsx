@@ -14,6 +14,8 @@ import CompareBar from '@/components/CompareBar';
 import InsuranceBadge from '@/components/InsuranceBadge';
 import BidThread, { type ThreadMsg } from '@/components/BidThread';
 import ListingPhotoUploader from '@/components/ListingPhotoUploader';
+import BidViewNotice from '@/components/BidViewNotice';
+import { ackBidView, recordBidViews, recordCompared } from '@/lib/bidViews';
 import { acceptBid, closeListing, deleteListingPhoto, deleteListingVideo, placeBid, withdrawBid } from '../actions';
 
 export const dynamic = 'force-dynamic';
@@ -62,6 +64,9 @@ export default async function ListingPage({ params, searchParams }: { params: { 
   );
   const visible = owner ? allBids.filter((b) => b.status !== 'withdrawn') : [];
   const myBid = companyId ? allBids.find((b) => b.company_id === companyId) : undefined;
+  // Viewed signals: the homeowner's visit is noted for the contractor; the contractor opening their bid clears the Needs you row.
+  if (owner) await recordBidViews(db, visible as any[]);
+  else if (myBid) await ackBidView(db, myBid as any);
 
   // For the homeowner: who each bidder is, their rating and whether their insurance is verified.
   const info = new Map<string, { name: string; avg: number; count: number; insured: boolean; pending: boolean; kinds: string[]; until: string; logo: string }>();
@@ -94,6 +99,7 @@ export default async function ListingPage({ params, searchParams }: { params: { 
   const wanted = (Array.isArray(searchParams.compare) ? searchParams.compare : searchParams.compare ? [searchParams.compare] : []).slice(0, 3);
   const compareBids = owner ? visible.filter((b) => wanted.includes(b.id)) : [];
   const cmpIds = new Set(compareBids.map((b) => b.id));
+  if (compareBids.length >= 2) await recordCompared(db, compareBids.map((b) => b.id));
   const hasAI = l.ai_low_cents != null && l.ai_high_cents != null;
   const budget = range(l.budget_min_cents, l.budget_max_cents);
 
@@ -173,6 +179,7 @@ export default async function ListingPage({ params, searchParams }: { params: { 
             <h2>{shown.length} bid{shown.length === 1 ? '' : 's'}</h2>
             {visible.length > 0 && <Link className="pill" href={onlyInsured ? `/marketplace/${l.id}` : `/marketplace/${l.id}?insured=1`} aria-pressed={onlyInsured}>{onlyInsured ? '✓ Insured only' : 'Insured only'}</Link>}
           </div>
+          {visible.length > 0 && <BidViewNotice />}
           {onlyInsured && shown.length < visible.length && <p className="muted small">Hiding {visible.length - shown.length} bid{visible.length - shown.length === 1 ? '' : 's'} without current verified insurance.</p>}
           {compareBids.length >= 2 && (
             <BidCompare
