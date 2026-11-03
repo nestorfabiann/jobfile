@@ -1,0 +1,76 @@
+<title>Homeowner ZIP</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: three phone states for collecting a homeowner ZIP and reaching them by area. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#cd7d2e;--orl:#f9efe4;--orb:#ecd4a8;--gr:#1f7a55;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--gr:#6fd1a3;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--gr:#6fd1a3;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:14px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px}
+h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
+.mut{color:var(--mut);font-size:13.5px;line-height:1.45}
+.sw{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.sw button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:10px 2px;border-radius:99px;font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:44px}.sw button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.hero{background:var(--orl);border-color:var(--orb)}
+.fld{border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;font-size:20px;font-weight:600;background:var(--bg)}
+.btn{display:flex;align-items:center;justify-content:center;border-radius:99px;min-height:48px;padding:0 18px;font:600 15px 'IBM Plex Sans',sans-serif;border:1px solid var(--or);background:var(--or);color:#fff;cursor:pointer;width:100%}
+.link{text-align:center;font-size:14px;color:var(--mut);text-decoration:underline;padding:6px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.tog{width:50px;height:30px;border-radius:99px;background:var(--gr);position:relative;flex:none}.tog:after{content:"";position:absolute;right:3px;top:3px;width:24px;height:24px;border-radius:50%;background:#fff}
+.chips{display:flex;flex-wrap:wrap;gap:8px}.chips span{padding:10px 16px;border-radius:99px;border:1px solid var(--line);background:var(--card);font-size:14px;font-weight:600}.chips .on{background:var(--or);color:#fff;border-color:var(--or)}
+.big{font:800 40px 'Bricolage Grotesque',sans-serif}
+.sec[hidden]{display:none}
+</style>
+<div class="wrap">
+  <div class="note"><b>Mockup, example data.</b> Homeowners are asked for a ZIP once, so you can reach them by area before they post. Tap the three states.</div>
+  <div class="sw" id="sw"><button class="on" data-s="a" type="button">1 · Homeowner</button><button data-s="b" type="button">2 · Settings</button><button data-s="c" type="button">3 · Admin</button></div>
+
+  <div id="a" class="sec" style="display:flex;flex-direction:column;gap:14px">
+    <h2 style="font-size:24px">Projects</h2>
+    <div class="card hero">
+      <h3 style="font-size:20px">What's your ZIP code?</h3>
+      <span class="mut">We'll show you contractors near you and tell you when new ones join your area.</span>
+      <div class="fld">75074</div>
+      <button class="btn" type="button">Save ZIP</button>
+      <div class="link">Skip for now</div>
+    </div>
+    <div class="note" style="border-style:solid">Shown once on Projects after sign-in, only to homeowners without a ZIP. One field, one tap to skip. If skipped, it shows again at the next sign-in. After saving, the card turns into "Contractors near 75074" with the nearest matches.</div>
+  </div>
+
+  <div id="b" class="sec" hidden style="flex-direction:column;gap:14px">
+    <h2 style="font-size:24px">Settings</h2>
+    <div class="card">
+      <b>Your ZIP code</b>
+      <div class="fld">75074</div>
+      <span class="mut">Used to show contractors near you. Your street address is never shared.</span>
+    </div>
+    <div class="card">
+      <div class="row"><span><b>Tips and local news</b><br><span class="mut">Emails when contractors join your area or a project could get bids.</span></span><span class="tog"></span></div>
+      <span class="mut">Turn this off any time. Messages about your own projects always still arrive.</span>
+    </div>
+    <div class="note" style="border-style:solid">On by default. Every marketing email from Jobfile also gets an "unsubscribe" link at the bottom that turns this same switch off. In-app alerts are not affected.</div>
+  </div>
+
+  <div id="c" class="sec" hidden style="flex-direction:column;gap:14px">
+    <h2 style="font-size:24px">Message by area</h2>
+    <div class="card"><b>1 · Area</b><div class="fld">75074</div><span class="mut">50 mile radius</span></div>
+    <div class="card"><b>2 · Who</b>
+      <div class="chips"><span>Contractors</span><span class="on">Homeowners</span><span>Both</span></div>
+      <span class="mut">Homeowners with a ZIP in this area, whether or not they have posted a project.</span>
+    </div>
+    <div class="card"><b>3 · Matches</b>
+      <div><span class="big">38</span> <span class="mut">people match</span></div>
+      <span class="mut">29 have not posted a project · 9 have</span>
+      <span class="mut">4 skipped by turning off "Tips and local news". They get in-app alerts only.</span>
+    </div>
+    <div class="card"><b>Homeowners without a ZIP: 12</b><span class="mut">They skipped the question. They will be asked again at their next sign-in.</span></div>
+  </div>
+</div>
+<script>
+var sw=document.getElementById('sw');
+[].forEach.call(sw.children,function(b){b.onclick=function(){[].forEach.call(sw.children,function(x){x.classList.toggle('on',x===b)});
+ ['a','b','c'].forEach(function(id){var e=document.getElementById(id);e.hidden=id!==b.dataset.s;e.style.display=e.hidden?'none':'flex'});window.scrollTo(0,0)}});
+</script>
