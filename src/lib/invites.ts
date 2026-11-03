@@ -1,56 +1,43 @@
-import { randomBytes } from 'crypto';
+import { requireUser } from './session';
 import { supabaseAdmin } from './supabase/server';
 
-export const REF_COOKIE = 'jf_ref';
-export const INVITE_SKIP_COOKIE = 'jf_invite_skip';
-const ALPHA = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
-export const validCode = (c: string) => /^[A-Z0-9]{6}$/.test(c);
+export const EMAIL = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+export const MAX_OPEN = 5;
+export const MAX_PER_DAY = 10;
+export const MAX_SENDS = 3;
 
-function newCode() {
-  const b = randomBytes(6);
-  return Array.from(b).map((x) => ALPHA[x % ALPHA.length]).join('');
-}
+export type Invite = {
+  id: string;
+  homeowner_id: string;
+  homeowner_name: string;
+  project_name: string;
+  address: string;
+  description: string;
+  is_homestead: boolean;
+  contractor_email: string;
+  contractor_name: string;
+  message: string;
+  status: 'pending' | 'accepted' | 'declined' | 'cancelled';
+  send_count: number;
+  last_sent_at: string;
+  expires_at: string;
+  project_id: string | null;
+  created_at: string;
+};
 
-/** The person's invite code. Made the first time they ask. */
-export async function getOrCreateCode(userId: string): Promise<string | null> {
-  const db = supabaseAdmin();
-  const { data } = await db.from('invite_codes').select('code').eq('user_id', userId).maybeSingle();
-  if (data?.code) return data.code as string;
-  for (let i = 0; i < 5; i++) {
-    const code = newCode();
-    const { error } = await db.from('invite_codes').insert({ user_id: userId, code });
-    if (!error) return code;
-    const { data: again } = await db.from('invite_codes').select('code').eq('user_id', userId).maybeSingle();
-    if (again?.code) return again.code as string;
-  }
-  return null;
-}
+export const isExpired = (i: { status: string; expires_at: string }) => i.status === 'pending' && new Date(i.expires_at).getTime() < Date.now();
 
-export type InviteStats = { opened: number; joined: number; posted: number };
-
-export async function inviteStats(code: string): Promise<InviteStats> {
-  const db = supabaseAdmin();
-  const [{ count: opened }, { data: joins }] = await Promise.all([
-    db.from('invite_events').select('id', { count: 'exact', head: true }).eq('code', code).eq('kind', 'open'),
-    db.from('invite_events').select('invitee_id').eq('code', code).eq('kind', 'join').limit(1000),
-  ]);
-  const ids = (joins ?? []).map((j: any) => j.invitee_id as string).filter(Boolean);
-  let posted = 0;
-  if (ids.length) {
-    const { data: ls } = await db.from('marketplace_listings').select('homeowner_id').in('homeowner_id', ids).limit(5000);
-    posted = new Set((ls ?? []).map((l: any) => l.homeowner_id as string)).size;
-  }
-  return { opened: opened ?? 0, joined: ids.length, posted };
-}
-
-/** Called after sign-in. Counts a join once, only for a new account, and never for your own code. */
-export async function recordJoin(user: { id: string; created_at?: string }, code: string | undefined) {
-  try {
-    if (!code || !validCode(code)) return;
-    if (!user.created_at || Date.now() - new Date(user.created_at).getTime() > 3 * 24 * 3600_000) return;
-    const db = supabaseAdmin();
-    const { data: owner } = await db.from('invite_codes').select('user_id').eq('code', code).maybeSingle();
-    if (!owner || owner.user_id === user.id) return;
-    await db.from('invite_events').insert({ code, kind: 'join', invitee_id: user.id });
-  } catch { /* never block sign-in */ }
+/**
+ * Loads an invite for the signed-in person. They see it only if they sent it (homeowner),
+ * or if their confirmed sign-in email is the one that was invited (contractor). Otherwise null.
+ */
+export async function loadInvite(id: string) {
+  const { user } = await requireUser();
+  if (!/^[0-9a-f-]{36}$/i.test(id)) return { user, invite: null, side: null as 'homeowner' | 'contractor' | null };
+  const { data } = await supabaseAdmin().from('project_invites').select('*').eq('id', id).maybeSingle<Invite>();
+  if (!data) return { user, invite: null, side: null as 'homeowner' | 'contractor' | null };
+  const mine = data.homeowner_id === user.id;
+  const invited = !!user.email && !!user.email_confirmed_at && user.email.toLowerCase() === data.contractor_email.toLowerCase();
+  const side: 'homeowner' | 'contractor' | null = mine ? 'homeowner' : invited ? 'contractor' : null;
+  return { user, invite: side ? data : null, side };
 }

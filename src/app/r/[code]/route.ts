@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase/server';
-import { REF_COOKIE, validCode } from '@/lib/invites';
+import { REF_COOKIE, validCode } from '@/lib/referrals';
 
 export const dynamic = 'force-dynamic';
 

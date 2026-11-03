@@ -3,7 +3,7 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { requireUser } from '@/lib/session';
-import { INVITE_SKIP_COOKIE } from '@/lib/invites';
+import { INVITE_SKIP_COOKIE } from '@/lib/referrals';
 
 /** "Not now" on the invite card: hides it for 30 days. */
 export async function dismissInvite(formData: FormData) {

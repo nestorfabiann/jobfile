@@ -1,7 +1,7 @@
 import { headers } from 'next/headers';
 import { requireUser } from '@/lib/session';
 import { supabaseAdmin } from '@/lib/supabase/server';
-import { getOrCreateCode, inviteStats } from '@/lib/invites';
+import { getOrCreateCode, inviteStats } from '@/lib/referrals';
 import InviteShare from '@/components/InviteShare';
 
 export const dynamic = 'force-dynamic';

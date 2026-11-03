@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { cookies } from 'next/headers';
 import { dismissInvite } from '@/app/invite/actions';
-import { INVITE_SKIP_COOKIE } from '@/lib/invites';
+import { INVITE_SKIP_COOKIE } from '@/lib/referrals';
 
 /** A small card shown when people are happiest. "Not now" hides it for 30 days. */
 export default function InviteCard({ title, body, cta, back }: { title: string; body: string; cta: string; back: string }) {

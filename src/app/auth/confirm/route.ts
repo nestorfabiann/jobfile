@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 import type { EmailOtpType } from '@supabase/supabase-js';
 import { supabaseServer } from '@/lib/supabase/server';
 import { NEXT_COOKIE, safeNext } from '@/lib/nextPath';
-import { REF_COOKIE, recordJoin } from '@/lib/invites';
+import { REF_COOKIE, recordJoin } from '@/lib/referrals';
 
 // The sign-in email links here. The token_hash style works in any browser; the code style (Supabase default email) needs the same browser.
 export async function GET(req: NextRequest) {
