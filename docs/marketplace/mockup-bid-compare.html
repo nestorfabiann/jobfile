@@ -1,0 +1,90 @@
+<title>Bid Comparison</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: pick bids on the list, then a table with one column per bid and a sticky label column. Best-in-row cells get a quiet marker, not a verdict. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#cd7d2e;--orl:#f9efe4;--orb:#ecd4a8;--gr:#1f7a55;--grl:#d9f1e6;--bad:#b3261e;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--grl:#173a2c;--gr:#6fd1a3;--bad:#f2b8b5;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--grl:#173a2c;--gr:#6fd1a3;--bad:#f2b8b5;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:14px 90px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px}
+h1,h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;text-wrap:balance}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
+.mut{color:var(--mut);font-size:14px;line-height:1.5}.sm{font-size:12.5px}
+.sw{display:flex;gap:6px}.sw button{flex:1;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:10px 4px;border-radius:99px;font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:44px}.sw button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:8px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.cmp{display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:600;min-height:44px;cursor:pointer}.cmp input{width:22px;height:22px;accent-color:var(--or)}
+.price{font:800 24px 'Bricolage Grotesque',sans-serif}
+.bar{position:fixed;left:0;right:0;bottom:0;padding:12px max(16px,env(safe-area-inset-right,0px)) calc(12px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));background:var(--card);border-top:1px solid var(--line);display:flex;justify-content:center;z-index:5}
+.bar > div{width:100%;max-width:430px;display:flex;gap:10px;align-items:center;justify-content:space-between}
+.btn{display:flex;align-items:center;justify-content:center;border-radius:99px;min-height:48px;padding:0 18px;font:600 15px 'IBM Plex Sans',sans-serif;border:1px solid var(--or);background:var(--or);color:#fff;cursor:pointer}
+.btn.gh{background:var(--orl);color:var(--or);border-color:var(--orb)}.btn:disabled{opacity:.4;cursor:not-allowed}
+.scroll{position:relative}
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:18px;background:var(--card);-webkit-overflow-scrolling:touch}
+table{border-collapse:separate;border-spacing:0;width:max-content;min-width:100%}
+th,td{padding:10px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top;font-size:13.5px;line-height:1.4;width:150px;min-width:150px;max-width:150px}
+th.l,td.l{position:sticky;left:0;z-index:2;background:var(--card);width:86px;min-width:86px;max-width:86px;color:var(--mut);font-size:12px;font-weight:600;border-right:1px solid var(--line)}
+tr:last-child td{border-bottom:0}
+.best{background:var(--grl);border-radius:8px;padding:2px 6px;color:var(--gr);font-weight:600;display:inline-block}
+.tag{display:block;font-size:11.5px;color:var(--gr);font-weight:600;margin-top:2px}.tag.warn{color:var(--or)}
+.fade{position:absolute;top:0;right:0;bottom:0;width:36px;pointer-events:none;border-radius:0 18px 18px 0;background:linear-gradient(90deg,transparent,var(--bg))}
+.hint{font-size:12.5px;color:var(--mut);text-align:center}
+.sec[hidden]{display:none}
+button:focus-visible,input:focus-visible{outline:2px solid var(--or);outline-offset:2px}
+</style>
+
+<div class="wrap">
+  <div class="note"><b>Mockup, example data.</b> On the bid list, tick up to 3 bids and tap Compare. The table keeps a fixed label column, so two bids fit with no scrolling and a third scrolls sideways with a visible fade. Markers show who is lowest, fastest or highest rated. They are facts about the row, not a recommendation.</div>
+  <div class="sw" id="sw"><button class="on" data-s="a" type="button">1 · Pick</button><button data-s="b" type="button">2 · Two bids</button><button data-s="c" type="button">3 · Three bids</button></div>
+
+  <div id="a" class="sec" style="display:flex;flex-direction:column;gap:14px">
+    <h2 style="font-size:22px">3 bids</h2>
+    <div class="card"><div class="top"><b>Nesty's Painting</b><label class="cmp"><input type="checkbox" class="pick" data-k="0">Compare</label></div><div class="price">$18,400</div><div class="mut sm">2 weeks · ★ 4.9 (12)</div></div>
+    <div class="card"><div class="top"><b>Lone Star Remodeling</b><label class="cmp"><input type="checkbox" class="pick" data-k="1">Compare</label></div><div class="price">$16,900</div><div class="mut sm">3 weeks · no reviews yet</div></div>
+    <div class="card"><div class="top"><b>Frisco Home Pros</b><label class="cmp"><input type="checkbox" class="pick" data-k="2">Compare</label></div><div class="price">$21,500</div><div class="mut sm">1 week · ★ 4.6 (3)</div></div>
+    <div class="mut sm" id="pickmsg" style="text-align:center">Tick two or three bids to compare them.</div>
+  </div>
+
+  <div id="b" class="sec" hidden style="flex-direction:column;gap:14px"><div class="hint">Comparing 2 bids · <a href="#" id="back1" style="color:var(--or)">Change</a></div><div id="t2"></div></div>
+  <div id="c" class="sec" hidden style="flex-direction:column;gap:14px"><div class="hint">Comparing 3 bids · swipe sideways to see all</div><div id="t3"></div></div>
+</div>
+
+<div class="bar" id="bar" hidden><div><span id="barn" class="mut">0 selected</span><button class="btn" id="go" type="button" disabled>Compare</button></div></div>
+
+<script>
+var B=[
+{n:'Nesty\'s Painting',p:18400,w:2,s:'Nov 12',r:4.9,c:12,ins:'Insured to Mar 2027',inc:'2 coats, prep, patching, cleanup',ai:'Inside local range'},
+{n:'Lone Star Remodeling',p:16900,w:3,s:'Nov 20',r:null,c:0,ins:'Under review',inc:'Materials, cleanup. Trim extra.',ai:'Inside local range'},
+{n:'Frisco Home Pros',p:21500,w:1,s:'Dec 1',r:4.6,c:3,ins:'None on file',inc:'Everything, 1-year warranty',ai:'Above local range'}];
+var $=function(i){return document.getElementById(i)};
+var f=function(n){return '$'+n.toLocaleString('en-US')};
+function table(ix,scroll){
+  var L=ix.map(function(i){return B[i]});
+  var lo=Math.min.apply(0,L.map(function(b){return b.p})),fast=Math.min.apply(0,L.map(function(b){return b.w}));
+  var rated=L.filter(function(b){return b.r!=null}),top=rated.length?Math.max.apply(0,rated.map(function(b){return b.r})):null;
+  var rows=[
+   ['Price',function(b){return '<span class="'+(b.p===lo&&L.length>1?'best':'')+'" style="font:800 18px Bricolage Grotesque,sans-serif">'+f(b.p)+'</span>'+(b.p===lo&&L.length>1?'<span class="tag">Lowest</span>':'')+'<span class="tag '+(b.ai.indexOf('Above')>-1?'warn':'')+'" style="font-weight:500;color:var(--mut)">'+b.ai+'</span>'}],
+   ['Time',function(b){return '<span class="'+(b.w===fast&&L.length>1?'best':'')+'">'+b.w+' week'+(b.w>1?'s':'')+'</span>'+(b.w===fast&&L.length>1?'<span class="tag">Fastest</span>':'')+'<span class="tag" style="font-weight:500;color:var(--mut)">Starts '+b.s+'</span>'}],
+   ['Rating',function(b){return b.r==null?'<span class="mut">No reviews yet</span>':'<span class="'+(b.r===top&&rated.length>1?'best':'')+'">★ '+b.r.toFixed(1)+'</span> <span class="mut sm">('+b.c+')</span>'+(b.r===top&&rated.length>1?'<span class="tag">Highest rated</span>':'')}],
+   ['Insurance',function(b){return b.ins}],
+   ['Included',function(b){return b.inc}],
+   ['',function(b){return '<button class="btn" style="min-height:40px;width:100%;padding:0 8px;font-size:14px" type="button">Accept</button><button class="btn gh" style="min-height:40px;width:100%;padding:0 8px;font-size:14px;margin-top:6px" type="button">Message</button>'}]];
+  var h='<div class="scroll"><div class="tw"><table><thead><tr><th class="l"></th>'+L.map(function(b){return '<th><b style="color:var(--ink);font-size:14px">'+b.n+'</b></th>'}).join('')+'</tr></thead><tbody>';
+  rows.forEach(function(r){h+='<tr><td class="l">'+r[0]+'</td>'+L.map(function(b){return '<td>'+r[1](b)+'</td>'}).join('')+'</tr>'});
+  return h+'</tbody></table></div>'+(scroll?'<div class="fade"></div>':'')+'</div>'}
+$('t2').innerHTML=table([0,1],false);$('t3').innerHTML=table([0,1,2],true);
+var sel=[];
+[].forEach.call(document.querySelectorAll('.pick'),function(c){c.onchange=function(){
+  var k=+c.dataset.k;if(c.checked){if(sel.length>=3){c.checked=false;return}sel.push(k)}else sel=sel.filter(function(x){return x!==k});
+  $('bar').hidden=sel.length===0;$('barn').textContent=sel.length+' selected';$('go').disabled=sel.length<2;$('go').textContent=sel.length<2?'Pick 1 more':'Compare '+sel.length;
+  $('pickmsg').textContent=sel.length>=3?'You can compare up to 3 bids.':'Tick two or three bids to compare them.'}});
+$('go').onclick=function(){$('sw').children[sel.length===3?2:1].click();if(sel.length>=2){$((sel.length===3?'t3':'t2')).innerHTML=table(sel.slice().sort(),sel.length===3)}};
+$('back1').onclick=function(e){e.preventDefault();$('sw').children[0].click()};
+[].forEach.call($('sw').children,function(b){b.onclick=function(){
+  [].forEach.call($('sw').children,function(x){x.classList.toggle('on',x===b)});
+  ['a','b','c'].forEach(function(id){var e=$(id);e.hidden=id!==b.dataset.s;e.style.display=e.hidden?'none':'flex'});
+  $('bar').style.display=b.dataset.s==='a'&&sel.length?'flex':'none';window.scrollTo(0,0)}});
+$('bar').style.display='none';
+</script>
