@@ -1,0 +1,94 @@
+<title>Photo Help on Posting</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: the Photos and videos card on the post form, in three states: tips before photos, shot list ticking off, and a gentle nudge on Publish. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#cd7d2e;--orl:#f9efe4;--orb:#ecd4a8;--gr:#1f7a55;--grl:#d9f1e6;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--grl:#173a2c;--gr:#6fd1a3;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--grl:#173a2c;--gr:#6fd1a3;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:14px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px}
+h1,h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;text-wrap:balance}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
+.mut{color:var(--mut);font-size:14px;line-height:1.5}.sm{font-size:12.5px}
+.sw{display:flex;gap:6px}.sw button{flex:1;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:10px 4px;border-radius:99px;font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:44px}.sw button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.trade{display:flex;gap:6px;flex-wrap:wrap}.trade button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:7px 12px;border-radius:99px;font:500 12.5px 'IBM Plex Sans',sans-serif;cursor:pointer}.trade button.on{border-color:var(--or);background:var(--orl);color:var(--or)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:18px;display:flex;flex-direction:column;gap:12px}
+.tip{background:var(--orl);border:1px solid var(--orb);border-radius:16px;padding:12px 14px;font-size:14px;line-height:1.5}
+.tip b{display:block;margin-bottom:4px}
+.shots{display:flex;flex-direction:column;gap:6px;margin:0;padding:0;list-style:none}
+.shots li{display:flex;gap:10px;align-items:center;font-size:14px;min-height:34px}
+.box{flex:none;width:22px;height:22px;border-radius:50%;border:1.5px solid var(--orb);display:grid;place-items:center;font-size:13px;color:#fff}
+li.done .box{background:var(--gr);border-color:var(--gr)}li.done span:last-child{color:var(--mut);text-decoration:line-through}
+.bar{height:6px;border-radius:99px;background:var(--line);overflow:hidden}.bar i{display:block;height:100%;background:var(--or);transition:width .2s}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.t{position:relative;aspect-ratio:1;border-radius:14px;background:linear-gradient(135deg,#9aa0a8,#565c66)}.t.b{background:linear-gradient(135deg,#c9a77a,#7a5a34)}.t.c{background:linear-gradient(135deg,#93a89a,#4a6355)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn{display:flex;align-items:center;justify-content:center;border-radius:99px;min-height:50px;padding:0 16px;font:600 15px 'IBM Plex Sans',sans-serif;border:1px solid var(--or);background:var(--or);color:#fff;cursor:pointer;width:100%}
+.btn.gh{background:var(--orl);color:var(--or);border-color:var(--orb)}
+.sec[hidden]{display:none}
+button:focus-visible{outline:2px solid var(--or);outline-offset:2px}
+</style>
+
+<div class="wrap">
+  <div class="note"><b>Mockup.</b> Pick a trade to see its photo tips. The photos are placeholders. Nothing here claims photos win more jobs; it only explains what helps a contractor give an accurate price.</div>
+  <div class="sw" id="sw"><button class="on" data-s="a" type="button">1 · Tips</button><button data-s="b" type="button">2 · Shot list</button><button data-s="c" type="button">3 · Publish nudge</button></div>
+  <div class="trade" id="trade"></div>
+
+  <div id="a" class="sec" style="display:flex;flex-direction:column;gap:14px">
+    <div class="card">
+      <h2 style="font-size:22px">Photos and videos <span class="mut" style="font-weight:400;font-size:15px">(optional)</span></h2>
+      <div class="tip"><b id="tipt"></b><span id="tipb"></span></div>
+      <div class="two"><button class="btn" type="button">Add photos</button><button class="btn gh" type="button">Add video</button></div>
+      <div class="mut sm">Contractors never see your street address. Check that house numbers, mail and documents are not in the frame.</div>
+    </div>
+  </div>
+
+  <div id="b" class="sec" hidden style="flex-direction:column;gap:14px">
+    <div class="card">
+      <h2 style="font-size:22px">Photos and videos</h2>
+      <div class="grid"><div class="t"></div><div class="t b"></div><div class="t c"></div></div>
+      <div class="mut sm" id="cnt"></div><div class="bar"><i id="fill"></i></div>
+      <ul class="shots" id="shots"></ul>
+      <div class="mut sm">The list is only a guide. Tap a shot to mark it done, or ignore it. It is never required.</div>
+      <div class="two"><button class="btn gh" type="button">Add more</button><button class="btn gh" type="button">Add video</button></div>
+    </div>
+  </div>
+
+  <div id="c" class="sec" hidden style="flex-direction:column;gap:14px">
+    <div class="card">
+      <h2 style="font-size:22px">Publish project</h2>
+      <div class="tip"><b>No photos yet</b>Contractors price more accurately when they can see the space. You can still publish now and add photos later from the project page.</div>
+      <button class="btn gh" type="button">Add photos first</button>
+      <button class="btn" type="button">Publish without photos</button>
+      <div class="mut sm">Shown once, only when the project has no photos or videos.</div>
+    </div>
+  </div>
+</div>
+<script>
+var T={
+'Kitchen':['Take photos of every wall, floor to ceiling','Cabinets and countertops up close','Sink, stove and appliance areas','Anything that is damaged or leaking'],
+'Bathroom':['The whole room from the doorway','Shower or tub, and the walls around it','Vanity, toilet and floor','Any water stains, cracks or mold'],
+'Roofing':['The whole house from the street, each side','Close-ups of leaks, stains or missing shingles','Inside: ceiling stains and the attic if you can','Gutters and vents'],
+'Painting':['Each room you want painted, from the corner','Walls with damage, cracks or stains','Trim, doors and ceilings','Exterior: each side of the house'],
+'Flooring':['The whole room from the doorway','Close-up of the current floor','Transitions between rooms','Damage, gaps or soft spots'],
+'Landscaping':['The whole yard from two corners','Fence lines and gates','Trees, beds or areas to change','Drainage problems or bare spots']};
+var cur='Kitchen',done={};
+function $(i){return document.getElementById(i)}
+function draw(){
+  var l=T[cur];$('tipt').textContent='Photos of the whole space help contractors bid accurately';
+  $('tipb').innerHTML='<ul style="margin:6px 0 0;padding-left:18px">'+l.map(function(x){return '<li>'+x+'</li>'}).join('')+'</ul>';
+  $('shots').innerHTML='';var n=0;
+  l.forEach(function(x,i){var k=cur+i,li=document.createElement('li');li.className=done[k]?'done':'';li.style.cursor='pointer';
+    li.innerHTML='<span class="box">'+(done[k]?'✓':'')+'</span><span>'+x+'</span>';
+    li.onclick=function(){done[k]=!done[k];draw()};$('shots').appendChild(li);if(done[k])n++});
+  $('cnt').textContent=n+' of '+l.length+' suggested shots · 3 photos added';$('fill').style.width=(n/l.length*100)+'%';
+}
+Object.keys(T).forEach(function(t){var b=document.createElement('button');b.type='button';b.textContent=t;b.className=t===cur?'on':'';
+  b.onclick=function(){cur=t;[].forEach.call($('trade').children,function(x){x.classList.toggle('on',x===b)});draw()};$('trade').appendChild(b)});
+[].forEach.call($('sw').children,function(b){b.onclick=function(){
+  [].forEach.call($('sw').children,function(x){x.classList.toggle('on',x===b)});
+  ['a','b','c'].forEach(function(id){var e=$(id);e.hidden=id!==b.dataset.s;e.style.display=e.hidden?'none':'flex'});$('trade').style.display=b.dataset.s==='c'?'none':'flex'}});
+draw();
+</script>
