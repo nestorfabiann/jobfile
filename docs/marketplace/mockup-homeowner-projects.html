@@ -1,0 +1,142 @@
+<title>Homeowner Projects</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: one phone column. Tabs compare the current page, the proposed page, and a brand new homeowner. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#cd7d2e;--orl:#f9efe4;--orb:#ecd4a8;--gr:#1f7a55;--grl:#d9f1e6;--am:#9a5b00;--aml:#fbeccd;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--gr:#6fd1a3;--grl:#173a2c;--am:#f0b95a;--aml:#3a2e12;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--gr:#6fd1a3;--grl:#173a2c;--am:#f0b95a;--aml:#3a2e12;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:14px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px}
+h1,h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;text-wrap:balance}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
+.mut{color:var(--mut);font-size:13.5px;line-height:1.45}
+.sw{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.sw button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:8px 2px;border-radius:99px;font:500 12.5px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:44px}.sw button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.btn{display:flex;align-items:center;justify-content:center;border-radius:99px;min-height:50px;padding:0 18px;font:700 15.5px 'IBM Plex Sans',sans-serif;border:1px solid var(--or);background:var(--or);color:#fff;cursor:pointer;width:100%}
+.btn.ghost{background:transparent;color:var(--or)}
+.btn.sm{min-height:40px;font-size:14px;width:auto;padding:0 16px}
+.link{background:none;border:0;color:var(--or);font:600 14px 'IBM Plex Sans',sans-serif;padding:8px 0;cursor:pointer;text-align:left;min-height:40px}
+.pill{display:inline-block;width:max-content;font-size:12px;font-weight:700;padding:4px 10px;border-radius:99px;background:var(--orl);color:var(--or);border:1px solid var(--orb)}
+.pill.g{background:var(--grl);color:var(--gr);border-color:transparent}
+.pill.a{background:var(--aml);color:var(--am);border-color:transparent}
+.badge{display:inline-grid;place-items:center;min-width:24px;height:24px;border-radius:99px;background:var(--or);color:#fff;font-size:12.5px;font-weight:700;padding:0 7px}
+.badge.o{background:var(--orl);color:var(--or);border:1px solid var(--orb)}
+.tabs{display:flex;gap:14px;border-bottom:1px solid var(--line);padding-bottom:10px;align-items:center}
+.tabs span{font-weight:600;font-size:15px;color:var(--mut);display:inline-flex;gap:8px;align-items:center}
+.tabs span.on{color:var(--or)}
+.row{display:flex;gap:12px;align-items:center}
+.thumb{width:64px;height:64px;border-radius:14px;flex:none;background:linear-gradient(135deg,#d9c9a8,#9b8b73);display:grid;place-items:center;color:#fff;font-weight:700}
+.thumb.k{background:linear-gradient(135deg,#9fb4d9,#3e5aa8)}
+.logo{width:22px;height:22px;border-radius:50%;background:var(--or);color:#fff;display:inline-grid;place-items:center;font-size:11px;font-weight:700;flex:none}
+.bar{height:8px;border-radius:99px;background:var(--line);overflow:hidden}.bar i{display:block;height:100%;background:var(--gr);border-radius:99px}
+.next{background:var(--aml);color:var(--am);border-radius:12px;padding:8px 10px;font-size:13.5px;font-weight:600;line-height:1.35}
+.sh{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.sh h2{font-size:19px}
+details.c{border:1px solid var(--line);border-radius:18px;background:var(--card);padding:12px 14px}
+details.c summary{font-weight:600;font-size:15px;cursor:pointer;min-height:26px;display:flex;justify-content:space-between;gap:8px}
+.chips{display:flex;gap:7px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:99px;padding:8px 13px;font:500 13.5px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:38px}
+.chip.on{background:var(--orl);border-color:var(--or);color:var(--or)}
+.quiet{display:flex;gap:8px;align-items:center;font-size:13.5px;color:var(--gr);font-weight:600}
+.sec[hidden]{display:none}
+</style>
+<div class="wrap">
+  <div class="note"><b>Mockup.</b> The Projects page for a homeowner. Compare today's page with the proposed one, and see what a brand new homeowner gets. On the Proposed tab, flip the switch to see the page with and without something waiting.</div>
+  <div class="sw" id="sw">
+    <button data-s="now" type="button">Today</button>
+    <button data-s="new" class="on" type="button">Proposed</button>
+    <button data-s="first" type="button">First visit</button>
+  </div>
+
+  <!-- TODAY -->
+  <div id="now" class="sec" hidden style="flex-direction:column;gap:14px">
+    <h1 style="font-size:30px">Projects</h1>
+    <span class="mut" style="font-size:15px">Signed in as jerry@example.com</span>
+    <div class="card" style="background:var(--grl);border-color:transparent;padding:18px"><b style="color:var(--gr);font-size:17px">You're all caught up</b><span class="mut">Nothing is waiting on you right now.</span></div>
+    <div class="tabs"><span class="on">Projects <i class="badge o">2</i></span><span>Bids <i class="badge">1</i></span></div>
+    <div class="sh"><h2 style="font-size:22px">Ongoing projects</h2><button class="btn ghost sm" type="button">+ Start a project</button></div>
+    <div class="card"><div class="row"><div class="thumb"></div><div style="flex:1;min-width:0"><b style="font-size:16px">Kitchen and walls painting</b><div class="mut">727 plano tx · Nesty's Painting</div></div><span class="pill">Active</span></div></div>
+    <h2 style="font-size:22px">Completed projects</h2>
+    <div class="card"><div class="row"><div class="thumb k"></div><div style="flex:1;min-width:0"><b style="font-size:16px">Kitchen remodel</b><div class="mut">TX 75074</div></div><span class="pill g">Completed</span></div></div>
+  </div>
+
+  <!-- PROPOSED -->
+  <div id="new" class="sec" style="display:flex;flex-direction:column;gap:14px">
+    <div>
+      <h1 style="font-size:30px">Hi Jerry</h1>
+      <span class="mut" style="font-size:15px">Here is where your projects stand.</span>
+    </div>
+    <div>
+      <button class="btn" type="button">Post a project</button>
+      <button class="link" type="button">I already have a contractor</button>
+    </div>
+    <div class="chips" id="wsw"><button class="chip on" data-w="1" type="button">Something is waiting</button><button class="chip" data-w="0" type="button">Nothing waiting</button></div>
+
+    <div id="need" class="card" style="background:var(--orl);border-color:var(--orb)">
+      <div class="sh"><h2 style="font-size:19px">Needs you</h2><span class="badge">2</span></div>
+      <div class="next">Approve a change order: extra prep on the ceiling, $450</div>
+      <button class="btn sm" type="button" style="width:100%">Review change order</button>
+      <div class="next">3 new bids on your roofing job</div>
+      <button class="btn ghost sm" type="button" style="width:100%">Compare bids</button>
+    </div>
+    <div id="quiet" class="quiet" hidden>✓ You're all caught up</div>
+
+    <div class="sh"><h2>Waiting for bids</h2><span class="mut">1</span></div>
+    <div class="card">
+      <div class="row"><div class="thumb"></div><div style="flex:1;min-width:0"><b style="font-size:16px">Roofing: asphalt shingles</b><div class="mut">ZIP 75074 · open for 12 more days</div></div></div>
+      <div class="row" style="justify-content:space-between"><span class="pill a">3 new bids</span><button class="btn sm" type="button">View bids</button></div>
+    </div>
+
+    <div class="sh"><h2>Hired and ongoing</h2><span class="mut">1</span></div>
+    <div class="card">
+      <div class="row"><div class="thumb"></div><div style="flex:1;min-width:0"><b style="font-size:16px">Kitchen and walls painting</b><div class="row" style="gap:6px;margin-top:4px"><span class="logo">N</span><span class="mut">Nesty's Painting</span></div></div></div>
+      <div class="bar" role="img" aria-label="55 percent"><i style="width:55%"></i></div>
+      <div class="row" style="justify-content:space-between"><span class="pill g">Work in progress</span><span class="mut">2 of 4 payments recorded</span></div>
+      <div class="next" id="nx">Next: approve a change order ($450)</div>
+    </div>
+
+    <details class="c">
+      <summary><span>Completed</span><span class="mut">1</span></summary>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:12px">
+        <div class="row"><div class="thumb k"></div><div style="flex:1;min-width:0"><b style="font-size:16px">Kitchen remodel</b><div class="mut">TX 75074 · finished Oct 14</div></div></div>
+        <div class="next">You have not rated this project yet</div>
+        <button class="btn ghost sm" type="button" style="width:100%">Rate your contractor</button>
+      </div>
+    </details>
+
+    <div class="card" style="gap:6px"><b>Happy with Jobfile?</b><span class="mut">Tell a neighbor. It is free.</span><button class="link" type="button">Invite a friend</button></div>
+    <div class="note" style="border-style:solid">What changed: a friendly greeting, one clear Post button, and the page ordered the way a homeowner thinks (bids, hired, done). Each project says where it stands and what comes next. The email line and the big "all caught up" box are gone. Completed work folds away. Later, Design ideas would sit here too.</div>
+  </div>
+
+  <!-- FIRST VISIT -->
+  <div id="first" class="sec" hidden style="flex-direction:column;gap:14px">
+    <div>
+      <h1 style="font-size:30px">Welcome, Maria</h1>
+      <span class="mut" style="font-size:15px">Tell us about your project and local contractors will send bids. It is free.</span>
+    </div>
+    <button class="btn" type="button">Post your first project</button>
+    <div class="card"><b>How it works</b>
+      <div class="row"><span class="badge o">1</span><span>Tell us what you want done and add photos</span></div>
+      <div class="row"><span class="badge o">2</span><span>Local contractors send bids</span></div>
+      <div class="row"><span class="badge o">3</span><span>Pick one, sign the agreement, and track the work in one place</span></div>
+    </div>
+    <button class="link" type="button">I already have a contractor</button>
+    <div class="note" style="border-style:solid">With no projects yet, the empty page teaches instead of showing blank sections. The ZIP card and Design ideas would appear here later.</div>
+  </div>
+</div>
+<script>
+var sw=document.getElementById('sw');
+[].forEach.call(sw.children,function(b){b.onclick=function(){
+  [].forEach.call(sw.children,function(x){x.classList.toggle('on',x===b)});
+  ['now','new','first'].forEach(function(id){var e=document.getElementById(id);e.hidden=id!==b.dataset.s;e.style.display=e.hidden?'none':'flex'});
+  window.scrollTo(0,0)}});
+var w=document.getElementById('wsw');
+[].forEach.call(w.children,function(b){b.onclick=function(){
+  [].forEach.call(w.children,function(x){x.classList.toggle('on',x===b)});
+  var on=b.dataset.w==='1';
+  document.getElementById('need').hidden=!on;document.getElementById('quiet').hidden=on;
+  document.getElementById('nx').textContent=on?'Next: approve a change order ($450)':'Next: the contractor finishes the walls, due Nov 12';
+}});
+</script>
