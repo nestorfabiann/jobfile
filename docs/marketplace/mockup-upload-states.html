@@ -1,0 +1,94 @@
+<title>Upload and Error States</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: four phone states in tabs: uploading with per-file progress, a failed file with Retry, a partial result on the job page, and page-level loading and error screens. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#cd7d2e;--orl:#f9efe4;--orb:#ecd4a8;--gr:#1f7a55;--grl:#d9f1e6;--bad:#b3261e;--badl:#fbe4e2;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--grl:#173a2c;--gr:#6fd1a3;--bad:#f2b8b5;--badl:#3d1f1d;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--grl:#173a2c;--gr:#6fd1a3;--bad:#f2b8b5;--badl:#3d1f1d;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:14px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px}
+h1,h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;text-wrap:balance}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
+.mut{color:var(--mut);font-size:14px;line-height:1.5}.sm{font-size:12.5px}
+.sw{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.sw button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:10px 2px;border-radius:99px;font:500 12.5px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:44px}.sw button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.t{position:relative;aspect-ratio:1;border-radius:14px;overflow:hidden;background:linear-gradient(135deg,#9aa0a8,#565c66)}.t.b{background:linear-gradient(135deg,#c9a77a,#7a5a34)}.t.c{background:linear-gradient(135deg,#93a89a,#4a6355)}.t.v{background:linear-gradient(135deg,#6d7a90,#2e3544)}
+.ov{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:4px;padding:6px;color:#fff;font-size:11.5px;font-weight:600;background:linear-gradient(transparent 40%,#000a)}
+.ov.dim{background:#0008;justify-content:center}
+.ov.err{background:#7a1a14d9;justify-content:center;text-align:center}
+.pb{width:100%;height:5px;border-radius:99px;background:#fff4;overflow:hidden}.pb i{display:block;height:100%;background:#fff}
+.ck{position:absolute;top:5px;left:5px;width:22px;height:22px;border-radius:50%;background:var(--gr);color:#fff;display:grid;place-items:center;font-size:13px}
+.play{position:absolute;top:6px;right:8px;color:#fff;font-size:12px;text-shadow:0 1px 4px #000a}
+.rt{border:0;background:#fff;color:#7a1a14;border-radius:99px;min-height:30px;padding:0 12px;font:700 12px 'IBM Plex Sans',sans-serif;cursor:pointer}
+.sum{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:14px;font-weight:600}
+.bar{height:8px;border-radius:99px;background:var(--line);overflow:hidden}.bar i{display:block;height:100%;background:var(--or);transition:width .3s}
+.box{border-radius:14px;padding:12px;font-size:14px;line-height:1.45}.box.bad{background:var(--badl);color:var(--bad)}.box.ok{background:var(--grl);color:var(--gr)}.box.warn{background:var(--orl);border:1px solid var(--orb)}
+.btn{display:flex;align-items:center;justify-content:center;border-radius:99px;min-height:48px;padding:0 16px;font:600 15px 'IBM Plex Sans',sans-serif;border:1px solid var(--or);background:var(--or);color:#fff;cursor:pointer;width:100%}
+.btn.gh{background:var(--orl);color:var(--or);border-color:var(--orb)}
+.sk{border-radius:12px;background:linear-gradient(90deg,var(--line),var(--orl),var(--line));background-size:200% 100%;animation:s 1.3s linear infinite}
+@keyframes s{to{background-position:-200% 0}}@media (prefers-reduced-motion:reduce){.sk{animation:none}}
+.sec[hidden]{display:none}
+button:focus-visible{outline:2px solid var(--or);outline-offset:2px}
+</style>
+
+<div class="wrap">
+  <div class="note"><b>Mockup, example data.</b> Today an upload shows one line of text ("Uploading 3 of 5…"). These states show each file's own progress, what failed and a Retry, and friendly loading and error screens for whole pages. Tap Retry in tab 2.</div>
+  <div class="sw" id="sw"><button class="on" data-s="a" type="button">Uploading</button><button data-s="b" type="button">Failed</button><button data-s="c" type="button">Job page</button><button data-s="d" type="button">Page</button></div>
+
+  <div id="a" class="sec" style="display:flex;flex-direction:column;gap:14px">
+    <div class="card">
+      <h2 style="font-size:20px">Publishing your project</h2>
+      <div class="sum"><span>Uploading 3 of 5</span><span class="mut sm">1 video, 4 photos</span></div>
+      <div class="bar"><i style="width:56%"></i></div>
+      <div class="grid">
+        <div class="t"><span class="ck">✓</span></div>
+        <div class="t b"><span class="ck">✓</span></div>
+        <div class="t c"><div class="ov"><div class="pb"><i style="width:100%"></i></div>Finishing…</div></div>
+        <div class="t v"><span class="play">▶</span><div class="ov"><div class="pb"><i style="width:42%"></i></div>Video 42%</div></div>
+        <div class="t"><div class="ov dim">Waiting</div></div>
+      </div>
+      <div class="box warn">Keep this page open until it finishes. Videos take the longest. Your project is already saved, so you will not lose it.</div>
+    </div>
+  </div>
+
+  <div id="b" class="sec" hidden style="flex-direction:column;gap:14px">
+    <div class="card">
+      <h2 style="font-size:20px">Almost done</h2>
+      <div class="sum"><span id="bs">4 of 5 uploaded</span><span class="mut sm" id="bsm">1 needs attention</span></div>
+      <div class="bar"><i id="bb" style="width:80%"></i></div>
+      <div class="grid">
+        <div class="t"><span class="ck">✓</span></div><div class="t b"><span class="ck">✓</span></div><div class="t c"><span class="ck">✓</span></div>
+        <div class="t v" id="vid"><span class="play">▶</span><div class="ov err" id="verr">Lost connection<button class="rt" type="button" id="retry">Retry</button></div></div>
+        <div class="t"><span class="ck">✓</span></div>
+      </div>
+      <div class="box bad" id="bmsg">The video did not upload. Your connection dropped. Tap Retry. The photos are saved.</div>
+      <button class="btn gh" type="button" id="skip">Continue without it</button>
+    </div>
+  </div>
+
+  <div id="c" class="sec" hidden style="flex-direction:column;gap:14px">
+    <div class="note">If the person continues, or leaves, the project still posts. The job page remembers what is missing and offers the same Retry, so nothing is silently lost.</div>
+    <div class="box ok">Your project is posted. Contractors can now send bids.</div>
+    <div class="box warn"><b>1 video did not upload.</b><br>Everything else is saved. You can add it again now.<button class="btn" type="button" style="margin-top:10px">Choose the video again</button></div>
+    <div class="card"><h2 style="font-size:20px">Photos</h2><div class="grid"><div class="t"></div><div class="t b"></div><div class="t c"></div></div></div>
+  </div>
+
+  <div id="d" class="sec" hidden style="flex-direction:column;gap:14px">
+    <div class="note">Two screens for every page. A loading screen shows the page's shape while data arrives, so it never looks frozen. An error screen replaces a blank or technical failure.</div>
+    <div class="card" aria-label="Loading example"><div class="sk" style="height:26px;width:55%"></div><div class="sk" style="height:14px;width:80%"></div><div class="sk" style="height:84px"></div><div class="sk" style="height:84px"></div></div>
+    <div class="card"><h2 style="font-size:20px">Something went wrong</h2><div class="mut">We could not load this page. Your information is safe. Check your connection and try again.</div><button class="btn" type="button">Try again</button><button class="btn gh" type="button">Go to Projects</button><div class="mut sm">If it keeps happening, tell us at the address on the Menu &gt; Help page.</div></div>
+  </div>
+</div>
+<script>
+function $(i){return document.getElementById(i)}
+$('retry').onclick=function(){var v=$('verr');v.className='ov';v.innerHTML='<div class="pb"><i style="width:30%"></i></div>Retrying…';$('bmsg').className='box warn';$('bmsg').textContent='Retrying the video…';
+ setTimeout(function(){v.className='ov';v.innerHTML='<div class="pb"><i style="width:100%"></i></div>Finishing…'},900);
+ setTimeout(function(){v.remove();$('vid').insertAdjacentHTML('beforeend','<span class="ck">✓</span>');$('bs').textContent='5 of 5 uploaded';$('bsm').textContent='All done';$('bb').style.width='100%';$('bmsg').className='box ok';$('bmsg').textContent='All uploaded.';$('skip').textContent='Open my project'},1800)};
+$('skip').onclick=function(){$('sw').children[2].click()};
+[].forEach.call($('sw').children,function(b){b.onclick=function(){
+  [].forEach.call($('sw').children,function(x){x.classList.toggle('on',x===b)});
+  ['a','b','c','d'].forEach(function(id){var e=$(id);e.hidden=id!==b.dataset.s;e.style.display=e.hidden?'none':'flex'});window.scrollTo(0,0)}});
+</script>
