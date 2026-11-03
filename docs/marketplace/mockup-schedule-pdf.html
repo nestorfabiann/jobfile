@@ -1,0 +1,117 @@
+<title>Schedule and Project Record</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: one phone column. Tabs: Schedule, Homeowner sees, Reminders, PDF record. Dates and names are made-up examples. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#cd7d2e;--orl:#f9efe4;--orb:#ecd4a8;--gr:#1f7a55;--grl:#d9f1e6;--am:#9a5b00;--aml:#fbeccd;--page:#e9e5dc;--paper:#fff}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--gr:#6fd1a3;--grl:#173a2c;--am:#f0b95a;--aml:#3a2e12;--page:#0d0c0b;--paper:#f3efe8;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--gr:#6fd1a3;--grl:#173a2c;--am:#f0b95a;--aml:#3a2e12;--page:#0d0c0b;--paper:#f3efe8;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:14px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:16px}
+h1,h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;text-wrap:balance}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
+.mut{color:var(--mut);font-size:14px;line-height:1.5;margin:0}
+.sw{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.sw button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:8px 2px;border-radius:99px;font:500 12.5px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:44px}.sw button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.sec{display:flex;flex-direction:column;gap:16px}.sec[hidden]{display:none}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.pill{font-size:12px;font-weight:700;padding:4px 10px;border-radius:99px;background:var(--orl);color:var(--or);border:1px solid var(--orb);white-space:nowrap}.pill.g{background:var(--grl);color:var(--gr);border-color:transparent}.pill.a{background:var(--aml);color:var(--am);border-color:transparent}
+.btn{display:block;text-align:center;background:var(--or);color:#fff;border:0;border-radius:99px;padding:13px 18px;font:600 15px 'IBM Plex Sans',sans-serif;min-height:46px;width:100%}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.tl{display:flex;flex-direction:column}
+.ph{display:grid;grid-template-columns:22px 1fr auto;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);align-items:start}.ph:last-child{border-bottom:0}
+.dot{width:18px;height:18px;border-radius:50%;border:2px solid var(--orb);background:var(--card);margin-top:2px}.dot.done{background:var(--gr);border-color:var(--gr)}.dot.now{background:var(--or);border-color:var(--or);box-shadow:0 0 0 4px var(--orl)}
+.ph b{display:block;font-size:15px}.ph span{font-size:13px;color:var(--mut)}
+.kv{display:flex;justify-content:space-between;gap:10px;font-size:14.5px;padding:9px 0;border-bottom:1px solid var(--line)}.kv:last-child{border-bottom:0}
+.tg{width:44px;height:26px;border-radius:99px;background:var(--line);position:relative;flex:none}.tg::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff}.tg.on{background:var(--gr)}.tg.on::after{left:21px}
+.msg{border:1px solid var(--line);border-radius:16px;padding:12px;font-size:14px;line-height:1.5;background:var(--bg)}.msg small{display:block;color:var(--mut);font-size:12px;margin-bottom:4px}
+.sheet{background:var(--paper);color:#1b1a18;border-radius:6px;padding:20px 18px;border:1px solid var(--line);display:flex;flex-direction:column;gap:10px;box-shadow:0 6px 20px rgba(0,0,0,.12)}
+.sheet h3{font-size:22px}.sheet p{margin:0;font-size:13px;color:#5b554e;line-height:1.5}.sheet hr{border:0;border-top:1px solid #d9d3c8;margin:4px 0;width:100%}
+.sheet .row{display:flex;justify-content:space-between;font-size:13px;gap:10px}
+.thumbs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.thumbs i{aspect-ratio:1;border-radius:6px;background:#d9d3c8;display:block}
+</style>
+<div class="wrap">
+  <div class="note"><b>Mockup.</b> Project schedule with reminders, and the whole-project PDF record. Dates, names and amounts are made-up examples.</div>
+  <div class="sw" id="sw"><button data-s="sc" class="on" type="button">Schedule</button><button data-s="ho" type="button">Homeowner</button><button data-s="re" type="button">Reminders</button><button data-s="pd" type="button">PDF record</button></div>
+
+  <div id="sc" class="sec">
+    <h2 style="font-size:24px">Schedule</h2>
+    <p class="mut">The contractor builds it on the project. Both sides see the same dates, and changes are logged.</p>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><h3 style="font-size:17px">Kitchen repaint, Plano</h3><span class="pill g">On track</span></div>
+      <div class="tl">
+        <div class="ph"><i class="dot done"></i><div><b>Prep and mask</b><span>Oct 27 to Oct 28 · done</span></div><span class="pill g">Done</span></div>
+        <div class="ph"><i class="dot now"></i><div><b>Prime and first coat</b><span>Nov 3 to Nov 5 · in progress</span></div><span class="pill">Now</span></div>
+        <div class="ph"><i class="dot"></i><div><b>Second coat</b><span>Nov 6 · homeowner picks sheen by Nov 4</span></div><span class="pill a">Needs you</span></div>
+        <div class="ph"><i class="dot"></i><div><b>Trim and touch-ups</b><span>Nov 7</span></div></div>
+        <div class="ph"><i class="dot"></i><div><b>Final walkthrough and payment</b><span>Nov 8</span></div></div>
+      </div>
+      <button class="btn ghost" type="button">+ Add a phase</button>
+    </div>
+    <div class="note" style="border-style:solid">Moving a date asks for a short reason ("rain delay") and tells the other person. Weather and material delays stay on record, which helps if there is ever a dispute.</div>
+  </div>
+
+  <div id="ho" class="sec" hidden>
+    <h2 style="font-size:24px">What the homeowner sees</h2>
+    <div class="card">
+      <span class="pill a" style="align-self:flex-start">Needs you</span>
+      <h3 style="font-size:19px">Pick the sheen by Nov 4</h3>
+      <p class="mut">Nesty's Painting starts the second coat on Nov 6 and needs your choice first.</p>
+      <button class="btn" type="button">Choose sheen</button>
+    </div>
+    <div class="card"><h3 style="font-size:17px">Coming up</h3>
+      <div class="kv"><span>Tomorrow</span><b>Prime and first coat</b></div>
+      <div class="kv"><span>Thu, Nov 6</span><b>Second coat</b></div>
+      <div class="kv"><span>Fri, Nov 7</span><b>Trim and touch-ups</b></div>
+      <div class="kv"><span>Sat, Nov 8</span><b>Final walkthrough</b></div>
+    </div>
+    <div class="note" style="border-style:solid">This sits near the top of the homeowner's Projects page, under "Needs you".</div>
+  </div>
+
+  <div id="re" class="sec" hidden>
+    <h2 style="font-size:24px">Reminders</h2>
+    <div class="card"><h3 style="font-size:17px">Sent automatically</h3>
+      <div class="kv"><span>The day before each phase</span><span class="tg on"></span></div>
+      <div class="kv"><span>Morning of, 7:00 AM</span><span class="tg on"></span></div>
+      <div class="kv"><span>When a date moves</span><span class="tg on"></span></div>
+      <div class="kv"><span>A decision is due in 2 days</span><span class="tg on"></span></div>
+      <div class="kv"><span>Text messages</span><span class="tg"></span></div>
+    </div>
+    <p class="mut">Email goes out first. Text messages appear once SMS is set up.</p>
+    <div class="msg"><small>Email to Jerry · Mon 7:00 AM</small><b>Nesty's Painting is on site tomorrow.</b><br>Prime and first coat, 8:00 AM. Please make sure the kitchen is clear. Open your project to see the full schedule.</div>
+    <div class="msg"><small>Email to Jerry · Tue 9:00 AM</small><b>One decision needed by tomorrow.</b><br>Choose the sheen so the second coat can start Thursday.</div>
+  </div>
+
+  <div id="pd" class="sec" hidden>
+    <h2 style="font-size:24px">Project record</h2>
+    <p class="mut">One PDF of everything on the project. Useful for resale, insurance, warranty claims and taxes.</p>
+    <div class="sheet">
+      <p style="font-size:11px;letter-spacing:.08em;text-transform:uppercase">Jobfile project record</p>
+      <h3>Kitchen repaint</h3>
+      <p>Jerry Still · Plano, TX<br>Nesty's Painting · Oct 27 to Nov 8, 2026</p>
+      <hr>
+      <div class="row"><span>Agreement signed</span><b>Oct 24</b></div>
+      <div class="row"><span>Contract total</span><b>$4,800</b></div>
+      <div class="row"><span>Change orders</span><b>1 · +$350</b></div>
+      <div class="row"><span>Payments recorded</span><b>$2,900</b></div>
+      <hr>
+      <div class="thumbs"><i></i><i></i><i></i></div>
+      <p>Includes: agreement, change orders, payment log, schedule changes, photos, messages, ratings.</p>
+    </div>
+    <div class="card">
+      <div class="kv"><span>Include messages</span><span class="tg on"></span></div>
+      <div class="kv"><span>Include photos</span><span class="tg on"></span></div>
+      <div class="kv"><span>Include payment log</span><span class="tg on"></span></div>
+      <button class="btn" type="button">Download PDF</button>
+    </div>
+    <div class="note" style="border-style:solid">Both the homeowner and the contractor can download it. Payments are shown as recorded, since Jobfile does not move money.</div>
+  </div>
+
+  <div class="note" style="border-style:solid"><b>How it would work:</b> One SQL step adds a schedule table. Reminders run from a daily Vercel job, which fits the free plan. They use email now, and text later. The PDF is generated on the server from data already in the project.</div>
+</div>
+<script>
+var sw=document.getElementById('sw'),ids=['sc','ho','re','pd'];
+[].forEach.call(sw.children,function(b){b.onclick=function(){
+  [].forEach.call(sw.children,function(x){x.classList.toggle('on',x===b)});
+  ids.forEach(function(id){document.getElementById(id).hidden=id!==b.dataset.s});window.scrollTo(0,0)}});
+</script>
