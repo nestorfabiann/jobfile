@@ -10,7 +10,8 @@ import { isExpired, type Invite } from '@/lib/invites';
 import { dollars } from '@/lib/money';
 import { listingOpen, listingTitle, marketplaceEnabled, type Bid, type Listing } from '@/lib/marketplace';
 import ProjectsTabs from '@/components/ProjectsTabs';
-import NeedsYou, { type NeedItem } from '@/components/NeedsYou';
+import NeedsYou from '@/components/NeedsYou';
+import { projectTasks, type NeedItem } from '@/lib/needs';
 import WhyJobfile from '@/components/WhyJobfile';
 import StartProjectForm from '@/components/StartProjectForm';
 import { alertHref } from '@/lib/alertPath';
@@ -24,7 +25,7 @@ export default async function Projects({ searchParams }: { searchParams: { error
   const { sb, user } = await requireUser();
 
   const [{ data: projects }, { data: memberships }, { data: alerts }] = await Promise.all([
-    sb.from('projects').select('id,name,address,homeowner_name,created_at,closeout_started_at,completed_at').order('created_at', { ascending: false }),
+    sb.from('projects').select('id,name,address,homeowner_name,created_at,closeout_started_at,completed_at,company_id').order('created_at', { ascending: false }),
     sb.from('company_members').select('company_id, companies(name)').eq('user_id', user.id),
     sb
       .from('notifications')
@@ -76,7 +77,7 @@ export default async function Projects({ searchParams }: { searchParams: { error
   const mk = marketplaceEnabled();
   const posted: Listing[] = [];
   const drafts: { id: string; updated_at: string; data: ReturnType<typeof cleanDraft> }[] = [];
-  const stats = new Map<string, { n: number; lo: number; hi: number; fresh: number }>();
+  const stats = new Map<string, { n: number; lo: number; hi: number; fresh: number; freshAt: string }>();
   const myBidIds: string[] = [];
   let extra = 0;
   if (mk) {
@@ -93,10 +94,10 @@ export default async function Projects({ searchParams }: { searchParams: { error
         (bs ?? []).forEach((b: any) => {
           if (b.status === 'withdrawn') return;
           myBidIds.push(b.id);
-          const c = stats.get(b.listing_id) ?? { n: 0, lo: Infinity, hi: 0, fresh: 0 };
+          const c = stats.get(b.listing_id) ?? { n: 0, lo: Infinity, hi: 0, fresh: 0, freshAt: '' };
           const lst = posted.find((x) => x.id === b.listing_id) as any;
           // Until the 014 column exists, nothing counts as new.
-          if (lst && 'bids_seen_at' in lst && new Date(b.created_at) > new Date(lst.bids_seen_at ?? lst.created_at)) c.fresh += 1;
+          if (lst && 'bids_seen_at' in lst && new Date(b.created_at) > new Date(lst.bids_seen_at ?? lst.created_at)) { c.fresh += 1; if (!c.freshAt || b.created_at < c.freshAt) c.freshAt = b.created_at; }
           c.n += 1; c.lo = Math.min(c.lo, b.price_cents); c.hi = Math.max(c.hi, b.price_cents);
           stats.set(b.listing_id, c);
         });
@@ -109,41 +110,42 @@ export default async function Projects({ searchParams }: { searchParams: { error
       (mine ?? []).forEach((b: any) => myBidIds.push(b.id));
     }
   }
-  const needs: NeedItem[] = [];
+  // "Needs you": real open tasks, oldest first. Each one leaves the list when the thing is done.
+  const needs: NeedItem[] = await projectTasks(user.id, list as any, ((memberships ?? []) as any[]).map((m) => m.company_id as string));
   posted.forEach((l) => {
     const st = stats.get(l.id);
-    if (listingOpen(l) && st && st.fresh > 0) needs.push({ key: `b${l.id}`, title: `${st.fresh} new bid${st.fresh === 1 ? '' : 's'} on ${listingTitle(l)}`, sub: `Lowest ${dollars(st.lo)} of ${st.n} bid${st.n === 1 ? '' : 's'}`, href: `/marketplace/${l.id}`, go: 'Compare', tone: 'new' });
+    if (listingOpen(l) && st && st.fresh > 0) needs.push({ key: `b${l.id}`, icon: 'bid', title: `${st.fresh} new bid${st.fresh === 1 ? '' : 's'} on ${listingTitle(l)}`, sub: `Lowest ${dollars(st.lo)} of ${st.n} bid${st.n === 1 ? '' : 's'}`, href: `/marketplace/${l.id}`, go: 'Compare', at: st.freshAt });
   });
   // Unread messages from the other side on bids that are still open.
   if (mk && myBidIds.length) {
-    const { data: ms } = await supabaseAdmin().from('marketplace_messages').select('listing_id,bid_id').in('bid_id', myBidIds).neq('sender_id', user.id).is('read_at', null);
-    const perListing = new Map<string, number>();
-    (ms ?? []).forEach((m: any) => perListing.set(m.listing_id, (perListing.get(m.listing_id) ?? 0) + 1));
+    const { data: ms } = await supabaseAdmin().from('marketplace_messages').select('listing_id,bid_id,created_at').in('bid_id', myBidIds).neq('sender_id', user.id).is('read_at', null).order('created_at');
+    const perListing = new Map<string, { n: number; at: string }>();
+    (ms ?? []).forEach((m: any) => { const c = perListing.get(m.listing_id); perListing.set(m.listing_id, { n: (c?.n ?? 0) + 1, at: c?.at ?? m.created_at }); });
     if (perListing.size) {
       const { data: ls } = await supabaseAdmin().from('marketplace_listings').select('id,job_type,items').in('id', Array.from(perListing.keys()));
       (ls ?? []).forEach((l: any) => {
-        const n = perListing.get(l.id) ?? 0;
-        needs.push({ key: `m${l.id}`, title: `${n} new message${n === 1 ? '' : 's'} about ${listingTitle(l)}`, sub: 'Before the bid is accepted', href: `/marketplace/${l.id}`, go: 'Read', tone: 'new' });
+        const c = perListing.get(l.id)!;
+        needs.push({ key: `m${l.id}`, icon: 'msg', title: `${c.n} new message${c.n === 1 ? '' : 's'} about ${listingTitle(l)}`, sub: 'Before the bid is accepted', href: `/marketplace/${l.id}`, go: 'Read', at: c.at });
       });
     }
   }
+  // New nearby jobs and a rating to leave still come from alerts.
   const { data: unread } = await sb
     .from('notifications')
     .select('id,title,created_at,project_id,kind')
     .is('read_at', null)
-    .in('kind', ['change', 'agreement', 'payment', 'review', 'bid', 'job_match'])
+    .in('kind', ['review', 'job_match'])
     .gt('created_at', new Date(Date.now() - 14 * 86400000).toISOString())
-    .order('created_at', { ascending: false })
+    .order('created_at', { ascending: true })
     .limit(30);
-  const jobs = (unread ?? []).filter((n: any) => n.kind === 'job_match').length;
+  const jobAlerts = (unread ?? []).filter((n: any) => n.kind === 'job_match');
   (unread ?? []).forEach((n: any) => {
-    if (n.kind === 'job_match' || (n.kind === 'bid' && !n.project_id)) return;
-    // Only alerts that ask the person to do something. "Fully signed", "approved" and "payment received" are just news.
-    if (n.kind !== 'bid' && !/needs your approval|ready to review|signed the agreement|payment requested|payment sent|rate your experience/i.test(n.title)) return;
-    needs.push({ key: n.id, title: n.title, sub: when(n.created_at), href: `/n/${n.id}`, go: n.kind === 'bid' ? 'Open' : 'Review', tone: n.kind === 'bid' ? 'won' : 'new' });
+    if (n.kind === 'review' && /rate your experience/i.test(n.title)) needs.push({ key: n.id, icon: 'star', title: n.title, sub: when(n.created_at), href: `/n/${n.id}`, go: 'Rate', at: n.created_at });
   });
-  if (jobs > 0) needs.push({ key: 'jobs', title: `${jobs} new job${jobs === 1 ? '' : 's'} near you`, sub: 'Matched to your trades and area', href: '/n/jobs', go: 'View', tone: 'new' });
-  const needsCard = <NeedsYou items={needs.slice(0, 6)} />;
+  if (jobAlerts.length > 0) needs.push({ key: 'jobs', icon: 'job', title: `${jobAlerts.length} new job${jobAlerts.length === 1 ? '' : 's'} near you`, sub: 'Matched to your trades and area', href: '/n/jobs', go: 'View', at: (jobAlerts[0] as any).created_at });
+  needs.sort((x, y) => new Date(x.at).getTime() - new Date(y.at).getTime());
+  const hasAnything = list.length > 0 || posted.length > 0 || !!company;
+  const needsCard = <NeedsYou items={needs.slice(0, 8)} caughtUp={hasAnything} />;
 
   const tab = mk && !company && searchParams.tab === 'posted' ? 'posted' : 'projects';
   const tabs = mk ? <ProjectsTabs active={tab === 'posted' ? 'extra' : 'projects'} role={company ? 'contractor' : 'homeowner'} projects={list.length} extra={extra} /> : null;
