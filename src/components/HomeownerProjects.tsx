@@ -3,6 +3,7 @@ import TradeIcon from '@/components/TradeIcon';
 import KitchenArt from '@/components/KitchenArt';
 import InviteCard from '@/components/InviteCard';
 import { createCompany } from '@/app/projects/actions';
+import { deleteDraft } from '@/app/marketplace/actions';
 import { listingOpen, listingTitle, type Listing } from '@/lib/marketplace';
 import type { Summary } from '@/lib/homeSummary';
 
@@ -79,6 +80,17 @@ export default function HomeownerProjects(p: {
               <b>{d.data.type}{d.data.picks.length ? ` · ${d.data.picks.length} choice${d.data.picks.length === 1 ? '' : 's'} picked` : ''}</b>
               <span className="muted small">Not visible to contractors until you publish</span>
               <Link className="btn ghost" href={`/marketplace/new?draft=${d.id}`}>Continue your post</Link>
+              <details>
+                <summary className="muted small" style={{ cursor: 'pointer', padding: '8px 0' }}>Delete this draft</summary>
+                <div className="stack" style={{ gap: 8 }}>
+                  <p className="muted small" style={{ margin: 0 }}>This removes the draft for good.</p>
+                  <form action={deleteDraft}>
+                    <input type="hidden" name="id" value={d.id} />
+                    <input type="hidden" name="back" value="/projects" />
+                    <button className="btn ghost" type="submit">Yes, delete the draft</button>
+                  </form>
+                </div>
+              </details>
             </div>
           ))}
           {waiting.map((l) => {

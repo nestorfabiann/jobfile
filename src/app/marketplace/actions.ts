@@ -460,5 +460,5 @@ export async function deleteDraft(formData: FormData) {
   const id = String(formData.get('id') ?? '');
   if (/^[0-9a-f-]{36}$/i.test(id)) await supabaseAdmin().from('marketplace_drafts').delete().eq('id', id).eq('user_id', user.id);
   revalidatePath('/projects');
-  redirect('/projects?tab=posted');
+  redirect(String(formData.get('back') ?? '') === '/projects' ? '/projects' : '/projects?tab=posted');
 }
