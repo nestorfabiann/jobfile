@@ -9,6 +9,8 @@ import { fmtDate, INSURANCE_KINDS, isCurrent, signedUrls } from '@/lib/companyPr
 import { firstNameInitial, listingOpen, listingTitle, requireMarketplace, type Bid, type Listing } from '@/lib/marketplace';
 import RangeBar from '@/components/RangeBar';
 import AcceptBid from '@/components/AcceptBid';
+import BidCompare, { type CompareCol } from '@/components/BidCompare';
+import CompareBar from '@/components/CompareBar';
 import InsuranceBadge from '@/components/InsuranceBadge';
 import BidThread, { type ThreadMsg } from '@/components/BidThread';
 import ListingPhotoUploader from '@/components/ListingPhotoUploader';
@@ -18,7 +20,7 @@ export const dynamic = 'force-dynamic';
 const when = (iso: string) => new Date(iso).toLocaleDateString('en-US', { timeZone: 'America/Chicago', month: 'short', day: 'numeric', year: 'numeric' });
 const range = (a: number | null, b: number | null) => [a, b].filter((x) => x != null).map((x) => dollars(x as number)).join(' – ');
 
-export default async function ListingPage({ params, searchParams }: { params: { id: string }; searchParams: { insured?: string; open?: string; posted?: string; media?: string; bid?: string; error?: string } }) {
+export default async function ListingPage({ params, searchParams }: { params: { id: string }; searchParams: { compare?: string | string[]; insured?: string; open?: string; posted?: string; media?: string; bid?: string; error?: string } }) {
   requireMarketplace();
   const { user } = await requireUser();
   if (!/^[0-9a-f-]{36}$/i.test(params.id)) notFound();
@@ -88,6 +90,10 @@ export default async function ListingPage({ params, searchParams }: { params: { 
     needsInsurance = !(mine ?? []).some((i: any) => isCurrent(i));
   }
 
+  // Side-by-side view: ?compare=<bid id>&compare=<bid id> (2 or 3 bids, homeowner only).
+  const wanted = (Array.isArray(searchParams.compare) ? searchParams.compare : searchParams.compare ? [searchParams.compare] : []).slice(0, 3);
+  const compareBids = owner ? visible.filter((b) => wanted.includes(b.id)) : [];
+  const cmpIds = new Set(compareBids.map((b) => b.id));
   const hasAI = l.ai_low_cents != null && l.ai_high_cents != null;
   const budget = range(l.budget_min_cents, l.budget_max_cents);
 
@@ -168,6 +174,22 @@ export default async function ListingPage({ params, searchParams }: { params: { 
             {visible.length > 0 && <Link className="pill" href={onlyInsured ? `/marketplace/${l.id}` : `/marketplace/${l.id}?insured=1`} aria-pressed={onlyInsured}>{onlyInsured ? '✓ Insured only' : 'Insured only'}</Link>}
           </div>
           {onlyInsured && shown.length < visible.length && <p className="muted small">Hiding {visible.length - shown.length} bid{visible.length - shown.length === 1 ? '' : 's'} without current verified insurance.</p>}
+          {compareBids.length >= 2 && (
+            <BidCompare
+              backHref={`/marketplace/${l.id}`}
+              cols={compareBids.map((b): CompareCol => {
+                const c = info.get(b.company_id);
+                return {
+                  id: b.id, name: c?.name ?? 'Contractor', priceCents: b.price_cents, price: dollars(b.price_cents),
+                  range: hasAI ? (b.price_cents < (l.ai_low_cents as number) * 0.8 ? 'low' : b.price_cents > (l.ai_high_cents as number) * 1.2 ? 'high' : 'in') : null,
+                  weeks: b.weeks, start: b.start_date ? fmtDate(b.start_date) : '',
+                  rating: c && c.count > 0 ? { avg: c.avg, count: c.count } : null,
+                  insurance: c?.insured ? 'ok' : c?.pending ? 'wait' : 'none', until: c?.until ? fmtDate(c.until) : '',
+                  inclusions: b.inclusions, canAccept: open && b.status === 'waiting', messageHref: `/marketplace/${l.id}?open=${b.id}#bid-${b.id}`,
+                };
+              })}
+            />
+          )}
           {shown.length === 0 && visible.length > 0 && <div className="card"><p className="muted">No bids with verified insurance yet. Turn off the filter to see all bids.</p></div>}
           {visible.length === 0 && <div className="card"><p className="muted">No bids yet. Contractors on Jobfile can see your project and send bids.</p></div>}
           {shown.map((b) => {
@@ -175,7 +197,7 @@ export default async function ListingPage({ params, searchParams }: { params: { 
             const low = hasAI && b.price_cents < (l.ai_low_cents as number) * 0.8;
             const high = hasAI && b.price_cents > (l.ai_high_cents as number) * 1.2;
             return (
-              <div className="card" key={b.id} style={b.status === 'won' ? { borderColor: 'var(--ok)' } : undefined}>
+              <div className="card" id={`bid-${b.id}`} key={b.id} style={b.status === 'won' ? { borderColor: 'var(--ok)' } : undefined}>
                 <div className="row" style={{ justifyContent: 'space-between' }}>
                   <span className="row" style={{ gap: 12, flexWrap: 'nowrap', minWidth: 0 }}>
                     {c?.logo ? (
@@ -191,6 +213,7 @@ export default async function ListingPage({ params, searchParams }: { params: { 
                       <Link href={`/contractors/${b.company_id}`} className="small" style={{ fontWeight: 700 }}>View profile ›</Link>
                     </span>
                   </span>
+                  {shown.length > 1 && b.status === 'waiting' ? <label className="row small" style={{ gap: 8, fontWeight: 700, minHeight: 44, cursor: 'pointer' }}><input type="checkbox" name="compare" form="cmpform" value={b.id} defaultChecked={cmpIds.has(b.id)} style={{ width: 22, height: 22 }} />Compare</label> : null}
                   {b.status === 'won' ? <span className="pill ok">Hired</span> : b.status === 'not_selected' ? <span className="pill">Not selected</span> : null}
                 </div>
                 <div className="row small muted">
@@ -212,6 +235,7 @@ export default async function ListingPage({ params, searchParams }: { params: { 
             );
           })}
           {l.status === 'awarded' && l.project_id && <Link className="btn" href={`/projects/${l.project_id}/overview`}>Open the project</Link>}
+          {shown.length > 1 && <CompareBar action={`/marketplace/${l.id}`} />}
           {open && (
             <form action={closeListing}><input type="hidden" name="listing_id" value={l.id} /><button className="btn ghost" type="submit">Close this project (no more bids)</button></form>
           )}
