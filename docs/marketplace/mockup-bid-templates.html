@@ -1,0 +1,100 @@
+<title>Bid Templates</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: contractor's bid card on a job page, three states: pick a template, quick bid with only the price left, manage saved templates. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#cd7d2e;--orl:#f9efe4;--orb:#ecd4a8;--gr:#1f7a55;--grl:#d9f1e6;--bad:#b3261e;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--grl:#173a2c;--gr:#6fd1a3;--bad:#f2b8b5;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--grl:#173a2c;--gr:#6fd1a3;--bad:#f2b8b5;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:14px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px}
+h1,h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;text-wrap:balance}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
+.mut{color:var(--mut);font-size:14px;line-height:1.5}.sm{font-size:12.5px}
+.sw{display:flex;gap:6px}.sw button{flex:1;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:10px 4px;border-radius:99px;font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:44px}.sw button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:18px;display:flex;flex-direction:column;gap:12px}
+.job{display:flex;flex-direction:column;gap:4px}
+.pill{display:inline-block;width:max-content;font-size:12px;font-weight:600;padding:4px 10px;border-radius:99px;background:var(--grl);color:var(--gr)}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chips button{border:1.5px solid var(--line);background:var(--card);color:var(--ink);border-radius:99px;padding:10px 14px;min-height:44px;font:500 14px 'IBM Plex Sans',sans-serif;cursor:pointer}
+.chips button.on{border-color:var(--or);background:var(--orl);color:var(--or)}
+label.f{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--mut)}
+input[type=text],textarea{width:100%;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:14px;padding:12px;font:16px 'IBM Plex Sans',sans-serif}
+textarea{min-height:76px;resize:vertical}
+.price{font-size:20px;font-weight:600}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn{display:flex;align-items:center;justify-content:center;border-radius:99px;min-height:52px;padding:0 16px;font:600 16px 'IBM Plex Sans',sans-serif;border:1px solid var(--or);background:var(--or);color:#fff;cursor:pointer;width:100%}
+.btn.gh{background:var(--orl);color:var(--or);border-color:var(--orb)}
+.applied{display:flex;justify-content:space-between;gap:8px;align-items:center;background:var(--orl);border:1px solid var(--orb);border-radius:14px;padding:10px 12px;font-size:14px}
+.applied button{border:0;background:none;color:var(--or);font:600 13px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:32px}
+.ok{background:var(--grl);color:var(--gr);border-radius:14px;padding:12px;font-size:14px}
+.row{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--line)}.row:last-child{border-bottom:0}
+.chk{display:flex;gap:10px;align-items:center;font-size:14px;min-height:40px}.chk input{width:20px;height:20px;accent-color:var(--or)}
+.sec[hidden]{display:none}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--or);outline-offset:2px}
+</style>
+
+<div class="wrap">
+  <div class="note"><b>Mockup, example data.</b> A template saves everything except the price, because every job is priced differently. Pick a template, type the price, send: that is the two taps.</div>
+  <div class="sw" id="sw"><button class="on" data-s="a" type="button">1 · Pick</button><button data-s="b" type="button">2 · Quick bid</button><button data-s="c" type="button">3 · Manage</button></div>
+
+  <div id="a" class="sec" style="display:flex;flex-direction:column;gap:14px">
+    <div class="card job"><span class="pill">Open for bids</span><h2 style="font-size:22px">Painting: Walls, Trim and doors</h2><div class="mut sm">ZIP 75072 · 1,800 sq ft · Budget $6,000 – $6,500</div></div>
+    <div class="card">
+      <h2 style="font-size:20px">Place a bid</h2>
+      <div><div class="mut sm" style="margin-bottom:6px">Start from one of your templates</div>
+        <div class="chips" id="chips"><button type="button" data-t="0">Interior repaint</button><button type="button" data-t="1">Exterior + trim</button><button type="button" data-t="2">Cabinet refresh</button></div></div>
+      <div class="mut sm" id="hint">Or fill in the bid yourself below.</div>
+      <div class="two"><label class="f">Your price ($)<input type="text" inputmode="decimal" id="price" placeholder="6200"></label><label class="f">How many weeks?<input type="text" id="weeks" inputmode="numeric" placeholder="2"></label></div>
+      <label class="f">What is included<textarea id="inc" placeholder="Permits, materials…"></textarea></label>
+      <label class="f">Note to the homeowner<textarea id="note" placeholder="Short intro"></textarea></label>
+      <div class="applied" id="applied" hidden><span id="appliedt"></span><button type="button" id="clear">Clear</button></div>
+      <button class="btn" type="button" id="send">Send bid</button>
+      <label class="chk" id="saveRow"><input type="checkbox" id="save"><span>Save this as a template for next time</span></label>
+      <div class="ok" id="sent" hidden></div>
+    </div>
+  </div>
+
+  <div id="b" class="sec" hidden style="flex-direction:column;gap:14px">
+    <div class="note">What it looks like right after tapping "Interior repaint": everything is filled in. Only the price is left. The contractor can still edit any field before sending.</div>
+    <div class="card">
+      <h2 style="font-size:20px">Place a bid</h2>
+      <div class="applied"><span>Using template: <b>Interior repaint</b></span><button type="button">Change</button></div>
+      <label class="f">Your price ($)<input type="text" value="" placeholder="Type your price" style="border-color:var(--or)"></label>
+      <div class="mut sm">Last 3 painting bids: $5,800, $6,400, $6,900</div>
+      <div class="two"><div class="mut sm">2 weeks</div><div class="mut sm">Starts: within 10 days</div></div>
+      <div class="mut sm" style="border:1px solid var(--line);border-radius:14px;padding:10px 12px">Included: 2 coats, prep and patching, standard Sherwin-Williams, cleanup. Trim and doors: priced separately. No furniture moving above 1 floor.</div>
+      <button class="btn" type="button">Send bid</button>
+    </div>
+  </div>
+
+  <div id="c" class="sec" hidden style="flex-direction:column;gap:14px">
+    <div class="note">Lives in Settings &gt; Business profile, so contractors can edit, rename or delete templates. Up to 10 per business.</div>
+    <div class="card">
+      <h2 style="font-size:20px">Bid templates</h2>
+      <div class="row"><div><b>Interior repaint</b><div class="mut sm">2 weeks · 2 coats, prep, cleanup</div></div><button class="btn gh" style="width:auto;min-height:40px">Edit</button></div>
+      <div class="row"><div><b>Exterior + trim</b><div class="mut sm">1 week · Pressure wash, prime, 2 coats</div></div><button class="btn gh" style="width:auto;min-height:40px">Edit</button></div>
+      <div class="row"><div><b>Cabinet refresh</b><div class="mut sm">1 week · Degrease, sand, spray finish</div></div><button class="btn gh" style="width:auto;min-height:40px">Edit</button></div>
+      <button class="btn gh" type="button">+ New template</button>
+    </div>
+  </div>
+</div>
+<script>
+var T=[{n:'Interior repaint',w:'2',i:'2 coats, prep and patching, standard paint, cleanup. Trim and doors priced separately.',note:'Thanks for posting. I have painted many homes in your area and can start within 10 days. Happy to answer questions.'},
+{n:'Exterior + trim',w:'1',i:'Pressure wash, scrape, prime bare spots, 2 coats, caulk trim, cleanup.',note:'I can start soon and will protect landscaping and windows. Ask me anything about the scope.'},
+{n:'Cabinet refresh',w:'1',i:'Remove doors, degrease, sand, spray finish, reinstall hardware.',note:'Cabinets are my specialty. Happy to bring color samples.'}];
+function $(i){return document.getElementById(i)}
+var used=-1;
+[].forEach.call($('chips').children,function(b){b.onclick=function(){
+  [].forEach.call($('chips').children,function(x){x.classList.toggle('on',x===b)});
+  used=+b.dataset.t;var t=T[used];$('weeks').value=t.w;$('inc').value=t.i;$('note').value=t.note;
+  $('applied').hidden=false;$('appliedt').textContent='Using template: '+t.n+'. Edit anything before sending.';
+  $('hint').textContent='Now just enter your price.';$('saveRow').hidden=true;$('price').focus()}});
+$('clear').onclick=function(){used=-1;['weeks','inc','note','price'].forEach(function(i){$(i).value=''});$('applied').hidden=true;$('hint').textContent='Or fill in the bid yourself below.';$('saveRow').hidden=false;[].forEach.call($('chips').children,function(x){x.classList.remove('on')})};
+$('send').onclick=function(){if(!$('price').value.trim()){$('price').focus();$('sent').hidden=false;$('sent').style.background='var(--orl)';$('sent').style.color='var(--ink)';$('sent').textContent='Enter your price first.';return}
+  $('sent').hidden=false;$('sent').style.background='';$('sent').style.color='';$('sent').textContent='Bid sent'+($('save').checked&&used<0?'. Saved as a new template.':'.')};
+[].forEach.call($('sw').children,function(b){b.onclick=function(){
+  [].forEach.call($('sw').children,function(x){x.classList.toggle('on',x===b)});
+  ['a','b','c'].forEach(function(id){var e=$(id);e.hidden=id!==b.dataset.s;e.style.display=e.hidden?'none':'flex'});window.scrollTo(0,0)}});
+</script>
