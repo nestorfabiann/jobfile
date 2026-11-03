@@ -18,6 +18,8 @@ import StartProjectForm from '@/components/StartProjectForm';
 import { alertHref } from '@/lib/alertPath';
 import { cookies } from 'next/headers';
 import ZipCard from '@/components/ZipCard';
+import ProfileMeter from '@/components/ProfileMeter';
+import { profileMeter } from '@/lib/profileMeter';
 import HomeownerProjects from '@/components/HomeownerProjects';
 import { homeownerSummaries, contractorSummaries } from '@/lib/homeSummary';
 import ContractorProjects from '@/components/ContractorProjects';
@@ -287,8 +289,10 @@ export default async function Projects({ searchParams }: { searchParams: { error
     const bids = brs.filter((b) => lmap.has(b.listing_id)).map((b) => ({ id: b.id as string, price_cents: b.price_cents as number, created_at: b.created_at as string, listing: lmap.get(b.listing_id) as Listing, view: viewStatus(b) }));
     const { data: me } = await sb.from('profiles').select('full_name').eq('id', user.id).maybeSingle();
     const firstName = String((me as any)?.full_name ?? '').trim().split(/\s+/)[0] ?? '';
+    const pm = await profileMeter(company.company_id);
     return (
       <ContractorProjects
+        meter={<ProfileMeter pct={pm.pct} items={pm.items} />}
         firstName={firstName}
         companyId={company.company_id}
         companyName={company.companies?.name ?? ''}

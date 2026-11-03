@@ -70,11 +70,11 @@ export default async function ListingPage({ params, searchParams }: { params: { 
   else if (myBid) await ackBidView(db, myBid as any);
 
   // For the homeowner: who each bidder is, their rating and whether their insurance is verified.
-  const info = new Map<string, { name: string; avg: number; count: number; insured: boolean; pending: boolean; kinds: string[]; until: string; logo: string }>();
+  const info = new Map<string, { name: string; avg: number; count: number; insured: boolean; pending: boolean; kinds: string[]; until: string; logo: string; verified: boolean }>();
   if (owner && visible.length) {
     const cids = Array.from(new Set(visible.map((b) => b.company_id)));
     const [{ data: cos }, { data: ins }] = await Promise.all([
-      db.from('companies').select('id,name,logo_path').in('id', cids),
+      db.from('companies').select('*').in('id', cids),
       db.from('company_insurance').select('company_id,status,expires_on,kind').in('company_id', cids),
     ]);
     const logoUrls = await signedUrls('company-photos', (cos ?? []).map((c: any) => c.logo_path as string).filter(Boolean));
@@ -83,7 +83,7 @@ export default async function ListingPage({ params, searchParams }: { params: { 
       const good = (ins ?? []).filter((i: any) => i.company_id === c.id && isCurrent(i)).map((i: any) => i.expires_on as string).sort();
       const kinds: string[] = Array.from(new Set<string>((ins ?? []).filter((i: any) => i.company_id === c.id && isCurrent(i)).map((i: any) => (INSURANCE_KINDS as Record<string, string>)[i.kind as string] ?? ''))).filter(Boolean);
       const pending = (ins ?? []).some((i: any) => i.company_id === c.id && i.status === 'pending');
-      info.set(c.id as string, { name: c.name as string, avg: s.avg, count: s.count, insured: good.length > 0, pending, kinds, until: good[0] ?? '', logo: (c as any).logo_path ? logoUrls.get((c as any).logo_path as string) ?? '' : '' });
+      info.set(c.id as string, { name: c.name as string, avg: s.avg, count: s.count, insured: good.length > 0, pending, kinds, until: good[0] ?? '', logo: (c as any).logo_path ? logoUrls.get((c as any).logo_path as string) ?? '' : '', verified: !!(c as any).verified_at && !(c as any).hidden_at });
     }
   }
 
@@ -245,6 +245,7 @@ export default async function ListingPage({ params, searchParams }: { params: { 
                 <div className="row small muted">
                   <span>{c && c.count > 0 ? `★ ${c.avg.toFixed(1)} · ${c.count} review${c.count > 1 ? 's' : ''}` : 'No reviews yet'}</span>
                 </div>
+                {c?.verified ? <span className="pill ok" style={{ width: 'max-content' }}>✓ Verified by Jobfile</span> : null}
                 <InsuranceBadge state={c?.insured ? 'ok' : c?.pending ? 'wait' : 'none'} name={c?.name ?? 'This contractor'} until={c?.until ?? ''} kinds={c?.kinds ?? []} />
                 <div style={{ fontSize: 26, fontWeight: 800 }}>{dollars(b.price_cents)}</div>
                 <p className="muted small">{[b.weeks ? `${b.weeks} week${b.weeks > 1 ? 's' : ''}` : '', b.start_date ? `starts ${fmtDate(b.start_date)}` : ''].filter(Boolean).join(' · ') || 'Timeline not given'}</p>
