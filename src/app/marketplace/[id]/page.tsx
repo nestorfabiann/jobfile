@@ -5,10 +5,11 @@ import { requireUser } from '@/lib/session';
 import { supabaseAdmin } from '@/lib/supabase/server';
 import { dollars } from '@/lib/money';
 import { companyReviews, summarize } from '@/lib/reviews';
-import { fmtDate, isCurrent, signedUrls } from '@/lib/companyProfile';
+import { fmtDate, INSURANCE_KINDS, isCurrent, signedUrls } from '@/lib/companyProfile';
 import { firstNameInitial, listingOpen, listingTitle, requireMarketplace, type Bid, type Listing } from '@/lib/marketplace';
 import RangeBar from '@/components/RangeBar';
 import AcceptBid from '@/components/AcceptBid';
+import InsuranceBadge from '@/components/InsuranceBadge';
 import BidThread, { type ThreadMsg } from '@/components/BidThread';
 import ListingPhotoUploader from '@/components/ListingPhotoUploader';
 import { acceptBid, closeListing, deleteListingPhoto, deleteListingVideo, placeBid, withdrawBid } from '../actions';
@@ -17,7 +18,7 @@ export const dynamic = 'force-dynamic';
 const when = (iso: string) => new Date(iso).toLocaleDateString('en-US', { timeZone: 'America/Chicago', month: 'short', day: 'numeric', year: 'numeric' });
 const range = (a: number | null, b: number | null) => [a, b].filter((x) => x != null).map((x) => dollars(x as number)).join(' – ');
 
-export default async function ListingPage({ params, searchParams }: { params: { id: string }; searchParams: { open?: string; posted?: string; media?: string; bid?: string; error?: string } }) {
+export default async function ListingPage({ params, searchParams }: { params: { id: string }; searchParams: { insured?: string; open?: string; posted?: string; media?: string; bid?: string; error?: string } }) {
   requireMarketplace();
   const { user } = await requireUser();
   if (!/^[0-9a-f-]{36}$/i.test(params.id)) notFound();
@@ -61,19 +62,30 @@ export default async function ListingPage({ params, searchParams }: { params: { 
   const myBid = companyId ? allBids.find((b) => b.company_id === companyId) : undefined;
 
   // For the homeowner: who each bidder is, their rating and whether their insurance is verified.
-  const info = new Map<string, { name: string; avg: number; count: number; insured: boolean; until: string; logo: string }>();
+  const info = new Map<string, { name: string; avg: number; count: number; insured: boolean; pending: boolean; kinds: string[]; until: string; logo: string }>();
   if (owner && visible.length) {
     const cids = Array.from(new Set(visible.map((b) => b.company_id)));
     const [{ data: cos }, { data: ins }] = await Promise.all([
       db.from('companies').select('id,name,logo_path').in('id', cids),
-      db.from('company_insurance').select('company_id,status,expires_on').in('company_id', cids),
+      db.from('company_insurance').select('company_id,status,expires_on,kind').in('company_id', cids),
     ]);
     const logoUrls = await signedUrls('company-photos', (cos ?? []).map((c: any) => c.logo_path as string).filter(Boolean));
     for (const c of cos ?? []) {
       const s = summarize(await companyReviews(c.id as string));
       const good = (ins ?? []).filter((i: any) => i.company_id === c.id && isCurrent(i)).map((i: any) => i.expires_on as string).sort();
-      info.set(c.id as string, { name: c.name as string, avg: s.avg, count: s.count, insured: good.length > 0, until: good[0] ?? '', logo: (c as any).logo_path ? logoUrls.get((c as any).logo_path as string) ?? '' : '' });
+      const kinds: string[] = Array.from(new Set<string>((ins ?? []).filter((i: any) => i.company_id === c.id && isCurrent(i)).map((i: any) => (INSURANCE_KINDS as Record<string, string>)[i.kind as string] ?? ''))).filter(Boolean);
+      const pending = (ins ?? []).some((i: any) => i.company_id === c.id && i.status === 'pending');
+      info.set(c.id as string, { name: c.name as string, avg: s.avg, count: s.count, insured: good.length > 0, pending, kinds, until: good[0] ?? '', logo: (c as any).logo_path ? logoUrls.get((c as any).logo_path as string) ?? '' : '' });
     }
+  }
+
+  const onlyInsured = searchParams.insured === '1';
+  const shown = onlyInsured ? visible.filter((b) => info.get(b.company_id)?.insured) : visible;
+  // A contractor without current verified insurance gets a nudge, since the badge helps them stand out.
+  let needsInsurance = false;
+  if (!owner && companyId) {
+    const { data: mine } = await db.from('company_insurance').select('status,expires_on').eq('company_id', companyId);
+    needsInsurance = !(mine ?? []).some((i: any) => isCurrent(i));
   }
 
   const hasAI = l.ai_low_cents != null && l.ai_high_cents != null;
@@ -151,9 +163,14 @@ export default async function ListingPage({ params, searchParams }: { params: { 
 
       {owner && (
         <>
-          <h2>{visible.length} bid{visible.length === 1 ? '' : 's'}</h2>
+          <div className="row" style={{ justifyContent: 'space-between' }}>
+            <h2>{shown.length} bid{shown.length === 1 ? '' : 's'}</h2>
+            {visible.length > 0 && <Link className="pill" href={onlyInsured ? `/marketplace/${l.id}` : `/marketplace/${l.id}?insured=1`} aria-pressed={onlyInsured}>{onlyInsured ? '✓ Insured only' : 'Insured only'}</Link>}
+          </div>
+          {onlyInsured && shown.length < visible.length && <p className="muted small">Hiding {visible.length - shown.length} bid{visible.length - shown.length === 1 ? '' : 's'} without current verified insurance.</p>}
+          {shown.length === 0 && visible.length > 0 && <div className="card"><p className="muted">No bids with verified insurance yet. Turn off the filter to see all bids.</p></div>}
           {visible.length === 0 && <div className="card"><p className="muted">No bids yet. Contractors on Jobfile can see your project and send bids.</p></div>}
-          {visible.map((b) => {
+          {shown.map((b) => {
             const c = info.get(b.company_id);
             const low = hasAI && b.price_cents < (l.ai_low_cents as number) * 0.8;
             const high = hasAI && b.price_cents > (l.ai_high_cents as number) * 1.2;
@@ -178,8 +195,8 @@ export default async function ListingPage({ params, searchParams }: { params: { 
                 </div>
                 <div className="row small muted">
                   <span>{c && c.count > 0 ? `★ ${c.avg.toFixed(1)} · ${c.count} review${c.count > 1 ? 's' : ''}` : 'No reviews yet'}</span>
-                  {c?.insured && <span className="pill ok">Insurance verified until {fmtDate(c.until)}</span>}
                 </div>
+                <InsuranceBadge state={c?.insured ? 'ok' : c?.pending ? 'wait' : 'none'} name={c?.name ?? 'This contractor'} until={c?.until ?? ''} kinds={c?.kinds ?? []} />
                 <div style={{ fontSize: 26, fontWeight: 800 }}>{dollars(b.price_cents)}</div>
                 <p className="muted small">{[b.weeks ? `${b.weeks} week${b.weeks > 1 ? 's' : ''}` : '', b.start_date ? `starts ${fmtDate(b.start_date)}` : ''].filter(Boolean).join(' · ') || 'Timeline not given'}</p>
                 {hasAI && <RangeBar price={b.price_cents} lo={l.ai_low_cents as number} hi={l.ai_high_cents as number} />}
@@ -206,6 +223,12 @@ export default async function ListingPage({ params, searchParams }: { params: { 
           <h2>{myBid && myBid.status !== 'withdrawn' ? 'Your bid' : 'Place a bid'}</h2>
           {myBid && myBid.status === 'won' && l.project_id && <><div className="box ok">You won this job.</div><Link className="btn" href={`/projects/${l.project_id}/overview`}>Open the project</Link></>}
           {myBid && myBid.status === 'not_selected' && <div className="box warn">This project went to another contractor or was closed.</div>}
+          {open && needsInsurance && (
+            <div className="box" style={{ background: 'var(--accent-soft, #f9efe4)' }}>
+              <b>Add your insurance to show a verified badge on your bids.</b>
+              <span className="small" style={{ display: 'block' }}>Homeowners see it next to your name. Upload your certificate in <Link href="/settings/business">Settings &gt; Business profile</Link>.</span>
+            </div>
+          )}
           {open && (!myBid || myBid.status === 'waiting' || myBid.status === 'withdrawn') ? (
             <form action={placeBid} className="stack" style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               <input type="hidden" name="listing_id" value={l.id} />
