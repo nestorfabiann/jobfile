@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
 /** Signed-in header menu: Home first, then the usual links. Closes on navigation, outside tap and Escape. */
-export default function AppMenu({ marketplace, admin, signOutAction }: { marketplace: boolean; admin: boolean; signOutAction: () => void | Promise<void> }) {
+export default function AppMenu({ marketplace, contractor, admin, signOutAction }: { marketplace: boolean; contractor?: boolean; admin: boolean; signOutAction: () => void | Promise<void> }) {
   const [open, setOpen] = useState(false);
   const path = usePathname();
   const box = useRef<HTMLDivElement>(null);
@@ -24,7 +24,7 @@ export default function AppMenu({ marketplace, admin, signOutAction }: { marketp
     ['/', 'Home'],
     ['/projects', 'Projects'],
     ...(marketplace ? ([['/marketplace', 'Marketplace']] as [string, string][]) : []),
-    ...(marketplace ? ([['/find', 'Find contractors']] as [string, string][]) : []),
+    ...(marketplace && !contractor ? ([['/find', 'Find contractors']] as [string, string][]) : []),
     ['/settings', 'Settings'],
     ['/invite', 'Invite friends'],
     ['/help', 'Help and contact'],
