@@ -1,0 +1,97 @@
+<title>Finish a Project</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: project Overview on a phone, in four states: the contractor's stage card at the top, the homeowner's "Work is finished" request, the request as a task for the contractor, and the confirm step that opens ratings. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#cd7d2e;--orl:#f9efe4;--orb:#ecd4a8;--gr:#1f7a55;--grl:#d9f1e6;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--grl:#173a2c;--gr:#6fd1a3;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--grl:#173a2c;--gr:#6fd1a3;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:14px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px}
+h1,h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;text-wrap:balance}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
+.mut{color:var(--mut);font-size:14px;line-height:1.5}.sm{font-size:12.5px}
+.sw{display:grid;grid-template-columns:1fr 1fr;gap:6px}.sw button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:10px 4px;border-radius:99px;font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:44px}.sw button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.pill{display:inline-block;border:1px solid var(--orb);background:var(--orl);color:var(--or);border-radius:99px;padding:5px 12px;font-size:13px;font-weight:600;width:max-content}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.steps i{display:block;height:6px;border-radius:99px;background:var(--line)}.steps i.on{background:var(--or)}
+.steps+.steps{margin-top:-8px}.steps span{font:600 10.5px 'IBM Plex Sans',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--mut)}.steps span.on{color:var(--ink)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.stage{background:var(--orl);border:1px solid var(--orb)}
+.btn{display:flex;align-items:center;justify-content:center;border-radius:99px;min-height:50px;padding:0 18px;font:600 15.5px 'IBM Plex Sans',sans-serif;border:1px solid var(--or);background:var(--or);color:#fff;cursor:pointer;width:100%}
+.btn.gh{background:transparent;color:var(--ink);border-color:var(--line)}
+.check{display:flex;gap:10px;align-items:flex-start;font-size:14px}.check i{flex:none;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-size:13px;background:var(--grl);color:var(--gr)}.check i.no{background:var(--line);color:var(--mut)}
+.task{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:6px}
+.age{display:inline-block;width:max-content;font-size:11.5px;font-weight:600;padding:2px 8px;border-radius:99px;background:var(--orl);color:var(--or)}
+.ok{background:var(--grl);color:var(--gr);border-radius:14px;padding:12px;font-size:14px;line-height:1.45}
+.sec[hidden]{display:none}
+button:focus-visible{outline:2px solid var(--or);outline-offset:2px}
+</style>
+
+<div class="wrap">
+  <div class="note"><b>Mockup, example data.</b> Three changes: the stage card moves to the top of Overview, the homeowner can ask the contractor to finish the job, and the two steps (closeout, then complete) become one when the final payment is in. Tap through the four states. In state 1, tap the button to see the confirm step.</div>
+  <div class="sw" id="sw"><button class="on" data-s="a" type="button">1 · Contractor</button><button data-s="b" type="button">2 · Homeowner</button><button data-s="c" type="button">3 · Request arrives</button><button data-s="d" type="button">4 · Done</button></div>
+
+  <h1 style="font-size:28px">Kitchen remodel</h1>
+  <div class="steps" aria-hidden="true"><i class="on"></i><i class="on"></i><i id="s3"></i><i id="s4"></i></div>
+  <div class="steps" aria-hidden="true"><span class="on">Agreement</span><span class="on">Active</span><span id="l3">Closeout</span><span id="l4">Complete</span></div>
+
+  <!-- 1 contractor -->
+  <div id="a" class="sec" style="display:flex;flex-direction:column;gap:14px">
+    <div class="card stage" id="stage">
+      <h2 style="font-size:20px">Is the work finished?</h2>
+      <div class="check"><i>✓</i><span>Final payment confirmed received</span></div>
+      <div class="check"><i>✓</i><span>No open punch-list items</span></div>
+      <span class="mut sm">Marking it complete opens ratings for you and the homeowner.</span>
+      <button class="btn" type="button" id="open">Mark project complete</button>
+      <button class="btn gh" type="button">Not yet, keep it active</button>
+    </div>
+    <div class="card" id="confirm" hidden>
+      <h2 style="font-size:20px">Mark this project complete?</h2>
+      <span class="mut">This is what happens next:</span>
+      <div class="check"><i>1</i><span>Jerry gets an alert to rate your work.</span></div>
+      <div class="check"><i>2</i><span>You rate Jerry. Ratings show only after you both rate, or after 14 days.</span></div>
+      <div class="check"><i>3</i><span>The project moves to Completed. You can move it back to active if something comes up.</span></div>
+      <button class="btn" type="button" id="yes">Yes, mark complete</button>
+      <button class="btn gh" type="button" id="no">Cancel</button>
+    </div>
+    <div class="card"><h3 style="font-size:17px">Needs your attention</h3><span class="mut sm">Everything else on Overview stays where it is, below this card.</span></div>
+    <div class="note" style="border-style:solid"><b>If the final payment is not confirmed yet</b>, the card says so and offers "Start closeout" like today, so the punch list and last payment still have a step.</div>
+  </div>
+
+  <!-- 2 homeowner -->
+  <div id="b" class="sec" hidden style="flex-direction:column;gap:14px">
+    <div class="card stage">
+      <h2 style="font-size:20px">Is the work finished?</h2>
+      <span class="mut">Tell Nesty's Painting the work is done. They confirm and close the job, then you both rate each other.</span>
+      <button class="btn" type="button" id="ask">The work is finished</button>
+      <div class="ok" id="asked" hidden>Sent. We asked Nesty's Painting to mark the project complete. You will get an alert when they do.</div>
+    </div>
+    <div class="note" style="border-style:solid">Only the contractor closes the job, so a homeowner cannot end it early. The homeowner button is a request, and it can be sent once a day.</div>
+  </div>
+
+  <!-- 3 request arrives -->
+  <div id="c" class="sec" hidden style="flex-direction:column;gap:14px">
+    <h2 style="font-size:22px">Needs you <span style="color:var(--or)">1</span></h2>
+    <div class="task"><b>Jerry says the work is finished</b><span class="mut sm">Kitchen remodel · Mark it complete to open ratings</span><span class="age">Today</span><button class="btn" type="button" style="min-height:42px;align-self:flex-end;width:auto">Review</button></div>
+    <div class="note" style="border-style:solid">Tapping Review opens Overview with the "Is the work finished?" card from state 1 at the top.</div>
+  </div>
+
+  <!-- 4 done -->
+  <div id="d" class="sec" hidden style="flex-direction:column;gap:14px">
+    <div class="ok"><b>Project complete.</b><br>Rate your experience with Jerry. Ratings show after you both rate.</div>
+    <button class="btn" type="button">Rate your experience</button>
+    <button class="btn gh" type="button">Move back to active</button>
+  </div>
+</div>
+<script>
+function $(i){return document.getElementById(i)}
+function show(id){['a','b','c','d'].forEach(function(x){var e=$(x);e.hidden=x!==id;e.style.display=e.hidden?'none':'flex'});
+ [].forEach.call($('sw').children,function(b){b.classList.toggle('on',b.dataset.s===id)});
+ var done=id==='d';$('s3').className=done?'on':'';$('s4').className=done?'on':'';$('l3').className=done?'on':'';$('l4').className=done?'on':'';window.scrollTo(0,0)}
+[].forEach.call($('sw').children,function(b){b.onclick=function(){show(b.dataset.s)}});
+$('open').onclick=function(){$('stage').hidden=true;$('confirm').hidden=false};
+$('no').onclick=function(){$('stage').hidden=false;$('confirm').hidden=true};
+$('yes').onclick=function(){$('stage').hidden=false;$('confirm').hidden=true;show('d')};
+$('ask').onclick=function(){$('asked').hidden=false;this.disabled=true;this.style.opacity=.5};
+</script>
