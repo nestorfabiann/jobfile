@@ -6,6 +6,7 @@ import Stars from '@/components/Stars';
 import PendingButton from '@/components/PendingButton';
 import { catsFor, homeownerReviews, homeownerSummaryVisible, REVEAL_DAYS, revealedBy, summarize, type ReviewRow } from '@/lib/reviews';
 import { replyToReview, submitReview } from './actions';
+import InviteCard from '@/components/InviteCard';
 
 export const dynamic = 'force-dynamic';
 
@@ -111,6 +112,10 @@ export default async function Rating({
           <p className="muted small">Keep it honest and about the project. Reviews with abuse, personal details or accusations unrelated to the work can be removed.</p>
           <PendingButton>{mine ? 'Update rating' : 'Submit rating'}</PendingButton>
         </form>
+      )}
+
+      {role === 'homeowner' && done && mine && (
+        <InviteCard title="Happy with how it went?" body="Tell a neighbor. Getting bids on Jobfile is free." cta="Invite a friend" back={`/projects/${project.id}/rating`} />
       )}
 
       {role === 'homeowner' && (

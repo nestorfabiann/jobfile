@@ -34,6 +34,17 @@ export default async function UserPage({ params }: { params: { id: string } }) {
   const events = await loadFeed({ userId: u.id, limit: 50 });
   const names = await lookups(events);
   const isAdmin = isAdminEmail(u.email);
+  let invitedBy = '';
+  try {
+    const { data: j } = await db.from('invite_events').select('code').eq('invitee_id', u.id).eq('kind', 'join').maybeSingle();
+    if (j?.code) {
+      const { data: c } = await db.from('invite_codes').select('user_id').eq('code', j.code as string).maybeSingle();
+      if (c?.user_id) {
+        const { data: o } = await db.from('profiles').select('full_name,email').eq('id', c.user_id as string).maybeSingle();
+        invitedBy = (o?.full_name || o?.email || '') as string;
+      }
+    }
+  } catch { /* invites not set up yet */ }
   const { data: notes } = await db.from('admin_notes').select('id,body,author_email,created_at').eq('subject_type', 'user').eq('subject_id', u.id).order('created_at', { ascending: false }).limit(50);
 
   return (
@@ -49,6 +60,7 @@ export default async function UserPage({ params }: { params: { id: string } }) {
           {companies?.length ? ' · Company: ' : ''}{(companies ?? []).map((c, i) => (<span key={c.id}>{i ? ', ' : ''}<Link href={`/admin/companies/${c.id}`}>{c.name}</Link></span>))}
         </div>
         {u.banned_at && <div className="small">Reason: {u.ban_reason || '—'}</div>}
+        {invitedBy ? <div className="small muted">Invited by {invitedBy}</div> : null}
       </div>
 
       {!isAdmin && (

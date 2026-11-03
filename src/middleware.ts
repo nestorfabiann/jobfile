@@ -29,7 +29,7 @@ export async function middleware(req: NextRequest) {
   const path = req.nextUrl.pathname;
   // Public marketplace pages (landing and open jobs) are visible when signed out, only while the marketplace is on.
   const publicMarket = process.env.MARKETPLACE_ENABLED === 'true' && (path === '/' || path === '/jobs' || path.startsWith('/jobs/'));
-  const isOpen = path.startsWith('/login') || path.startsWith('/auth') || path.startsWith('/unsubscribe') || path === '/help' || publicMarket;
+  const isOpen = path.startsWith('/login') || path.startsWith('/auth') || path.startsWith('/unsubscribe') || path === '/help' || path.startsWith('/r/') || publicMarket;
 
   if (!user && !isOpen) {
     const url = req.nextUrl.clone();
