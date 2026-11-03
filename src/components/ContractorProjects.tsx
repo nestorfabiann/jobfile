@@ -44,7 +44,7 @@ export default function ContractorProjects(p: {
   return (
     <>
       <div className="stack">
-        <h1>{first ? `Welcome${p.firstName ? `, ${p.firstName}` : ''}` : `Hi${p.firstName ? ` ${p.firstName}` : ''}`}</h1>
+        <h1>{first ? `Welcome${p.firstName ? `, ${p.firstName}` : ''}` : `Hi ${p.firstName || 'there'}`}</h1>
         <p className="muted">{first ? 'Find jobs near you, bid on them, and run the work without the paperwork. It is free.' : `${p.companyName} · here is your work at a glance.`}</p>
       </div>
 

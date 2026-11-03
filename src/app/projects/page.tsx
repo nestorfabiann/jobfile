@@ -320,9 +320,12 @@ export default async function Projects({ searchParams }: { searchParams: { error
       (rv ?? []).forEach((r: any) => rated.add(r.project_id as string));
     }
     const { data: me } = await sb.from('profiles').select('full_name').eq('id', user.id).maybeSingle();
-    const firstName = String((me as any)?.full_name ?? '').trim().split(/\s+/)[0] ?? '';
+    const savedName = String((me as any)?.full_name ?? '').trim();
+    const projectName = String(((list as any[]).find((x) => String(x.homeowner_name ?? '').trim()) as any)?.homeowner_name ?? '').trim();
+    const firstName = (savedName || projectName).split(/\s+/)[0] ?? '';
     return (
       <HomeownerProjects
+        needsName={!savedName}
         firstName={firstName}
         email={user.email ?? ''}
         needsCard={needsCard}

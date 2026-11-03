@@ -16,6 +16,7 @@ const short = (iso: string) => new Date(iso).toLocaleDateString('en-US', { timeZ
 
 /** The homeowner's Projects page, ordered the way a homeowner thinks: needs you, waiting for bids, hired, completed. */
 export default function HomeownerProjects(p: {
+  needsName?: boolean;
   firstName: string;
   email: string;
   needsCard: React.ReactNode;
@@ -48,8 +49,9 @@ export default function HomeownerProjects(p: {
   return (
     <>
       <div className="stack">
-        <h1>{first ? `Welcome${p.firstName ? `, ${p.firstName}` : ''}` : `Hi${p.firstName ? ` ${p.firstName}` : ''}`}</h1>
+        <h1>{first ? `Welcome${p.firstName ? `, ${p.firstName}` : ''}` : `Hi ${p.firstName || 'there'}`}</h1>
         <p className="muted">{first ? 'Tell us about your project and local contractors will send bids. It is free.' : 'Here is where your projects stand.'}</p>
+        {p.needsName && <Link href="/settings" className="small" style={{ fontWeight: 700 }}>Add your name in Settings</Link>}
       </div>
 
       <div className="stack" style={{ gap: 4 }}>
