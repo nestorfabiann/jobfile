@@ -42,6 +42,11 @@ export default function LandingPitch({ aiOn, signedIn }: { aiOn: boolean; signed
       {who === 'c' ? (
         <>
           <h2 style={{ fontSize: 24 }}>Win the job, then run it without the paperwork</h2>
+          <span className="pill ok" style={{ width: 'max-content' }}>Free for contractors</span>
+          <div className="card" style={{ background: 'var(--ok-bg, #d9f1e6)', borderColor: 'transparent' }}>
+            <h3 style={{ margin: 0 }}>Free to join. No subscription. No fees at all.</h3>
+            <span className="small">No monthly or yearly charge, no fee to bid, and nothing taken from the jobs you win.</span>
+          </div>
           <div className="card">
             <h3 style={{ margin: 0 }}>How it works for contractors</h3>
             {steps([
@@ -79,9 +84,9 @@ export default function LandingPitch({ aiOn, signedIn }: { aiOn: boolean; signed
           </div>
           <div className="card" style={{ gap: 6 }}>
             <h3 style={{ margin: 0 }}>Your customers&apos; privacy</h3>
-            <span className="muted small">Homeowner addresses, names and phone numbers stay private until a bid is accepted. Free to start.</span>
+            <span className="muted small">Homeowner addresses, names and phone numbers stay private until a bid is accepted.</span>
           </div>
-          <Link className="btn" href={go}>Create your contractor profile →</Link>
+          <Link className="btn" href={go}>Create your free contractor profile →</Link>
         </>
       ) : (
         <>
