@@ -1,0 +1,229 @@
+<title>Scope Questions</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: one phone column. Four tabs: the question form, the completeness check, what the contractor sees, all trades. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#cd7d2e;--orl:#f9efe4;--orb:#ecd4a8;--gr:#1f7a55;--grl:#d9f1e6;--am:#9a5b00;--aml:#fbeccd;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--gr:#6fd1a3;--grl:#173a2c;--am:#f0b95a;--aml:#3a2e12;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--gr:#6fd1a3;--grl:#173a2c;--am:#f0b95a;--aml:#3a2e12;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:14px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px}
+h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;text-wrap:balance}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
+.mut{color:var(--mut);font-size:13.5px;line-height:1.45}
+.sw{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.sw button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:8px 2px;border-radius:99px;font:500 12.5px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:44px}.sw button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.q{display:flex;flex-direction:column;gap:7px}
+.q label,.q .lb{font-size:14px;font-weight:600}
+.q .hint{font-size:12.5px;color:var(--mut);line-height:1.4;margin-top:-3px}
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:99px;padding:9px 14px;font:500 14px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:40px}
+.chip.on{background:var(--orl);border-color:var(--or);color:var(--or)}
+.chip.ns{border-style:dashed;color:var(--mut)}
+.chip.ns.on{color:var(--am);background:var(--aml);border-color:var(--am)}
+input[type=text],input[type=number],textarea{width:100%;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:14px;padding:11px 12px;font:15px 'IBM Plex Sans',sans-serif;min-height:44px}
+textarea{min-height:84px;resize:vertical}
+.grp{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);font-weight:600}
+hr{border:0;border-top:1px solid var(--line);margin:2px 0;width:100%}
+.meter{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:10px 14px;display:flex;flex-direction:column;gap:6px}
+.bar{height:8px;border-radius:99px;background:var(--line);overflow:hidden}.bar i{display:block;height:100%;background:var(--or);border-radius:99px;transition:width .25s}
+.bar.good i{background:var(--gr)}
+.pill{display:inline-block;width:max-content;font-size:12px;font-weight:700;padding:4px 10px;border-radius:99px;background:var(--grl);color:var(--gr)}
+.pill.am{background:var(--aml);color:var(--am)}
+.photo{border:1.5px dashed var(--orb);border-radius:14px;padding:10px 12px;display:flex;gap:10px;align-items:center;font-size:13.5px;line-height:1.35}
+.photo b{display:block;font-size:14px}
+.photo .pl{width:40px;height:40px;border-radius:10px;background:var(--orl);color:var(--or);display:grid;place-items:center;font-size:22px;flex:none}
+.btn{display:flex;align-items:center;justify-content:center;border-radius:99px;min-height:50px;padding:0 18px;font:700 15.5px 'IBM Plex Sans',sans-serif;border:1px solid var(--or);background:var(--or);color:#fff;cursor:pointer;width:100%}
+.btn.ghost{background:transparent;color:var(--or)}
+.sug{background:var(--orl);border-radius:14px;padding:10px 12px;font-size:13.5px;line-height:1.4;display:flex;flex-direction:column;gap:7px}
+.kv{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:6px 12px;font-size:13.5px;line-height:1.4}
+.kv span:nth-child(odd){color:var(--mut)}
+.ns-v{color:var(--am);font-weight:600}
+details{border:1px solid var(--line);background:var(--card);border-radius:16px;padding:12px 14px}
+summary{font-weight:600;font-size:14.5px;cursor:pointer;min-height:24px}
+details ul{margin:10px 0 0;padding-left:18px;font-size:13.5px;line-height:1.5;color:var(--mut)}
+.sec[hidden]{display:none}
+</style>
+<div class="wrap">
+  <div class="note"><b>Mockup.</b> Kitchen remodel shown in full. After the homeowner taps what they want done, the form asks the questions a contractor would ask on a site visit. Every question has a "Not sure" answer, so nobody gets stuck. Tap the chips to try it.</div>
+  <div class="sw" id="sw">
+    <button data-s="form" class="on" type="button">Questions</button>
+    <button data-s="check" type="button">Check</button>
+    <button data-s="view" type="button">Bidder view</button>
+    <button data-s="all" type="button">All trades</button>
+  </div>
+
+  <!-- TAB 1 -->
+  <div id="form" class="sec" style="display:flex;flex-direction:column;gap:14px">
+    <div class="meter">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px"><b style="font-size:14px">Ready for bids</b><span id="pct" style="font-weight:700;font-size:14px">0%</span></div>
+      <div class="bar" id="bar"><i id="fill" style="width:0"></i></div>
+      <span class="mut" id="mtxt" style="font-size:12.5px">Answer the questions below. Contractors bid closer when they know more.</span>
+    </div>
+
+    <div class="card">
+      <h3 style="font-size:18px">Kitchen remodel: the details</h3>
+      <span class="mut">Based on what you tapped: gut and rebuild, new semi-custom cabinets, quartz, tile backsplash, new tile floor.</span>
+
+      <div class="grp">About the room</div>
+      <div class="q" data-k="size"><label for="sz">Kitchen size (sq ft)</label><input id="sz" type="number" inputmode="numeric" placeholder="150"><span class="hint">Length times width. A rough number is fine.</span></div>
+      <div class="q" data-k="shape"><div class="lb">Shape of the kitchen</div><div class="chips" data-g="shape"><button class="chip" type="button">Galley</button><button class="chip" type="button">L-shape</button><button class="chip" type="button">U-shape</button><button class="chip" type="button">Open to living room</button><button class="chip ns" type="button">Not sure</button></div></div>
+      <div class="q" data-k="wall"><div class="lb">Is a wall coming out?</div><div class="chips" data-g="wall"><button class="chip" type="button">No walls</button><button class="chip" type="button">Yes, load-bearing</button><button class="chip" type="button">Yes, not load-bearing</button><button class="chip ns" type="button">Not sure</button></div><span class="hint">Load-bearing walls need an engineer and a permit. "Not sure" is fine, the contractor will check.</span></div>
+
+      <hr><div class="grp">Cabinets</div>
+      <div class="q" data-k="cab"><div class="lb">How many cabinets?</div><div class="chips" data-g="cab"><button class="chip" type="button">Under 15</button><button class="chip" type="button">15 to 25</button><button class="chip" type="button">25 or more</button><button class="chip ns" type="button">Not sure</button></div><span class="hint">Count the doors and drawers you see. Wall and base cabinets together.</span></div>
+      <div class="q" data-k="style"><div class="lb">Door style</div><div class="chips" data-g="style"><button class="chip" type="button">Shaker</button><button class="chip" type="button">Flat slab</button><button class="chip" type="button">Traditional raised</button><button class="chip ns" type="button">Not sure</button></div></div>
+      <div class="q" data-k="fin"><div class="lb">Finish</div><div class="chips" data-g="fin"><button class="chip" type="button">Painted</button><button class="chip" type="button">Stained wood</button><button class="chip" type="button">Laminate</button><button class="chip ns" type="button">Not sure</button></div></div>
+
+      <hr><div class="grp">Countertops and backsplash</div>
+      <div class="q" data-k="ct"><label for="ctt">Counter length (feet, all runs added up)</label><input id="ctt" type="number" inputmode="numeric" placeholder="24"></div>
+      <div class="q" data-k="sink"><div class="lb">Sink</div><div class="chips" data-g="sink"><button class="chip" type="button">Undermount</button><button class="chip" type="button">Drop-in</button><button class="chip" type="button">Farmhouse</button><button class="chip ns" type="button">Not sure</button></div></div>
+      <div class="q" data-k="bs"><div class="lb">Backsplash height</div><div class="chips" data-g="bs"><button class="chip" type="button">4 inches</button><button class="chip" type="button">Full height to cabinets</button><button class="chip" type="button">Up to the ceiling</button></div></div>
+
+      <hr><div class="grp">Appliances and utilities</div>
+      <div class="q" data-k="fuel"><div class="lb">Range fuel</div><div class="chips" data-g="fuel"><button class="chip" type="button">Gas</button><button class="chip" type="button">Electric</button><button class="chip" type="button">Switching</button><button class="chip ns" type="button">Not sure</button></div></div>
+      <div class="q" data-k="hood"><div class="lb">Range hood</div><div class="chips" data-g="hood"><button class="chip" type="button">None</button><button class="chip" type="button">Vents outside</button><button class="chip" type="button">Recirculating</button><button class="chip" type="button">New vent needed</button></div></div>
+      <div class="q" data-k="plmv"><div class="lb">Is the sink or dishwasher moving?</div><div class="chips" data-g="plmv"><button class="chip" type="button">Same spot</button><button class="chip" type="button">Moving</button><button class="chip ns" type="button">Not sure</button></div></div>
+
+      <hr><div class="grp">Level of finish</div>
+      <div class="q" data-k="lvl"><div class="lb">What are you aiming for?</div><div class="chips" data-g="lvl"><button class="chip" type="button">Budget friendly</button><button class="chip" type="button">Mid range</button><button class="chip" type="button">High end</button></div><span class="hint">This changes a bid more than anything else.</span></div>
+      <div class="q" data-k="mat"><div class="lb">Who buys materials?</div><div class="chips" data-g="mat"><button class="chip" type="button">Contractor supplies all</button><button class="chip" type="button">I buy some</button><button class="chip" type="button">Already bought</button></div></div>
+    </div>
+
+    <div class="card">
+      <h3 style="font-size:18px">The house and the job</h3>
+      <span class="mut">Same for every trade.</span>
+      <div class="q" data-k="when"><div class="lb">When do you want to start?</div><div class="chips" data-g="when"><button class="chip" type="button">Within 2 weeks</button><button class="chip" type="button">This month</button><button class="chip" type="button">1 to 3 months</button><button class="chip" type="button">Just pricing</button></div></div>
+      <div class="q" data-k="flex"><div class="lb">Is the date flexible?</div><div class="chips" data-g="flex"><button class="chip" type="button">Fixed deadline</button><button class="chip" type="button">Somewhat</button><button class="chip" type="button">Very flexible</button></div></div>
+      <div class="q" data-k="home"><div class="lb">Will you be living there?</div><div class="chips" data-g="home"><button class="chip" type="button">Yes, living there</button><button class="chip" type="button">Empty or vacant</button><button class="chip" type="button">Rental, tenants inside</button></div></div>
+      <div class="q" data-k="yr"><div class="lb">When was the house built?</div><div class="chips" data-g="yr"><button class="chip" type="button">Before 1978</button><button class="chip" type="button">1978 to 2000</button><button class="chip" type="button">After 2000</button><button class="chip ns" type="button">Not sure</button></div><span class="hint">Older homes can have lead paint or asbestos. Contractors price in the safe handling.</span></div>
+      <div class="q" data-k="st"><div class="lb">Stories</div><div class="chips" data-g="st"><button class="chip" type="button">1</button><button class="chip" type="button">2</button><button class="chip" type="button">3 or more</button></div></div>
+      <div class="q" data-k="acc"><div class="lb">Getting to the work area</div><div class="chips" data-g="acc"><button class="chip" type="button">Easy, driveway parking</button><button class="chip" type="button">Stairs</button><button class="chip" type="button">Gated or HOA rules</button><button class="chip" type="button">Tight access</button></div></div>
+      <div class="q" data-k="perm"><div class="lb">Permits</div><div class="chips" data-g="perm"><button class="chip" type="button">Contractor pulls them</button><button class="chip" type="button">I have them</button><button class="chip ns" type="button">Not sure</button></div></div>
+    </div>
+
+    <div class="card">
+      <h3 style="font-size:18px">Photos that help bids</h3>
+      <span class="mut">Contractors can price a lot from good photos. Each tile asks for one shot.</span>
+      <div class="photo"><div class="pl">+</div><div><b>The whole kitchen</b>Stand in the doorway and fit the whole room in.</div></div>
+      <div class="photo"><div class="pl">+</div><div><b>The sink wall</b>Include the window, sink and plumbing wall.</div></div>
+      <div class="photo"><div class="pl">+</div><div><b>The stove wall</b>Show the range, hood and any outlets nearby.</div></div>
+      <div class="photo"><div class="pl">+</div><div><b>The floor</b>One photo at floor level showing the current material.</div></div>
+      <div class="q"><label for="nt">Anything else a contractor should know?</label><textarea id="nt" placeholder="Pets in the house, work hours, things you do not want touched..."></textarea><span class="hint">You can use the microphone on your keyboard to talk instead of type.</span></div>
+    </div>
+  </div>
+
+  <!-- TAB 2 -->
+  <div id="check" class="sec" hidden style="flex-direction:column;gap:14px">
+    <div class="card">
+      <h3 style="font-size:18px">Before it goes live</h3>
+      <div class="bar"><i style="width:72%"></i></div>
+      <b style="font-size:14px">72% ready for bids</b>
+      <span class="mut">Needed to post (blocks the Post button until done):</span>
+      <div class="kv"><span>Job type</span><span>Done</span><span>At least one item</span><span>Done</span><span>Size</span><span>Done</span><span>Start timing</span><span>Done</span><span>2 photos</span><span class="ns-v">1 of 2, add one more</span></div>
+      <span class="mut">Recommended (the post can go live without them):</span>
+      <div class="kv"><span>Cabinet count</span><span class="ns-v">Missing</span><span>Level of finish</span><span class="ns-v">Missing</span><span>Wall coming out</span><span>Done</span><span>Notes</span><span>Done</span></div>
+      <span class="pill am">Posts with 80% or more get bids that are closer to the final price</span>
+    </div>
+    <div class="card">
+      <h3 style="font-size:18px">Ask Claude to review</h3>
+      <span class="mut">Optional button. It reads the whole post and asks up to three follow-up questions a contractor would ask. It uses the same daily AI limit as the cost reference.</span>
+      <button class="btn ghost" type="button" id="ai">Check my post</button>
+      <div class="sug" id="sugs" hidden>
+        <b>Three things a contractor would ask</b>
+        <span>1. You chose "Gut and rebuild". Is the gas line staying where it is?</span>
+        <span>2. The floor is tile. Is there a concrete slab under it, or a wood floor?</span>
+        <span>3. You wrote "new window". Is that part of this job, or already done?</span>
+        <span class="mut">Tap a question to add it to your notes.</span>
+      </div>
+    </div>
+    <div class="note" style="border-style:solid">Also suggested, not drawn here: contractors can send one question before they bid, and the answer shows on the listing for every bidder. That way one answer helps everyone, and the post gets better over time.</div>
+  </div>
+
+  <!-- TAB 3 -->
+  <div id="view" class="sec" hidden style="flex-direction:column;gap:14px">
+    <div class="card">
+      <h3 style="font-size:18px">Kitchen remodel in 75205</h3>
+      <span class="pill">Detail level: high (86%)</span>
+      <div class="grp">Scope</div>
+      <span class="mut">Gut and rebuild · New semi-custom cabinets · Quartz · Tile backsplash · New tile floor</span>
+      <div class="grp">What the homeowner told us</div>
+      <div class="kv">
+        <span>Size</span><span>150 sq ft</span>
+        <span>Shape</span><span>L-shape</span>
+        <span>Wall removal</span><span class="ns-v">Not sure, check on site</span>
+        <span>Cabinets</span><span>15 to 25, Shaker, painted</span>
+        <span>Counter length</span><span>24 ft</span>
+        <span>Backsplash</span><span>Full height to cabinets</span>
+        <span>Range</span><span>Gas, vents outside</span>
+        <span>Plumbing</span><span>Sink stays in place</span>
+        <span>Level</span><span>Mid range</span>
+        <span>Materials</span><span>Contractor supplies all</span>
+        <span>Start</span><span>This month, somewhat flexible</span>
+        <span>House</span><span>Built 1978 to 2000, 1 story</span>
+        <span>Living there</span><span>Yes</span>
+        <span>Permits</span><span>Contractor pulls them</span>
+      </div>
+      <div class="grp">Photos</div>
+      <span class="mut">The whole kitchen · Sink wall · Stove wall · Floor</span>
+      <span class="mut">Items marked "Not sure" are flagged in amber so you can raise them in your bid note or ask before bidding.</span>
+    </div>
+  </div>
+
+  <!-- TAB 4 -->
+  <div id="all" class="sec" hidden style="flex-direction:column;gap:10px">
+    <span class="mut">Key questions for each of the 16 trades, on top of the "house and job" questions. About 5 to 8 per trade. Each one is chips or a short number, never a long text box.</span>
+    <div id="alllist" style="display:flex;flex-direction:column;gap:10px"></div>
+  </div>
+</div>
+<script>
+var T={
+'Kitchen remodel':['Shape, wall removal, cabinet count and style','Counter length, sink type, backsplash height','Range fuel, hood venting, plumbing moving','Level of finish, who buys materials'],
+'Bathroom':['How many bathrooms','Shower size, curb or no curb, niche','Tile size and how high it goes','Moving plumbing, tub-to-shower, safety grab bars','Ventilation fan and window'],
+'Painting':['Number of rooms, ceiling height','Walls, ceilings, trim, doors: which ones','Dark-to-light color change','Wallpaper or texture to remove','Exterior: material (brick, stucco, wood, siding), stories','Furniture: empty or contractor moves it'],
+'Roofing':['Stories and roof pitch (low, medium, steep)','Layers of old roofing','Shingle grade or metal type','Skylights, chimneys, vents count','Is this an insurance claim','Known leaks, where'],
+'Flooring':['Rooms and total sq ft','What is under it (slab or wood)','Remove old floor, who hauls it','Stairs: how many steps','Furniture moving','Baseboards and transitions'],
+'Landscaping':['Slope of the yard','Existing sprinklers','Gate width for equipment','Haul away debris','Plants: native, low water, or no preference','HOA rules'],
+'Plumbing':['Where the water heater is (garage, attic, closet)','Gas or electric, age, tank size','Number of fixtures','Slab or pier and beam','Known leak location','Water pressure or color problems'],
+'Electrical':['Panel amps and age','Attic or crawlspace access','Breaker trips or flickering','Number of outlets, switches, fixtures','Distance from panel for EV charger','City permit and inspection'],
+'HVAC':['Current system age and tonnage','Indoor unit location (attic, closet)','Gas or electric heat','Condition of ductwork','Number of zones or thermostats','Efficiency level (standard or high)'],
+'Windows and doors':['Count and rough sizes','Floor level','Frame material (vinyl, wood, fiberglass)','Egress or bedroom windows','Trim finish: inside and outside','HOA approval'],
+'Siding and exterior':['Stories and wall area','Current material','Rot or water damage suspected','Insulation or house wrap','Color and style','Pre-1978 paint'],
+'Fencing':['Length in feet, height','Gates: count and width','Slope and obstacles','Remove old fence','Shared with a neighbor','Property line known or surveyed','HOA rules'],
+'Decks and patios':['Size and height above ground','Attached to house or freestanding','Stairs and railing needed','Material (wood, composite, pavers)','Remove old deck','Permit and HOA'],
+'Concrete and driveways':['Area and thickness','Slope and drainage','Remove old concrete','Truck access','Finish (broom, stamped, colored)','Rebar or mesh'],
+'Drywall and carpentry':['Walls or ceilings, area','Cause of damage and whether it is fixed','Texture type to match','Stories and ceiling height','Trim style and height','Paint after repair'],
+'Garage':['Door size (single, double, width)','Opener: type, brand','Floor condition and cracks','Insulated or not','Sq ft of floor coating','Storage: wall or ceiling']
+};
+var al=document.getElementById('alllist');
+Object.keys(T).forEach(function(k){var d=document.createElement('details');var s=document.createElement('summary');s.textContent=k;var u=document.createElement('ul');T[k].forEach(function(x){var l=document.createElement('li');l.textContent=x;u.appendChild(l)});d.appendChild(s);d.appendChild(u);al.appendChild(d)});
+
+var total=document.querySelectorAll('#form .q[data-k]').length;
+function upd(){
+  var done=0;
+  document.querySelectorAll('#form .q[data-k]').forEach(function(q){
+    var on=q.querySelector('.chip.on'),inp=q.querySelector('input');
+    if(on||(inp&&inp.value))done++;
+  });
+  var p=Math.round(done/total*100);
+  document.getElementById('pct').textContent=p+'%';
+  var f=document.getElementById('fill');f.style.width=p+'%';
+  document.getElementById('bar').classList.toggle('good',p>=80);
+  document.getElementById('mtxt').textContent=p>=80?'Great. Contractors can bid with confidence.':(p>=40?'Getting there. Answer a few more for tighter bids.':'Answer the questions below. Contractors bid closer when they know more.');
+}
+document.querySelectorAll('#form .chips').forEach(function(g){
+  g.addEventListener('click',function(e){var b=e.target.closest('.chip');if(!b)return;
+    var was=b.classList.contains('on');
+    [].forEach.call(g.children,function(x){x.classList.remove('on')});
+    if(!was)b.classList.add('on');upd();});
+});
+document.querySelectorAll('#form input').forEach(function(i){i.addEventListener('input',upd)});
+var sw=document.getElementById('sw');
+[].forEach.call(sw.children,function(b){b.onclick=function(){
+  [].forEach.call(sw.children,function(x){x.classList.toggle('on',x===b)});
+  ['form','check','view','all'].forEach(function(id){var e=document.getElementById(id);e.hidden=id!==b.dataset.s;e.style.display=e.hidden?'none':'flex'});
+  window.scrollTo(0,0);}});
+document.getElementById('ai').onclick=function(){document.getElementById('sugs').hidden=false};
+upd();
+</script>
