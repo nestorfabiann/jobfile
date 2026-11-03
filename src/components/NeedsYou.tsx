@@ -13,8 +13,9 @@ const ICONS: Record<NeedIcon, JSX.Element> = {
 };
 
 /** Open tasks for this person, oldest first. Disappears when there is nothing to do, or shows a short all-caught-up line. */
-export default function NeedsYou({ items, caughtUp }: { items: NeedItem[]; caughtUp?: boolean }) {
+export default function NeedsYou({ items, caughtUp, compact }: { items: NeedItem[]; caughtUp?: boolean; compact?: boolean }) {
   if (!items.length) {
+    if (compact) return caughtUp ? <p className="small" style={{ margin: 0, color: 'var(--ok)', fontWeight: 700 }}>✓ You&rsquo;re all caught up</p> : null;
     return caughtUp ? (
       <section aria-label="Needs you" className="card" style={{ background: 'var(--ok-soft, #d9f1e6)', borderColor: 'transparent', padding: 14, gap: 2 }}>
         <b style={{ color: 'var(--ok)' }}>You&rsquo;re all caught up</b>

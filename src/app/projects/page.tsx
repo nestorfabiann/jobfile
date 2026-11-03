@@ -19,6 +19,8 @@ import { alertHref } from '@/lib/alertPath';
 import { cookies } from 'next/headers';
 import ZipCard from '@/components/ZipCard';
 import { nearbyContractors } from '@/lib/nearby';
+import HomeownerProjects from '@/components/HomeownerProjects';
+import { homeownerSummaries } from '@/lib/homeSummary';
 
 const TZ = 'America/Chicago';
 const when = (iso: string) =>
@@ -154,7 +156,7 @@ export default async function Projects({ searchParams }: { searchParams: { error
   if (jobAlerts.length > 0) needs.push({ key: 'jobs', icon: 'job', title: `${jobAlerts.length} new job${jobAlerts.length === 1 ? '' : 's'} near you`, sub: 'Matched to your trades and area', href: '/n/jobs', go: 'View', at: (jobAlerts[0] as any).created_at });
   needs.sort((x, y) => new Date(x.at).getTime() - new Date(y.at).getTime());
   const hasAnything = list.length > 0 || posted.length > 0 || !!company;
-  const needsCard = <NeedsYou items={needs.slice(0, 8)} caughtUp={hasAnything} />;
+  const needsCard = <NeedsYou items={needs.slice(0, 8)} caughtUp={hasAnything} compact={mk && !company} />;
 
   const tab = mk && !company && searchParams.tab === 'posted' ? 'posted' : 'projects';
   const tabs = mk ? <ProjectsTabs active={tab === 'posted' ? 'extra' : 'projects'} role={company ? 'contractor' : 'homeowner'} projects={list.length} extra={extra} /> : null;
@@ -223,6 +225,75 @@ export default async function Projects({ searchParams }: { searchParams: { error
           );
         })}
       </>
+    );
+  }
+
+  // Homeowners get a page ordered by their journey. Contractors keep the page below.
+  if (mk && !company) {
+    const invitesBlock = (
+      <>
+        {got.length > 0 && (
+          <section className="stack" aria-label="Invitations for you">
+            {got.map((i) => (
+              <Link key={i.id} href={`/invites/${i.id}`} className="card" style={{ borderLeft: '6px solid var(--accent)' }}>
+                <b>{i.homeowner_name || 'A homeowner'} invited you to {i.project_name}</b>
+                <span className="muted small">Tap to review and accept or decline.</span>
+              </Link>
+            ))}
+          </section>
+        )}
+        {sent.length > 0 && (
+          <section className="stack" aria-label="Invitations you sent">
+            {sent.map((i) => (
+              <Link key={i.id} href={`/invites/${i.id}`} className="card">
+                <div className="row" style={{ justifyContent: 'space-between' }}><b>{i.project_name}</b><span className="pill warn">Waiting for contractor</span></div>
+                <span className="muted small">Invited {i.contractor_name || i.contractor_email}</span>
+              </Link>
+            ))}
+          </section>
+        )}
+      </>
+    );
+    const alertsBlock = (alerts ?? []).length > 0 ? (
+      <section className="card" aria-label="Recent alerts">
+        <h2>Recent alerts</h2>
+        <ul className="stack" style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+          {(alerts ?? []).map((a) => (
+            <li key={a.id}>
+              <Link href={alertHref(a.project_id, a.kind)}>{a.title}</Link>
+              <span className="muted small" style={{ display: 'block' }}>{when(a.created_at)}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+    ) : null;
+    const summaries = await homeownerSummaries(list as any);
+    const doneIds = (list as any[]).filter((x) => x.completed_at).map((x) => x.id as string);
+    const rated = new Set<string>();
+    if (doneIds.length) {
+      const { data: rv } = await supabaseAdmin().from('reviews').select('project_id,reviewer_role').in('project_id', doneIds).eq('reviewer_role', 'homeowner');
+      (rv ?? []).forEach((r: any) => rated.add(r.project_id as string));
+    }
+    const { data: me } = await sb.from('profiles').select('full_name').eq('id', user.id).maybeSingle();
+    const firstName = String((me as any)?.full_name ?? '').trim().split(/\s+/)[0] ?? '';
+    return (
+      <HomeownerProjects
+        firstName={firstName}
+        email={user.email ?? ''}
+        needsCard={needsCard}
+        zipCard={zipCard}
+        invites={invitesBlock}
+        alerts={alertsBlock}
+        error={searchParams.error}
+        posted={posted}
+        stats={stats}
+        drafts={drafts as any}
+        projects={list as any}
+        covers={covers}
+        summaries={summaries}
+        rated={rated}
+        hasInvites={got.length + sent.length > 0}
+      />
     );
   }
 
