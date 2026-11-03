@@ -122,8 +122,8 @@ export default function MarketplacePost({ types, aiOn, draft }: { types: Types; 
         window.scrollTo({ top: 0, behavior: 'smooth' });
         await runUploads(r.id, media);
       } else router.push(`/marketplace/${r.id}?posted=1`);
-    } catch {
-      setPostErr('Something went wrong. Check your connection and try again.');
+    } catch (err: any) {
+      setPostErr(`Something went wrong. Check your connection and try again. (${String(err?.message ?? err).slice(0, 160)})`);
       setPosting(false);
     }
   }
