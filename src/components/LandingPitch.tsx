@@ -82,10 +82,6 @@ export default function LandingPitch({ aiOn, signedIn }: { aiOn: boolean; signed
             </div>
             <span className="muted small">Example bid card. Insurance and ratings come from your profile.</span>
           </div>
-          <div className="card" style={{ gap: 6 }}>
-            <h3 style={{ margin: 0 }}>Your customers&apos; privacy</h3>
-            <span className="muted small">Homeowner addresses, names and phone numbers stay private until a bid is accepted.</span>
-          </div>
           <Link className="btn" href={go}>Create your free contractor profile →</Link>
         </>
       ) : (
