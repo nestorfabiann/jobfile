@@ -15,6 +15,7 @@ import InsuranceBadge from '@/components/InsuranceBadge';
 import BidThread, { type ThreadMsg } from '@/components/BidThread';
 import ListingPhotoUploader from '@/components/ListingPhotoUploader';
 import BidViewNotice from '@/components/BidViewNotice';
+import { answerRows, detailPercent } from '@/lib/scopeQuestions';
 import { ackBidView, recordBidViews, recordCompared } from '@/lib/bidViews';
 import { acceptBid, closeListing, deleteListingPhoto, deleteListingVideo, placeBid, withdrawBid } from '../actions';
 
@@ -100,6 +101,8 @@ export default async function ListingPage({ params, searchParams }: { params: { 
   const compareBids = owner ? visible.filter((b) => wanted.includes(b.id)) : [];
   const cmpIds = new Set(compareBids.map((b) => b.id));
   if (compareBids.length >= 2) await recordCompared(db, compareBids.map((b) => b.id));
+  const rows = answerRows(l.job_type, l.answers);
+  const pctDetail = detailPercent(l.job_type, l.answers);
   const hasAI = l.ai_low_cents != null && l.ai_high_cents != null;
   const budget = range(l.budget_min_cents, l.budget_max_cents);
 
@@ -123,6 +126,21 @@ export default async function ListingPage({ params, searchParams }: { params: { 
       <div className="card">
         <h2>Scope of work</h2>
         {l.items.length > 0 ? <ul style={{ margin: 0, paddingLeft: 20 }}>{l.items.map((i) => <li key={i}>{i}</li>)}</ul> : <p className="muted">No items listed.</p>}
+        {rows.length > 0 ? (
+          <>
+            <span className="pill ok">Detail level: {pctDetail >= 80 ? 'high' : pctDetail >= 40 ? 'medium' : 'low'} ({pctDetail}%)</span>
+            <h3 style={{ margin: '4px 0 0', fontSize: 16 }}>What the homeowner told us</h3>
+            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) minmax(0,1.3fr)', gap: '6px 12px', fontSize: 14 }}>
+              {rows.map((r) => (
+                <div key={r.label} style={{ display: 'contents' }}>
+                  <span className="muted">{r.label}</span>
+                  <span style={r.unsure ? { color: 'var(--warn, #9a5b00)', fontWeight: 700 } : undefined}>{r.unsure ? 'Not sure, check on site' : r.value}</span>
+                </div>
+              ))}
+            </div>
+            {rows.some((r) => r.unsure) ? <p className="muted small" style={{ margin: 0 }}>Items marked &quot;Not sure&quot; are flagged so you can raise them in your bid note or ask before bidding.</p> : null}
+          </>
+        ) : null}
         {l.details ? <p style={{ whiteSpace: 'pre-wrap' }}><b>Notes:</b> {l.details}</p> : null}
         {budget ? <p><b>Homeowner budget:</b> {budget}</p> : null}
         {owner && l.address ? <p className="muted small">Your address ({l.address}) is shared only with the contractor you hire.</p> : null}

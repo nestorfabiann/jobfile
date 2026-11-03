@@ -185,6 +185,7 @@ export type Listing = {
   budget_min_cents: number | null; budget_max_cents: number | null;
   ai_low_cents: number | null; ai_high_cents: number | null; ai_likely_cents: number | null; ai_confidence: string | null;
   ai_breakdown: { group: string; low: number; high: number }[]; ai_notes: string;
+  answers?: Record<string, string> | null;
   status: 'open' | 'awarded' | 'closed'; expires_at: string; awarded_bid_id: string | null; project_id: string | null; created_at: string;
 };
 export type Bid = {

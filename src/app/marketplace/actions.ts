@@ -12,7 +12,8 @@ import {
   AI_DAILY_LIMIT, cleanItems, inputHash, JOB_TYPES, listingOpen, listingTitle, MAX_BIDS_PER_DAY, MAX_LISTINGS_PER_DAY, MAX_OPEN_LISTINGS,
   requireMarketplace, scopeText, type Bid, type Listing,
 } from '@/lib/marketplace';
-import { aiConfigured, makeReference, type Reference } from '@/lib/marketplaceAI';
+import { aiConfigured, makeReference, makePostReview, type Reference } from '@/lib/marketplaceAI';
+import { cleanAnswers, questionsFor } from '@/lib/scopeQuestions';
 import { cleanDraft } from '@/lib/drafts';
 import { hasContactInfo } from '@/lib/contactInfo';
 import { MAX_VIDEOS, MAX_VIDEO_BYTES, VIDEO_TYPES } from '@/lib/mediaLimits';
@@ -104,8 +105,12 @@ export async function createListing(formData: FormData): Promise<CreateResult> {
     if (fresh && call.input_hash === inputHash(jobType, picked.map((p) => p.item), size, zip, details)) ref = call.result as Reference;
   }
 
+  let answers: Record<string, string> = {};
+  try { answers = cleanAnswers(jobType, JSON.parse(txt(formData, 'answers', 6000) || '{}')); } catch { /* ignore bad JSON */ }
+  if (!answers.when) return bad('Choose when you want to start.');
+
   const { data: prof } = await db.from('profiles').select('full_name').eq('id', user.id).maybeSingle();
-  const { data: l, error } = await db.from('marketplace_listings').insert({
+  const row = {
     homeowner_id: user.id,
     homeowner_name: ((prof?.full_name as string | undefined) ?? '').trim().slice(0, 120),
     job_type: jobType,
@@ -119,7 +124,11 @@ export async function createListing(formData: FormData): Promise<CreateResult> {
     budget_min_cents: bmin,
     budget_max_cents: bmax,
     ...(ref ? { ai_low_cents: ref.low * 100, ai_high_cents: ref.high * 100, ai_likely_cents: ref.likely * 100, ai_confidence: ref.confidence, ai_breakdown: ref.breakdown, ai_notes: ref.notes } : {}),
-  }).select('id,homeowner_id,job_type,zip,city,items,ai_low_cents,ai_high_cents').single();
+  };
+  const cols = 'id,homeowner_id,job_type,zip,city,items,ai_low_cents,ai_high_cents';
+  let { data: l, error } = await db.from('marketplace_listings').insert({ ...row, answers }).select(cols).single();
+  // Until the 023 column exists, post without the answers rather than fail.
+  if (error && /answers/i.test(error.message ?? '')) ({ data: l, error } = await db.from('marketplace_listings').insert(row).select(cols).single());
   if (error || !l) return bad('Could not post the project. Check that the database step was run.');
   await alertMatchingContractors(l as any);
   const draftId = txt(formData, 'draft_id', 40);
@@ -461,4 +470,30 @@ export async function deleteDraft(formData: FormData) {
   if (/^[0-9a-f-]{36}$/i.test(id)) await supabaseAdmin().from('marketplace_drafts').delete().eq('id', id).eq('user_id', user.id);
   revalidatePath('/projects');
   redirect(String(formData.get('back') ?? '') === '/projects' ? '/projects' : '/projects?tab=posted');
+}
+
+
+// ---------- Optional AI review of the post ----------
+
+export type ReviewResult = { ok: true; questions: string[] } | { ok: false; error: string };
+
+/** Asks up to three follow-up questions a contractor would ask. Shares the daily AI limit with the cost reference. */
+export async function checkPost(input: { jobType: string; items: string[]; answers: unknown; size: string; details: string }): Promise<ReviewResult> {
+  requireMarketplace();
+  const { user } = await requireUser();
+  if (!aiConfigured()) return { ok: false, error: 'The post review is not available yet. You can still post your project.' };
+  const jobType = String(input.jobType ?? '');
+  if (!JOB_TYPES[jobType]) return { ok: false, error: 'Choose a job type first.' };
+  const picked = cleanItems(jobType, Array.isArray(input.items) ? input.items.map(String) : []);
+  if (!picked.length) return { ok: false, error: 'Pick at least one item first.' };
+  const answers = cleanAnswers(jobType, input.answers);
+  const db = supabaseAdmin();
+  const since = new Date(Date.now() - 24 * 3600_000).toISOString();
+  const { count } = await db.from('marketplace_ai_calls').select('id', { count: 'exact', head: true }).eq('user_id', user.id).gt('created_at', since);
+  if ((count ?? 0) >= AI_DAILY_LIMIT) return { ok: false, error: 'You have used today’s AI checks. Try again tomorrow, or post as is.' };
+  const labeled = questionsFor(jobType).filter((q) => answers[q.k]).map((q) => ({ question: q.label, answer: answers[q.k] }));
+  const r = await makePostReview({ jobType, items: picked.map((p) => p.item), answers: labeled, size: String(input.size ?? '').replace(/\D/g, '').slice(0, 7), details: String(input.details ?? '').trim().slice(0, 1000) });
+  if (!r.ok) return r;
+  await db.from('marketplace_ai_calls').insert({ user_id: user.id, input_hash: 'review', result: { questions: r.questions } });
+  return { ok: true, questions: r.questions };
 }

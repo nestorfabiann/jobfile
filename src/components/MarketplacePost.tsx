@@ -3,13 +3,14 @@
 import TradeIcon from '@/components/TradeIcon';
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { createListing, getReference, saveDraft, type RefResult } from '@/app/marketplace/actions';
+import { checkPost, createListing, getReference, saveDraft, type RefResult } from '@/app/marketplace/actions';
 import type { DraftData } from '@/lib/drafts';
 import RangeBar from '@/components/RangeBar';
 import MediaPicker from '@/components/MediaPicker';
 import { tipsFor } from '@/lib/photoTips';
 import { uploadMedia, type MediaItem, type FileState } from '@/lib/uploadMedia';
 import UploadProgress from '@/components/UploadProgress';
+import { optionsOf, questionsFor, readiness, type Answers } from '@/lib/scopeQuestions';
 
 type Types = Record<string, { size: number; sizeLabel: string; groups: [string, string[]][] }>;
 const money = (n: number) => '$' + Math.round(n).toLocaleString('en-US');
@@ -26,6 +27,8 @@ export default function MarketplacePost({ types, aiOn, draft }: { types: Types; 
   const [details, setDetails] = useState(d0?.details ?? '');
   const [bmin, setBmin] = useState(d0?.bmin ?? '');
   const [bmax, setBmax] = useState(d0?.bmax ?? '');
+  const [answers, setAnswers] = useState<Answers>(d0?.answers ?? {});
+  const [review, setReview] = useState<{ busy: boolean; error: string; questions: string[] }>({ busy: false, error: '', questions: [] });
   const [saveMsg, setSaveMsg] = useState<{ tone: 'ok' | 'bad' | 'wait'; text: string } | null>(null);
   const draftId = useRef<string | undefined>(draft?.id);
   const lastSaved = useRef('');
@@ -49,8 +52,16 @@ export default function MarketplacePost({ types, aiOn, draft }: { types: Types; 
   const mediaCard = useRef<HTMLDivElement>(null);
 
   const changed = () => setRef(null);
-  const chooseType = (t: string) => { setType(t); setPicks([]); setSize(String(types[t].size)); changed(); };
+  const chooseType = (t: string) => { setType(t); setPicks([]); setAnswers({}); setSize(String(types[t].size)); changed(); };
   const toggle = (item: string) => { setPicks((p) => (p.includes(item) ? p.filter((x) => x !== item) : [...p, item])); changed(); };
+
+  const setAnswer = (k: string, v: string) => setAnswers((a) => { const next = { ...a }; if (v) next[k] = v; else delete next[k]; return next; });
+  async function runReview() {
+    setReview({ busy: true, error: '', questions: [] });
+    const r = await checkPost({ jobType: type, items: picks, answers, size, details });
+    setReview(r.ok ? { busy: false, error: '', questions: r.questions } : { busy: false, error: r.error, questions: [] });
+  }
+  const addToNotes = (q: string) => { setDetails((d) => (d ? d + '\n' : '') + q + ' '); changed(); };
 
   async function reference() {
     setErr('');
@@ -70,8 +81,8 @@ export default function MarketplacePost({ types, aiOn, draft }: { types: Types; 
   // Saves the form on the server a moment after each change, so nothing is lost if the page closes.
   useEffect(() => {
     if (posting) return;
-    const data = { type, picks, size, zip, city, details, bmin, bmax };
-    const meaningful = picks.length > 0 || zip !== '' || city !== '' || details !== '';
+    const data = { type, picks, size, zip, city, details, bmin, bmax, answers };
+    const meaningful = picks.length > 0 || zip !== '' || city !== '' || details !== '' || Object.keys(answers).length > 0;
     const snap = JSON.stringify(data);
     if (firstRun.current) { firstRun.current = false; if (draft) { lastSaved.current = snap; return; } }
     if (!meaningful || snap === lastSaved.current) return;
@@ -88,11 +99,12 @@ export default function MarketplacePost({ types, aiOn, draft }: { types: Types; 
       });
     }, 900);
     return () => clearTimeout(t);
-  }, [type, picks, size, zip, city, details, bmin, bmax, posting]);
+  }, [type, picks, size, zip, city, details, bmin, bmax, answers, posting]);
 
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (posting) return;
+    if (!answers.when) { setPostErr('Choose when you want to start. It is in the questions above.'); return; }
     // Once, and only when there are no photos or videos: a gentle nudge. Publishing is never blocked.
     if (!media.length && !skipPhotos.current) { setNudge(true); return; }
     setPostErr('');
@@ -141,6 +153,9 @@ export default function MarketplacePost({ types, aiOn, draft }: { types: Types; 
     }
   }
 
+  const qs = questionsFor(type);
+  const rd = readiness(type, answers, media.length, picks.length, size);
+
   return (
     <form ref={formEl} onSubmit={submit} className="stack" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       {listingId && media.length ? (
@@ -154,6 +169,7 @@ export default function MarketplacePost({ types, aiOn, draft }: { types: Types; 
       {draft && !saveMsg ? <div className="box ok">Welcome back. We restored your draft from {new Date(draft.at).toLocaleString('en-US', { timeZone: 'America/Chicago', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}. Photos and videos need to be added again before you publish.</div> : null}
       <input type="hidden" name="job_type" value={type} />
       {picks.map((p) => <input key={p} type="hidden" name="items" value={p} />)}
+      <input type="hidden" name="answers" value={JSON.stringify(answers)} />
       {ref ? <input type="hidden" name="ref_id" value={ref.id} /> : null}
 
       <div className="card">
@@ -191,6 +207,38 @@ export default function MarketplacePost({ types, aiOn, draft }: { types: Types; 
         </label>
       </div>
 
+      {picks.length > 0 ? (
+        <>
+          <div className="card" style={{ position: 'sticky', top: 0, zIndex: 5, gap: 6, padding: '10px 14px' }} aria-live="polite">
+            <div className="row" style={{ justifyContent: 'space-between', flexWrap: 'nowrap' }}><b>Ready for bids</b><b>{rd.pct}%</b></div>
+            <div style={{ height: 8, borderRadius: 99, background: 'var(--line)', overflow: 'hidden' }}><div style={{ height: '100%', width: `${rd.pct}%`, background: rd.pct >= 80 ? 'var(--ok)' : 'var(--accent)', borderRadius: 99, transition: 'width .25s' }} /></div>
+            <span className="muted small">{rd.pct >= 80 ? 'Great. Contractors can bid with confidence.' : rd.pct >= 40 ? 'Getting there. Answer a few more for tighter bids.' : 'Answer the questions below. Contractors bid closer when they know more.'}</span>
+          </div>
+          <div className="card">
+            <h2>{type}: the details</h2>
+            <p className="muted small" style={{ margin: 0 }}>The questions a contractor would ask on a site visit. Pick &quot;Not sure&quot; when you do not know. Nobody gets stuck.</p>
+            {qs.map((q, i) => (
+              <div key={q.k} className="stack" style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                {i === 0 || qs[i - 1].group !== q.group ? <div className="small muted" style={{ textTransform: 'uppercase', letterSpacing: '.06em', fontWeight: 700, marginTop: i ? 8 : 0 }}>{q.group}</div> : null}
+                {q.kind === 'number' ? (
+                  <label className="fld">{q.label}{q.req ? ' *' : ''}<input inputMode="numeric" maxLength={7} value={answers[q.k] ?? ''} onChange={(e) => setAnswer(q.k, e.target.value.replace(/\D/g, ''))} placeholder={q.placeholder} /></label>
+                ) : (
+                  <>
+                    <div style={{ fontWeight: 600, fontSize: 14 }}>{q.label}{q.req ? ' *' : ''}</div>
+                    <div className="chips" role="group" aria-label={q.label}>
+                      {optionsOf(q).map((o) => (
+                        <label className="chip" key={o}><input type="checkbox" checked={answers[q.k] === o} onChange={() => setAnswer(q.k, answers[q.k] === o ? '' : o)} /><span style={o === 'Not sure' ? { borderStyle: 'dashed' } : undefined}>{o}</span></label>
+                      ))}
+                    </div>
+                  </>
+                )}
+                {q.hint ? <span className="muted small">{q.hint}</span> : null}
+              </div>
+            ))}
+          </div>
+        </>
+      ) : null}
+
       <div className="card" ref={mediaCard}>
         <h2>Photos and videos <span className="muted small" style={{ fontWeight: 400 }}>(optional)</span></h2>
         <p className="muted small" style={{ margin: 0 }}>Show contractors the space. A short walk-through video often gets more accurate bids.</p>
@@ -220,6 +268,31 @@ export default function MarketplacePost({ types, aiOn, draft }: { types: Types; 
         </div>
       )}
       {!aiOn && err ? <div className="box bad">{err}</div> : null}
+
+      {picks.length > 0 ? (
+        <div className="card">
+          <h2>Before it goes live</h2>
+          <div className="small">
+            {rd.required.map((r) => <div key={r.label}>{r.ok ? '✓' : '○'} {r.label}</div>)}
+            <div>{media.length >= 2 ? '✓' : '○'} 2 or more photos {media.length >= 2 ? '' : `(${media.length} added, recommended)`}</div>
+          </div>
+          {rd.missing.length ? <p className="muted small" style={{ margin: 0 }}>Still open: {rd.missing.slice(0, 5).map((q) => q.short || q.label).join(', ')}{rd.missing.length > 5 ? ` and ${rd.missing.length - 5} more` : ''}. Posts with 80% or more get bids that are closer to the final price.</p> : null}
+          {aiOn ? (
+            <>
+              <button type="button" className="btn ghost" disabled={review.busy} onClick={runReview}>{review.busy ? 'Reading your post…' : '✦ Check my post'}</button>
+              <p className="muted small" style={{ margin: 0 }}>Optional. It asks up to three follow-up questions a contractor would ask. It shares the daily AI limit with the cost reference.</p>
+              {review.error ? <div className="box bad">{review.error}</div> : null}
+              {review.questions.length ? (
+                <div className="box" style={{ background: 'var(--surface-2)' }}>
+                  <b>Things a contractor would ask</b>
+                  {review.questions.map((q, i) => <button key={i} type="button" onClick={() => addToNotes(q)} style={{ display: 'block', textAlign: 'left', background: 'none', border: 0, padding: '6px 0', font: 'inherit', color: 'inherit', cursor: 'pointer' }}>{i + 1}. {q}</button>)}
+                  <span className="muted small">Tap a question to add it to your notes above, then answer it there.</span>
+                </div>
+              ) : null}
+            </>
+          ) : null}
+        </div>
+      ) : null}
 
       <div className="card">
         <h2>Your budget (optional)</h2>
