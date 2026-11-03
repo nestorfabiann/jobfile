@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { requireAdmin } from '@/lib/admin';
 import { loadFeed, lookups } from '@/lib/adminFeed';
 import AdminFeed from '@/components/AdminFeed';
+import { attentionItems, ageText } from '@/lib/adminHealth';
 
 export const dynamic = 'force-dynamic';
 
@@ -25,6 +26,7 @@ export default async function AdminHome() {
     count('notifications', (q) => q.not('error', 'is', null).gt('created_at', week)),
     count('agreement_milestones', (q) => q.in('pay_status', ['requested', 'paid'])),
   ]);
+  const attention = await attentionItems(db);
   const events = await loadFeed({ limit: 25 });
   const names = await lookups(events);
   const tiles: [string, number, string?][] = [
@@ -40,6 +42,19 @@ export default async function AdminHome() {
   return (
     <>
       <h1>Admin</h1>
+      <section className="card why" aria-label="Needs attention">
+        <h2 style={{ fontSize: 20 }}>Needs attention <span style={{ color: 'var(--accent)' }}>{attention.length}</span></h2>
+        <p className="muted small" style={{ margin: 0 }}>Oldest first. Each one leaves this list when it is handled.</p>
+        {attention.length === 0 ? <p style={{ margin: 0 }}>Nothing is waiting on you.</p> : attention.map((a) => (
+          <div key={a.key} className="card" style={{ gap: 4 }}>
+            <div className="row" style={{ justifyContent: 'space-between', flexWrap: 'nowrap' }}>
+              <b>{a.title}</b>
+              <Link className="btn" href={a.href} style={{ minHeight: 40, padding: '6px 16px' }}>{a.go}</Link>
+            </div>
+            <span className="muted small">{a.sub} · {ageText(a.at)}</span>
+          </div>
+        ))}
+      </section>
       <div className="tiles">
         {tiles.map(([label, n, href]) => (
           <div className="tile" key={label}>
