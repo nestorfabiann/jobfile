@@ -42,13 +42,13 @@ export default function ContractorProjects(p: {
     );
 
   return (
-    <>
-      <div className="stack">
+    <div className="cpage">
+      <div className="stack" style={{ gap: 8 }}>
         <h1>{first ? `Welcome${p.firstName ? `, ${p.firstName}` : ''}` : `Hi ${p.firstName || 'there'}`}</h1>
         <p className="muted">{first ? 'Find jobs near you, bid on them, and run the work without the paperwork. It is free.' : `${p.companyName} · here is your work at a glance.`}</p>
       </div>
 
-      <div className="stack" style={{ gap: 8 }}>
+      <div className="startp-row">
         <Link className="btn" href="/marketplace">Find work</Link>
         <StartProjectForm companyId={p.companyId} companyName={p.companyName} open={!!p.error} ghost />
       </div>
@@ -159,6 +159,6 @@ export default function ContractorProjects(p: {
       )}
 
       {p.alerts}
-    </>
+    </div>
   );
 }

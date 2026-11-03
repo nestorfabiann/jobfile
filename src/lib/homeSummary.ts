@@ -95,7 +95,7 @@ export async function contractorSummaries(projects: P[]): Promise<Map<string, Su
       const upcoming = mine.find((x: any) => x.pay_status === 'scheduled');
       if (co) { next = `Answer change order CO-${co.number}`; kind = 'change'; action = true; }
       else if (paid) { next = `Confirm payment received: ${paid.label}`; kind = 'payment'; action = true; }
-      else if (upcoming && n === 1) { next = `Next payment to request: ${upcoming.label}`; kind = 'payment'; }
+      else if (upcoming && n === 1) { next = `Request the next payment (${upcoming.label})`; kind = 'payment'; }
       else next = n === 2 ? 'Closeout: finish the final details' : 'Work is underway';
     }
     out.set(p.id, { contractor: '', stage, pct, payDone, payTotal, next, action, href: alertHref(p.id, kind), paidText: m && m.total > 0 ? `${dollars(m.received)} of ${dollars(m.total)} paid` : undefined });

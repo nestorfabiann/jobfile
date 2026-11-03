@@ -51,11 +51,11 @@ export default function StartProjectForm({ companyId, companyName, open, heading
   );
   if (!ghost) return form;
   return (
-    <div>
+    <>
       {form}
-      <p className="muted small startp-hint" style={{ margin: '10px 0 0' }}>
-        <b style={{ color: 'var(--ink)' }}>Already have a customer?</b> Add them by email, even if they are not on Jobfile yet. They get an invite to join the project.
+      <p className="muted small startp-hint">
+        <b style={{ color: 'var(--ink)' }}>Customer not on Jobfile yet?</b> Tap Start a project and add them by email. They get an invite to join.
       </p>
-    </div>
+    </>
   );
 }
