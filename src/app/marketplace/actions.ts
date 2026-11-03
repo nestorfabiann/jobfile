@@ -13,6 +13,7 @@ import {
   requireMarketplace, scopeText, type Bid, type Listing,
 } from '@/lib/marketplace';
 import { aiConfigured, makeReference, type Reference } from '@/lib/marketplaceAI';
+import { cleanDraft } from '@/lib/drafts';
 import { hasContactInfo } from '@/lib/contactInfo';
 import { MAX_VIDEOS, MAX_VIDEO_BYTES, VIDEO_TYPES } from '@/lib/mediaLimits';
 
@@ -121,6 +122,8 @@ export async function createListing(formData: FormData): Promise<CreateResult> {
   }).select('id,homeowner_id,job_type,zip,city,items,ai_low_cents,ai_high_cents').single();
   if (error || !l) return bad('Could not post the project. Check that the database step was run.');
   await alertMatchingContractors(l as any);
+  const draftId = txt(formData, 'draft_id', 40);
+  if (/^[0-9a-f-]{36}$/i.test(draftId)) await db.from('marketplace_drafts').delete().eq('id', draftId).eq('user_id', user.id);
   revalidatePath('/marketplace');
   return { ok: true, id: l.id as string };
 }
@@ -423,4 +426,36 @@ export async function sendBidMessage(formData: FormData) {
     });
   }
   redirect(`${here}#bid-${bid.id}`);
+}
+
+
+// ---------- Drafts of the post form ----------
+
+const MAX_DRAFTS = 3;
+
+export async function saveDraft(input: { id?: string; data: unknown }): Promise<{ ok: true; id: string } | { ok: false; error: string }> {
+  requireMarketplace();
+  const { user } = await requireUser();
+  const db = supabaseAdmin();
+  if (await myCompany(user.id)) return { ok: false, error: 'Contractors bid on projects. Homeowners post them.' };
+  const data = cleanDraft(input.data);
+  const now = new Date().toISOString();
+  if (input.id && /^[0-9a-f-]{36}$/i.test(input.id)) {
+    const { data: upd } = await db.from('marketplace_drafts').update({ data, updated_at: now }).eq('id', input.id).eq('user_id', user.id).select('id');
+    if ((upd ?? []).length) return { ok: true, id: input.id };
+  }
+  const { count } = await db.from('marketplace_drafts').select('id', { count: 'exact', head: true }).eq('user_id', user.id);
+  if ((count ?? 0) >= MAX_DRAFTS) return { ok: false, error: `You already have ${MAX_DRAFTS} drafts. Delete one on the Posted jobs tab to save this one.` };
+  const { data: row, error } = await db.from('marketplace_drafts').insert({ user_id: user.id, data }).select('id').single();
+  if (error || !row) return { ok: false, error: 'Could not save the draft.' };
+  return { ok: true, id: row.id as string };
+}
+
+export async function deleteDraft(formData: FormData) {
+  requireMarketplace();
+  const { user } = await requireUser();
+  const id = String(formData.get('id') ?? '');
+  if (/^[0-9a-f-]{36}$/i.test(id)) await supabaseAdmin().from('marketplace_drafts').delete().eq('id', id).eq('user_id', user.id);
+  revalidatePath('/projects');
+  redirect('/projects?tab=posted');
 }

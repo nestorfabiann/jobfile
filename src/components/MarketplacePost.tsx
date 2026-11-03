@@ -1,9 +1,10 @@
 'use client';
 
 import TradeIcon from '@/components/TradeIcon';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { createListing, getReference, type RefResult } from '@/app/marketplace/actions';
+import { createListing, getReference, saveDraft, type RefResult } from '@/app/marketplace/actions';
+import type { DraftData } from '@/lib/drafts';
 import RangeBar from '@/components/RangeBar';
 import MediaPicker from '@/components/MediaPicker';
 import { tipsFor } from '@/lib/photoTips';
@@ -13,15 +14,22 @@ type Types = Record<string, { size: number; sizeLabel: string; groups: [string, 
 const money = (n: number) => '$' + Math.round(n).toLocaleString('en-US');
 const digits = (v: string) => parseInt(v.replace(/\D/g, ''), 10) || 0;
 
-export default function MarketplacePost({ types, aiOn }: { types: Types; aiOn: boolean }) {
+export default function MarketplacePost({ types, aiOn, draft }: { types: Types; aiOn: boolean; draft?: { id: string; at: string; data: DraftData } | null }) {
   const names = Object.keys(types);
-  const [type, setType] = useState(names[0]);
-  const [picks, setPicks] = useState<string[]>([]);
-  const [size, setSize] = useState(String(types[names[0]].size));
-  const [zip, setZip] = useState('');
-  const [details, setDetails] = useState('');
-  const [bmin, setBmin] = useState('');
-  const [bmax, setBmax] = useState('');
+  const d0 = draft?.data;
+  const [type, setType] = useState(d0 && types[d0.type] ? d0.type : names[0]);
+  const [picks, setPicks] = useState<string[]>(d0?.picks ?? []);
+  const [size, setSize] = useState(d0?.size || String(types[d0 && types[d0.type] ? d0.type : names[0]].size));
+  const [zip, setZip] = useState(d0?.zip ?? '');
+  const [city, setCity] = useState(d0?.city ?? '');
+  const [details, setDetails] = useState(d0?.details ?? '');
+  const [bmin, setBmin] = useState(d0?.bmin ?? '');
+  const [bmax, setBmax] = useState(d0?.bmax ?? '');
+  const [saveMsg, setSaveMsg] = useState<{ tone: 'ok' | 'bad' | 'wait'; text: string } | null>(null);
+  const draftId = useRef<string | undefined>(draft?.id);
+  const lastSaved = useRef('');
+  const chain = useRef<Promise<void>>(Promise.resolve());
+  const firstRun = useRef(true);
   const [ref, setRef] = useState<Extract<RefResult, { ok: true }> | null>(null);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
@@ -54,6 +62,30 @@ export default function MarketplacePost({ types, aiOn }: { types: Types; aiOn: b
   }
 
 
+
+  // Saves the form on the server a moment after each change, so nothing is lost if the page closes.
+  useEffect(() => {
+    if (posting) return;
+    const data = { type, picks, size, zip, city, details, bmin, bmax };
+    const meaningful = picks.length > 0 || zip !== '' || city !== '' || details !== '';
+    const snap = JSON.stringify(data);
+    if (firstRun.current) { firstRun.current = false; if (draft) { lastSaved.current = snap; return; } }
+    if (!meaningful || snap === lastSaved.current) return;
+    const t = setTimeout(() => {
+      setSaveMsg({ tone: 'wait', text: 'Saving…' });
+      chain.current = chain.current.then(async () => {
+        try {
+          const r = await saveDraft({ id: draftId.current, data });
+          if (r.ok) { draftId.current = r.id; lastSaved.current = snap; setSaveMsg({ tone: 'ok', text: 'Draft saved' }); }
+          else setSaveMsg({ tone: 'bad', text: r.error });
+        } catch {
+          setSaveMsg({ tone: 'bad', text: 'Could not save the draft. Check your connection.' });
+        }
+      });
+    }, 900);
+    return () => clearTimeout(t);
+  }, [type, picks, size, zip, city, details, bmin, bmax, posting]);
+
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (posting) return;
@@ -62,8 +94,11 @@ export default function MarketplacePost({ types, aiOn }: { types: Types; aiOn: b
     setPostErr('');
     setPosting(true);
     setStatus('Publishing your project…');
+    await chain.current; // let any draft save finish first, so it cannot recreate a draft after publishing
     try {
-      const r = await createListing(new FormData(e.currentTarget));
+      const fd = new FormData(e.currentTarget);
+      if (draftId.current) fd.set('draft_id', draftId.current);
+      const r = await createListing(fd);
       if (!r.ok) { setPostErr(r.error); setPosting(false); return; }
       let tail = '';
       if (media.length) {
@@ -92,6 +127,12 @@ export default function MarketplacePost({ types, aiOn }: { types: Types; aiOn: b
 
   return (
     <form ref={formEl} onSubmit={submit} className="stack" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      {saveMsg ? (
+        <div role="status" className="small" style={{ display: 'flex', alignItems: 'center', gap: 8, fontWeight: 600, color: saveMsg.tone === 'ok' ? 'var(--ok)' : saveMsg.tone === 'bad' ? 'var(--bad)' : 'var(--accent)' }}>
+          <span aria-hidden="true" style={{ width: 8, height: 8, borderRadius: '50%', background: 'currentColor' }} />{saveMsg.text}
+        </div>
+      ) : null}
+      {draft && !saveMsg ? <div className="box ok">Welcome back. We restored your draft from {new Date(draft.at).toLocaleString('en-US', { timeZone: 'America/Chicago', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}. Photos and videos need to be added again before you publish.</div> : null}
       <input type="hidden" name="job_type" value={type} />
       {picks.map((p) => <input key={p} type="hidden" name="items" value={p} />)}
       {ref ? <input type="hidden" name="ref_id" value={ref.id} /> : null}
@@ -124,7 +165,7 @@ export default function MarketplacePost({ types, aiOn }: { types: Types; aiOn: b
         <div className="grid2">
           <label className="fld">{types[type].sizeLabel}<input name="size" inputMode="numeric" value={size} onChange={(e) => { setSize(e.target.value); changed(); }} /></label>
           <label className="fld">ZIP code<input name="zip" inputMode="numeric" maxLength={5} value={zip} onChange={(e) => { setZip(e.target.value.replace(/\D/g, '')); changed(); }} placeholder="75074" /></label>
-          <label className="fld">City (optional)<input name="city" maxLength={80} placeholder="Plano" /></label>
+          <label className="fld">City (optional)<input name="city" maxLength={80} value={city} onChange={(e) => setCity(e.target.value)} placeholder="Plano" /></label>
         </div>
         <label className="fld">Anything else? (optional)
           <textarea name="details" rows={3} maxLength={1000} value={details} onChange={(e) => { setDetails(e.target.value); changed(); }} placeholder="Example: I want to start in January. Dogs at home." />

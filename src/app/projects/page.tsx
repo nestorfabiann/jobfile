@@ -4,6 +4,8 @@ import { requireUser } from '@/lib/session';
 import { supabaseAdmin } from '@/lib/supabase/server';
 import KitchenArt from '@/components/KitchenArt';
 import { createCompany } from './actions';
+import { deleteDraft } from '@/app/marketplace/actions';
+import { cleanDraft } from '@/lib/drafts';
 import { isExpired, type Invite } from '@/lib/invites';
 import { dollars } from '@/lib/money';
 import { listingOpen, listingTitle, marketplaceEnabled, type Bid, type Listing } from '@/lib/marketplace';
@@ -73,12 +75,17 @@ export default async function Projects({ searchParams }: { searchParams: { error
   // Marketplace tabs: homeowners see the jobs they posted, contractors link to their bids.
   const mk = marketplaceEnabled();
   const posted: Listing[] = [];
+  const drafts: { id: string; updated_at: string; data: ReturnType<typeof cleanDraft> }[] = [];
   const stats = new Map<string, { n: number; lo: number; hi: number; fresh: number }>();
   const myBidIds: string[] = [];
   let extra = 0;
   if (mk) {
     const db = supabaseAdmin();
     if (!company) {
+      // Drafts older than 30 days are removed the next time the list is opened.
+      await db.from('marketplace_drafts').delete().eq('user_id', user.id).lt('updated_at', new Date(Date.now() - 30 * 86400000).toISOString());
+      const { data: ds } = await db.from('marketplace_drafts').select('id,data,updated_at').eq('user_id', user.id).order('updated_at', { ascending: false }).limit(3);
+      (ds ?? []).forEach((x: any) => drafts.push({ id: x.id, updated_at: x.updated_at, data: cleanDraft(x.data) }));
       const { data: ls } = await db.from('marketplace_listings').select('*').eq('homeowner_id', user.id).order('created_at', { ascending: false }).limit(30);
       posted.push(...((ls ?? []) as Listing[]));
       if (posted.length) {
@@ -154,7 +161,21 @@ export default async function Projects({ searchParams }: { searchParams: { error
         {needsCard}
         {tabs}
         <div className="row"><Link className="btn" href="/marketplace/new">+ Post a project to the marketplace</Link></div>
-        {posted.length === 0 && <div className="card"><p className="muted">You have not posted a job yet. Post one and local contractors can send you bids.</p></div>}
+        {drafts.map((dr) => (
+          <div className="card" key={dr.id}>
+            <div className="row" style={{ justifyContent: 'space-between' }}>
+              <span className="pill warn">Draft</span>
+              <span className="muted small">Saved {when(dr.updated_at)}</span>
+            </div>
+            <h3>{dr.data.type}{dr.data.picks.length ? ` · ${dr.data.picks.length} choice${dr.data.picks.length === 1 ? '' : 's'} picked` : ''}</h3>
+            <p className="muted small">{[dr.data.zip ? `ZIP ${dr.data.zip}` : '', 'Not visible to contractors until you publish'].filter(Boolean).join(' · ')}</p>
+            <div className="row">
+              <Link className="btn" href={`/marketplace/new?draft=${dr.id}`}>Continue</Link>
+              <form action={deleteDraft}><input type="hidden" name="id" value={dr.id} /><button className="btn ghost" type="submit">Delete draft</button></form>
+            </div>
+          </div>
+        ))}
+        {posted.length === 0 && drafts.length === 0 && <div className="card"><p className="muted">You have not posted a job yet. Post one and local contractors can send you bids.</p></div>}
         {posted.map((l) => {
           const open = listingOpen(l);
           const st = stats.get(l.id);
