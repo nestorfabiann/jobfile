@@ -29,6 +29,7 @@ export default function AppMenu({ marketplace, contractor, admin, signOutAction 
     ['/settings', 'Settings', 'set'],
     ['/invite', 'Invite friends', 'inv'],
     ['/help', 'Help and contact', 'help'],
+    ...(contractor ? ([['/settings/business', 'Business profile', 'biz']] as [string, string, string][]) : []),
     ...(admin ? ([['/admin', 'Admin', 'adm']] as [string, string, string][]) : []),
   ];
   const current = (href: string) => (href === '/' ? path === '/' : path === href || path.startsWith(`${href}/`));
