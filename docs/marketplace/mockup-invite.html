@@ -1,0 +1,123 @@
+<title>Invite Friends</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: one phone column. Four tabs: Menu, Invite page (homeowner / contractor), moment card, Admin counts. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#cd7d2e;--orl:#f9efe4;--orb:#ecd4a8;--gr:#1f7a55;--grl:#d9f1e6;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--gr:#6fd1a3;--grl:#173a2c;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--gr:#6fd1a3;--grl:#173a2c;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:14px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px}
+h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;text-wrap:balance}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
+.mut{color:var(--mut);font-size:13.5px;line-height:1.45}
+.sw{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.sw button,.sw2 button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:8px 2px;border-radius:99px;font:500 12.5px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:44px}.sw button.on,.sw2 button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.sw2{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.mi{display:flex;align-items:center;gap:12px;padding:13px 4px;border-bottom:1px solid var(--line);font-size:15.5px;min-height:48px}
+.mi:last-child{border-bottom:0}
+.mi .ic{width:30px;height:30px;border-radius:10px;background:var(--orl);color:var(--or);display:grid;place-items:center;flex:none;font-size:15px;font-weight:700}
+.mi.new .ic{background:var(--or);color:#fff}
+.tag{margin-left:auto;font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:99px;background:var(--grl);color:var(--gr)}
+.btn{display:flex;align-items:center;justify-content:center;border-radius:99px;min-height:50px;padding:0 18px;font:700 15.5px 'IBM Plex Sans',sans-serif;border:1px solid var(--or);background:var(--or);color:#fff;cursor:pointer;width:100%}
+.btn.ghost{background:transparent;color:var(--or)}
+.bubble{background:var(--orl);border:1px solid var(--orb);border-radius:18px 18px 18px 6px;padding:12px 14px;font-size:14.5px;line-height:1.5}
+.link{display:flex;gap:8px;align-items:center;border:1px solid var(--line);border-radius:14px;padding:10px 12px;font-size:13.5px;background:var(--bg);word-break:break-all}
+.tiles{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.tile{border:1px solid var(--line);border-radius:16px;padding:10px;background:var(--card);display:flex;flex-direction:column;gap:2px}
+.tile b{font:800 22px 'Bricolage Grotesque',sans-serif}
+.tile span{font-size:12px;color:var(--mut)}
+.row{display:flex;justify-content:space-between;gap:10px;font-size:14px;padding:9px 0;border-bottom:1px solid var(--line)}
+.row:last-child{border-bottom:0}
+.ok{background:var(--grl);border-radius:14px;padding:10px 12px;font-size:13.5px;color:var(--gr);font-weight:600}
+.sec[hidden]{display:none}
+</style>
+<div class="wrap">
+  <div class="note"><b>Mockup.</b> A way for people to share Jobfile. Tap the tabs. Try the role switch and the Share and Copy buttons on the Invite page.</div>
+  <div class="sw" id="sw">
+    <button data-s="menu" class="on" type="button">Menu</button>
+    <button data-s="inv" type="button">Invite</button>
+    <button data-s="mom" type="button">Moment</button>
+    <button data-s="adm" type="button">Admin</button>
+  </div>
+
+  <div id="menu" class="sec" style="display:flex;flex-direction:column;gap:14px">
+    <h2 style="font-size:24px">Menu</h2>
+    <div class="card" style="gap:0;padding:8px 16px">
+      <div class="mi"><span class="ic">S</span>Settings</div>
+      <div class="mi"><span class="ic">?</span>Help and contact</div>
+      <div class="mi new"><span class="ic">+</span>Invite friends<span class="tag">New</span></div>
+      <div class="mi"><span class="ic">X</span>Sign out</div>
+    </div>
+  </div>
+
+  <div id="inv" class="sec" hidden style="flex-direction:column;gap:14px">
+    <h2 style="font-size:24px">Invite friends</h2>
+    <span class="mut">Know someone who needs a contractor, or a contractor who needs work? Send them Jobfile. It is free for everyone.</span>
+    <div class="sw2" id="role"><button data-r="h" class="on" type="button">I am a homeowner</button><button data-r="c" type="button">I am a contractor</button></div>
+    <div class="card">
+      <b style="font-size:14px">Your message</b>
+      <div class="bubble" id="bub"></div>
+      <div class="link" id="lnk">jobfile-rosy.vercel.app/?ref=<b>NESTY4K</b></div>
+      <button class="btn" type="button" id="share">Share</button>
+      <button class="btn ghost" type="button" id="copy">Copy link</button>
+      <div class="ok" id="okmsg" hidden></div>
+      <span class="mut">The Share button opens your phone's share sheet: Messages, WhatsApp, Facebook and more.</span>
+    </div>
+    <div class="card">
+      <b style="font-size:14px">Your invites</b>
+      <div class="tiles"><div class="tile"><b>12</b><span>Opened</span></div><div class="tile"><b>4</b><span>Joined</span></div><div class="tile"><b>1</b><span>Posted a job</span></div></div>
+      <span class="mut">Counts only. We never show who they are.</span>
+    </div>
+    <div class="note" style="border-style:solid">No rewards for now. Jobfile is free, so the message is simple: help a friend. If you want rewards later, they can be added on top.</div>
+  </div>
+
+  <div id="mom" class="sec" hidden style="flex-direction:column;gap:14px">
+    <span class="mut">A small card that appears when people are happiest. It can be dismissed and does not come back for 30 days.</span>
+    <div class="grp" style="font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);font-weight:600">Homeowner, after rating a finished job</div>
+    <div class="card" style="background:var(--orl);border-color:var(--orb)">
+      <h3 style="font-size:18px">Happy with how it went?</h3>
+      <span class="mut" style="color:var(--ink)">Tell a neighbor. Getting bids on Jobfile is free.</span>
+      <button class="btn" type="button">Invite a friend</button>
+      <button class="btn ghost" type="button" style="min-height:40px">Not now</button>
+    </div>
+    <div class="grp" style="font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);font-weight:600">Contractor, after winning a bid</div>
+    <div class="card" style="background:var(--orl);border-color:var(--orb)">
+      <h3 style="font-size:18px">Know a contractor who needs work?</h3>
+      <span class="mut" style="color:var(--ink)">Jobfile is free to join. Send it to a friend in the trades.</span>
+      <button class="btn" type="button">Invite a contractor</button>
+      <button class="btn ghost" type="button" style="min-height:40px">Not now</button>
+    </div>
+  </div>
+
+  <div id="adm" class="sec" hidden style="flex-direction:column;gap:14px">
+    <h2 style="font-size:24px">Admin: Invites</h2>
+    <div class="tiles"><div class="tile"><b>86</b><span>Opened</span></div><div class="tile"><b>23</b><span>Joined</span></div><div class="tile"><b>7</b><span>Posted a job</span></div></div>
+    <div class="card">
+      <b style="font-size:14px">Top inviters</b>
+      <div class="row"><span>Nesty's Painting (contractor)</span><b>9 joined</b></div>
+      <div class="row"><span>Jerry S. (homeowner)</span><b>4 joined</b></div>
+      <div class="row"><span>Garcia Roofing (contractor)</span><b>3 joined</b></div>
+      <div class="row"><span>Maria L. (homeowner)</span><b>2 joined</b></div>
+    </div>
+    <span class="mut">It also shows where each new sign-up came from on the person's profile: "Invited by Jerry S." So you can thank your best sharers.</span>
+  </div>
+</div>
+<script>
+var sw=document.getElementById('sw');
+[].forEach.call(sw.children,function(b){b.onclick=function(){
+  [].forEach.call(sw.children,function(x){x.classList.toggle('on',x===b)});
+  ['menu','inv','mom','adm'].forEach(function(id){var e=document.getElementById(id);e.hidden=id!==b.dataset.s;e.style.display=e.hidden?'none':'flex'});
+  window.scrollTo(0,0);}});
+var M={h:'Hey, I use Jobfile to get free bids from local contractors and keep everything about my project in one place. It is free to use. Take a look:',c:'Hey, Jobfile is free for contractors: no subscription, no fees at all. You can bid on local jobs and run projects without the paperwork. Take a look:'};
+var role=document.getElementById('role'),bub=document.getElementById('bub'),ok=document.getElementById('okmsg');
+function setRole(r){bub.textContent=M[r];[].forEach.call(role.children,function(x){x.classList.toggle('on',x.dataset.r===r)});ok.hidden=true}
+[].forEach.call(role.children,function(b){b.onclick=function(){setRole(b.dataset.r)}});setRole('h');
+document.getElementById('share').onclick=function(){ok.hidden=false;ok.textContent='On your phone, this opens the share sheet.'};
+document.getElementById('copy').onclick=function(){
+  var t=bub.textContent+' https://jobfile-rosy.vercel.app/?ref=NESTY4K';
+  var done=function(){ok.hidden=false;ok.textContent='Copied.'};
+  try{navigator.clipboard.writeText(t).then(done,function(){ok.hidden=false;ok.textContent='Copy was blocked here. In the real app it copies.'})}catch(e){ok.hidden=false;ok.textContent='Copy was blocked here. In the real app it copies.'}
+};
+</script>
