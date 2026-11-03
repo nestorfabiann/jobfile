@@ -1,0 +1,66 @@
+<title>Landing Spacing</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: one phone column. Two tabs, Today and Proposed, same content with different spacing and weights. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#cd7d2e;--orl:#f9efe4;--orb:#ecd4a8;--gr:#1f7a55;--grl:#d9f1e6;--page:#e9e5dc;--seg:#e4dfd6}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--gr:#6fd1a3;--grl:#173a2c;--page:#0d0c0b;--seg:#2b2824;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--gr:#6fd1a3;--grl:#173a2c;--page:#0d0c0b;--seg:#2b2824;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:14px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px;margin-bottom:12px}.note b{color:var(--ink)}
+.sw{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-bottom:16px}.sw button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:8px 2px;border-radius:99px;font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:44px}.sw button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+/* the page under test; --gap drives the section spacing */
+.pg{--gap:18px;display:flex;flex-direction:column;gap:var(--gap)}
+.pg.new{--gap:36px}
+.eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--or);font-weight:600}
+h1,h2{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.035em;margin:0;text-wrap:balance}
+h1{font-size:40px;line-height:1.02}h1 em{font-style:normal;color:var(--or)}
+.lead{font-size:17px;line-height:1.55;color:var(--mut);margin:0}
+.btns{display:flex;flex-direction:column;gap:10px}.pg.new .btns{gap:14px}
+.btn{display:flex;align-items:center;justify-content:center;border-radius:99px;min-height:56px;padding:0 18px;font:700 17px 'IBM Plex Sans',sans-serif;border:2px solid var(--ink);background:var(--ink);color:var(--bg)}
+.btn.main{background:var(--or);border-color:var(--or);color:#fff;box-shadow:0 8px 18px rgba(205,125,46,.25)}
+.pg.new .btn.alt{background:transparent;color:var(--ink);border-color:var(--line);min-height:50px;font-size:16px}
+.stats{display:flex;justify-content:space-between;text-align:center;gap:6px}
+.stats b{display:block;font:800 36px 'Bricolage Grotesque',sans-serif;color:var(--or);line-height:1}.stats span{font-size:14px;color:var(--mut)}
+.pg.new .stats{padding:18px 0;border-block:1px solid var(--line)}.pg.new .stats b{font-size:26px}.pg.new .stats span{font-size:13px}
+.seg{display:grid;grid-template-columns:1fr 1fr;background:var(--seg);border-radius:99px;padding:5px}.seg span{text-align:center;padding:14px;border-radius:99px;font-size:15px;color:var(--mut)}.seg span.on{background:var(--card);color:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.12)}
+h2{font-size:34px;line-height:1.05}.pg.new h2{font-size:27px}
+.pill{width:max-content;font-size:14px;font-weight:700;padding:9px 16px;border-radius:99px;background:var(--grl);color:var(--gr)}
+.free{background:var(--grl);border-radius:26px;padding:22px;display:flex;flex-direction:column;gap:10px}.free b{font:800 21px 'Bricolage Grotesque',sans-serif;letter-spacing:-.02em}.free span{font-size:16px;line-height:1.5}
+.card{background:var(--card);border:1px solid var(--line);border-radius:26px;height:90px}
+.pg.new .tight{display:flex;flex-direction:column;gap:14px}
+</style>
+<div class="wrap">
+  <div class="note"><b>Mockup.</b> Same content, same words. Only spacing and weight change. Flip between the two tabs and compare how the page breathes.</div>
+  <div class="sw" id="sw"><button data-v="old" type="button">Today</button><button data-v="new" class="on" type="button">Proposed</button></div>
+  <div class="pg new" id="pg">
+    <div class="tight">
+      <span class="eyebrow">Home improvement marketplace</span>
+      <h1>Post it. Bid on it. <em>Run the job in one place.</em></h1>
+      <p class="lead">Homeowners post projects and compare bids from local contractors. Contractors find nearby work and keep the paperwork, photos and payments in one shared record.</p>
+    </div>
+    <div class="btns">
+      <div class="btn main">Get bids on your project →</div>
+      <div class="btn alt">Find Work near you →</div>
+    </div>
+    <div class="stats"><div><b>6</b><span>Projects posted</span></div><div><b>1</b><span>Local pros</span></div><div><b>5.0 ★</b><span>Avg. rating (1)</span></div></div>
+    <div class="seg"><span class="on">For contractors</span><span>For homeowners</span></div>
+    <div class="tight">
+      <h2>Win the job, then run it without the paperwork</h2>
+      <span class="pill">Free for contractors</span>
+    </div>
+    <div class="free"><b>Free to join. No subscription. No fees at all.</b><span>No monthly or yearly charge, no fee to bid, and nothing taken from the jobs you win.</span></div>
+    <div class="card"></div>
+  </div>
+  <div class="note" style="margin-top:24px"><b>What changed:</b> double the space between sections; the second button is outlined and spaced away; the stats are a quiet strip between two thin lines; the headline under the toggle is a step smaller; the text blocks are looser. No words removed.</div>
+</div>
+<script>
+var sw=document.getElementById('sw'),pg=document.getElementById('pg');
+[].forEach.call(sw.children,function(b){b.onclick=function(){
+  [].forEach.call(sw.children,function(x){x.classList.toggle('on',x===b)});
+  pg.classList.toggle('new',b.dataset.v==='new');
+  [].forEach.call(pg.querySelectorAll('.tight'),function(t){t.style.gap=b.dataset.v==='new'?'':'12px'});
+}});
+</script>
