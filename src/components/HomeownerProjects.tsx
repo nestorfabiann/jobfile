@@ -159,7 +159,14 @@ export default function HomeownerProjects(p: {
 
       {done.length > 0 && (
         <details className="card" aria-label="Completed" style={{ display: 'block', padding: '14px 16px' }}>
-          <summary style={{ fontWeight: 700, cursor: 'pointer', display: 'flex', justifyContent: 'space-between', gap: 8 }}><span>Completed</span><span className="muted small">{done.length}</span></summary>
+          <summary style={{ fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10, listStyle: 'none', minHeight: 32 }}>
+            <span aria-hidden="true" style={{ flex: 'none', width: 28, height: 28, borderRadius: '50%', background: 'var(--ok-bg, #d9f1e6)', color: 'var(--ok, #1f7a55)', display: 'grid', placeItems: 'center' }}>
+              <svg viewBox="0 0 24 24" width={16} height={16} fill="none" stroke="currentColor" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>
+            </span>
+            <span style={{ flex: 1 }}>Completed</span>
+            <span className="pill ok">{done.length}</span>
+            <span aria-hidden="true" className="muted">›</span>
+          </summary>
           <div className="stack" style={{ marginTop: 12 }}>
             {done.map((x) => (
               <div key={x.id} className="stack" style={{ gap: 8 }}>
