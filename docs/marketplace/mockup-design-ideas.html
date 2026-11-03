@@ -1,0 +1,153 @@
+<title>Design Ideas</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: one phone column. Four steps: upload, pick changes, results, use in project. The pictures are drawn stand-ins for real AI photos. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#cd7d2e;--orl:#f9efe4;--orb:#ecd4a8;--gr:#1f7a55;--grl:#d9f1e6;--am:#9a5b00;--aml:#fbeccd;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--gr:#6fd1a3;--grl:#173a2c;--am:#f0b95a;--aml:#3a2e12;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--gr:#6fd1a3;--grl:#173a2c;--am:#f0b95a;--aml:#3a2e12;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:14px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px}
+h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;text-wrap:balance}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
+.mut{color:var(--mut);font-size:13.5px;line-height:1.45}
+.sw{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.sw button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:8px 2px;border-radius:99px;font:500 12.5px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:44px}.sw button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.q{display:flex;flex-direction:column;gap:7px}
+.lb{font-size:14px;font-weight:600}
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:99px;padding:9px 14px;font:500 14px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:40px;display:inline-flex;gap:8px;align-items:center}
+.chip.on{background:var(--orl);border-color:var(--or);color:var(--or)}
+.dot{width:14px;height:14px;border-radius:50%;border:1px solid rgba(0,0,0,.25);flex:none}
+.btn{display:flex;align-items:center;justify-content:center;border-radius:99px;min-height:50px;padding:0 18px;font:700 15.5px 'IBM Plex Sans',sans-serif;border:1px solid var(--or);background:var(--or);color:#fff;cursor:pointer;width:100%}
+.btn.ghost{background:transparent;color:var(--or)}
+textarea{width:100%;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:14px;padding:11px 12px;font:15px 'IBM Plex Sans',sans-serif;min-height:70px;resize:vertical}
+.pic{position:relative;border-radius:16px;overflow:hidden;border:1px solid var(--line);line-height:0}
+.pic svg{width:100%;height:auto;display:block}
+.tagpic{position:absolute;left:8px;top:8px;line-height:1.2;font-size:11.5px;font-weight:700;padding:4px 9px;border-radius:99px;background:rgba(27,26,24,.78);color:#fff}
+.tagai{position:absolute;right:8px;bottom:8px;line-height:1.2;font-size:11px;font-weight:700;padding:4px 9px;border-radius:99px;background:var(--aml);color:var(--am)}
+.pill{display:inline-block;width:max-content;font-size:12px;font-weight:700;padding:4px 10px;border-radius:99px;background:var(--grl);color:var(--gr)}
+.pill.am{background:var(--aml);color:var(--am)}
+.drop{border:1.5px dashed var(--orb);border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:6px;align-items:center;text-align:center;background:var(--orl)}
+.ck{display:flex;gap:10px;align-items:flex-start;font-size:13.5px;line-height:1.45}
+.ck input{width:22px;height:22px;flex:none;margin:0;accent-color:var(--or)}
+.kv{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:6px 12px;font-size:13.5px;line-height:1.4}
+.kv span:nth-child(odd){color:var(--mut)}
+.bar{height:8px;border-radius:99px;background:var(--line);overflow:hidden}.bar i{display:block;height:100%;background:var(--or)}
+.sec[hidden]{display:none}
+</style>
+<div class="wrap">
+  <div class="note"><b>Mockup.</b> Homeowners upload a photo of their space, choose the changes they want, and see ideas of the finished room. The pictures here are drawn stand-ins. In the real app they would be AI-edited versions of the homeowner's own photo. Tap the chips on the Style tab and watch the results change.</div>
+  <div class="sw" id="sw">
+    <button data-s="up" class="on" type="button">1 Photo</button>
+    <button data-s="st" type="button">2 Style</button>
+    <button data-s="re" type="button">3 Ideas</button>
+    <button data-s="us" type="button">4 Use it</button>
+  </div>
+
+  <!-- 1 -->
+  <div id="up" class="sec" style="display:flex;flex-direction:column;gap:14px">
+    <h2 style="font-size:24px">See your new space</h2>
+    <span class="mut">Upload a photo of the room. Pick a look. See ideas before you ask for bids.</span>
+    <div class="card">
+      <div class="q"><div class="lb">What kind of space?</div><div class="chips" id="space"><button class="chip on" type="button">Kitchen</button><button class="chip" type="button">Bathroom</button><button class="chip" type="button">Living room</button><button class="chip" type="button">Backyard</button><button class="chip" type="button">Exterior</button></div></div>
+      <div class="pic" id="orig" style="min-height:0"></div>
+      <div class="drop"><b>Your photo</b><span class="mut">Stand in the doorway and fit the whole room in. Good light works best.</span><button class="btn ghost" type="button" style="width:auto;min-height:44px">Choose a photo</button></div>
+      <label class="ck"><input type="checkbox" id="ok"><span>I understand my photo is sent to an AI service to make the ideas. I will not upload photos with people's faces or my street address visible.</span></label>
+      <button class="btn" type="button" id="go1">Next: pick a look</button>
+    </div>
+  </div>
+
+  <!-- 2 -->
+  <div id="st" class="sec" hidden style="flex-direction:column;gap:14px">
+    <h2 style="font-size:24px">Pick a look</h2>
+    <div class="card">
+      <div class="q"><div class="lb">Overall style</div><div class="chips" id="style"><button class="chip on" data-v="modern" type="button">Modern</button><button class="chip" data-v="farm" type="button">Farmhouse</button><button class="chip" data-v="trad" type="button">Traditional</button><button class="chip" data-v="coast" type="button">Coastal</button></div></div>
+      <div class="q"><div class="lb">Cabinets</div><div class="chips" id="cab"></div></div>
+      <div class="q"><div class="lb">Countertops</div><div class="chips" id="ctr"></div></div>
+      <div class="q"><div class="lb">Floor</div><div class="chips" id="flr"></div></div>
+      <div class="q"><div class="lb">Wall color</div><div class="chips" id="wal"></div></div>
+      <div class="q"><div class="lb">Anything else?</div><textarea placeholder="Example: add an island, open shelves instead of upper cabinets, black faucet"></textarea></div>
+      <div class="mut">The AI is best at colors, materials and finishes. It is not good at moving walls or windows.</div>
+      <div class="bar"><i style="width:66%"></i></div>
+      <span class="mut">2 of 3 designs left today.</span>
+      <button class="btn" type="button" id="go2">Show me ideas</button>
+    </div>
+  </div>
+
+  <!-- 3 -->
+  <div id="re" class="sec" hidden style="flex-direction:column;gap:14px">
+    <h2 style="font-size:24px">Your ideas</h2>
+    <span class="pill am">AI ideas. Not a plan, not a price.</span>
+    <div class="card">
+      <b>Idea 1</b>
+      <div class="pic" id="r1"><span class="tagai">AI idea</span></div>
+      <div class="chips"><button class="btn" type="button" style="width:auto;flex:1;min-height:44px">Use this idea</button><button class="btn ghost" type="button" style="width:auto;min-height:44px">Save</button></div>
+    </div>
+    <div class="card">
+      <b>Idea 2: different cabinets</b>
+      <div class="pic" id="r2"><span class="tagai">AI idea</span></div>
+      <div class="chips"><button class="btn ghost" type="button" style="width:auto;flex:1;min-height:44px">Use this idea</button><button class="btn ghost" type="button" style="width:auto;min-height:44px">Save</button></div>
+    </div>
+    <div class="card">
+      <b>Compare with your photo</b>
+      <div class="pic" id="r3a"><span class="tagpic">Now</span></div>
+      <div class="pic" id="r3b"><span class="tagpic">Idea 1</span></div>
+    </div>
+    <span class="mut">Ideas can show things that cannot be built or that cost more than you expect. A contractor will tell you what is possible and what it costs.</span>
+  </div>
+
+  <!-- 4 -->
+  <div id="us" class="sec" hidden style="flex-direction:column;gap:14px">
+    <h2 style="font-size:24px">Use this in my project</h2>
+    <span class="mut">One tap turns your idea into a project post.</span>
+    <div class="card">
+      <b>What gets filled in for you</b>
+      <div class="kv" id="fill"></div>
+      <span class="mut">You can change any of it before you post.</span>
+      <button class="btn" type="button">Continue to my post</button>
+    </div>
+    <div class="card">
+      <b>What contractors see</b>
+      <div class="pic" id="bid"><span class="tagpic">Homeowner's idea</span></div>
+      <span class="mut">A small picture with the label "Homeowner's idea, not a plan". It sits next to your real photos so bidders know what you are picturing. It never appears as a price or a promise.</span>
+    </div>
+  </div>
+</div>
+<script>
+var C={cab:{White:'#f4f1ea','Sage green':'#8fa88b',Navy:'#2b3f5c','Natural oak':'#b98a55'},ctr:{'White quartz':'#ece9e4','Black granite':'#2a2a2c','Butcher block':'#c79a62'},flr:{'Light wood':'#d9b98a','Gray tile':'#9a9a9a','Dark wood':'#6b4a30'},wal:{'Warm white':'#f1eadf','Soft gray':'#cfd1d2','Pale blue':'#c7d8e3'}};
+var P={modern:{cab:'White',ctr:'White quartz',flr:'Gray tile',wal:'Soft gray'},farm:{cab:'Sage green',ctr:'Butcher block',flr:'Light wood',wal:'Warm white'},trad:{cab:'Natural oak',ctr:'Black granite',flr:'Dark wood',wal:'Warm white'},coast:{cab:'White',ctr:'White quartz',flr:'Light wood',wal:'Pale blue'}};
+var S={cab:'White',ctr:'White quartz',flr:'Gray tile',wal:'Soft gray'};
+var ids={cab:'cab',ctr:'ctr',flr:'flr',wal:'wal'};
+function room(o,old){
+ var w=old?'#e3d9c6':C.wal[o.wal],cab=old?'#8a6a43':C.cab[o.cab],ct=old?'#b9b2a4':C.ctr[o.ctr],fl=old?'#b89a6e':C.flr[o.flr],sp=old?'#d8cfbd':'#e9e5dd';
+ return '<svg viewBox="0 0 300 190" role="img" aria-label="Kitchen drawing"><rect width="300" height="190" fill="'+w+'"/>'+
+ '<rect y="140" width="300" height="50" fill="'+fl+'"/>'+
+ '<rect x="170" y="30" width="80" height="60" rx="3" fill="#cfe6f2" stroke="#fff" stroke-width="5"/><line x1="210" y1="30" x2="210" y2="90" stroke="#fff" stroke-width="3"/>'+
+ '<rect x="10" y="22" width="140" height="48" rx="3" fill="'+cab+'"/><line x1="80" y1="22" x2="80" y2="70" stroke="rgba(0,0,0,.2)"/>'+
+ '<rect x="10" y="78" width="280" height="22" fill="'+sp+'"/>'+
+ '<rect x="6" y="100" width="288" height="9" fill="'+ct+'"/>'+
+ '<rect x="10" y="109" width="280" height="36" fill="'+cab+'"/><line x1="80" y1="109" x2="80" y2="145" stroke="rgba(0,0,0,.2)"/><line x1="150" y1="109" x2="150" y2="145" stroke="rgba(0,0,0,.2)"/><line x1="220" y1="109" x2="220" y2="145" stroke="rgba(0,0,0,.2)"/>'+
+ '<circle cx="74" cy="127" r="2.5" fill="rgba(0,0,0,.45)"/><circle cx="86" cy="127" r="2.5" fill="rgba(0,0,0,.45)"/><circle cx="144" cy="127" r="2.5" fill="rgba(0,0,0,.45)"/><circle cx="156" cy="127" r="2.5" fill="rgba(0,0,0,.45)"/></svg>';
+}
+function put(id,html,keep){var e=document.getElementById(id);var t=[].slice.call(e.querySelectorAll('span'));e.innerHTML=html;t.forEach(function(x){e.appendChild(x)})}
+function chips(k){var box=document.getElementById(ids[k]);box.innerHTML='';Object.keys(C[k]).forEach(function(n){var b=document.createElement('button');b.type='button';b.className='chip'+(S[k]===n?' on':'');b.innerHTML='<i class="dot" style="background:'+C[k][n]+'"></i>'+n;b.onclick=function(){S[k]=n;chips(k);draw()};box.appendChild(b)})}
+function alt(){var keys=Object.keys(C.cab);var o={cab:S.cab,ctr:S.ctr,flr:S.flr,wal:S.wal};var i=(keys.indexOf(S.cab)+2)%keys.length;o.cab=keys[i];return o}
+function draw(){
+ put('orig',room(S,true));
+ put('r1',room(S,false));put('r2',room(alt(),false));
+ put('r3a',room(S,true));put('r3b',room(S,false));put('bid',room(S,false));
+ document.getElementById('fill').innerHTML='<span>Job type</span><span>Kitchen remodel</span><span>Cabinets</span><span>New cabinets, '+S.cab.toLowerCase()+'</span><span>Countertops</span><span>'+S.ctr+'</span><span>Floor</span><span>'+S.flr+' (new floor)</span><span>Walls</span><span>Fresh paint, '+S.wal.toLowerCase()+'</span><span>Photos</span><span>Your photo, plus the idea marked as inspiration</span>';
+}
+['cab','ctr','flr','wal'].forEach(chips);
+document.getElementById('style').addEventListener('click',function(e){var b=e.target.closest('.chip');if(!b)return;
+ [].forEach.call(this.children,function(x){x.classList.toggle('on',x===b)});S=JSON.parse(JSON.stringify(P[b.dataset.v]));['cab','ctr','flr','wal'].forEach(chips);draw()});
+document.getElementById('space').addEventListener('click',function(e){var b=e.target.closest('.chip');if(!b)return;[].forEach.call(this.children,function(x){x.classList.toggle('on',x===b)})});
+var sw=document.getElementById('sw');
+function show(s){[].forEach.call(sw.children,function(x){x.classList.toggle('on',x.dataset.s===s)});['up','st','re','us'].forEach(function(id){var e=document.getElementById(id);e.hidden=id!==s;e.style.display=e.hidden?'none':'flex'});window.scrollTo(0,0)}
+[].forEach.call(sw.children,function(b){b.onclick=function(){show(b.dataset.s)}});
+document.getElementById('go1').onclick=function(){show('st')};
+document.getElementById('go2').onclick=function(){show('re')};
+draw();
+</script>
