@@ -1,0 +1,107 @@
+<title>Admin Profile Actions</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: admin user and company pages on a phone. Edit fields, take actions, keep private notes, and confirm every change with a reason that goes to the audit log. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#cd7d2e;--orl:#f9efe4;--orb:#ecd4a8;--gr:#1f7a55;--grl:#d9f1e6;--bad:#b3261e;--badl:#fbe4e2;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--grl:#173a2c;--gr:#6fd1a3;--bad:#f2b8b5;--badl:#3d1f1d;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--grl:#173a2c;--gr:#6fd1a3;--bad:#f2b8b5;--badl:#3d1f1d;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:14px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px}
+h1,h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;text-wrap:balance}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
+.mut{color:var(--mut);font-size:14px;line-height:1.5}.sm{font-size:12.5px}
+.sw{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.sw button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:10px 2px;border-radius:99px;font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:44px}.sw button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.pill{display:inline-block;border-radius:99px;padding:3px 10px;font-size:12px;font-weight:600;background:var(--grl);color:var(--gr);width:max-content}.pill.w{background:var(--orl);color:var(--or)}.pill.b{background:var(--badl);color:var(--bad)}
+.fld{display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:600}
+.fld input,.fld textarea,.fld select{font:500 16px 'IBM Plex Sans',sans-serif;min-height:46px;border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--bg);color:var(--ink);width:100%}
+.fld textarea{min-height:90px}
+.btn{display:flex;align-items:center;justify-content:center;border-radius:99px;min-height:48px;padding:0 18px;font:600 15px 'IBM Plex Sans',sans-serif;border:1px solid var(--or);background:var(--or);color:#fff;cursor:pointer;width:100%}
+.btn.gh{background:transparent;color:var(--ink);border-color:var(--line)}.btn.dg{background:transparent;color:var(--bad);border-color:var(--bad)}
+.act{display:grid;grid-template-columns:1fr auto;gap:2px 10px;align-items:center;border-top:1px solid var(--line);padding-top:10px}.act:first-of-type{border:0;padding-top:0}
+.act b{font-size:14.5px}.act button{grid-row:span 2;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:99px;min-height:40px;padding:0 14px;font:600 13.5px 'IBM Plex Sans',sans-serif;cursor:pointer}
+.act button.dg{color:var(--bad);border-color:var(--bad)}
+.diff{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:14px}.diff dt{color:var(--mut)}.diff dd{margin:0}.diff del{color:var(--bad)}.diff ins{color:var(--gr);text-decoration:none;font-weight:600}
+.ok{background:var(--grl);color:var(--gr);border-radius:14px;padding:12px;font-size:14px;line-height:1.45}
+.sec[hidden]{display:none}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--or);outline-offset:2px}
+</style>
+
+<div class="wrap">
+  <div class="note"><b>Mockup, example data.</b> Today an admin can read a profile, suspend it and message it. This adds editing, more actions, and private notes. Every change asks for a reason and is written to the audit log with the old and new value. Tap the three states.</div>
+  <div class="sw" id="sw"><button class="on" data-s="a" type="button">1 · Person</button><button data-s="b" type="button">2 · Company</button><button data-s="c" type="button">3 · Confirm</button></div>
+
+  <!-- 1 person -->
+  <div id="a" class="sec" style="display:flex;flex-direction:column;gap:14px">
+    <h1 style="font-size:24px">bestdfwcontractors@gmail.com</h1>
+    <div class="card"><div style="display:flex;gap:6px;flex-wrap:wrap"><span class="pill">active</span><span class="pill w">homeowner</span></div>
+      <span class="mut sm">Joined Oct 28 · last signed in today · 2 projects</span></div>
+
+    <div class="card"><h2 style="font-size:19px">Profile</h2>
+      <label class="fld" for="fn">Name<input id="fn" value="Jerry still"></label>
+      <label class="fld" for="ph">Phone<input id="ph" value="(214) 555-0147" inputmode="tel"></label>
+      <label class="fld" for="em">Email<input id="em" value="bestdfwcontractors@gmail.com" inputmode="email"></label>
+      <span class="mut sm">Changing an email signs the person out and they sign in again with the new address. The old one is kept in the audit log.</span>
+      <button class="btn" type="button" id="save1">Save changes</button>
+    </div>
+
+    <div class="card"><h2 style="font-size:19px">Actions</h2>
+      <div class="act"><b>Sign out everywhere</b><button type="button">Sign out</button><span class="mut sm">Ends every session. They can sign in again.</span></div>
+      <div class="act"><b>Turn alerts off</b><button type="button">Turn off</button><span class="mut sm">Stops email and text alerts, for example after bounces.</span></div>
+      <div class="act"><b>Suspend access</b><button class="dg" type="button">Suspend</button><span class="mut sm">Blocks sign-in. Their records stay for the other party.</span></div>
+      <div class="act"><b>Delete account</b><button class="dg" type="button">Delete</button><span class="mut sm">Only if they have no projects. Otherwise suspend.</span></div>
+    </div>
+
+    <div class="card"><h2 style="font-size:19px">Private notes</h2>
+      <span class="mut sm">Only admins see these. Never shown to the person.</span>
+      <div class="note" style="border-style:solid"><b>Nov 2 · you:</b> Test homeowner for the Kitchen remodel project.</div>
+      <label class="fld" for="nt">Add a note<textarea id="nt" placeholder="What happened, who you spoke to, what to watch for"></textarea></label>
+      <button class="btn gh" type="button">Save note</button>
+    </div>
+  </div>
+
+  <!-- 2 company -->
+  <div id="b" class="sec" hidden style="flex-direction:column;gap:14px">
+    <h1 style="font-size:24px">Nesty's Painting</h1>
+    <div class="card"><div style="display:flex;gap:6px;flex-wrap:wrap"><span class="pill">listed</span><span class="pill">insured to Mar 2027</span><span class="pill w">not verified</span></div>
+      <span class="mut sm">Owner: nestor.rodriguez92@gmail.com · 1 staff · 4 bids · ★ 4.9 (12)</span></div>
+
+    <div class="card"><h2 style="font-size:19px">Business profile</h2>
+      <label class="fld" for="cn">Business name<input id="cn" value="Nesty's Painting"></label>
+      <label class="fld" for="ab">About<textarea id="ab">Interior and exterior painting across Collin County.</textarea></label>
+      <label class="fld" for="tr">Trades<input id="tr" value="Painting, Drywall and carpentry"></label>
+      <label class="fld" for="zp">Service area<input id="zp" value="ZIP 75074 · 25 miles"></label>
+      <button class="btn" type="button" id="save2">Save changes</button>
+    </div>
+
+    <div class="card"><h2 style="font-size:19px">Actions</h2>
+      <div class="act"><b>Mark as verified</b><button type="button">Verify</button><span class="mut sm">Adds a "Verified by Jobfile" badge after you check the license and insurance.</span></div>
+      <div class="act"><b>Remove logo or a photo</b><button type="button">Choose</button><span class="mut sm">For images that break the rules. The business is told why.</span></div>
+      <div class="act"><b>Hide from the marketplace</b><button class="dg" type="button">Hide</button><span class="mut sm">They stop appearing and can't bid. Open projects with them stay as they are.</span></div>
+      <div class="act"><b>Move ownership</b><button type="button">Move</button><span class="mut sm">Makes another staff member the owner, for example if the owner left.</span></div>
+    </div>
+  </div>
+
+  <!-- 3 confirm -->
+  <div id="c" class="sec" hidden style="flex-direction:column;gap:14px">
+    <div class="card"><h2 style="font-size:20px">Confirm this change</h2>
+      <dl class="diff"><dt>Person</dt><dd>Jerry still</dd><dt>Phone</dt><dd><del>(214) 555-0147</del><br><ins>(214) 555-0199</ins></dd></dl>
+      <label class="fld" for="rs">Reason (saved in the audit log)<input id="rs" placeholder="Example: person called to fix a typo"></label>
+      <label class="fld" for="tell" style="flex-direction:row;align-items:center;gap:10px;font-weight:500;font-size:14px"><input id="tell" type="checkbox" checked style="width:22px;height:22px;min-height:0;accent-color:var(--or)">Tell them about this change</label>
+      <button class="btn" type="button" id="conf" disabled>Save change</button>
+      <button class="btn gh" type="button">Cancel</button>
+      <div class="ok" id="done" hidden>Saved. The audit log now shows: you changed Phone from (214) 555-0147 to (214) 555-0199, with your reason.</div>
+    </div>
+    <div class="note" style="border-style:solid">Name, phone and business text can be edited. Passwords never exist here. Admin accounts can't be suspended or deleted from this page.</div>
+  </div>
+</div>
+<script>
+function $(i){return document.getElementById(i)}
+function show(id){['a','b','c'].forEach(function(x){var e=$(x);e.hidden=x!==id;e.style.display=e.hidden?'none':'flex'});[].forEach.call($('sw').children,function(b){b.classList.toggle('on',b.dataset.s===id)});window.scrollTo(0,0)}
+[].forEach.call($('sw').children,function(b){b.onclick=function(){show(b.dataset.s)}});
+$('save1').onclick=function(){show('c')};$('save2').onclick=function(){show('c')};
+$('rs').oninput=function(){$('conf').disabled=this.value.trim().length<4};
+$('conf').onclick=function(){this.disabled=true;$('done').hidden=false};
+</script>
