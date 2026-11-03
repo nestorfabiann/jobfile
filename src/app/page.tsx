@@ -21,26 +21,28 @@ export default async function Home() {
   if (st.pros) nums.push([st.pros.toLocaleString('en-US'), 'Local pros']);
   if (st.rating) nums.push([`${st.rating.avg.toFixed(1)} ★`, `Avg. rating (${st.rating.count})`]);
   return (
-    <>
+    <div className="landing">
       {signedIn && (
         <div className="row" style={{ justifyContent: 'flex-end' }}>
           <Link className="pill" href="/projects">Go to Projects →</Link>
         </div>
       )}
-      <div className="stack">
+      <div className="stack" style={{ gap: 14 }}>
         <span className="lbl">Home improvement marketplace</span>
         <h1 style={{ fontSize: 'clamp(32px, 9vw, 44px)', lineHeight: 1.05, letterSpacing: '-0.03em' }}>
           Post it. Bid on it. <span style={{ color: 'var(--accent)' }}>Run the job in one place.</span>
         </h1>
         <p className="muted" style={{ fontSize: 17 }}>Homeowners post projects and compare bids from local contractors. Contractors find nearby work and keep the paperwork, photos and payments in one shared record.</p>
       </div>
-      <Link className="btn accent" href={signedIn ? '/marketplace/new' : `/login?next=${encodeURIComponent('/marketplace/new')}`}>Get bids on your project →</Link>
-      <Link className="btn" style={{ background: 'var(--ink)', borderColor: 'var(--ink)', color: 'var(--bg)' }} href={signedIn ? '/marketplace' : '/jobs'}>Find Work near you →</Link>
+      <div className="stack" style={{ gap: 14 }}>
+        <Link className="btn accent" href={signedIn ? '/marketplace/new' : `/login?next=${encodeURIComponent('/marketplace/new')}`}>Get bids on your project →</Link>
+        <Link className="btn ghost" href={signedIn ? '/marketplace' : '/jobs'}>Find Work near you →</Link>
+      </div>
 
       {nums.length > 0 && (
-        <div className="row" style={{ justifyContent: 'space-around', textAlign: 'center' }} aria-label="Jobfile so far">
+        <div className="row" style={{ justifyContent: 'space-around', textAlign: 'center', padding: '18px 0', borderBlock: '1px solid var(--line)' }} aria-label="Jobfile so far">
           {nums.map(([n, t]) => (
-            <div key={t}><div style={{ fontSize: 26, fontWeight: 800, color: 'var(--accent)' }}>{n}</div><div className="muted small">{t}</div></div>
+            <div key={t}><div style={{ fontSize: 24, fontWeight: 800, color: 'var(--accent)' }}>{n}</div><div className="muted small">{t}</div></div>
           ))}
         </div>
       )}
@@ -77,11 +79,13 @@ export default async function Home() {
       {listings.length === 0 ? (
         <div className="card"><p className="muted" style={{ margin: 0 }}>No open projects right now. Be the first to post one.</p></div>
       ) : (
-        listings.map((l) => <PublicJobCard key={l.id} l={l} bids={counts.get(l.id) ?? 0} />)
+        <div className="stack" style={{ gap: 12 }}>
+          {listings.map((l) => <PublicJobCard key={l.id} l={l} bids={counts.get(l.id) ?? 0} />)}
+        </div>
       )}
       <Link className="btn ghost" href="/jobs">See all open jobs →</Link>
 
       <Link className="btn accent" href={signedIn ? '/projects' : '/login'}>{signedIn ? 'Go to Projects →' : 'Get started free →'}</Link>
-    </>
+    </div>
   );
 }

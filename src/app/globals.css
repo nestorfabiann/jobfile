@@ -241,3 +241,6 @@ details.card > summary { list-style: none; }
 details.card > summary::-webkit-details-marker { display: none; }
 
 details.startp[open] + .startp-hint { display: none; }
+
+/* Landing page: more room between sections. */
+.landing { display: flex; flex-direction: column; gap: 32px; }
