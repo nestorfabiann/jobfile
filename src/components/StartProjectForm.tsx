@@ -2,7 +2,7 @@ import { createProject } from '@/app/projects/actions';
 
 /** Contractor "Start a project" button that opens the new-project form in place (no client JS needed). */
 export default function StartProjectForm({ companyId, companyName, open, heading, ghost }: { companyId: string; companyName?: string | null; open?: boolean; heading?: string; ghost?: boolean }) {
-  return (
+  const form = (
     <details className={heading ? 'startp startp-head' : 'startp'} open={open}>
       {heading ? (
         <summary>
@@ -14,6 +14,7 @@ export default function StartProjectForm({ companyId, companyName, open, heading
       )}
       <form action={createProject} className="stack" style={{ marginTop: 12 }}>
         {companyName ? <p className="muted small">{companyName}</p> : null}
+        <div className="box ok">They do not need an account yet. They create a free one from your invite.</div>
         <input type="hidden" name="company_id" value={companyId} />
         <div className="grid2">
           <label className="fld">
@@ -47,5 +48,14 @@ export default function StartProjectForm({ companyId, companyName, open, heading
         </div>
       </form>
     </details>
+  );
+  if (!ghost) return form;
+  return (
+    <div>
+      {form}
+      <p className="muted small startp-hint" style={{ margin: '10px 0 0' }}>
+        <b style={{ color: 'var(--ink)' }}>Already have a customer?</b> Add them by email, even if they are not on Jobfile yet. They get an invite to join the project.
+      </p>
+    </div>
   );
 }

@@ -239,3 +239,5 @@ body.pub .composer { box-shadow: 0 -10px 24px -14px rgba(27, 26, 24, 0.3); }
 
 details.card > summary { list-style: none; }
 details.card > summary::-webkit-details-marker { display: none; }
+
+details.startp[open] + .startp-hint { display: none; }
