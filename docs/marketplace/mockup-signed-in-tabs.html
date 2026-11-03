@@ -1,0 +1,65 @@
+<title>Signed-in Tab Bar</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: a phone screen with the Projects page behind a fixed bottom tab bar. A switch picks homeowner or contractor tabs, and Menu opens a sheet. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#cd7d2e;--orl:#f9efe4;--orb:#ecd4a8;--bad:#c0281f;--page:#e9e5dc;--shade:#0006}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--bad:#ff8f85;--page:#0d0c0b;--shade:#000a;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--bad:#ff8f85;--page:#0d0c0b;--shade:#000a;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:14px 110px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px}
+h1,h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
+.mut{color:var(--mut);font-size:14px;line-height:1.5}.sm{font-size:12.5px}
+.sw{display:grid;grid-template-columns:1fr 1fr;gap:6px}.sw button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:10px 4px;border-radius:99px;font:500 13.5px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:44px}.sw button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.top{display:flex;justify-content:space-between;align-items:center}
+.logo{font:800 22px 'Bricolage Grotesque',sans-serif;letter-spacing:-.03em}.logo b{color:var(--or)}
+.menu{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:99px;min-height:40px;padding:0 14px;font:600 13.5px 'IBM Plex Sans',sans-serif}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:6px}
+.needs{background:var(--orl);border:1px solid var(--orb);border-radius:22px;padding:14px;display:flex;flex-direction:column;gap:8px}
+.task{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;font-size:14px}
+.tabbar{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);padding:6px max(8px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(8px,env(safe-area-inset-left,0px));display:flex;justify-content:center;z-index:5}
+.tabbar nav{width:100%;max-width:430px;display:grid;grid-template-columns:repeat(4,1fr);gap:2px}
+.tb{position:relative;border:0;background:transparent;color:var(--mut);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:58px;border-radius:14px;font:600 11.5px 'IBM Plex Sans',sans-serif;cursor:pointer}
+.tb svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.tb.on{color:var(--or)}
+.tb.on::before{content:"";position:absolute;top:0;width:28px;height:3px;border-radius:0 0 3px 3px;background:var(--or)}
+.dot{position:absolute;top:5px;left:calc(50% + 6px);min-width:18px;height:18px;border-radius:99px;background:var(--bad);color:#fff;font-size:11px;font-weight:700;display:grid;place-items:center;padding:0 5px}
+.shade{position:fixed;inset:0;background:var(--shade);z-index:8}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:9;display:flex;justify-content:center}
+.sheet>div{width:100%;max-width:430px;background:var(--card);border-radius:24px 24px 0 0;padding:16px max(16px,env(safe-area-inset-right,0px)) calc(86px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:4px}
+.sheet a{display:flex;align-items:center;min-height:50px;border-bottom:1px solid var(--line);font-size:16px;font-weight:500;color:var(--ink)}
+.sheet a:last-child{border:0;color:var(--bad)}
+[hidden]{display:none!important}
+button:focus-visible{outline:2px solid var(--or);outline-offset:2px}
+</style>
+
+<div class="wrap">
+  <div class="note"><b>Mockup, example data.</b> The bar sits at the bottom of every signed-in page. Switch between the homeowner and contractor versions, and tap tabs to see the active state. "Menu" opens the same list as today's top button. The red number on Projects is the count from "Needs you".</div>
+  <div class="sw" id="sw"><button class="on" data-r="h" type="button">Homeowner</button><button data-r="c" type="button">Contractor</button></div>
+
+  <div class="top"><span class="logo">Job<b>file</b></span><span class="menu">Menu</span></div>
+  <h1 style="font-size:30px">Projects</h1>
+  <div class="needs"><h2 style="font-size:19px">Needs you <span style="color:var(--or)" id="cnt">3</span></h2>
+    <div class="task" id="t1">Sign the agreement · Kitchen remodel</div><div class="task" id="t2">Approve change order CO-2 (+$640)</div><div class="task" id="t3">3 new bids on Roofing</div></div>
+  <div class="card"><b>Kitchen remodel · Plano</b><span class="mut sm">Active</span></div>
+  <div class="card"><b>Fence repair · Frisco</b><span class="mut sm">Active</span></div>
+</div>
+
+<div class="tabbar"><nav id="nav" aria-label="Main"></nav></div>
+<div id="shade" class="shade" hidden></div>
+<div id="sheet" class="sheet" hidden><div><a>Settings</a><a>Business profile</a><a>Help</a><a>Sign out</a></div></div>
+
+<script>
+var IC={home:'<path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/>',proj:'<path d="M7 3h8l4 4v14H7z"/><path d="M15 3v4h4"/><path d="M10 13h6M10 17h6"/>',post:'<circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/>',find:'<circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/>',menu:'<path d="M4 7h16M4 12h16M4 17h16"/>'};
+var R={h:[['home','Home'],['proj','Projects',3],['post','Post'],['menu','Menu']],c:[['home','Home'],['proj','Projects',3],['find','Find work'],['menu','Menu']]};
+var role='h',cur='proj';
+var $=function(i){return document.getElementById(i)};
+function draw(){var n=$('nav');n.innerHTML='';R[role].forEach(function(t){var b=document.createElement('button');b.type='button';b.className='tb'+(t[0]===cur?' on':'');
+ b.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true">'+IC[t[0]]+'</svg>'+t[1]+(t[2]?'<span class="dot" aria-label="'+t[2]+' waiting">'+t[2]+'</span>':'');
+ b.onclick=function(){if(t[0]==='menu'){$('shade').hidden=false;$('sheet').hidden=false;return}cur=t[0]===(role==='h'?'post':'find')?cur:t[0];draw()};n.appendChild(b)})}
+$('shade').onclick=function(){$('shade').hidden=true;$('sheet').hidden=true};
+[].forEach.call($('sw').children,function(b){b.onclick=function(){role=b.dataset.r;[].forEach.call($('sw').children,function(x){x.classList.toggle('on',x===b)});draw()}});
+draw();
+</script>
