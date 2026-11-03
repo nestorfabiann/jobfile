@@ -95,7 +95,23 @@ export default function LandingPitch({ aiOn, signedIn }: { aiOn: boolean; signed
               ['Run the job in Jobfile', 'Accept a bid and the project opens with scope, price, photos, payments and change orders.'],
             ])}
           </div>
-          <Link className="btn" href={post}>Post a project →</Link>
+          <div className="card">
+            <h3 style={{ margin: 0 }}>Why homeowners use Jobfile</h3>
+            {([
+              ['spark', 'Know if the price is fair', 'An AI cost reference for your project before you commit, so you are not guessing.', true],
+              ['shield', "Know who's showing up", 'Every bid shows insurance, real ratings and work photos.'],
+              ['pin', 'Your details stay private', 'Your address and contact info go only to the contractor you hire. Ask questions first without giving out your number.'],
+              ['doc', 'Everything in one record', 'Price, scope, photos, changes and payments in one place, not lost in texts.'],
+              ['star', 'Built for Texas', 'Homestead steps are tracked for you.'],
+            ] as [string, string, string, boolean?][]).map(([ic, t, d, ai]) => (
+              <div key={t} className="row" style={{ alignItems: 'flex-start', flexWrap: 'nowrap', gap: 12 }}>
+                <Ic n={ic} />
+                <p style={{ margin: 0 }}><b>{t}</b>{ai && !aiOn ? <Soon /> : null}<span className="muted small" style={{ display: 'block' }}>{d}</span></p>
+              </div>
+            ))}
+          </div>
+          <span className="pill ok" style={{ width: 'max-content' }}>Free for homeowners</span>
+          <Link className="btn" href={post}>Post a project, it&apos;s free →</Link>
         </>
       )}
     </section>
