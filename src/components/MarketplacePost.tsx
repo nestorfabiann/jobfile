@@ -103,6 +103,7 @@ export default function MarketplacePost({ types, aiOn, draft }: { types: Types; 
 
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    const formNode = e.currentTarget; // read now: React clears currentTarget after the first await
     if (posting) return;
     if (!answers.when) { setPostErr('Choose when you want to start. It is in the questions above.'); return; }
     // Once, and only when there are no photos or videos: a gentle nudge. Publishing is never blocked.
@@ -112,7 +113,7 @@ export default function MarketplacePost({ types, aiOn, draft }: { types: Types; 
     setStatus('Publishing your project…');
     await chain.current; // let any draft save finish first, so it cannot recreate a draft after publishing
     try {
-      const fd = new FormData(e.currentTarget);
+      const fd = new FormData(formNode);
       if (draftId.current) fd.set('draft_id', draftId.current);
       const r = await createListing(fd);
       if (!r.ok) { setPostErr(r.error); setPosting(false); return; }
