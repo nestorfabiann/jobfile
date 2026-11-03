@@ -162,7 +162,7 @@ export const QUESTIONS: Record<string, Q[]> = {
     c('The build', 'mat', 'Material', ['Pressure treated wood', 'Cedar', 'Composite', 'Pavers', 'Stamped concrete'], { ns: true, short: 'Material' }),
     c('The build', 'rail', 'Stairs and railing needed?', ['Both', 'Stairs only', 'Railing only', 'Neither'], { short: 'Stairs and rail' }),
     c('The build', 'rem', 'Remove an old deck or patio?', YN, { short: 'Remove old' }),
-    c('The build', 'perm', 'Permit and HOA approval', ['Contractor handles', 'Already approved'], { ns: true, short: 'Permit and HOA' }),
+    c('The build', 'permhoa', 'Permit and HOA approval', ['Contractor handles', 'Already approved'], { ns: true, short: 'Permit and HOA' }),
     LVL('The build'),
   ],
   'Concrete and driveways': [
