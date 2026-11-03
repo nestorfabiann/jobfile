@@ -39,9 +39,9 @@ export default function AppTabs({ contractor, marketplace, waiting, admin, signO
     ...(marketplace ? ([['/marketplace', 'Marketplace', 'mkt']] as [string, string, string][]) : []),
     ...(marketplace && !contractor ? ([['/find', 'Find contractors', 'find']] as [string, string, string][]) : []),
     ['/settings', 'Settings', 'set'],
+    ...(contractor ? ([['/settings/business', 'Business profile', 'biz']] as [string, string, string][]) : []),
     ['/invite', 'Invite friends', 'inv'],
     ['/help', 'Help and contact', 'help'],
-    ...(contractor ? ([['/settings/business', 'Business profile', 'biz']] as [string, string, string][]) : []),
     ...(admin ? ([['/admin', 'Admin', 'adm']] as [string, string, string][]) : []),
   ];
 
