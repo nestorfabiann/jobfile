@@ -15,7 +15,7 @@ export async function GET() {
   if (!companyId) return new Response('Not found', { status: 404 });
   const db = supabaseAdmin();
   const { data: ps } = await db.from('projects').select('id,name').eq('company_id', companyId).limit(500);
-  const names = new Map((ps ?? []).map((p: any) => [p.id as string, p.name as string]));
+  const names = new Map<string, string>((ps ?? []).map((p: any) => [p.id as string, p.name as string] as [string, string]));
   const { data: ex } = names.size
     ? await db.from('project_expenses').select('project_id,amount_cents,category,vendor,spent_on').in('project_id', Array.from(names.keys())).order('spent_on', { ascending: false }).limit(20000)
     : { data: [] as any[] };
