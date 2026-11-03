@@ -1,13 +1,14 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { MAX_PHOTOS, MAX_VIDEOS, MAX_VIDEO_BYTES, VIDEO_TYPES } from '@/lib/mediaLimits';
 import type { MediaItem } from '@/lib/uploadMedia';
 
 /** Photos and videos chosen on the post form. Nothing uploads until the project is published. */
-export default function MediaPicker({ items, setItems, onProblem, disabled }: { items: MediaItem[]; setItems: (f: (prev: MediaItem[]) => MediaItem[]) => void; onProblem: (msg: string) => void; disabled?: boolean }) {
+export default function MediaPicker({ items, setItems, onProblem, disabled, tips }: { tips: string[]; items: MediaItem[]; setItems: (f: (prev: MediaItem[]) => MediaItem[]) => void; onProblem: (msg: string) => void; disabled?: boolean }) {
   const photoIn = useRef<HTMLInputElement>(null);
   const videoIn = useRef<HTMLInputElement>(null);
+  const [done, setDone] = useState<Record<number, boolean>>({});
   const live = useRef<MediaItem[]>([]);
   live.current = items;
   useEffect(() => () => live.current.forEach((i) => URL.revokeObjectURL(i.url)), []);
@@ -47,6 +48,8 @@ export default function MediaPicker({ items, setItems, onProblem, disabled }: { 
     });
   }
 
+  useEffect(() => setDone({}), [tips]);
+  const ticked = tips.filter((_, i) => done[i]).length;
   const mb = Math.round(items.filter((i) => i.kind === 'video').reduce((s, i) => s + i.file.size, 0) / 1048576);
   return (
     <div className="stack" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -72,6 +75,24 @@ export default function MediaPicker({ items, setItems, onProblem, disabled }: { 
           </div>
           <p className="muted small" style={{ margin: 0 }}>{photos} photo{photos === 1 ? '' : 's'} · {videos} video{videos === 1 ? '' : 's'}{videos ? ` (${mb} MB)` : ''}</p>
         </>
+      )}
+      {items.length === 0 ? (
+        <div style={{ background: 'var(--accent-soft, #f9efe4)', border: '1px solid var(--line)', borderRadius: 16, padding: '12px 14px', fontSize: 14, lineHeight: 1.5 }}>
+          <b style={{ display: 'block', marginBottom: 4 }}>Photos of the whole space help contractors bid accurately</b>
+          <ul style={{ margin: '6px 0 0', paddingLeft: 18 }}>{tips.map((t) => <li key={t}>{t}</li>)}</ul>
+        </div>
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <p className="muted small" style={{ margin: 0 }}>{ticked} of {tips.length} suggested shots</p>
+          <div aria-hidden="true" style={{ height: 6, borderRadius: 99, background: 'var(--line)', overflow: 'hidden' }}><div style={{ height: '100%', width: `${(ticked / tips.length) * 100}%`, background: 'var(--accent)' }} /></div>
+          {tips.map((t, i) => (
+            <button key={t} type="button" onClick={() => setDone((d) => ({ ...d, [i]: !d[i] }))} aria-pressed={!!done[i]} style={{ display: 'flex', gap: 10, alignItems: 'center', border: 0, background: 'none', padding: '6px 0', minHeight: 34, textAlign: 'left', font: 'inherit', color: done[i] ? 'var(--muted, #6b655e)' : 'inherit', textDecoration: done[i] ? 'line-through' : 'none', cursor: 'pointer' }}>
+              <span aria-hidden="true" style={{ flex: 'none', width: 22, height: 22, borderRadius: '50%', border: '1.5px solid var(--accent)', display: 'grid', placeItems: 'center', color: '#fff', background: done[i] ? 'var(--ok)' : 'transparent', borderColor: done[i] ? 'var(--ok)' : 'var(--accent)', fontSize: 13 }}>{done[i] ? '✓' : ''}</span>
+              <span>{t}</span>
+            </button>
+          ))}
+          <p className="muted small" style={{ margin: 0 }}>This list is only a guide. It is never required.</p>
+        </div>
       )}
       <div className="grid2" style={{ gridTemplateColumns: '1fr 1fr' }}>
         <button type="button" className="btn ghost" disabled={disabled} onClick={() => photoIn.current?.click()}>📷 {photos ? 'Add more' : 'Add photos'}</button>

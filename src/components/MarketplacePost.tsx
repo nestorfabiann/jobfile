@@ -1,11 +1,12 @@
 'use client';
 
 import TradeIcon from '@/components/TradeIcon';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createListing, getReference, type RefResult } from '@/app/marketplace/actions';
 import RangeBar from '@/components/RangeBar';
 import MediaPicker from '@/components/MediaPicker';
+import { tipsFor } from '@/lib/photoTips';
 import { uploadMedia, type MediaItem } from '@/lib/uploadMedia';
 
 type Types = Record<string, { size: number; sizeLabel: string; groups: [string, string[]][] }>;
@@ -30,6 +31,10 @@ export default function MarketplacePost({ types, aiOn }: { types: Types; aiOn: b
   const [posting, setPosting] = useState(false);
   const [status, setStatus] = useState('');
   const [postErr, setPostErr] = useState('');
+  const [nudge, setNudge] = useState(false);
+  const skipPhotos = useRef(false);
+  const formEl = useRef<HTMLFormElement>(null);
+  const mediaCard = useRef<HTMLDivElement>(null);
 
   const changed = () => setRef(null);
   const chooseType = (t: string) => { setType(t); setPicks([]); setSize(String(types[t].size)); changed(); };
@@ -52,6 +57,8 @@ export default function MarketplacePost({ types, aiOn }: { types: Types; aiOn: b
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (posting) return;
+    // Once, and only when there are no photos or videos: a gentle nudge. Publishing is never blocked.
+    if (!media.length && !skipPhotos.current) { setNudge(true); return; }
     setPostErr('');
     setPosting(true);
     setStatus('Publishing your project…');
@@ -84,7 +91,7 @@ export default function MarketplacePost({ types, aiOn }: { types: Types; aiOn: b
   }
 
   return (
-    <form onSubmit={submit} className="stack" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+    <form ref={formEl} onSubmit={submit} className="stack" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <input type="hidden" name="job_type" value={type} />
       {picks.map((p) => <input key={p} type="hidden" name="items" value={p} />)}
       {ref ? <input type="hidden" name="ref_id" value={ref.id} /> : null}
@@ -124,10 +131,10 @@ export default function MarketplacePost({ types, aiOn }: { types: Types; aiOn: b
         </label>
       </div>
 
-      <div className="card">
+      <div className="card" ref={mediaCard}>
         <h2>Photos and videos <span className="muted small" style={{ fontWeight: 400 }}>(optional)</span></h2>
         <p className="muted small" style={{ margin: 0 }}>Show contractors the space. A short walk-through video often gets more accurate bids.</p>
-        <MediaPicker items={media} setItems={setMedia} onProblem={setMediaErr} disabled={posting} />
+        <MediaPicker tips={tipsFor(type)} items={media} setItems={setMedia} onProblem={setMediaErr} disabled={posting} />
         {mediaErr ? <div className="box bad">{mediaErr}</div> : null}
         <p className="muted small" style={{ margin: 0 }}>Contractors never see your street address. Before you add media, check that house numbers, mail and documents are not in the frame.</p>
       </div>
@@ -169,6 +176,14 @@ export default function MarketplacePost({ types, aiOn }: { types: Types; aiOn: b
           <input type="checkbox" name="is_homestead" />
           <span>This is my homestead.<span className="muted small" style={{ display: 'block' }}>Texas has extra contract rules for homestead jobs. Jobfile will track them.</span></span>
         </label>
+        {nudge && !media.length ? (
+          <div className="card" role="alertdialog" aria-label="No photos yet" style={{ gap: 10 }}>
+            <b>No photos yet</b>
+            <p className="muted small" style={{ margin: 0 }}>Contractors price more accurately when they can see the space. You can still publish now and add photos later from the project page.</p>
+            <button type="button" className="btn ghost" onClick={() => { setNudge(false); mediaCard.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }}>Add photos first</button>
+            <button type="button" className="btn" onClick={() => { skipPhotos.current = true; setNudge(false); formEl.current?.requestSubmit(); }}>Publish without photos</button>
+          </div>
+        ) : null}
         {postErr ? <div className="box bad">{postErr}</div> : null}
         <div className="row"><button className="btn" type="submit" disabled={posting}>{posting ? status || 'Publishing…' : 'Publish project'}</button></div>
         <p className="muted small">Contractors on Jobfile can then send you bids. You choose who to hire. Your project stays open for 30 days.</p>
