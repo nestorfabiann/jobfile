@@ -1,0 +1,71 @@
+<title>Post Drafts</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: three phone screens in tabs. The post form autosaves, the draft waits on the Posted jobs tab, and tapping it restores everything. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#cd7d2e;--orl:#f9efe4;--orb:#ecd4a8;--gr:#1f7a55;--grl:#d9f1e6;--bad:#b3261e;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--grl:#173a2c;--gr:#6fd1a3;--bad:#f2b8b5;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--grl:#173a2c;--gr:#6fd1a3;--bad:#f2b8b5;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:14px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px}
+h1,h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;text-wrap:balance}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
+.mut{color:var(--mut);font-size:14px;line-height:1.5}.sm{font-size:12.5px}
+.sw{display:flex;gap:6px}.sw button{flex:1;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:10px 4px;border-radius:99px;font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:44px}.sw button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}.chip{border:1.5px solid var(--line);border-radius:99px;padding:8px 14px;font-size:13.5px;font-weight:500;background:var(--card)}.chip.on{background:var(--orl);border-color:var(--or);color:var(--or)}
+.saved{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--gr);font-weight:600;min-height:28px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--gr)}.dot.sav{background:var(--or);animation:p 1s infinite}
+@keyframes p{50%{opacity:.35}}@media (prefers-reduced-motion:reduce){.dot.sav{animation:none}}
+.pill{display:inline-block;width:max-content;font-size:12px;font-weight:600;padding:4px 10px;border-radius:99px;background:var(--orl);color:var(--or)}
+.tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px}.tab{display:flex;align-items:center;justify-content:center;border:1px solid var(--line);background:var(--card);border-radius:99px;min-height:46px;font:500 14.5px 'IBM Plex Sans',sans-serif}.tab.on{background:var(--or);color:#fff;border-color:var(--or)}
+.btn{display:flex;align-items:center;justify-content:center;border-radius:99px;min-height:50px;padding:0 16px;font:600 15px 'IBM Plex Sans',sans-serif;border:1px solid var(--or);background:var(--or);color:#fff;cursor:pointer;width:100%}
+.btn.gh{background:var(--orl);color:var(--or);border-color:var(--orb)}.btn.sm2{min-height:40px;width:auto;padding:0 16px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ok{background:var(--grl);color:var(--gr);border-radius:14px;padding:12px;font-size:14px;line-height:1.45}
+.sec[hidden]{display:none}.gone{display:none}
+button:focus-visible{outline:2px solid var(--or);outline-offset:2px}
+</style>
+
+<div class="wrap">
+  <div class="note"><b>Mockup, example data.</b> The form saves itself as you go, so nobody loses their scope selections if they close the page, run out of battery or switch phones. Tap through the three tabs.</div>
+  <div class="sw" id="sw"><button class="on" data-s="a" type="button">1 · Form</button><button data-s="b" type="button">2 · Draft</button><button data-s="c" type="button">3 · Resume</button></div>
+
+  <div id="a" class="sec" style="display:flex;flex-direction:column;gap:14px">
+    <div class="saved" id="saved"><span class="dot"></span><span id="savedt">Draft saved</span></div>
+    <div class="card"><h2 style="font-size:20px">What kind of job?</h2><div class="chips"><span class="chip">Painting</span><span class="chip on">Kitchen remodel</span><span class="chip">Bathroom</span></div></div>
+    <div class="card"><h2 style="font-size:20px">Tap what you want done</h2><div class="mut sm">Cabinets</div>
+      <div class="chips" id="picks"><button type="button" class="chip on" style="font:inherit">New semi-custom cabinets</button><button type="button" class="chip" style="font:inherit">Reface existing</button><button type="button" class="chip on" style="font:inherit">Quartz</button><button type="button" class="chip" style="font:inherit">Granite</button></div>
+      <div class="mut sm">Try tapping a choice: the status line above flips to "Saving…", then "Draft saved".</div></div>
+    <div class="note">Photos and videos are not kept in a draft, because they upload when the project is published. The form says so: "Add photos before you publish."</div>
+  </div>
+
+  <div id="b" class="sec" hidden style="flex-direction:column;gap:14px">
+    <h1 style="font-size:28px">Projects</h1>
+    <div class="tabs"><span class="tab">Ongoing</span><span class="tab on">Posted jobs</span></div>
+    <div class="card" id="draft"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><span class="pill">Draft</span><span class="mut sm">Saved 2 hours ago</span></div>
+      <h3 style="font-size:19px">Kitchen remodel · 4 choices picked</h3><div class="mut sm">ZIP 75074 · 200 sq ft · budget not set yet · not visible to contractors</div>
+      <div class="two"><button class="btn sm2" type="button" id="cont">Continue</button><button class="btn gh sm2" type="button" id="del">Delete draft</button></div>
+      <div class="mut sm" id="delmsg" hidden></div></div>
+    <div class="card"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><span class="pill" style="background:var(--grl);color:var(--gr)">Open · 12 days left</span></div><h3 style="font-size:19px">Fence repair</h3><div class="mut sm">2 bids</div></div>
+    <div class="note">Drafts show first, never appear on the public job board, and are deleted automatically after 30 days. Up to 3 drafts at a time.</div>
+  </div>
+
+  <div id="c" class="sec" hidden style="flex-direction:column;gap:14px">
+    <div class="ok">Welcome back. We restored your draft from 2 hours ago.</div>
+    <div class="card"><h2 style="font-size:20px">What kind of job?</h2><div class="chips"><span class="chip">Painting</span><span class="chip on">Kitchen remodel</span><span class="chip">Bathroom</span></div></div>
+    <div class="card"><h2 style="font-size:20px">Tap what you want done</h2><div class="chips"><span class="chip on">New semi-custom cabinets</span><span class="chip on">Quartz</span><span class="chip">Granite</span></div></div>
+    <div class="card"><div class="mut sm">Photos and videos need to be added again before publishing.</div><button class="btn" type="button">Publish project</button><button class="btn gh" type="button">Discard draft and start over</button></div>
+  </div>
+</div>
+<script>
+function $(i){return document.getElementById(i)}
+var t;
+[].forEach.call($('picks').children,function(b){b.onclick=function(){b.classList.toggle('on');$('savedt').textContent='Saving…';$('saved').firstChild.className='dot sav';clearTimeout(t);t=setTimeout(function(){$('savedt').textContent='Draft saved';$('saved').firstChild.className='dot'},700)}});
+$('del').onclick=function(){$('delmsg').hidden=false;$('delmsg').textContent='Draft deleted.';$('draft').children[1].classList.add('gone')};
+$('cont').onclick=function(){$('sw').children[2].click()};
+[].forEach.call($('sw').children,function(b){b.onclick=function(){
+  [].forEach.call($('sw').children,function(x){x.classList.toggle('on',x===b)});
+  ['a','b','c'].forEach(function(id){var e=$(id);e.hidden=id!==b.dataset.s;e.style.display=e.hidden?'none':'flex'});window.scrollTo(0,0)}});
+</script>
