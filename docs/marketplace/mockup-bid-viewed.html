@@ -1,0 +1,65 @@
+<title>Bid Viewed Signals</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: three phone states. The contractor's My bids cards show whether the homeowner has seen the bid, a Needs you row on first view, and the homeowner's one-line notice on the bid list. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#cd7d2e;--orl:#f9efe4;--orb:#ecd4a8;--gr:#1f7a55;--grl:#d9f1e6;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--grl:#173a2c;--gr:#6fd1a3;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--grl:#173a2c;--gr:#6fd1a3;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:14px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px}
+h1,h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
+.mut{color:var(--mut);font-size:14px;line-height:1.5}.sm{font-size:12.5px}
+.sw{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.sw button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:10px 2px;border-radius:99px;font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:44px}.sw button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:8px}
+.price{font:800 24px 'Bricolage Grotesque',sans-serif}
+.seen{display:flex;gap:8px;align-items:center;border-radius:14px;padding:9px 12px;font-size:13.5px;font-weight:600;background:var(--bg);color:var(--mut);border:1px solid var(--line)}
+.seen.on{background:var(--orl);color:var(--ink);border-color:var(--orb)}
+.seen.hot{background:var(--grl);color:var(--gr);border-color:transparent}
+.dot{width:9px;height:9px;border-radius:50%;background:currentColor;flex:none}
+.task{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:6px}
+.age{display:inline-block;width:max-content;font-size:11.5px;font-weight:600;padding:2px 8px;border-radius:99px;background:var(--orl);color:var(--or)}
+.btn{display:flex;align-items:center;justify-content:center;border-radius:99px;min-height:42px;padding:0 18px;font:600 14.5px 'IBM Plex Sans',sans-serif;border:1px solid var(--or);background:var(--or);color:#fff;cursor:pointer;align-self:flex-end}
+.hint{background:var(--orl);border:1px solid var(--orb);border-radius:14px;padding:10px 12px;font-size:13px;line-height:1.45}
+.sec[hidden]{display:none}
+button:focus-visible{outline:2px solid var(--or);outline-offset:2px}
+</style>
+
+<div class="wrap">
+  <div class="note"><b>Mockup, example data.</b> The contractor learns that a homeowner has seen the bid, how many times they came back, and when the bid is in their comparison. It shows no minutes and no exact times on the page. Tap the three states.</div>
+  <div class="sw" id="sw"><button class="on" data-s="a" type="button">1 · My bids</button><button data-s="b" type="button">2 · Needs you</button><button data-s="c" type="button">3 · Homeowner</button></div>
+
+  <div id="a" class="sec" style="display:flex;flex-direction:column;gap:14px">
+    <h2 style="font-size:24px">My bids</h2>
+    <div class="card"><b>Kitchen remodel · Plano</b><div class="price">$18,400</div><div class="mut sm">2 weeks · sent Nov 2</div>
+      <div class="seen"><span class="dot"></span>Not viewed yet</div></div>
+    <div class="card"><b>Fence repair · Frisco</b><div class="price">$3,950</div><div class="mut sm">1 week · sent Nov 1</div>
+      <div class="seen on"><span class="dot"></span>Viewed by the homeowner · today at 3:12 PM</div></div>
+    <div class="card"><b>Roofing · McKinney</b><div class="price">$11,200</div><div class="mut sm">3 weeks · sent Oct 30</div>
+      <div class="seen on"><span class="dot"></span>Viewed 3 times · last yesterday</div></div>
+    <div class="card"><b>Bathroom tile · Allen</b><div class="price">$6,800</div><div class="mut sm">10 days · sent Oct 29</div>
+      <div class="seen hot"><span class="dot"></span>In the homeowner's comparison · viewed 5 times</div></div>
+    <div class="note" style="border-style:solid">Gray means no view yet, orange means seen, green means the homeowner added the bid to Compare. Green is the strongest signal because it takes a deliberate tap.</div>
+  </div>
+
+  <div id="b" class="sec" hidden style="flex-direction:column;gap:14px">
+    <h2 style="font-size:22px">Needs you <span style="color:var(--or)">1</span></h2>
+    <div class="task"><b>Jerry viewed your bid</b><span class="mut sm">Kitchen remodel · Plano · $18,400</span><span class="age">Today</span><button class="btn" type="button">Open</button></div>
+    <div class="note" style="border-style:solid">This row appears only the first time a homeowner views a bid, so repeat views never create more rows. It leaves the list once the contractor opens the bid. Repeat views and comparisons only change the card from state 1.</div>
+  </div>
+
+  <div id="c" class="sec" hidden style="flex-direction:column;gap:14px">
+    <h2 style="font-size:24px">3 bids</h2>
+    <div class="hint">Contractors can see when you view their bid. They never see how long you looked, and they cannot see your notes or other bids.</div>
+    <div class="card"><b>Nesty's Painting</b><div class="price">$18,400</div><div class="mut sm">2 weeks · ★ 4.9 (12)</div></div>
+    <div class="card"><b>Lone Star Remodeling</b><div class="price">$16,900</div><div class="mut sm">3 weeks · no reviews yet</div></div>
+    <div class="note" style="border-style:solid">The notice sits at the top of the bid list, once per project. It can be dismissed. A matching line would go into the Privacy page when that page exists.</div>
+  </div>
+</div>
+<script>
+var sw=document.getElementById('sw');
+[].forEach.call(sw.children,function(b){b.onclick=function(){[].forEach.call(sw.children,function(x){x.classList.toggle('on',x===b)});
+ ['a','b','c'].forEach(function(id){var e=document.getElementById(id);e.hidden=id!==b.dataset.s;e.style.display=e.hidden?'none':'flex'});window.scrollTo(0,0)}});
+</script>
