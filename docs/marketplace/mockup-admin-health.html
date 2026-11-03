@@ -1,0 +1,86 @@
+<title>Admin Queue and Health</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: admin on a phone. Overview gets a "Needs attention" queue above the tiles; a new Health tab shows the marketplace funnel, speed to first bid and listings with no bids. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#cd7d2e;--orl:#f9efe4;--orb:#ecd4a8;--gr:#1f7a55;--grl:#d9f1e6;--bad:#b3261e;--badl:#fbe4e2;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--grl:#173a2c;--gr:#6fd1a3;--bad:#f2b8b5;--badl:#3d1f1d;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--grl:#173a2c;--gr:#6fd1a3;--bad:#f2b8b5;--badl:#3d1f1d;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:14px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px}
+h1,h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;text-wrap:balance}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
+.mut{color:var(--mut);font-size:14px;line-height:1.5}.sm{font-size:12.5px}
+.sw{display:grid;grid-template-columns:1fr 1fr;gap:6px}.sw button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:10px 4px;border-radius:99px;font:500 13.5px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:44px}.sw button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.nav{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px}.nav span{flex:none;border:1px solid var(--line);background:var(--card);border-radius:99px;padding:7px 13px;font-size:13px;font-weight:600}.nav span.on{background:var(--or);border-color:var(--or);color:#fff}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.q{background:var(--orl);border:1px solid var(--orb);border-radius:22px;padding:14px;display:flex;flex-direction:column;gap:8px}
+.row{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;display:grid;grid-template-columns:1fr auto;gap:2px 10px;align-items:center}
+.row b{font-size:14px}.row .go{grid-row:span 2;border:1px solid var(--or);background:var(--or);color:#fff;border-radius:99px;min-height:40px;padding:0 14px;font:600 13.5px 'IBM Plex Sans',sans-serif;cursor:pointer}
+.tag{display:inline-block;font-size:11.5px;font-weight:600;border-radius:99px;padding:2px 8px;background:var(--orl);color:var(--or);border:1px solid var(--orb);width:max-content}.tag.bad{background:var(--badl);color:var(--bad);border-color:transparent}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:8px}.tile{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px}.tile b{display:block;font:800 24px 'Bricolage Grotesque',sans-serif}
+.range{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.range button{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:99px;min-height:40px;font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer}.range button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.fun{display:flex;flex-direction:column;gap:10px}.fun div.l{display:flex;justify-content:space-between;font-size:14px;margin-bottom:4px}
+.bar{height:14px;border-radius:99px;background:var(--line);overflow:hidden}.bar i{display:block;height:100%;background:var(--or);transition:width .3s}
+.big{font:800 28px 'Bricolage Grotesque',sans-serif}
+.sec[hidden]{display:none}
+button:focus-visible{outline:2px solid var(--or);outline-offset:2px}
+</style>
+
+<div class="wrap">
+  <div class="note"><b>Mockup, example data.</b> Two changes to Admin. State 1: Overview gets a "Needs attention" queue above the tiles. State 2: a new "Health" tab. Tap 7 days, 30 days or All time on Health to see the numbers change. Every number here comes from data Jobfile already stores.</div>
+  <div class="sw" id="sw"><button class="on" data-s="a" type="button">1 · Overview</button><button data-s="b" type="button">2 · Health</button></div>
+  <div class="nav" aria-hidden="true"><span id="n1" class="on">Overview</span><span>Activity</span><span>Users</span><span>Projects</span><span>Reviews</span><span>Insurance</span><span>Marketplace</span><span id="n2">Health</span></div>
+
+  <div id="a" class="sec" style="display:flex;flex-direction:column;gap:14px">
+    <h1 style="font-size:28px">Admin</h1>
+    <div class="q"><h2 style="font-size:19px">Needs attention <span style="color:var(--or)">5</span></h2>
+      <div class="mut sm">Oldest first. Each one leaves this list when it is handled.</div>
+      <div class="row"><b>Review insurance certificate</b><button class="go" type="button">Review</button><span class="mut sm">Lone Star Remodeling · waiting 3 days</span></div>
+      <div class="row"><b>Reported review</b><button class="go" type="button">Open</button><span class="mut sm">"Never showed up" · reported 2 days ago</span></div>
+      <div class="row"><b>No bids after 48 hours</b><button class="go" type="button">View</button><span class="mut sm">Roofing · ZIP 76210 · posted 3 days ago</span></div>
+      <div class="row"><b>2 alerts failed to send</b><button class="go" type="button">Check</button><span class="mut sm">Email · last 7 days</span></div>
+      <div class="row"><b>Agreement unsigned for 7 days</b><button class="go" type="button">Open</button><span class="mut sm">Fence repair · Frisco</span></div>
+    </div>
+    <div class="tiles"><div class="tile"><span class="mut sm">Users</span><b>12</b></div><div class="tile"><span class="mut sm">New this week</span><b>3</b></div><div class="tile"><span class="mut sm">Projects</span><b>7</b></div><div class="tile"><span class="mut sm">Payments in progress</span><b>2</b></div></div>
+    <div class="note" style="border-style:solid">The existing tiles and the Recent activity list stay below the queue, unchanged.</div>
+  </div>
+
+  <div id="b" class="sec" hidden style="flex-direction:column;gap:14px">
+    <h1 style="font-size:28px">Marketplace health</h1>
+    <div class="range" id="range"><button class="on" data-r="7" type="button">7 days</button><button data-r="30" type="button">30 days</button><button data-r="all" type="button">All time</button></div>
+
+    <div class="card"><h3 style="font-size:17px">From posted to hired</h3>
+      <div class="fun" id="fun"></div>
+      <span class="mut sm" id="funnote"></span>
+    </div>
+
+    <div class="tiles">
+      <div class="tile"><span class="mut sm">Time to first bid</span><b id="t1"></b></div>
+      <div class="tile"><span class="mut sm">Bids per project</span><b id="t2"></b></div>
+      <div class="tile"><span class="mut sm">Projects with no bids</span><b id="t3"></b></div>
+      <div class="tile"><span class="mut sm">Bids accepted</span><b id="t4"></b></div>
+    </div>
+
+    <div class="card"><h3 style="font-size:17px">Open with no bids yet</h3>
+      <div class="row"><b>Roofing · Frisco</b><span class="tag bad">3 days</span><span class="mut sm">ZIP 75034 · 2 contractors cover roofing here</span></div>
+      <div class="row"><b>Fencing · McKinney</b><span class="tag">1 day</span><span class="mut sm">ZIP 75069 · 0 contractors cover fencing here</span></div>
+      <span class="mut sm">Projects waiting longest first. The last line shows how many registered contractors list that trade and service that ZIP, so you can see whether the wait is a supply gap.</span>
+    </div>
+  </div>
+</div>
+
+<script>
+function $(i){return document.getElementById(i)}
+var D={'7':{p:4,b:3,h:1,t:'6 hrs',n:'1.8',z:1,a:1},'30':{p:11,b:9,h:4,t:'9 hrs',n:'2.4',z:2,a:4},'all':{p:21,b:16,h:7,t:'11 hrs',n:'2.2',z:5,a:7}};
+function draw(k){var d=D[k],f=$('fun');
+ var rows=[['Posted a project',d.p,d.p],['Got at least one bid',d.b,d.p],['Hired a contractor',d.h,d.p]];
+ f.innerHTML=rows.map(function(r){var pc=r[2]?Math.round(r[1]/r[2]*100):0;return '<div><div class="l"><span>'+r[0]+'</span><b>'+r[1]+' <span class="mut sm" style="font-weight:400">('+pc+'%)</span></b></div><div class="bar"><i style="width:'+pc+'%"></i></div></div>'}).join('');
+ $('funnote').textContent=d.p-d.b+' of '+d.p+' projects have not had a bid. '+(d.b-d.h)+' got bids but no one has been hired yet.';
+ $('t1').textContent=d.t;$('t2').textContent=d.n;$('t3').textContent=d.z;$('t4').textContent=d.a}
+[].forEach.call($('range').children,function(b){b.onclick=function(){[].forEach.call($('range').children,function(x){x.classList.toggle('on',x===b)});draw(b.dataset.r)}});
+[].forEach.call($('sw').children,function(b){b.onclick=function(){[].forEach.call($('sw').children,function(x){x.classList.toggle('on',x===b)});
+ ['a','b'].forEach(function(id){var e=$(id);e.hidden=id!==b.dataset.s;e.style.display=e.hidden?'none':'flex'});$('n1').className=b.dataset.s==='a'?'on':'';$('n2').className=b.dataset.s==='b'?'on':'';window.scrollTo(0,0)}});
+draw('7');
+</script>
