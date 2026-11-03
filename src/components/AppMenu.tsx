@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
+import MenuIcon from '@/components/MenuIcon';
 
 /** Signed-in header menu: Home first, then the usual links. Closes on navigation, outside tap and Escape. */
 export default function AppMenu({ marketplace, contractor, admin, signOutAction }: { marketplace: boolean; contractor?: boolean; admin: boolean; signOutAction: () => void | Promise<void> }) {
@@ -20,15 +21,15 @@ export default function AppMenu({ marketplace, contractor, admin, signOutAction 
     return () => { document.removeEventListener('pointerdown', onDown); document.removeEventListener('keydown', onKey); };
   }, [open]);
 
-  const items: [string, string][] = [
-    ['/', 'Home'],
-    ['/projects', 'Projects'],
-    ...(marketplace ? ([['/marketplace', 'Marketplace']] as [string, string][]) : []),
-    ...(marketplace && !contractor ? ([['/find', 'Find contractors']] as [string, string][]) : []),
-    ['/settings', 'Settings'],
-    ['/invite', 'Invite friends'],
-    ['/help', 'Help and contact'],
-    ...(admin ? ([['/admin', 'Admin']] as [string, string][]) : []),
+  const items: [string, string, string][] = [
+    ['/', 'Home', 'home'],
+    ['/projects', 'Projects', 'proj'],
+    ...(marketplace ? ([['/marketplace', 'Marketplace', 'mkt']] as [string, string, string][]) : []),
+    ...(marketplace && !contractor ? ([['/find', 'Find contractors', 'find']] as [string, string, string][]) : []),
+    ['/settings', 'Settings', 'set'],
+    ['/invite', 'Invite friends', 'inv'],
+    ['/help', 'Help and contact', 'help'],
+    ...(admin ? ([['/admin', 'Admin', 'adm']] as [string, string, string][]) : []),
   ];
   const current = (href: string) => (href === '/' ? path === '/' : path === href || path.startsWith(`${href}/`));
 
@@ -39,11 +40,11 @@ export default function AppMenu({ marketplace, contractor, admin, signOutAction 
       </button>
       {open && (
         <nav id="appmenu-sheet" className="appmenu-sheet" aria-label="Main">
-          {items.map(([href, label]) => (
-            <Link key={href} href={href} aria-current={current(href) ? 'page' : undefined}>{label}</Link>
+          {items.map(([href, label, icon]) => (
+            <Link key={href} href={href} aria-current={current(href) ? 'page' : undefined}><MenuIcon name={icon} />{label}</Link>
           ))}
           <hr />
-          <form action={signOutAction}><button type="submit">Sign out</button></form>
+          <form action={signOutAction}><button type="submit" className="menu-out"><MenuIcon name="out" />Sign out</button></form>
         </nav>
       )}
     </div>

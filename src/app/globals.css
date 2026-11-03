@@ -208,7 +208,7 @@ body.pub .composer { box-shadow: 0 -10px 24px -14px rgba(27, 26, 24, 0.3); }
 .appmenu { position: relative; }
 .appmenu-btn { display: flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 16px; border-radius: 99px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font: 600 14px 'IBM Plex Sans', system-ui, sans-serif; cursor: pointer; }
 .appmenu-sheet { position: absolute; right: 0; top: calc(100% + 8px); width: 230px; background: var(--surface); border: 1px solid var(--line); border-radius: 18px; box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18); padding: 8px; z-index: 20; display: flex; flex-direction: column; }
-.appmenu-sheet a, .appmenu-sheet button { display: block; width: 100%; text-align: left; padding: 12px; border-radius: 12px; border: 0; background: none; font: 600 15px 'IBM Plex Sans', system-ui, sans-serif; color: var(--ink); text-decoration: none; cursor: pointer; }
+.appmenu-sheet a, .appmenu-sheet button { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; padding: 12px; border-radius: 12px; border: 0; background: none; font: 600 15px 'IBM Plex Sans', system-ui, sans-serif; color: var(--ink); text-decoration: none; cursor: pointer; }
 .appmenu-sheet a[aria-current='page'] { background: #f9efe4; color: var(--accent); }
 .appmenu-sheet hr { border: 0; border-top: 1px solid var(--line); margin: 6px 4px; }
 .appmenu-sheet form { margin: 0; }
@@ -234,7 +234,7 @@ body.pub .composer { box-shadow: 0 -10px 24px -14px rgba(27, 26, 24, 0.3); }
 .apptabs-dot { position: absolute; top: 5px; left: calc(50% + 6px); min-width: 18px; height: 18px; border-radius: 99px; background: var(--bad); color: #fff; font-size: 11px; font-weight: 700; display: grid; place-items: center; padding: 0 5px; }
 .apptabs-shade { position: fixed; inset: 0; z-index: 7; background: rgba(0, 0, 0, 0.4); }
 .apptabs-sheet { position: fixed; left: 0; right: 0; bottom: 0; z-index: 8; background: var(--surface); border-radius: 24px 24px 0 0; padding: 14px max(16px, env(safe-area-inset-right, 0px)) calc(84px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); display: flex; flex-direction: column; max-width: 560px; margin: 0 auto; }
-.apptabs-sheet a, .apptabs-sheet button { display: flex; align-items: center; min-height: 50px; border: 0; border-bottom: 1px solid var(--line); background: transparent; font: 500 16px inherit; font-family: inherit; color: var(--ink); text-decoration: none; width: 100%; text-align: left; cursor: pointer; }
+.apptabs-sheet a, .apptabs-sheet button { display: flex; align-items: center; gap: 12px; min-height: 50px; border: 0; border-bottom: 1px solid var(--line); background: transparent; font: 500 16px inherit; font-family: inherit; color: var(--ink); text-decoration: none; width: 100%; text-align: left; cursor: pointer; }
 .apptabs-sheet form { margin: 0; } .apptabs-sheet form button { color: var(--bad); border-bottom: 0; }
 
 details.card > summary { list-style: none; }
@@ -244,3 +244,5 @@ details.startp[open] + .startp-hint { display: none; }
 
 /* Landing page: more room between sections. */
 .landing { display: flex; flex-direction: column; gap: 32px; }
+
+.appmenu-sheet button.menu-out { color: var(--bad); }

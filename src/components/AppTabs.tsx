@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import MenuIcon from '@/components/MenuIcon';
 
 const IC: Record<string, string> = {
   home: '<path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/>',
@@ -34,14 +35,14 @@ export default function AppTabs({ contractor, marketplace, waiting, admin, signO
       : []),
     { icon: 'menu', label: 'Menu', on: open },
   ];
-  const links: [string, string][] = [
-    ...(marketplace ? ([['/marketplace', 'Marketplace']] as [string, string][]) : []),
-    ...(marketplace && !contractor ? ([['/find', 'Find contractors']] as [string, string][]) : []),
-    ['/settings', 'Settings'],
-    ['/invite', 'Invite friends'],
-    ['/help', 'Help and contact'],
-    ...(contractor ? ([['/settings/business', 'Business profile']] as [string, string][]) : []),
-    ...(admin ? ([['/admin', 'Admin']] as [string, string][]) : []),
+  const links: [string, string, string][] = [
+    ...(marketplace ? ([['/marketplace', 'Marketplace', 'mkt']] as [string, string, string][]) : []),
+    ...(marketplace && !contractor ? ([['/find', 'Find contractors', 'find']] as [string, string, string][]) : []),
+    ['/settings', 'Settings', 'set'],
+    ['/invite', 'Invite friends', 'inv'],
+    ['/help', 'Help and contact', 'help'],
+    ...(contractor ? ([['/settings/business', 'Business profile', 'biz']] as [string, string, string][]) : []),
+    ...(admin ? ([['/admin', 'Admin', 'adm']] as [string, string, string][]) : []),
   ];
 
   return (
@@ -49,8 +50,8 @@ export default function AppTabs({ contractor, marketplace, waiting, admin, signO
       {open && <div className="apptabs-shade" onClick={() => setOpen(false)} aria-hidden="true" />}
       {open && (
         <nav className="apptabs-sheet" id="apptabs-sheet" aria-label="More">
-          {links.map(([h, l]) => <Link key={h} href={h}>{l}</Link>)}
-          <form action={signOutAction}><button type="submit">Sign out</button></form>
+          {links.map(([h, l, i]) => <Link key={h} href={h}><MenuIcon name={i} />{l}</Link>)}
+          <form action={signOutAction}><button type="submit"><MenuIcon name="out" />Sign out</button></form>
         </nav>
       )}
       <nav className="apptabs" aria-label="Main">
