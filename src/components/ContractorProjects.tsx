@@ -130,7 +130,7 @@ export default function ContractorProjects(p: {
       )}
 
       {done.length > 0 && (
-        <details className="card" aria-label="Completed">
+        <details className="card" aria-label="Completed" style={{ display: 'block', padding: '14px 16px' }}>
           <summary style={{ fontWeight: 700, cursor: 'pointer', display: 'flex', justifyContent: 'space-between', gap: 8 }}><span>Completed</span><span className="muted small">{done.length}</span></summary>
           <div className="stack" style={{ marginTop: 12 }}>
             {done.map((x) => (
