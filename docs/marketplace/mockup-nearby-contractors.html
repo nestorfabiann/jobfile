@@ -1,0 +1,128 @@
+<title>Nearby Contractors</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: one phone column. Tabs: today's Projects page, proposed Projects page, Post screen, a later Find contractors page. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#cd7d2e;--orl:#f9efe4;--orb:#ecd4a8;--gr:#1f7a55;--grl:#d9f1e6;--am:#9a5b00;--aml:#fbeccd;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--gr:#6fd1a3;--grl:#173a2c;--am:#f0b95a;--aml:#3a2e12;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--gr:#6fd1a3;--grl:#173a2c;--am:#f0b95a;--aml:#3a2e12;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:14px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px}
+h1,h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;text-wrap:balance}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
+.mut{color:var(--mut);font-size:13.5px;line-height:1.45}
+.sw{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.sw button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:8px 2px;border-radius:99px;font:500 12.5px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:44px}.sw button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.zip{background:var(--orl);border-color:var(--orb)}
+.btn{display:flex;align-items:center;justify-content:center;border-radius:99px;min-height:50px;padding:0 18px;font:700 15.5px 'IBM Plex Sans',sans-serif;border:1px solid var(--or);background:var(--or);color:#fff;cursor:pointer;width:100%}
+.btn.ghost{background:transparent;color:var(--or)}
+.btn.sm{min-height:40px;font-size:14px;width:auto;padding:0 16px}
+.link{background:none;border:0;color:var(--or);font:600 14px 'IBM Plex Sans',sans-serif;padding:8px 0;cursor:pointer;text-align:left;min-height:40px}
+input[type=text]{width:100%;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:14px;padding:11px 12px;font:600 18px 'IBM Plex Sans',sans-serif;min-height:48px}
+.pill{display:inline-block;width:max-content;font-size:12px;font-weight:700;padding:4px 10px;border-radius:99px;background:var(--orl);color:var(--or);border:1px solid var(--orb)}
+.pill.g{background:var(--grl);color:var(--gr);border-color:transparent}
+.chips{display:flex;gap:7px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:99px;padding:9px 14px;font:500 14px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:40px}
+.chip.on{background:var(--orl);border-color:var(--or);color:var(--or)}
+.row{display:flex;gap:12px;align-items:center}
+.thumb{width:56px;height:56px;border-radius:14px;flex:none;background:linear-gradient(135deg,#d9c9a8,#9b8b73)}
+.logo{width:44px;height:44px;border-radius:12px;background:var(--or);color:#fff;display:grid;place-items:center;font-weight:700;flex:none}
+.trades{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.trades div{border:1px solid var(--line);border-radius:14px;padding:9px 11px;display:flex;justify-content:space-between;align-items:baseline;font-size:14px;background:var(--bg)}
+.trades b{font:800 18px 'Bricolage Grotesque',sans-serif;color:var(--or)}
+.ck{display:flex;gap:10px;align-items:flex-start;font-size:13.5px;line-height:1.45}
+.ck input{width:22px;height:22px;flex:none;margin:0;accent-color:var(--or)}
+.gone{outline:2px dashed var(--orb);outline-offset:4px;border-radius:22px}
+.sec[hidden]{display:none}
+</style>
+<div class="wrap">
+  <div class="note"><b>Mockup.</b> Where "contractors nearby" should live. Today it sits on the Projects page. The proposal moves it to the Post screen, keeps only a one-time ZIP question on Projects, and adds a Find contractors page later.</div>
+  <div class="sw" id="sw">
+    <button data-s="now" type="button">Today</button>
+    <button data-s="proj" class="on" type="button">Projects</button>
+    <button data-s="post" type="button">Post</button>
+    <button data-s="find" type="button">Find (later)</button>
+  </div>
+
+  <div id="now" class="sec" hidden style="flex-direction:column;gap:14px">
+    <h1 style="font-size:28px">Hi Jerry</h1>
+    <button class="btn" type="button">Post a project</button>
+    <div class="card zip gone">
+      <h3 style="font-size:18px">Contractors near 75074</h3>
+      <span class="mut">14 contractors cover your area.</span>
+      <div class="row"><span class="logo">N</span><div style="flex:1"><b>Nesty's Painting</b><div class="mut">Painting · 5.0 stars</div></div></div>
+      <div class="row"><span class="logo">G</span><div style="flex:1"><b>Garcia Roofing</b><div class="mut">Roofing · 4.8 stars</div></div></div>
+    </div>
+    <div class="card"><b>Kitchen and walls painting</b><span class="mut">Work in progress · Nesty's Painting</span></div>
+    <div class="note" style="border-style:solid">Today the nearby list sits between the buttons and the projects, every time. The dashed box is what moves.</div>
+  </div>
+
+  <div id="proj" class="sec" style="display:flex;flex-direction:column;gap:14px">
+    <h1 style="font-size:28px">Hi Jerry</h1>
+    <button class="btn" type="button">Post a project</button>
+    <div class="chips" id="zsw"><button class="chip on" data-z="0" type="button">No ZIP yet</button><button class="chip" data-z="1" type="button">ZIP saved</button></div>
+    <div id="zask" class="card zip">
+      <h3 style="font-size:18px">What's your ZIP code?</h3>
+      <span class="mut">We'll show you contractors near you when you post a project.</span>
+      <input type="text" inputmode="numeric" placeholder="75074" aria-label="ZIP code">
+      <button class="btn" type="button" id="zsave">Save ZIP</button>
+      <button class="link" type="button" style="text-align:center">Skip for now</button>
+    </div>
+    <div id="zdone" class="mut" hidden>Nothing about nearby contractors here. The ZIP card is gone for good once it is saved.</div>
+    <div class="card"><b>Kitchen and walls painting</b><span class="mut">Work in progress · Nesty's Painting</span></div>
+    <div class="card"><b>Painting: Walls, Trim and doors</b><span class="mut">ZIP 75072 · 29 days left · No bids yet</span></div>
+    <div class="note" style="border-style:solid">Projects stays about the homeowner's own work. The ZIP card shows only until it is answered. People can still change their ZIP in Settings.</div>
+  </div>
+
+  <div id="post" class="sec" hidden style="flex-direction:column;gap:14px">
+    <h1 style="font-size:28px">Post a project</h1>
+    <span class="mut">Pick the kind of job, tap what you want done, and local contractors send bids.</span>
+    <div class="card zip">
+      <h3 style="font-size:18px">Contractors near 75074</h3>
+      <span class="mut">14 contractors cover your area.</span>
+      <div class="trades">
+        <div><span>Painting</span><b>6</b></div><div><span>Roofing</span><b>4</b></div>
+        <div><span>Plumbing</span><b>5</b></div><div><span>Electrical</span><b>3</b></div>
+        <div><span>Flooring</span><b>4</b></div><div><span>HVAC</span><b>2</b></div>
+      </div>
+      <button class="link" type="button">See contractors near me ›</button>
+    </div>
+    <div class="card">
+      <div class="chips"><span class="mut" style="width:100%">Your ZIP (needed for your post)</span></div>
+      <input type="text" inputmode="numeric" value="75074" aria-label="ZIP code">
+      <label class="ck"><input type="checkbox" checked><span>Save this as my ZIP, so I do not have to enter it again.</span></label>
+    </div>
+    <h3 style="font-size:20px">What kind of job?</h3>
+    <div class="chips"><button class="chip on" type="button">Kitchen remodel</button><button class="chip" type="button">Bathroom</button><button class="chip" type="button">Painting</button><button class="chip" type="button">Roofing</button><button class="chip" type="button">Flooring</button></div>
+    <div class="note" style="border-style:solid">The nearby counts sit where the homeowner decides to post. The ZIP field here saves to the profile, so Projects never has to ask. With no ZIP yet, the card says "Enter your ZIP to see contractors near you".</div>
+  </div>
+
+  <div id="find" class="sec" hidden style="flex-direction:column;gap:14px">
+    <h1 style="font-size:28px">Find contractors</h1>
+    <span class="mut">Browse contractors near 75074. Open a profile, or invite one to your project. Added to the Menu as a later step.</span>
+    <div class="chips"><button class="chip on" type="button">All trades</button><button class="chip" type="button">Painting</button><button class="chip" type="button">Roofing</button><button class="chip" type="button">Plumbing</button></div>
+    <div class="card">
+      <div class="row"><span class="logo">N</span><div style="flex:1;min-width:0"><b>Nesty's Painting</b><div class="mut">Painting · 8 miles away</div></div></div>
+      <div class="row" style="flex-wrap:wrap"><span class="pill g">Insured</span><span class="pill">5.0 stars (12)</span></div>
+      <div class="row"><button class="btn ghost sm" type="button" style="flex:1">View profile</button><button class="btn sm" type="button" style="flex:1">Invite to a project</button></div>
+    </div>
+    <div class="card">
+      <div class="row"><span class="logo">G</span><div style="flex:1;min-width:0"><b>Garcia Roofing</b><div class="mut">Roofing · 12 miles away</div></div></div>
+      <div class="row" style="flex-wrap:wrap"><span class="pill g">Insured</span><span class="pill">4.8 stars (31)</span></div>
+      <div class="row"><button class="btn ghost sm" type="button" style="flex:1">View profile</button><button class="btn sm" type="button" style="flex:1">Invite to a project</button></div>
+    </div>
+    <div class="note" style="border-style:solid">Uses the profile pages and the "invite a contractor" flow we already have. Hidden companies stay out of the list.</div>
+  </div>
+</div>
+<script>
+var sw=document.getElementById('sw');
+[].forEach.call(sw.children,function(b){b.onclick=function(){
+  [].forEach.call(sw.children,function(x){x.classList.toggle('on',x===b)});
+  ['now','proj','post','find'].forEach(function(id){var e=document.getElementById(id);e.hidden=id!==b.dataset.s;e.style.display=e.hidden?'none':'flex'});
+  window.scrollTo(0,0)}});
+var z=document.getElementById('zsw');
+function zset(on){[].forEach.call(z.children,function(x){x.classList.toggle('on',(x.dataset.z==='1')===on)});document.getElementById('zask').hidden=on;document.getElementById('zdone').hidden=!on}
+[].forEach.call(z.children,function(b){b.onclick=function(){zset(b.dataset.z==='1')}});
+document.getElementById('zsave').onclick=function(){zset(true)};
+</script>
