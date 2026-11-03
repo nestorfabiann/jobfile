@@ -51,7 +51,6 @@ export default async function MyBids({ searchParams }: { searchParams: { f?: str
         <div className="card"><span className="muted small">Win rate</span><b style={{ fontSize: 26 }}>{decided ? `${Math.round((n('won') / decided) * 100)}%` : '—'}</b></div>
         <div className="card"><span className="muted small">Waiting now</span><b style={{ fontSize: 26 }}>{n('waiting')}</b></div>
       </div>
-      {n('won') > 0 && <InviteCard title="Know a contractor who needs work?" body="Jobfile is free to join. Send it to a friend in the trades." cta="Invite a contractor" back="/marketplace/bids" />}
       <div className="chips" aria-label="Filter bids">
         {FILTERS.map(([k, label]) => (
           <Link key={k} className="chip" href={k === 'all' ? '/marketplace/bids' : `/marketplace/bids?f=${k}`}>
@@ -90,6 +89,7 @@ export default async function MyBids({ searchParams }: { searchParams: { f?: str
           </div>
         );
       })}
+      {n('won') > 0 && <InviteCard slim title="Know a contractor who needs work?" body="Jobfile is free to join." cta="Invite" back="/marketplace/bids" />}
     </>
   );
 }
