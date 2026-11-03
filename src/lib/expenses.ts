@@ -27,8 +27,8 @@ export async function moneyFor(db: SupabaseClient, projectIds: string[]): Promis
   ]);
   for (const id of projectIds) {
     const m = out.get(id)!;
-    const t = totals((items ?? []).filter((i: any) => i.project_id === id) as Item[], (cos ?? []).filter((c: any) => c.project_id === id) as ChangeOrder[]);
-    const mine = (ms ?? []).filter((x: any) => x.project_id === id).map((x: any) => ({ ...x, pct: Number(x.pct) })) as (Milestone & { pay_status: string })[];
+    const t = totals((items ?? []).filter((i: any) => i.project_id === id) as unknown as Item[], (cos ?? []).filter((c: any) => c.project_id === id) as unknown as ChangeOrder[]);
+    const mine = (ms ?? []).filter((x: any) => x.project_id === id).map((x: any) => ({ ...x, pct: Number(x.pct) })) as unknown as (Milestone & { pay_status: string })[];
     const due = milestoneAmounts(t.base, mine);
     m.total = t.total;
     m.received = mine.reduce((s, x, i) => (x.pay_status === 'confirmed' ? s + due[i] : s), 0);
