@@ -8,7 +8,8 @@ import type { DraftData } from '@/lib/drafts';
 import RangeBar from '@/components/RangeBar';
 import MediaPicker from '@/components/MediaPicker';
 import { tipsFor } from '@/lib/photoTips';
-import { uploadMedia, type MediaItem } from '@/lib/uploadMedia';
+import { uploadMedia, type MediaItem, type FileState } from '@/lib/uploadMedia';
+import UploadProgress from '@/components/UploadProgress';
 
 type Types = Record<string, { size: number; sizeLabel: string; groups: [string, string[]][] }>;
 const money = (n: number) => '$' + Math.round(n).toLocaleString('en-US');
@@ -38,6 +39,9 @@ export default function MarketplacePost({ types, aiOn, draft }: { types: Types; 
   const [mediaErr, setMediaErr] = useState('');
   const [posting, setPosting] = useState(false);
   const [status, setStatus] = useState('');
+  const [upStates, setUpStates] = useState<Record<string, FileState>>({});
+  const [listingId, setListingId] = useState('');
+  const upLive = useRef<Record<string, FileState>>({});
   const [postErr, setPostErr] = useState('');
   const [nudge, setNudge] = useState(false);
   const skipPhotos = useRef(false);
@@ -100,17 +104,29 @@ export default function MarketplacePost({ types, aiOn, draft }: { types: Types; 
       if (draftId.current) fd.set('draft_id', draftId.current);
       const r = await createListing(fd);
       if (!r.ok) { setPostErr(r.error); setPosting(false); return; }
-      let tail = '';
       if (media.length) {
-        const u = await uploadMedia(r.id, media, setStatus);
-        if (u.errors.length) tail = '&media=partial';
-      }
-      router.push(`/marketplace/${r.id}?posted=1${tail}`);
+        setListingId(r.id);
+        setStatus('Uploading…');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        await runUploads(r.id, media);
+      } else router.push(`/marketplace/${r.id}?posted=1`);
     } catch {
       setPostErr('Something went wrong. Check your connection and try again.');
       setPosting(false);
     }
   }
+
+  function note(id: string, st: FileState) {
+    upLive.current = { ...upLive.current, [id]: st };
+    setUpStates(upLive.current);
+  }
+  // Uploads the given files, then leaves for the job page once none are still failing.
+  async function runUploads(lid: string, list: MediaItem[]) {
+    await uploadMedia(lid, list, note);
+    const failed = media.filter((m) => upLive.current[m.id]?.status === 'error').length;
+    if (!failed) router.push(`/marketplace/${lid}?posted=1`);
+  }
+  const leaveWithFailures = () => router.push(`/marketplace/${listingId}?posted=1&media=partial`);
 
   // Compares the homeowner's budget with the AI range, once a reference exists.
   let check: { tone: 'ok' | 'warn'; text: string } | null = null;
@@ -127,7 +143,10 @@ export default function MarketplacePost({ types, aiOn, draft }: { types: Types; 
 
   return (
     <form ref={formEl} onSubmit={submit} className="stack" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-      {saveMsg ? (
+      {listingId && media.length ? (
+        <UploadProgress items={media} states={upStates} onRetry={(id) => { const it = media.find((m) => m.id === id); if (it) void runUploads(listingId, [it]); }} onSkip={leaveWithFailures} />
+      ) : null}
+      {saveMsg && !listingId ? (
         <div role="status" className="small" style={{ display: 'flex', alignItems: 'center', gap: 8, fontWeight: 600, color: saveMsg.tone === 'ok' ? 'var(--ok)' : saveMsg.tone === 'bad' ? 'var(--bad)' : 'var(--accent)' }}>
           <span aria-hidden="true" style={{ width: 8, height: 8, borderRadius: '50%', background: 'currentColor' }} />{saveMsg.text}
         </div>
@@ -226,7 +245,7 @@ export default function MarketplacePost({ types, aiOn, draft }: { types: Types; 
           </div>
         ) : null}
         {postErr ? <div className="box bad">{postErr}</div> : null}
-        <div className="row"><button className="btn" type="submit" disabled={posting}>{posting ? status || 'Publishing…' : 'Publish project'}</button></div>
+        <div className="row"><button className="btn" type="submit" disabled={posting}>{posting ? (listingId ? 'Uploading…' : 'Publishing…') : 'Publish project'}</button></div>
         <p className="muted small">Contractors on Jobfile can then send you bids. You choose who to hire. Your project stays open for 30 days.</p>
       </div>
     </form>
