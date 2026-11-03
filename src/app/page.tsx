@@ -4,6 +4,8 @@ import { supabaseServer } from '@/lib/supabase/server';
 import { marketplaceEnabled } from '@/lib/marketplace';
 import { landingStats, publicListings } from '@/lib/publicMarketplace';
 import PublicJobCard from '@/components/PublicJobCard';
+import LandingPitch from '@/components/LandingPitch';
+import { aiConfigured } from '@/lib/marketplaceAI';
 
 export const dynamic = 'force-dynamic';
 
@@ -18,12 +20,6 @@ export default async function Home() {
   if (st.posted) nums.push([st.posted.toLocaleString('en-US'), 'Projects posted']);
   if (st.pros) nums.push([st.pros.toLocaleString('en-US'), 'Local pros']);
   if (st.rating) nums.push([`${st.rating.avg.toFixed(1)} ★`, `Avg. rating (${st.rating.count})`]);
-  const steps: [string, string][] = [
-    ['📝 Post your project', 'Tap the work you want done, add photos, set a budget range and location in minutes.'],
-    ['🔨 Compare bids', 'Local contractors send proposals. Review them side by side.'],
-    ['✦ Know fair pricing', 'Get an AI cost reference before you commit.'],
-    ['📂 Run the job in Jobfile', 'Accept a bid and the project opens with scope, price, photos, payments and change orders.'],
-  ];
   return (
     <>
       {signedIn && (
@@ -34,12 +30,12 @@ export default async function Home() {
       <div className="stack">
         <span className="lbl">Home improvement marketplace</span>
         <h1 style={{ fontSize: 'clamp(32px, 9vw, 44px)', lineHeight: 1.05, letterSpacing: '-0.03em' }}>
-          Post it. Compare bids. Build it <span style={{ color: 'var(--accent)' }}>for a fair price.</span>
+          Post it. Bid on it. <span style={{ color: 'var(--accent)' }}>Run the job in one place.</span>
         </h1>
-        <p className="muted" style={{ fontSize: 17 }}>Homeowners post projects, local contractors bid, and our AI shows you what the job should cost in your area. Then Jobfile keeps the whole job organized.</p>
+        <p className="muted" style={{ fontSize: 17 }}>Homeowners post projects and compare bids from local contractors. Contractors find nearby work and keep the paperwork, photos and payments in one shared record.</p>
       </div>
       <Link className="btn accent" href={signedIn ? '/marketplace/new' : `/login?next=${encodeURIComponent('/marketplace/new')}`}>Post a Project →</Link>
-      <Link className="btn ghost" href={signedIn ? '/marketplace' : '/jobs'}>🔍 Find Work</Link>
+      <Link className="btn" style={{ background: 'var(--ink)', borderColor: 'var(--ink)', color: 'var(--bg)' }} href={signedIn ? '/marketplace' : '/jobs'}>Find Work near you →</Link>
 
       {nums.length > 0 && (
         <div className="row" style={{ justifyContent: 'space-around', textAlign: 'center' }} aria-label="Jobfile so far">
@@ -48,6 +44,8 @@ export default async function Home() {
           ))}
         </div>
       )}
+
+      <LandingPitch aiOn={aiConfigured()} signedIn={signedIn} />
 
       <section className="card why" aria-label="Bring your own contractor or customer">
         <span className="pill ok" style={{ width: 'max-content' }}>You do not need the marketplace</span>
@@ -66,8 +64,8 @@ export default async function Home() {
           ))}
         </div>
         <div className="grid2" style={{ gridTemplateColumns: '1fr 1fr' }}>
-          <Link className="btn ghost" href={signedIn ? '/invites/new' : `/login?next=${encodeURIComponent('/invites/new')}`}>I&apos;m a homeowner</Link>
-          <Link className="btn ghost" href={signedIn ? '/projects' : `/login?next=${encodeURIComponent('/projects')}`}>I&apos;m a contractor</Link>
+          <Link className="btn ghost" style={{ padding: '9px 8px', whiteSpace: 'nowrap' }} href={signedIn ? '/invites/new' : `/login?next=${encodeURIComponent('/invites/new')}`}>I&apos;m a homeowner</Link>
+          <Link className="btn ghost" style={{ padding: '9px 8px', whiteSpace: 'nowrap' }} href={signedIn ? '/projects' : `/login?next=${encodeURIComponent('/projects')}`}>I&apos;m a contractor</Link>
         </div>
         <p className="muted small" style={{ margin: 0 }}>Free to start. The person you invite does not need an account first.</p>
       </section>
@@ -83,10 +81,6 @@ export default async function Home() {
       )}
       <Link className="btn ghost" href="/jobs">See all open jobs →</Link>
 
-      <h2 style={{ margin: '14px 0 0' }}>How it works</h2>
-      {steps.map(([t, d]) => (
-        <div className="card" key={t}><h3 style={{ margin: 0 }}>{t}</h3><p className="muted" style={{ margin: 0 }}>{d}</p></div>
-      ))}
       <Link className="btn accent" href={signedIn ? '/projects' : '/login'}>{signedIn ? 'Go to Projects →' : 'Get started free →'}</Link>
     </>
   );
