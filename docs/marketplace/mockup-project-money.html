@@ -1,0 +1,103 @@
+<title>Project Money</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: three phone states for a contractor-only money tracker. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#cd7d2e;--orl:#f9efe4;--orb:#ecd4a8;--gr:#1f7a55;--grl:#d9f1e6;--rd:#b3412f;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--grl:#173a2c;--gr:#6fd1a3;--rd:#e58b78;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--grl:#173a2c;--gr:#6fd1a3;--rd:#e58b78;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:14px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px}
+h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
+.mut{color:var(--mut);font-size:13.5px;line-height:1.45}
+.sw{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.sw button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:10px 2px;border-radius:99px;font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:44px}.sw button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px}.tabs span{white-space:nowrap;font-size:13px;padding:8px 12px;border-radius:99px;border:1px solid var(--line);background:var(--card)}.tabs .on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.big{font:800 34px 'Bricolage Grotesque',sans-serif;letter-spacing:-.03em}
+.gr{color:var(--gr)}.rd{color:var(--rd)}
+.row{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-size:14.5px}
+.bar{height:12px;border-radius:99px;background:var(--line);overflow:hidden;display:flex}.bar i{display:block;height:100%}
+.lock{display:inline-block;font-size:11.5px;font-weight:600;padding:3px 9px;border-radius:99px;background:var(--orl);color:var(--or);width:max-content}
+.btn{display:flex;align-items:center;justify-content:center;border-radius:99px;min-height:48px;padding:0 18px;font:600 15px 'IBM Plex Sans',sans-serif;border:1px solid var(--or);background:var(--or);color:#fff;cursor:pointer;width:100%}
+.btn.g{background:transparent;color:var(--ink);border-color:var(--line)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}.chips span{padding:10px 14px;border-radius:99px;border:1px solid var(--line);background:var(--card);font-size:14px;min-height:44px;display:flex;align-items:center}.chips .on{background:var(--orl);border-color:var(--or);font-weight:600}
+.amt{font:800 44px 'Bricolage Grotesque',sans-serif;border-bottom:2px solid var(--or);padding-bottom:4px}
+.ex{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-top:1px solid var(--line);font-size:14.5px}.ex:first-of-type{border-top:0}
+.sec[hidden]{display:none}
+button:focus-visible{outline:2px solid var(--or);outline-offset:2px}
+</style>
+<div class="wrap">
+  <div class="note"><b>Mockup, example data.</b> A private money tracker for the contractor on each project. The homeowner never sees it. Tap the three states.</div>
+  <div class="sw" id="sw"><button class="on" data-s="a" type="button">1 · Project</button><button data-s="b" type="button">2 · Add expense</button><button data-s="c" type="button">3 · All jobs</button></div>
+
+  <div id="a" class="sec" style="display:flex;flex-direction:column;gap:14px">
+    <div class="tabs"><span>Overview</span><span>Messages</span><span>Payments</span><span class="on">My money</span></div>
+    <span class="lock">🔒 Only you can see this</span>
+    <div class="card">
+      <span class="mut">Profit so far</span>
+      <div class="big gr">$6,150</div>
+      <div class="bar"><i style="width:46%;background:var(--rd)"></i><i style="width:54%;background:var(--gr)"></i></div>
+      <div class="row"><span class="mut">Received</span><b>$11,400</b></div>
+      <div class="row"><span class="mut">Spent</span><b>$5,250</b></div>
+      <div class="row"><span class="mut">Still to collect</span><b>$7,000</b></div>
+      <p class="mut" style="margin:0">Contract $18,400. Received comes from payments you confirmed on the Payments tab.</p>
+    </div>
+    <button class="btn" type="button">+ Add expense</button>
+    <div class="card">
+      <h3 style="font-size:18px">Spent by type</h3>
+      <div class="row"><span>Materials</span><b>$2,840</b></div>
+      <div class="row"><span>Labor and helpers</span><b>$1,600</b></div>
+      <div class="row"><span>Equipment and fuel</span><b>$410</b></div>
+      <div class="row"><span>Permits and fees</span><b>$400</b></div>
+    </div>
+    <div class="card">
+      <h3 style="font-size:18px">Recent expenses</h3>
+      <div class="ex"><span><b>Home Depot</b><br><span class="mut">Materials · Nov 1 · 📎 receipt</span></span><b>$612</b></div>
+      <div class="ex"><span><b>Carlos, 2 days</b><br><span class="mut">Labor · Oct 30</span></span><b>$400</b></div>
+      <div class="ex"><span><b>City permit</b><br><span class="mut">Permits · Oct 28 · 📎 receipt</span></span><b>$400</b></div>
+    </div>
+  </div>
+
+  <div id="b" class="sec" hidden style="flex-direction:column;gap:14px">
+    <h2 style="font-size:24px">Add expense</h2>
+    <div class="card">
+      <span class="mut">Amount</span>
+      <div class="amt">$ 612</div>
+      <span class="mut">Type</span>
+      <div class="chips"><span class="on">Materials</span><span>Labor</span><span>Equipment / fuel</span><span>Permits</span><span>Other</span></div>
+      <span class="mut">Who or where (optional)</span>
+      <div class="card" style="padding:12px;border-radius:14px">Home Depot</div>
+      <span class="mut">Date: today</span>
+      <button class="btn g" type="button">📷 Take a photo of the receipt</button>
+    </div>
+    <button class="btn" type="button">Save expense</button>
+    <div class="note" style="border-style:solid">Only the amount is required. Type defaults to your last choice, the date to today. Receipt photos are private and are shrunk before they upload, the same as project photos.</div>
+  </div>
+
+  <div id="c" class="sec" hidden style="flex-direction:column;gap:14px">
+    <h2 style="font-size:24px">Business profile</h2>
+    <div class="tabs"><span>Profile</span><span>Bids</span><span class="on">Money</span></div>
+    <span class="lock">🔒 Only you can see this</span>
+    <div class="card">
+      <span class="mut">All active jobs</span>
+      <div class="big gr">$14,820</div><span class="mut">profit so far</span>
+      <div class="row"><span class="mut">Received</span><b>$31,200</b></div>
+      <div class="row"><span class="mut">Spent</span><b>$16,380</b></div>
+      <div class="row"><span class="mut">Still to collect</span><b>$12,500</b></div>
+    </div>
+    <div class="card">
+      <div class="ex"><span><b>Kitchen remodel · Plano</b><br><span class="mut">Spent $5,250 of $18,400</span></span><b class="gr">+$6,150</b></div>
+      <div class="ex"><span><b>Fence repair · Frisco</b><br><span class="mut">Spent $2,100 of $3,950</span></span><b class="gr">+$1,850</b></div>
+      <div class="ex"><span><b>Roofing · McKinney</b><br><span class="mut">Spent $9,030 of $11,200</span></span><b class="rd">−$830</b></div>
+    </div>
+    <button class="btn g" type="button">Download for taxes (spreadsheet)</button>
+    <div class="note" style="border-style:solid">The spreadsheet lists every expense with date, project, type and amount, for you or your bookkeeper. Red means a job is costing more than you have collected so far.</div>
+  </div>
+</div>
+<script>
+var sw=document.getElementById('sw');
+[].forEach.call(sw.children,function(b){b.onclick=function(){[].forEach.call(sw.children,function(x){x.classList.toggle('on',x===b)});
+ ['a','b','c'].forEach(function(id){var e=document.getElementById(id);e.hidden=id!==b.dataset.s;e.style.display=e.hidden?'none':'flex'});window.scrollTo(0,0)}});
+</script>
