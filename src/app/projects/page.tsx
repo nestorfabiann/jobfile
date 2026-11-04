@@ -279,6 +279,17 @@ export default async function Projects({ searchParams }: { searchParams: { error
       collected += m.received;
       if (!x.completed_at) toCollect += m.toCollect;
     });
+    const doneStats: Record<string, { billed: number; rating: number | null; comment: string }> = {};
+    const doneIds2 = (list as any[]).filter((x) => x.completed_at).map((x) => x.id as string);
+    doneIds2.forEach((id) => { doneStats[id] = { billed: money.get(id)?.total ?? 0, rating: null, comment: '' }; });
+    if (doneIds2.length) {
+      const { data: rv } = await db2.from('reviews').select('*').in('project_id', doneIds2).eq('reviewer_role', 'homeowner');
+      ((rv ?? []) as any[]).forEach((r) => {
+        if (r.hidden_at || !doneStats[r.project_id]) return;
+        doneStats[r.project_id].rating = Number(r.overall) || null;
+        doneStats[r.project_id].comment = String(r.comment ?? '');
+      });
+    }
     const { data: bidRows } = await db2.from('marketplace_bids').select('*').eq('company_id', company.company_id).eq('status', 'waiting').order('created_at', { ascending: false }).limit(5);
     const brs = (bidRows ?? []) as any[];
     const lids = Array.from(new Set(brs.map((b) => b.listing_id as string)));
@@ -305,6 +316,7 @@ export default async function Projects({ searchParams }: { searchParams: { error
         waitingCount={extra}
         collected={collected}
         toCollect={toCollect}
+        doneStats={doneStats}
         hasInvites={got.length + sent.length > 0}
       />
     );

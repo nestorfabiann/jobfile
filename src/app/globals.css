@@ -385,3 +385,11 @@ input[type='date'], input[type='time'], input[type='datetime-local'] { min-width
 .lm-final h2 { font-size: 28px; }
 .lm-final p { margin: 0; color: #b9b2a7; }
 @media (prefers-reduced-motion: reduce) { .lm-phone, .lm-fade, .lm-chev { animation: none; transition: none; } }
+
+/* Jump bar on the contractor Projects page */
+html { scroll-behavior: smooth; }
+.cpage section[id] { scroll-margin-top: 12px; }
+.jumpbar { display: flex; gap: 8px; overflow-x: auto; }
+.jumpbar a { flex: none; display: flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 14px; border: 1.5px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--ink); font-weight: 600; font-size: 14px; text-decoration: none; }
+.jumpbar a b { background: var(--warn-bg); color: var(--accent); border-radius: 999px; padding: 1px 8px; font-size: 12px; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
