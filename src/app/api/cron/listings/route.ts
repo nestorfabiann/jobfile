@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase/server';
-import { notifyUsers } from '@/lib/notify';
+import { notifyUsers, notifyOtherSide } from '@/lib/notify';
 import { listingTitle } from '@/lib/marketplace';
 
 export const dynamic = 'force-dynamic';
@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic';
 const DAY = 86400_000;
 const fmt = (d: string) => new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 
-/** Daily job. Sends homeowners a nudge when a post has no bids, is about to end, or has ended. Safe to run twice: each notice is sent once. */
+/** Daily job. Nudges homeowners about marketplace posts (no bids, ending, ended) and reminds whoever must decide on a change order that has waited. Safe to run twice: each notice is sent once. */
 export async function GET(req: Request) {
   const secret = process.env.CRON_SECRET;
   if (secret && req.headers.get('authorization') !== `Bearer ${secret}`) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
@@ -45,6 +45,27 @@ export async function GET(req: Request) {
         await once(l.homeowner_id, 'listing_ended', `${name} has ended (${fmt(l.expires_at)})`, nBids > 0 ? `${nBids} bid${nBids === 1 ? ' is' : 's are'} still waiting. Pick one or close the project so contractors are not left hanging.` : 'No bids were waiting. You can post it again any time.', path, 'Open project');
       }
     } catch { /* one bad post must not stop the rest */ }
+  }
+
+  // Change orders still waiting for a decision: remind the other side after 3 days, and once more after 7.
+  const { data: pending } = await db.from('change_orders').select('id,project_id,number,title,cost_cents,requested_by,requested_role,created_at').eq('status', 'pending').limit(500);
+  for (const co of (pending ?? []) as any[]) {
+    try {
+      const age = now - new Date(co.created_at).getTime();
+      const stage = age >= 7 * DAY ? 7 : age >= 3 * DAY ? 3 : 0;
+      if (!stage) continue;
+      const { data: project } = await db.from('projects').select('name').eq('id', co.project_id).maybeSingle();
+      const name = (project?.name as string | undefined) ?? 'your project';
+      const title = stage === 3 ? `CO-${co.number} is waiting for your approval on ${name}` : `Reminder: CO-${co.number} has waited 7 days on ${name}`;
+      const { count } = await db.from('notifications').select('id', { count: 'exact', head: true }).eq('project_id', co.project_id).eq('kind', 'change').eq('title', title);
+      if ((count ?? 0) > 0) continue;
+      const amount = (co.cost_cents as number) >= 0 ? `+$${Math.round((co.cost_cents as number) / 100).toLocaleString('en-US')}` : `-$${Math.round(-(co.cost_cents as number) / 100).toLocaleString('en-US')}`;
+      await notifyOtherSide({
+        projectId: co.project_id, senderId: co.requested_by, senderRole: co.requested_role === 'homeowner' ? 'homeowner' : 'contractor', kind: 'change',
+        title: () => title, body: `${co.title} (${amount}). Open the project to approve or decline it. Work on a change should not start until it is approved.`,
+      });
+      sent++;
+    } catch { /* keep going */ }
   }
   return NextResponse.json({ ok: true, checked: (listings ?? []).length, sent });
 }
