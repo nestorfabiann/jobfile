@@ -1,5 +1,6 @@
 import Link from 'next/link';
-import { requireAdmin } from '@/lib/admin';
+import { redirect } from 'next/navigation';
+import { requireAnyAdmin, ROLE_AREAS } from '@/lib/admin';
 import { loadFeed, lookups } from '@/lib/adminFeed';
 import AdminFeed from '@/components/AdminFeed';
 import { attentionItems, ageText } from '@/lib/adminHealth';
@@ -7,7 +8,11 @@ import { attentionItems, ageText } from '@/lib/adminHealth';
 export const dynamic = 'force-dynamic';
 
 export default async function AdminHome() {
-  const { db } = await requireAdmin();
+  const { db, role } = await requireAnyAdmin();
+  if (role !== 'owner') {
+    const first = ROLE_AREAS[role][0];
+    redirect(first === 'verification' ? '/admin/verification' : first === 'reviews' ? '/admin/reviews' : first === 'help' ? '/admin/help' : '/admin/audit');
+  }
   const day = new Date(Date.now() - 24 * 3600_000).toISOString();
   const week = new Date(Date.now() - 7 * 24 * 3600_000).toISOString();
   const count = async (table: string, f?: (q: any) => any) => {

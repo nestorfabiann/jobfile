@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { isAdminEmail, requireAdmin } from '@/lib/admin';
+import { isTeamAdmin, requireAdmin } from '@/lib/admin';
 import { loadFeed, lookups } from '@/lib/adminFeed';
 import { ago, avgVisitMs, DAY, fmtDuration, loadEvents, visitsOf } from '@/lib/usageStats';
 import AdminFeed from '@/components/AdminFeed';
@@ -12,7 +12,7 @@ import { editUser, signOutEverywhere, alertsOff, deleteUser, addNote } from '../
 export const dynamic = 'force-dynamic';
 
 export default async function UserPage({ params }: { params: { id: string } }) {
-  const { db, user: me } = await requireAdmin();
+  const { db, user: me, role } = await requireAdmin('view');
   const { data: u } = await db.from('profiles').select('*').eq('id', params.id).maybeSingle();
   if (!u) notFound();
 
@@ -39,7 +39,8 @@ export default async function UserPage({ params }: { params: { id: string } }) {
   const recentVisits = uvisits.filter((v) => v.start > Date.now() - 30 * DAY);
   const lastEv = uev.length ? uev[uev.length - 1].created_at : null;
   const recentPages = uev.filter((e) => e.kind === 'view').slice(-12).reverse();
-  const isAdmin = isAdminEmail(u.email);
+  const isAdmin = await isTeamAdmin(u.email);
+  const canEdit = role === 'owner';
   let invitedBy = '';
   try {
     const { data: j } = await db.from('invite_events').select('code').eq('invitee_id', u.id).eq('kind', 'join').maybeSingle();
@@ -69,7 +70,7 @@ export default async function UserPage({ params }: { params: { id: string } }) {
         {invitedBy ? <div className="small muted">Invited by {invitedBy}</div> : null}
       </div>
 
-      {!isAdmin && (
+      {!isAdmin && canEdit && (
         <>
           <h2>Profile</h2>
           <div className="card">
@@ -107,7 +108,7 @@ export default async function UserPage({ params }: { params: { id: string } }) {
         ))}
       </div>
 
-      {u.id !== me.id && !isAdmin && (
+      {canEdit && u.id !== me.id && !isAdmin && (
         <>
           <h2>{u.banned_at ? 'Restore access' : 'Suspend access'}</h2>
           <div className="card">
@@ -125,13 +126,17 @@ export default async function UserPage({ params }: { params: { id: string } }) {
         {(notes ?? []).map((n: any) => (
           <div key={n.id} className="box" style={{ background: 'var(--surface-2)' }}><b>{new Date(n.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} · {n.author_email}:</b> {n.body}</div>
         ))}
-        <NoteForm type="user" id={u.id} action={addNote} />
+        {canEdit && <NoteForm type="user" id={u.id} action={addNote} />}
       </div>
 
-      <h2>Message this person</h2>
-      <div className="card">
-        <MessageForm action={sendBroadcast} audience="user" target={u.id} />
-      </div>
+      {canEdit && (
+        <>
+          <h2>Message this person</h2>
+          <div className="card">
+            <MessageForm action={sendBroadcast} audience="user" target={u.id} />
+          </div>
+        </>
+      )}
 
       <h2>Usage</h2>
       <div className="card">

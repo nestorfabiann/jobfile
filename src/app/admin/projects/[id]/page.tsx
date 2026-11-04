@@ -10,7 +10,7 @@ import { sendBroadcast } from '../../actions';
 export const dynamic = 'force-dynamic';
 
 export default async function ProjectPage({ params }: { params: { id: string } }) {
-  const { db } = await requireAdmin();
+  const { db, role } = await requireAdmin('view');
   const { data: p } = await db.from('projects').select('*, companies(name)').eq('id', params.id).maybeSingle();
   if (!p) notFound();
 
@@ -70,6 +70,8 @@ export default async function ProjectPage({ params }: { params: { id: string } }
         ))}
       </div>
 
+      {role === 'owner' && (
+        <>
       <h2>Conversation</h2>
       <div className="card">
         <p className="small muted">Reading what the two sides wrote is logged in the audit log. Only open it for support or a complaint.</p>
@@ -82,6 +84,8 @@ export default async function ProjectPage({ params }: { params: { id: string } }
       <div className="card">
         <MessageForm action={sendBroadcast} audience="project" target={p.id} />
       </div>
+        </>
+      )}
 
       <h2>Timeline</h2>
       <AdminFeed events={events} names={names} />

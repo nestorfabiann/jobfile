@@ -3,7 +3,7 @@ import Link from 'next/link';
 import type { Metadata, Viewport } from 'next';
 import { supabaseServer, supabaseAdmin } from '@/lib/supabase/server';
 import { signOut } from './auth/actions';
-import { isAdminEmail } from '@/lib/admin';
+import { adminRoleOf } from '@/lib/admin';
 import { marketplaceEnabled } from '@/lib/marketplace';
 import PubTabs from '@/components/PubTabs';
 import AppMenu from '@/components/AppMenu';
@@ -28,7 +28,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   // Signed-in tab bar: contractors see Find work, everyone else sees Post. The badge matches the "Needs you" card.
   let contractor = false;
   let waiting = 0;
+  let isAdmin = false;
   if (user) {
+    isAdmin = (await adminRoleOf(user.email, !!user.email_confirmed_at)) !== null;
     try {
       const db = supabaseAdmin();
       const m = await db.from('company_members').select('company_id', { count: 'exact', head: true }).eq('user_id', user.id);
@@ -55,14 +57,14 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <header className="pubtop app">
             <div className="in pubtop-in">
               <Link href="/" className="publogo">Job<b>file</b></Link>
-              {user && <AppMenu marketplace={marketplaceEnabled()} contractor={contractor} admin={isAdminEmail(user.email, !!user.email_confirmed_at)} signOutAction={signOut} />}
+              {user && <AppMenu marketplace={marketplaceEnabled()} contractor={contractor} admin={isAdmin} signOutAction={signOut} />}
             </div>
           </header>
         )}
         <main className="in">{children}</main>
         {tabs && <PubTabs />}
         {user && <UsageBeacon />}
-        {user && <AppTabs contractor={contractor} marketplace={marketplaceEnabled()} waiting={waiting} admin={isAdminEmail(user.email, !!user.email_confirmed_at)} signOutAction={signOut} />}
+        {user && <AppTabs contractor={contractor} marketplace={marketplaceEnabled()} waiting={waiting} admin={isAdmin} signOutAction={signOut} />}
       </body>
     </html>
   );

@@ -6,7 +6,7 @@ import { hideReview, restoreReview } from '../actions';
 export const dynamic = 'force-dynamic';
 
 export default async function AdminReviews({ searchParams }: { searchParams: { all?: string } }) {
-  const { db } = await requireAdmin();
+  const { db } = await requireAdmin('reviews');
   const all = searchParams.all === '1';
   let q = db.from('reviews').select('*, projects(name), companies:subject_company_id(name)').order('created_at', { ascending: false }).limit(100);
   if (!all) q = q.not('reported_at', 'is', null);

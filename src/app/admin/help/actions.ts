@@ -6,7 +6,7 @@ import { notifyUsers } from '@/lib/notify';
 
 /** Reply to a help message: saves the reply, marks it done and alerts the person. */
 export async function replyHelp(formData: FormData) {
-  const { user: me, db } = await requireAdmin();
+  const { user: me, db } = await requireAdmin('help');
   const id = String(formData.get('id') ?? '');
   const reply = String(formData.get('reply') ?? '').trim().slice(0, 2000);
   if (!/^[0-9a-f-]{36}$/.test(id) || reply.length < 1) return;
@@ -21,7 +21,7 @@ export async function replyHelp(formData: FormData) {
 }
 
 export async function markHelpDone(formData: FormData) {
-  const { user: me, db } = await requireAdmin();
+  const { user: me, db } = await requireAdmin('help');
   const id = String(formData.get('id') ?? '');
   if (!/^[0-9a-f-]{36}$/.test(id)) return;
   await db.from('help_messages').update({ done_at: new Date().toISOString() }).eq('id', id);

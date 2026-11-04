@@ -4,7 +4,7 @@ import { requireAdmin } from '@/lib/admin';
 export const dynamic = 'force-dynamic';
 
 export default async function Projects({ searchParams }: { searchParams: { q?: string } }) {
-  const { db } = await requireAdmin();
+  const { db } = await requireAdmin('view');
   const q = (searchParams.q ?? '').replace(/[^a-zA-Z0-9@._+\- ]/g, '').trim();
   let query = db
     .from('projects')

@@ -1,7 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { audit, isAdminEmail, requireAdmin } from '@/lib/admin';
+import { audit, isTeamAdmin, requireAdmin } from '@/lib/admin';
 import { notifyUsers } from '@/lib/notify';
 import { JOB_TYPES } from '@/lib/marketplace';
 import type { Result } from './actions';
@@ -30,7 +30,7 @@ export async function editUser(_: Result | null, f: FormData): Promise<Result> {
   const changed = (Object.keys(next) as (keyof typeof next)[]).filter((k) => next[k] !== before[k]);
   if (!changed.length) return fail('Nothing was changed.');
   if (changed.includes('email')) {
-    if (isAdminEmail(u.email) && u.id !== me.id) return fail('Admin email addresses cannot be changed here.');
+    if ((await isTeamAdmin(u.email)) && u.id !== me.id) return fail('Admin email addresses cannot be changed here.');
     const { data: dup } = await db.from('profiles').select('id').eq('email', next.email).neq('id', id).maybeSingle();
     if (dup) return fail('Another account already uses that email.');
     const { error } = await db.auth.admin.updateUserById(id, { email: next.email, email_confirm: true });
@@ -50,7 +50,7 @@ async function userGuard(f: FormData) {
   if (reason.length < 4) return { err: fail('Add a short reason. It goes in the audit log.') } as const;
   const { data: u } = await db.from('profiles').select('id,email').eq('id', id).maybeSingle();
   if (!u) return { err: fail('User not found.') } as const;
-  if (id === me.id || isAdminEmail(u.email)) return { err: fail('This cannot be done to an admin account.') } as const;
+  if (id === me.id || (await isTeamAdmin(u.email))) return { err: fail('This cannot be done to an admin account.') } as const;
   return { err: undefined, me, db, id, reason, u } as const;
 }
 

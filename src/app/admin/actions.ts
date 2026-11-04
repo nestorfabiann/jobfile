@@ -1,7 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { audit, isAdminEmail, requireAdmin } from '@/lib/admin';
+import { audit, isTeamAdmin, requireAdmin } from '@/lib/admin';
 import { notifyUsers } from '@/lib/notify';
 import { supabaseAdmin } from '@/lib/supabase/server';
 import { miles, zipCoords } from '@/lib/matching';
@@ -21,7 +21,7 @@ export async function banUser(_: Result | null, f: FormData): Promise<Result> {
 
   const { data: prof } = await db.from('profiles').select('email').eq('id', id).maybeSingle();
   if (!prof) return { ok: false, error: 'User not found.' };
-  if (isAdminEmail(prof.email)) return { ok: false, error: 'Admin accounts cannot be suspended here.' };
+  if (await isTeamAdmin(prof.email)) return { ok: false, error: 'Admin accounts cannot be suspended here.' };
 
   // Block new sign-ins and token refreshes at Supabase, and flag the profile so existing sessions are stopped by the app.
   const { error } = await db.auth.admin.updateUserById(id, { ban_duration: '876000h' });
@@ -122,7 +122,7 @@ export async function sendBroadcast(_: Result | null, f: FormData): Promise<Resu
 
 /** Review moderation. Hide for rule violations (abuse, personal details, off-topic, fake), never for a low rating alone. */
 export async function hideReview(_: Result | null, f: FormData): Promise<Result> {
-  const { user: me, db } = await requireAdmin();
+  const { user: me, db } = await requireAdmin('reviews');
   const id = str(f, 'review_id');
   const reason = str(f, 'reason').slice(0, 500);
   if (!id) return { ok: false, error: 'No review selected.' };
@@ -135,7 +135,7 @@ export async function hideReview(_: Result | null, f: FormData): Promise<Result>
 }
 
 export async function restoreReview(_: Result | null, f: FormData): Promise<Result> {
-  const { user: me, db } = await requireAdmin();
+  const { user: me, db } = await requireAdmin('reviews');
   const id = str(f, 'review_id');
   const dismiss = f.get('dismiss') === '1';
   const patch = dismiss
@@ -150,7 +150,7 @@ export async function restoreReview(_: Result | null, f: FormData): Promise<Resu
 
 /** Approve or reject an insurance certificate. The contractor is told either way. */
 export async function reviewInsurance(_: Result | null, f: FormData): Promise<Result> {
-  const { user: me, db } = await requireAdmin();
+  const { user: me, db } = await requireAdmin('verification');
   const id = str(f, 'id');
   const decision = str(f, 'decision');
   const note = str(f, 'note').slice(0, 300);
@@ -180,7 +180,7 @@ export async function reviewInsurance(_: Result | null, f: FormData): Promise<Re
 
 /** Admin closes a marketplace listing (rule violation). Waiting bidders are told it closed. */
 export async function adminCloseListing(formData: FormData) {
-  const { user: me, db } = await requireAdmin();
+  const { user: me, db } = await requireAdmin('listings');
   const id = String(formData.get('listing_id') ?? '');
   const reason = String(formData.get('reason') ?? '').trim().slice(0, 300) || 'Closed by admin';
   const { data: l } = await db.from('marketplace_listings').update({ status: 'closed' }).eq('id', id).eq('status', 'open').select('id,homeowner_id,job_type');

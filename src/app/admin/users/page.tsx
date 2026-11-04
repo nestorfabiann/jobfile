@@ -4,7 +4,7 @@ import { requireAdmin } from '@/lib/admin';
 export const dynamic = 'force-dynamic';
 
 export default async function Users({ searchParams }: { searchParams: { q?: string } }) {
-  const { db } = await requireAdmin();
+  const { db } = await requireAdmin('view');
   // Strip characters that have meaning inside a PostgREST filter.
   const q = (searchParams.q ?? '').replace(/[^a-zA-Z0-9@._+\- ]/g, '').trim();
   let query = db.from('profiles').select('id,email,full_name,created_at,banned_at').order('created_at', { ascending: false }).limit(100);

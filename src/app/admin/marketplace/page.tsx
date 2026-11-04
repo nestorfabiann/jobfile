@@ -5,7 +5,7 @@ import { adminCloseListing } from '../actions';
 export const dynamic = 'force-dynamic';
 
 export default async function AdminMarketplace() {
-  const { db } = await requireAdmin();
+  const { db } = await requireAdmin('listings');
   const { data } = await db.from('marketplace_listings').select('*').order('created_at', { ascending: false }).limit(100);
   const listings = (data ?? []) as Listing[];
   const ids = listings.map((l) => l.id);

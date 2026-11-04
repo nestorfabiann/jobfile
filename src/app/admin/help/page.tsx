@@ -8,7 +8,7 @@ import { replyHelp, markHelpDone } from './actions';
 export const dynamic = 'force-dynamic';
 
 export default async function AdminHelp() {
-  const { db } = await requireAdmin();
+  const { db } = await requireAdmin('help');
   const { data } = await db.from('help_messages').select('*').order('created_at', { ascending: false }).limit(100);
   const rows = (data ?? []) as any[];
   const ids = Array.from(new Set(rows.map((r) => r.user_id as string)));

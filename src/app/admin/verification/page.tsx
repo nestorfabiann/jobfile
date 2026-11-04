@@ -6,7 +6,7 @@ import { reviewInsurance } from '../actions';
 export const dynamic = 'force-dynamic';
 
 export default async function Verification({ searchParams }: { searchParams: { all?: string } }) {
-  const { db } = await requireAdmin();
+  const { db } = await requireAdmin('verification');
   const all = searchParams.all === '1';
   let q = db.from('company_insurance').select('*, companies(name)').order('uploaded_at', { ascending: false }).limit(100);
   if (!all) q = q.eq('status', 'pending');

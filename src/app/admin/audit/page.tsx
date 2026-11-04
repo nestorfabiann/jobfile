@@ -3,12 +3,14 @@ import { requireAdmin } from '@/lib/admin';
 export const dynamic = 'force-dynamic';
 
 export default async function Audit() {
-  const { db } = await requireAdmin();
-  const { data } = await db.from('admin_audit').select('*').order('created_at', { ascending: false }).limit(200);
+  const { db, user, role } = await requireAdmin('audit');
+  let q = db.from('admin_audit').select('*').order('created_at', { ascending: false }).limit(200);
+  if (role !== 'owner') q = q.eq('admin_id', user.id);
+  const { data } = await q;
   return (
     <>
       <h1>Audit log</h1>
-      <p className="muted small">Every admin action, including each time a conversation was opened.</p>
+      <p className="muted small">{role === 'owner' ? 'Every admin action, including each time a conversation was opened.' : 'Your own actions in the Admin area.'}</p>
       <div className="card" style={{ gap: 0, padding: 0 }}>
         {(data ?? []).length === 0 && <p className="muted" style={{ padding: 16 }}>No admin actions yet.</p>}
         {(data ?? []).map((a, i) => (
