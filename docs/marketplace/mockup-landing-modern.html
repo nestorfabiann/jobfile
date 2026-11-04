@@ -69,6 +69,9 @@ h1,h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-
 .bar2{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:var(--card);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(3,1fr);padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px));z-index:5}
 .bar2 a{display:flex;flex-direction:column;align-items:center;gap:3px;min-height:54px;justify-content:center;font-size:11.5px;font-weight:600;color:var(--mut)}
 .bar2 a.on{color:var(--or)}.bar2 svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.have{background:var(--card);border:1.5px solid var(--orb);border-radius:26px;padding:22px 18px;display:flex;flex-direction:column;gap:14px}
+.have h2{font-size:24px}.have .two{display:grid;grid-template-columns:1fr 1fr;gap:8px}.have .cta{font-size:14.5px;padding:0 8px}
+.inv{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:8px;font-size:14px;color:var(--mut)}.inv b{color:var(--ink)}
 @media (prefers-reduced-motion:reduce){.phone,.fade{animation:none}}
 </style>
 <div class="wrap">
@@ -108,6 +111,14 @@ h1,h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-
     <button class="cta ghost" type="button">See all open jobs</button>
   </section>
 
+  <section class="have" aria-label="Already have a contractor or customer">
+    <h2>Already have a contractor or a customer?</h2>
+    <p class="sub" style="font-size:15.5px">Invite them by email and run the job here. They do not need an account first.</p>
+    <div class="two"><button class="cta ghost" type="button">I&rsquo;m a homeowner</button><button class="cta ghost" type="button">I&rsquo;m a contractor</button></div>
+    <button class="alt" type="button" id="invtog" aria-expanded="false" style="border-bottom:0;padding-inline:0"><b style="font-size:14.5px">How inviting works</b><svg class="c" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
+    <ol class="inv" id="inv" hidden><li><b>Start the project.</b> Add the job name and who it is with.</li><li><b>Send an invite.</b> They get an email and join with one tap. Nothing to download.</li><li><b>Run it together.</b> Price and scope, photos, payments, change orders and messages.</li></ol>
+  </section>
+
   <section class="final">
     <h2 id="fh"></h2>
     <p>Free to start. Nothing to download.</p>
@@ -136,6 +147,7 @@ co:[
 };
 var IC={pay:'<rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/>',doc:'<path d="M7 3h8l4 4v14H7z"/><path d="M15 3v4h4"/><path d="M10 13h6M10 17h6"/>',star:'<path d="M12 3l2.6 5.6 6 .7-4.4 4.1 1.2 6-5.4-3-5.4 3 1.2-6L3.4 9.3l6-.7z"/>',cal:'<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/>'};
 var role='ho',step=0;
+document.getElementById('invtog').addEventListener('click',function(){var o=this.getAttribute('aria-expanded')!=='true';this.setAttribute('aria-expanded',o);document.getElementById('inv').hidden=!o});
 document.getElementById('also').addEventListener('click',function(e){var b=e.target.closest('.alt');if(!b)return;var o=b.getAttribute('aria-expanded')!=='true';b.setAttribute('aria-expanded',o);b.nextElementSibling.hidden=!o});
 function paint(first){
  var c=C[role];
