@@ -79,7 +79,8 @@ export default async function Profile({ params, searchParams }: { params: { id: 
   const outside = await companyOutsideRatings(c.id);
   const s = summarize(reviews);
   const years = c.year_started ? new Date().getFullYear() - Number(c.year_started) : 0;
-  const factLine = [s.count > 0 ? `★ ${s.avg.toFixed(1)} · ${s.count} review${s.count > 1 ? 's' : ''}` : '', years >= 1 ? `${years} year${years > 1 ? 's' : ''}` : ''].filter(Boolean).join(' · ');
+  const g0 = outside[0];
+  const factLine = [s.count > 0 ? `★ ${s.avg.toFixed(1)} · ${s.count} review${s.count > 1 ? 's' : ''}${g0 ? ' on Jobfile' : ''}` : '', g0 ? `★ ${g0.rating.toFixed(1)} · ${g0.count} on Google Maps` : '', years >= 1 ? `${years} year${years > 1 ? 's' : ''}` : ''].filter(Boolean).join(' · ');
   const month = (iso: string) => new Date(iso).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
 
   return (
@@ -111,6 +112,25 @@ export default async function Profile({ params, searchParams }: { params: { id: 
           </div>
         )}
       </div>
+      {outside.length > 0 && (
+        <div className="rt2">
+          <div className="rt2-jf">
+            <span className="rt2-src">On Jobfile</span>
+            {s.count > 0 ? <><b>{s.avg.toFixed(1)}</b><Stars n={s.avg} /><small>{s.count} finished project{s.count > 1 ? 's' : ''}, every one verified</small></> : <><b>New</b><small>No finished projects here yet</small></>}
+          </div>
+          {outside.map((o) => (
+            <div className="rt2-g" key={o.source}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img className="rt2-logo" src="/brand/google-maps.png" alt="Google Maps" width={84} height={75} />
+              <b>{o.rating.toFixed(1)}</b><Stars n={o.rating} />
+              <small>{o.count} review{o.count > 1 ? 's' : ''}</small>
+              {o.url && <a href={o.url} target="_blank" rel="noopener noreferrer nofollow">See on Google</a>}
+            </div>
+          ))}
+          <p className="rt2-note"><b>Proven twice.</b> Jobfile scores come from real projects here. The Google rating is linked by the contractor and shown as Google reports it.</p>
+        </div>
+      )}
+
       {(c.about || (c.services ?? []).length > 0) && (
         <div className="card">
           {c.about ? <p style={{ whiteSpace: 'pre-wrap' }}>{c.about}</p> : null}
@@ -152,25 +172,6 @@ export default async function Profile({ params, searchParams }: { params: { id: 
       )}
 
       {searchParams.reported ? <div className="box ok">Thanks. An admin will review it.</div> : null}
-
-      {outside.length > 0 && (
-        <div className="rt2">
-          <div className="rt2-jf">
-            <span className="rt2-src">On Jobfile</span>
-            {s.count > 0 ? <><b>{s.avg.toFixed(1)}</b><Stars n={s.avg} /><small>{s.count} finished project{s.count > 1 ? 's' : ''}, every one verified</small></> : <><b>New</b><small>No finished projects here yet</small></>}
-          </div>
-          {outside.map((o) => (
-            <div className="rt2-g" key={o.source}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img className="rt2-logo" src="/brand/google-maps.png" alt="Google Maps" width={84} height={75} />
-              <b>{o.rating.toFixed(1)}</b><Stars n={o.rating} />
-              <small>{o.count} review{o.count > 1 ? 's' : ''}</small>
-              {o.url && <a href={o.url} target="_blank" rel="noopener noreferrer nofollow">See on Google</a>}
-            </div>
-          ))}
-          <p className="rt2-note"><b>Proven twice.</b> Jobfile scores come from real projects here. The Google rating is linked by the contractor and shown as Google reports it.</p>
-        </div>
-      )}
 
       {s.count === 0 ? (
         <div className="card"><p className="muted">No ratings yet. Ratings appear after a completed project, once both sides have rated.</p></div>
