@@ -555,5 +555,3 @@ html { scroll-behavior: smooth; }
 @media (prefers-color-scheme: dark) { body .appmenu-sheet a[aria-current='page'] { background: var(--surface-2); } }
 .appmenu-sheet a.mi-new { margin: 10px 0 8px; }
 .apptabs-sheet a.mi-new { margin: 8px 0 6px; }
-/* No fill for the current page in the header menu: every row looks the same, only Get the app stands out */
-.appmenu-sheet a[aria-current='page'], body .appmenu-sheet a[aria-current='page'] { background: transparent; color: var(--ink); }
