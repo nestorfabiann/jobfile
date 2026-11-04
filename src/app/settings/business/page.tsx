@@ -7,6 +7,7 @@ import { saveBusinessProfile, deleteBusinessPhoto, removeInsurance } from './act
 import BusinessTabs from '@/components/BusinessTabs';
 import ProfileMeter from '@/components/ProfileMeter';
 import { profileMeter } from '@/lib/profileMeter';
+import AvailabilityForm from '@/components/AvailabilityForm';
 import { JOB_TYPES, marketplaceEnabled } from '@/lib/marketplace';
 
 export const dynamic = 'force-dynamic';
@@ -42,6 +43,13 @@ export default async function Business({ searchParams }: { searchParams: { saved
 
       <ProfileMeter pct={pm.pct} items={pm.items} always />
       <Link className="btn ghost" href={`/contractors/${me.companyId}`}>Preview public page</Link>
+
+      {marketplaceEnabled() && (
+        <section className="card" aria-label="Availability">
+          <h2 id="bp-availability" style={{ scrollMarginTop: 80 }}>Availability</h2>
+          <AvailabilityForm company={c ?? {}} back="/settings/business" />
+        </section>
+      )}
 
       <form action={saveBusinessProfile} className="card">
         <h2 id="bp-about" style={{ scrollMarginTop: 80 }}>About your business</h2>

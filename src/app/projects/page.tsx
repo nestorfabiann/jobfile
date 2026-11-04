@@ -287,8 +287,10 @@ export default async function Projects({ searchParams }: { searchParams: { error
     const bids = brs.filter((b) => lmap.has(b.listing_id)).map((b) => ({ id: b.id as string, price_cents: b.price_cents as number, created_at: b.created_at as string, listing: lmap.get(b.listing_id) as Listing, view: viewStatus(b) }));
     const { data: me } = await sb.from('profiles').select('full_name').eq('id', user.id).maybeSingle();
     const firstName = String((me as any)?.full_name ?? '').trim().split(/\s+/)[0] ?? '';
+    const { data: coRow } = await supabaseAdmin().from('companies').select('*').eq('id', company.company_id).maybeSingle();
     return (
       <ContractorProjects
+        availability={(coRow ?? {}) as any}
         firstName={firstName}
         companyId={company.company_id}
         companyName={company.companies?.name ?? ''}

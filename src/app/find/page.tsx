@@ -4,6 +4,7 @@ import { supabaseAdmin } from '@/lib/supabase/server';
 import { JOB_TYPES, requireMarketplace } from '@/lib/marketplace';
 import { nearbyCards } from '@/lib/nearby';
 import { saveZip } from '@/app/projects/zipActions';
+import { untilText } from '@/lib/availability';
 
 export const dynamic = 'force-dynamic';
 
@@ -73,6 +74,7 @@ export default async function Find({ searchParams }: { searchParams: { trade?: s
                   <span className="muted small" style={{ flex: 'none', alignSelf: 'flex-start' }}>{c.miles} mi</span>
                 </div>
                 <div className="row" style={{ gap: 6, flexWrap: 'wrap' }}>
+                  {c.booked ? <span style={chip('var(--warn-bg)', 'var(--warn)')}>Booked until {untilText(c.booked)}</span> : <span style={chip('var(--ok-bg)', 'var(--ok)')}>Taking new jobs</span>}
                   {c.insured ? <span style={chip('var(--home-bg)', 'var(--home)')}>Insured</span> : null}
                   {shownTrades.map((t) => <span key={t} style={chip('var(--con-bg)', 'var(--con)')}>{t}</span>)}
                   {more > 0 ? <span style={{ ...chip('transparent', 'var(--ink-2)'), border: '1px solid var(--line)', fontWeight: 500 }}>+ {more} more</span> : null}

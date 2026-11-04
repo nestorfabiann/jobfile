@@ -1,6 +1,7 @@
 import { supabaseAdmin } from '@/lib/supabase/server';
 import { miles, zipCoords } from '@/lib/matching';
 import { isCurrent, signedUrls } from '@/lib/companyProfile';
+import { availabilityOf } from '@/lib/availability';
 import { publicReviews, type ReviewRow } from '@/lib/reviews';
 
 export type NearbyContractor = { id: string; name: string; miles: number };
@@ -25,7 +26,7 @@ export async function nearbyContractors(zip: string, radius = 50, limit = 3): Pr
   return { total: near.length, top: near.slice(0, limit) };
 }
 
-export type NearbyFull = NearbyContractor & { trades: string[] };
+export type NearbyFull = NearbyContractor & { trades: string[]; booked: string | null };
 
 /** Every visible contractor within the radius, closest first, optionally for one trade. */
 export async function nearbyAll(zip: string, trade = '', radius = 50, limit = 40): Promise<NearbyFull[]> {
@@ -39,11 +40,13 @@ export async function nearbyAll(zip: string, trade = '', radius = 50, limit = 40
   const out: NearbyFull[] = [];
   for (const c of cos) {
     const trades: string[] = c.trades ?? [];
+    const av = availabilityOf(c);
+    if (av.mode === 'paused') continue;
     if (trade && trades.length && !trades.includes(trade)) continue;
     const at = coords.get(c.business_zip as string);
     if (!at) continue;
     const d = Math.round(miles(center, at));
-    if (d <= radius) out.push({ id: c.id as string, name: (c.name as string) || 'Contractor', miles: d, trades });
+    if (d <= radius) out.push({ id: c.id as string, name: (c.name as string) || 'Contractor', miles: d, trades, booked: av.mode === 'booked' ? av.until : null });
   }
   out.sort((a, b) => a.miles - b.miles);
   return out.slice(0, limit);
@@ -98,8 +101,8 @@ export async function nearbyCards(zip: string, trade = '', radius = 50, limit = 
       photos: (photos.get(b.id) ?? []).map((p) => urls.get(p) ?? '').filter(Boolean),
     };
   });
-  // Distance still leads. Verified, insured and well-rated contractors move up a few miles' worth.
+  // Contractors taking jobs come first. Distance still leads inside each group. Verified, insured and well-rated contractors move up a few miles' worth.
   const rank = (c: NearbyCard) => c.miles - (c.verified ? 4 : 0) - (c.insured ? 3 : 0) - (c.count >= 3 && c.avg >= 4.5 ? 5 : 0);
-  cards.sort((a, b) => rank(a) - rank(b));
+  cards.sort((a, b) => (a.booked ? 1 : 0) - (b.booked ? 1 : 0) || rank(a) - rank(b));
   return cards.slice(0, limit);
 }

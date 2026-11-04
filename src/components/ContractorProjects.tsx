@@ -3,6 +3,7 @@ import KitchenArt from '@/components/KitchenArt';
 import StartProjectForm from '@/components/StartProjectForm';
 import InviteCard from '@/components/InviteCard';
 import { dollars } from '@/lib/money';
+import AvailabilityBar from '@/components/AvailabilityBar';
 import { listingTitle, type Listing } from '@/lib/marketplace';
 import type { Summary } from '@/lib/homeSummary';
 
@@ -14,6 +15,7 @@ const short = (iso: string) => new Date(iso).toLocaleDateString('en-US', { timeZ
 /** The contractor's Projects page: needs you, ongoing work, bids, money, completed. */
 export default function ContractorProjects(p: {
   firstName: string;
+  availability: { availability?: string | null; booked_until?: string | null };
   companyId: string;
   companyName: string;
   needsCard: React.ReactNode;
@@ -47,6 +49,8 @@ export default function ContractorProjects(p: {
         <h1>{first ? `Welcome${p.firstName ? `, ${p.firstName}` : ''}` : `Hi ${p.firstName || 'there'}`}</h1>
         <p className="muted">{first ? 'Find jobs near you, bid on them, and run the work without the paperwork. It is free.' : `${p.companyName} · here is your work at a glance.`}</p>
       </div>
+
+      <AvailabilityBar company={p.availability} />
 
       <div className="startp-row">
         <Link className="btn" href="/marketplace">Find work</Link>
