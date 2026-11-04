@@ -341,14 +341,14 @@ input[type='date'], input[type='time'], input[type='datetime-local'] { min-width
 .lm-bento { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .lm-bento h2 { grid-column: 1 / -1; font-size: 26px; }
 .lm-tile { border-radius: 22px; padding: 16px; display: flex; flex-direction: column; gap: 6px; background: var(--surface); border: 1px solid var(--line); min-width: 0; }
-.lm-tile.big { grid-column: 1 / -1; background: #1b1a18; color: #f3efe8; border: 0; }
-.lm-tile.big p { color: #b9b2a7; }
+.lm-tile.lead { grid-column: 1 / -1; background: #1b1a18; color: #f3efe8; border: 0; }
+.lm-tile.lead p { color: #b9b2a7; }
 .lm-tile.or { background: var(--warn-bg); }
 .lm-tile.gr { background: var(--ok-bg); border-color: transparent; }
 .lm-tile b { font: 700 17px 'Bricolage Grotesque', system-ui, sans-serif; }
 .lm-tile p { margin: 0; font-size: 14px; color: var(--ink-2); }
 .lm-ti { width: 40px; height: 40px; border-radius: 12px; background: var(--warn-bg); display: grid; place-items: center; margin-bottom: 4px; color: var(--accent); }
-.lm-tile.big .lm-ti { background: rgba(255, 255, 255, 0.12); color: #f3c98f; }
+.lm-tile.lead .lm-ti { background: rgba(255, 255, 255, 0.12); color: #f3c98f; }
 .lm-tile.gr .lm-ti { background: rgba(255, 255, 255, 0.55); color: var(--ok); }
 .lm-vis { margin-top: 10px; }
 .lm-vcard { background: var(--surface); color: var(--ink); border-radius: 14px; padding: 10px 12px; font-size: 12.5px; display: flex; flex-direction: column; gap: 7px; }

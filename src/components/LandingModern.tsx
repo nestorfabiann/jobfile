@@ -204,7 +204,7 @@ export default function LandingModern({ signedIn, nums, children }: { signedIn: 
       <section className="lm-bento" aria-label="What you get">
         <h2>{c.bh}</h2>
         {c.tiles.map(([t, d, ic, vis], i) => (
-          <div key={t} className={`lm-tile ${i === 0 || i === 3 ? 'big' : i === 1 ? 'or' : 'gr'}`}>
+          <div key={t} className={`lm-tile ${i === 0 || i === 3 ? 'lead' : i === 1 ? 'or' : 'gr'}`}>
             <span className="lm-ti"><Svg n={ic} /></span>
             <b>{t}</b>
             <p>{d}</p>
