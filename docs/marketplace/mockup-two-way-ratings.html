@@ -1,0 +1,70 @@
+<title>Ratings Go Both Ways</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: one phone column. Three views: contractor landing tile, homeowner landing line, in-app homeowner history. Names and numbers are examples. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#c4813f;--orl:#f9efe4;--orb:#ecd4a8;--gr:#1f7a55;--grl:#d9f1e6;--bl:#1d5fa8;--bll:#e0ecf8;--dk:#1b1a18;--dkt:#f3efe8;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--gr:#6fd1a3;--grl:#173a2c;--bl:#8fbdf0;--bll:#17283d;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--gr:#6fd1a3;--grl:#173a2c;--bl:#8fbdf0;--bll:#17283d;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:14px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:16px}
+h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;text-wrap:balance}h2{font-size:26px}h3{font-size:19px}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
+.mut{color:var(--mut);font-size:13px;line-height:1.45;margin:0}
+.sw{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.sw button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:8px 4px;border-radius:99px;font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:44px}.sw button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.sec[hidden]{display:none}.sec{display:flex;flex-direction:column;gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:14px;display:flex;flex-direction:column;gap:8px}
+.pill{font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:99px;background:var(--orl);color:var(--or);border:1px solid var(--orb);white-space:nowrap}.pill.g{background:var(--grl);color:var(--gr);border-color:transparent}.pill.n{background:var(--bll);color:var(--bl);border-color:transparent}
+.tile{background:var(--dk);color:var(--dkt);border-radius:24px;padding:18px;display:flex;flex-direction:column;gap:10px}
+.tile p{margin:0;font-size:14.5px;line-height:1.5;color:#b9b2a7}
+.ti{width:40px;height:40px;border-radius:12px;background:rgba(255,255,255,.12);color:#f3c98f;display:grid;place-items:center}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.half{background:var(--card);color:var(--ink);border-radius:16px;padding:12px;font-size:12.5px;display:flex;flex-direction:column;gap:6px}.half .who{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--mut)}
+.row{display:flex;justify-content:space-between;gap:8px;font-size:12.5px;align-items:center}.row span:first-child{color:var(--mut)}
+.st{color:var(--or);letter-spacing:1px}
+.line{display:flex;gap:12px;align-items:flex-start;background:var(--bll);color:var(--ink);border-radius:18px;padding:14px;font-size:14.5px;line-height:1.45}
+.line .ic{width:34px;height:34px;border-radius:10px;background:var(--card);color:var(--bl);display:grid;place-items:center;flex:none}
+.big{font:800 34px 'Bricolage Grotesque',sans-serif;letter-spacing:-.03em;line-height:1}
+.cat{display:flex;justify-content:space-between;font-size:14px;padding:6px 0;border-bottom:1px solid var(--line)}.cat:last-child{border:0}
+.priv{background:var(--orl);border:1px solid var(--orb);border-radius:22px;padding:14px;display:flex;flex-direction:column;gap:8px}
+.btn{display:block;text-align:center;border-radius:99px;padding:12px 16px;font:600 14.5px 'IBM Plex Sans',sans-serif;min-height:44px;background:var(--or);color:#fff}
+</style>
+<div class="wrap">
+<h2>Ratings go both ways</h2>
+<p class="note"><b>Already built:</b> after a job is complete, the contractor rates the homeowner on communication, quick decisions, paid on time and access to the site. Both ratings stay hidden until both sides rate or 14 days pass. <b>New in these mockups:</b> showing it off on the landing page, and showing a homeowner's history to contractors (today that is behind an off switch and only appears inside a project). Example data.</p>
+<div class="sw" role="group" aria-label="View"><button type="button" data-v="a" aria-pressed="true">Contractor page</button><button type="button" data-v="b" aria-pressed="false">Homeowner page</button><button type="button" data-v="c" aria-pressed="false">In the app</button></div>
+
+<section class="sec" data-s="a">
+<p class="mut">On the contractor side of the landing page, the "Ratings you earn" row becomes a full tile.</p>
+<div class="tile">
+<span class="ti" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.6 5.6 6 .7-4.4 4.1 1.2 6-5.4-3-5.4 3 1.2-6L3.4 9.3l6-.7z"/></svg></span>
+<h3>Rate your homeowners too</h3>
+<p>Homeowners rate you. You rate them. Know who pays on time, decides fast and gives access before you take the job.</p>
+<div class="pair">
+<div class="half"><span class="who">You get rated</span><span class="st" aria-label="5 stars">★★★★★</span><div class="row"><span>Quality</span><b>5.0</b></div><div class="row"><span>On time</span><b>4.8</b></div></div>
+<div class="half"><span class="who">You rate them</span><span class="st" aria-label="4 stars">★★★★☆</span><div class="row"><span>Paid on time</span><b>5.0</b></div><div class="row"><span>Quick decisions</span><b>4.0</b></div></div>
+</div>
+</div>
+</section>
+
+<section class="sec" data-s="b" hidden>
+<p class="mut">On the homeowner side, one calm line, placed in the trust area under the hero.</p>
+<div class="line"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 4.5-3.2 7.8-8 9-4.8-1.2-8-4.5-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg></span><span><b>Ratings go both ways.</b> You rate your contractor and they rate you, so both sides show up prepared and work gets done right.</span></div>
+</section>
+
+<section class="sec" data-s="c" hidden>
+<p class="mut">What a contractor could see about a homeowner before starting. This view is new; today it only appears on the Ratings tab inside a project and is off by default.</p>
+<div class="priv">
+<div style="display:flex;justify-content:space-between;align-items:center"><b>About this homeowner</b><span class="pill n">Private to contractors</span></div>
+<div style="display:flex;gap:12px;align-items:center"><span class="big">4.8</span><div><span class="st" aria-label="4.8 stars">★★★★★</span><div class="mut">3 past projects</div></div></div>
+<div><div class="cat"><span>Paid on time</span><b>5.0</b></div><div class="cat"><span>Quick decisions</span><b>4.7</b></div><div class="cat"><span>Communication</span><b>4.8</b></div><div class="cat"><span>Access to the site</span><b>4.7</b></div></div>
+<p class="mut">Only ratings that are already revealed count. Homeowners with no history show "New to Jobfile".</p>
+</div>
+<div class="card"><b>Not rated yet?</b><p class="mut" style="margin:0">After you mark a job complete, a card on the project asks you to rate the homeowner. Your rating stays hidden until they rate you or 14 days pass.</p><div class="btn">Rate your homeowner</div></div>
+</section>
+</div>
+<script>
+var bs=document.querySelectorAll('.sw button'),ss=document.querySelectorAll('[data-s]');
+bs.forEach(function(b){b.onclick=function(){bs.forEach(function(x){x.setAttribute('aria-pressed',x===b)});ss.forEach(function(s){s.hidden=s.dataset.s!==b.dataset.v})}});
+</script>

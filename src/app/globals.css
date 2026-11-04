@@ -367,7 +367,7 @@ input[type='date'], input[type='time'], input[type='datetime-local'] { min-width
 .lm-vbar { height: 8px; border-radius: 5px; background: #e4dfd6; position: relative; margin: 10px 0 8px; }
 .lm-vbar i { position: absolute; left: 18%; width: 56%; top: 0; bottom: 0; border-radius: 5px; background: #8fd4b4; }
 .lm-vbar u { position: absolute; left: 46%; top: -4px; width: 4px; height: 16px; background: #1b1a18; border-radius: 2px; }
-.lm-vm2 { display: flex; justify-content: space-between; gap: 8px; font-size: 11.5px; color: #6b655e; }
+.lm-vm2 { display: flex; flex-direction: column; gap: 3px; font-size: 11.5px; color: #6b655e; }
 .lm-vm2 b { color: #1b1a18; }
 .lm-also h3 { font-size: 20px; margin-bottom: 8px; }
 .lm-alt { display: flex; gap: 12px; align-items: center; width: 100%; text-align: left; border: 0; border-bottom: 1px solid var(--line); background: transparent; color: inherit; font: inherit; padding: 14px 2px; min-height: 56px; cursor: pointer; }
