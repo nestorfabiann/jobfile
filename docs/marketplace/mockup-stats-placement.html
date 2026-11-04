@@ -1,0 +1,59 @@
+<title>Stats Placement</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: one phone column showing the landing page in outline. Switch where the three live numbers sit. Numbers are the current live ones. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#c4813f;--orl:#f9efe4;--orb:#ecd4a8;--grl:#d9f1e6;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--grl:#173a2c;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--grl:#173a2c;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:14px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px}
+h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0}h2{font-size:26px}h3{font-size:20px}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
+.sw{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.sw button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:6px 2px;border-radius:14px;font:500 12px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:52px}.sw button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.blk{border:1px dashed var(--line);border-radius:18px;padding:12px 14px;font-size:13.5px;color:var(--mut);display:flex;justify-content:space-between;gap:10px;align-items:center}.blk b{color:var(--ink);font-size:14px}
+.hero{background:var(--orl);border-radius:18px;padding:14px}
+.nums{display:flex;justify-content:space-around;text-align:center;padding:16px 0;border-block:1px solid var(--line)}
+.nums b{display:block;font-size:24px;font-weight:800;color:var(--or)}.nums span{font-size:12.5px;color:var(--mut)}
+.tile{border-radius:22px;padding:14px 16px;background:#1f4d3a;color:#eef7f1;display:flex;flex-direction:column;gap:6px;font-size:13.5px}
+.fin{background:#1f4d3a;color:#eef7f1;border-radius:26px;padding:22px 18px;text-align:center;display:flex;flex-direction:column;gap:12px}
+.fin p{margin:0;color:#bcd8c8;font-size:14px}
+.fn{display:flex;justify-content:center;gap:22px;padding-block:4px}.fn b{display:block;font:800 20px 'Bricolage Grotesque',sans-serif;color:#eef7f1}.fn span{font-size:11.5px;color:#bcd8c8}
+.cta{display:flex;align-items:center;justify-content:center;background:var(--or);color:#fff;border-radius:99px;min-height:52px;font:700 15px 'IBM Plex Sans',sans-serif}
+.slot{display:none}.slot.on{display:block}
+.mk{outline:2px solid var(--or);outline-offset:3px;border-radius:18px}
+</style>
+<div class="wrap">
+<h2>Where the numbers go</h2>
+<p class="note"><b>Tap a spot.</b> The page is shown in outline. The orange outline marks where the numbers sit. Numbers are the live ones today.</p>
+<div class="sw" role="group" aria-label="Placement">
+<button type="button" data-p="0" aria-pressed="false">Now</button>
+<button type="button" data-p="1" aria-pressed="true">Closing card</button>
+<button type="button" data-p="2" aria-pressed="false">Above open jobs</button>
+<button type="button" data-p="3" aria-pressed="false">Under trust</button>
+</div>
+
+<div class="hero"><h3>Get bids from local pros.</h3></div>
+<div class="blk"><b>Three steps</b><span>tap one</span></div>
+<div class="slot" data-s="0"><div class="mk"><div class="nums"><div><b>6</b><span>Projects posted</span></div><div><b>1</b><span>Local pros</span></div><div><b>5.0 ★</b><span>Avg. rating (1)</span></div></div></div></div>
+<div class="blk"><b>Trust row</b><span>Insured · Private · Free</span></div>
+<div class="slot" data-s="3"><div class="mk"><div class="nums"><div><b>6</b><span>Projects posted</span></div><div><b>1</b><span>Local pros</span></div><div><b>5.0 ★</b><span>Avg. rating (1)</span></div></div></div></div>
+<div class="tile"><b>Feature tiles</b>Profile, jobs near you, price reference, ratings both ways</div>
+<div class="blk"><b>And also</b><span>accordion</span></div>
+<div class="blk"><b>Invite card</b><span>sand</span></div>
+<div class="slot" data-s="2"><div class="mk"><div class="nums"><div><b>6</b><span>Projects posted</span></div><div><b>1</b><span>Local pros</span></div><div><b>5.0 ★</b><span>Avg. rating (1)</span></div></div></div></div>
+<div class="blk"><b>Open near you</b><span>job cards</span></div>
+
+<div class="fin">
+<h3 style="font-size:24px">Ready to find your next job?</h3>
+<p>Free to start. Nothing to download.</p>
+<div class="slot" data-s="1"><div class="mk" style="outline-color:#a9e6c6"><div class="fn"><div><b>6</b><span>Projects posted</span></div><div><b>1</b><span>Local pros</span></div><div><b>5.0 ★</b><span>Avg. rating (1)</span></div></div></div></div>
+<span class="cta">Create your free profile →</span>
+</div>
+</div>
+<script>
+var bs=document.querySelectorAll('.sw button'),ss=document.querySelectorAll('.slot');
+function set(p){bs.forEach(function(b){b.setAttribute('aria-pressed',b.dataset.p===p)});ss.forEach(function(s){s.classList.toggle('on',s.dataset.s===p)})}
+bs.forEach(function(b){b.onclick=function(){set(b.dataset.p)}});set('1');
+</script>
