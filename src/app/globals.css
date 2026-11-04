@@ -530,3 +530,4 @@ html { scroll-behavior: smooth; }
 .rt2-note { grid-column: 1 / -1; margin: 0; background: var(--warn-bg); border-radius: 14px; padding: 10px 12px; font-size: 13.5px; line-height: 1.45; color: var(--ink-2); }
 .rt2-note b { font-size: inherit; letter-spacing: 0; font-family: inherit; color: var(--ink); }
 @media (max-width: 360px) { .rt2 { grid-template-columns: 1fr; } }
+.rt2-logo { width: 84px; height: auto; background: #fff; border-radius: 8px; padding: 2px 4px; align-self: flex-start; margin-bottom: 4px; }

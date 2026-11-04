@@ -161,7 +161,8 @@ export default async function Profile({ params, searchParams }: { params: { id: 
           </div>
           {outside.map((o) => (
             <div className="rt2-g" key={o.source}>
-              <span className="rt2-src">Google Maps</span>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img className="rt2-logo" src="/brand/google-maps.png" alt="Google Maps" width={84} height={75} />
               <b>{o.rating.toFixed(1)}</b><Stars n={o.rating} />
               <small>{o.count} review{o.count > 1 ? 's' : ''}</small>
               {o.url && <a href={o.url} target="_blank" rel="noopener noreferrer nofollow">See on Google</a>}
