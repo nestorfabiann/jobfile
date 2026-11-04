@@ -77,9 +77,15 @@ export default async function ListingPage({ params, searchParams }: { params: { 
   const visitBidIds = owner ? visible.map((b) => b.id) : myBid ? [myBid.id] : [];
   const visitRows = visitBidIds.length ? (((await db.from('visits').select('*').in('bid_id', visitBidIds).neq('status', 'canceled')).data ?? []) as unknown as Visit[]) : [];
   const visitFor = (bidId: string, role: 'homeowner' | 'contractor', bidOpen: boolean) => {
-    const v = visitRows.find((x) => x.bid_id === bidId);
+    const mine = visitRows.filter((x) => x.bid_id === bidId);
     const where = { scope: 'bid' as const, bidId, returnPath: `/marketplace/${l.id}?open=${bidId}#bid-${bidId}` };
-    return v ? <VisitCard visit={v} role={role} where={where} /> : open && bidOpen ? <NewVisit role={role} where={where} /> : null;
+    const active = mine.some((x) => x.status !== 'done');
+    return (
+      <>
+        {mine.map((v) => <VisitCard key={v.id} visit={v} role={role} where={where} />)}
+        {!active && open && bidOpen ? <NewVisit role={role} where={where} again={mine.length > 0} /> : null}
+      </>
+    );
   };
   // Viewed signals: the homeowner's visit is noted for the contractor; the contractor opening their bid clears the Needs you row.
   if (owner) await recordBidViews(db, visible as any[]);
@@ -317,7 +323,7 @@ export default async function ListingPage({ params, searchParams }: { params: { 
 
       {!owner && companyId && (
         <div className="card">
-          <h2>{myBid && myBid.status !== 'withdrawn' ? 'Your bid' : 'Place a bid'}</h2>
+          <h2 id="your-bid">{myBid && myBid.status !== 'withdrawn' ? 'Your bid' : 'Place a bid'}</h2>
           {myBid && myBid.status === 'won' && l.project_id && <><div className="box ok">You won this job.</div><Link className="btn" href={`/projects/${l.project_id}/overview`}>Open the project</Link></>}
           {myBid && myBid.status === 'not_selected' && <div className="box warn">This project went to another contractor or was closed.</div>}
           {open && needsInsurance && (

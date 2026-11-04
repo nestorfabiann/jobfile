@@ -3,10 +3,11 @@ const TZ = 'America/Chicago';
 export type Visit = {
   id: string; listing_id: string | null; bid_id: string | null; project_id: string | null;
   title: string; note: string; duration_text: string;
-  status: 'requested' | 'proposed' | 'confirmed' | 'canceled';
+  status: 'requested' | 'proposed' | 'confirmed' | 'done' | 'canceled';
   slots: string[]; scheduled_for: string | null;
   requested_role: 'contractor' | 'homeowner' | null; last_role: 'contractor' | 'homeowner' | null;
   created_by: string | null; access: { gate?: string; pets?: string; parking?: string; other?: string } | null;
+  live: { state?: 'on_way' | 'late15' | 'late30' | 'arrived'; at?: string } | null; report: string | null;
   created_at: string;
 };
 
@@ -41,4 +42,31 @@ export function visitTodo(v: Visit, role: 'contractor' | 'homeowner'): 'propose'
   if (v.status === 'requested' && v.requested_role && v.requested_role !== role) return 'propose';
   if (v.status === 'proposed' && v.last_role && v.last_role !== role) return 'pick';
   return null;
+}
+
+/** Plain-words countdown for a moment, in Central days. */
+export function countdown(iso: string): string {
+  const days = Math.round((Date.parse(chiDay(iso) + 'T12:00:00Z') - Date.parse(chiDay(new Date().toISOString()) + 'T12:00:00Z')) / 86400000);
+  if (days < 0) return 'Past';
+  if (days === 0) return 'Today';
+  if (days === 1) return 'Tomorrow';
+  return `In ${days} days`;
+}
+
+/** Minutes a visit lasts, read from text like "30 minutes" or "1 hour". Defaults to 30. */
+export function durationMinutes(text: string): number {
+  const h = /(\d+(?:\.\d+)?)\s*h/i.exec(text);
+  if (h) return Math.round(parseFloat(h[1]) * 60);
+  const m = /(\d+)\s*m/i.exec(text);
+  return m ? parseInt(m[1], 10) : 30;
+}
+
+/** A Google Calendar "add event" link. Pass a location only when it is safe to share with this person. */
+export function calendarUrl(v: Visit, location?: string): string {
+  const start = new Date(v.scheduled_for ?? Date.now());
+  const end = new Date(start.getTime() + durationMinutes(v.duration_text) * 60000);
+  const f = (d: Date) => d.toISOString().replace(/[-:]/g, '').replace(/\.\d+/, '');
+  const q = new URLSearchParams({ action: 'TEMPLATE', text: v.title, dates: `${f(start)}/${f(end)}`, details: 'Booked on Jobfile' });
+  if (location) q.set('location', location);
+  return `https://calendar.google.com/calendar/render?${q.toString()}`;
 }

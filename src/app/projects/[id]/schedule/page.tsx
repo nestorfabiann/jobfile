@@ -118,8 +118,8 @@ export default async function Schedule({ params, searchParams }: { params: { id:
       <div className="card stack">
         <h2>Visits</h2>
         {visits.length === 0 && <p className="muted small">No visits planned. Add one for a measure, an inspection or the final walkthrough.</p>}
-        {visits.map((v) => <VisitCard key={v.id} visit={v} role={role} where={{ scope: 'project', projectId: project.id, returnPath: `/projects/${project.id}/schedule` }} />)}
-        <NewVisit role={role} where={{ scope: 'project', projectId: project.id, returnPath: `/projects/${project.id}/schedule` }} />
+        {visits.map((v) => <VisitCard key={v.id} visit={v} role={role} where={{ scope: 'project', projectId: project.id, returnPath: `/projects/${project.id}/schedule`, address: (project as any).address || undefined }} />)}
+        <NewVisit role={role} where={{ scope: 'project', projectId: project.id, returnPath: `/projects/${project.id}/schedule`, address: (project as any).address || undefined }} />
       </div>
 
       {soon.length > 0 && (

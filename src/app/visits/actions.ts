@@ -10,6 +10,15 @@ import { chiToIso, fmtWhen, type Visit } from '@/lib/visits';
 import { requireMarketplace } from '@/lib/marketplace';
 
 type Role = 'contractor' | 'homeowner';
+
+/** Tapped days plus one time of day, or the older three typed date-times. At most three, soonest first. */
+function slotsFromForm(f: FormData): string[] {
+  const days = f.getAll('day').map(String).filter((d) => /^\d{4}-\d{2}-\d{2}$/.test(d)).slice(0, 3);
+  const time = String(f.get('time_other') ?? '') || String(f.get('time') ?? '');
+  const tapped = /^\d{2}:\d{2}$/.test(time) ? days.map((d) => chiToIso(`${d}T${time}`)) : [];
+  const typed = [1, 2, 3].map((i) => chiToIso(String(f.get(`slot${i}`) ?? '')));
+  return [...tapped, ...typed].filter((x): x is string => !!x).sort().slice(0, 3);
+}
 const txt = (f: FormData, k: string, n: number) => String(f.get(k) ?? '').trim().slice(0, n);
 
 function go(path: string, msg?: string): never {
@@ -57,6 +66,12 @@ async function loadVisit(c: Ctx, formData: FormData): Promise<Visit> {
   return { ...(data as any), slots: ((data as any).slots as string[]) ?? [] } as Visit;
 }
 
+function requestNote(f: FormData): string {
+  const free = f.getAll('avail').map(String).filter(Boolean).slice(0, 5).join(', ');
+  const note = txt(f, 'note', 400);
+  return [free ? `Free: ${free}.` : '', note].filter(Boolean).join(' ').slice(0, 500);
+}
+
 /** A homeowner asks a bidder to come and see the job. */
 export async function requestVisit(formData: FormData) {
   const c = await context(formData);
@@ -65,7 +80,7 @@ export async function requestVisit(formData: FormData) {
   if (c.scope === 'bid' && (c.listingStatus !== 'open' || c.bidStatus !== 'waiting')) go(c.back, 'This bid is no longer open.');
   const { count } = await c.db.from('visits').select('id', { count: 'exact', head: true }).eq('bid_id', c.key.bid_id).in('status', ['requested', 'proposed', 'confirmed']);
   if ((count ?? 0) > 0) go(c.back, 'There is already a visit for this bid.');
-  const { error } = await c.db.from('visits').insert({ ...c.key, title: 'Site visit', note: txt(formData, 'note', 500), status: 'requested', requested_role: 'homeowner', last_role: 'homeowner', created_by: c.user.id });
+  const { error } = await c.db.from('visits').insert({ ...c.key, title: 'Site visit', note: requestNote(formData), status: 'requested', requested_role: 'homeowner', last_role: 'homeowner', created_by: c.user.id });
   if (error) go(c.back, 'Could not save the request. Check that the database step was run.');
   await c.tell('A homeowner wants to see the job', 'Open the bid and propose two or three times for a visit.');
   go(c.back);
@@ -74,7 +89,7 @@ export async function requestVisit(formData: FormData) {
 /** The contractor proposes times, or either side adds a visit on a project. Proposing again replaces earlier times. */
 export async function proposeVisit(formData: FormData) {
   const c = await context(formData);
-  const slots = [1, 2, 3].map((i) => chiToIso(String(formData.get(`slot${i}`) ?? ''))).filter((x): x is string => !!x);
+  const slots = slotsFromForm(formData);
   if (slots.length === 0) go(c.back, 'Pick at least one date and time.');
   if (slots.some((s) => new Date(s).getTime() < Date.now())) go(c.back, 'Those times are in the past.');
   const note = txt(formData, 'note', 500);
@@ -117,7 +132,8 @@ export async function declineTimes(formData: FormData) {
   const c = await context(formData);
   const v = await loadVisit(c, formData);
   if (v.status !== 'proposed' || v.last_role === c.role) go(c.back, 'There is nothing to answer.');
-  const why = txt(formData, 'why', 300);
+  const free = formData.getAll('avail').map(String).filter(Boolean).slice(0, 4).join(', ');
+  const why = [free ? `Free: ${free}.` : '', txt(formData, 'why', 250)].filter(Boolean).join(' ');
   await c.db.from('visits').update({ status: 'requested', requested_role: c.role, last_role: c.role, slots: [], note: why, updated_at: new Date().toISOString() }).eq('id', v.id);
   await c.tell(`Those times do not work: ${v.title}`, why || 'Please propose other times.');
   go(c.back);
@@ -143,3 +159,37 @@ export async function saveAccess(formData: FormData) {
   go(c.back);
 }
 
+
+
+/** Day of the visit: the contractor says they are on the way, running late, or here. */
+export async function setVisitLive(formData: FormData) {
+  const c = await context(formData);
+  const v = await loadVisit(c, formData);
+  if (c.role !== 'contractor') go(c.back, 'Only the contractor sends this.');
+  if (v.status !== 'confirmed' || !v.scheduled_for) go(c.back, 'This visit is not confirmed.');
+  const hours = (new Date(v.scheduled_for!).getTime() - Date.now()) / 3600000;
+  if (hours > 12 || hours < -12) go(c.back, 'This can only be sent on the day of the visit.');
+  const state = String(formData.get('state') ?? '');
+  const say: Record<string, [string, string]> = {
+    on_way: ['is on the way', 'They expect to arrive around the planned time.'],
+    late15: ['is running about 15 minutes late', 'Thanks for your patience.'],
+    late30: ['is running about 30 minutes late', 'Thanks for your patience.'],
+    arrived: ['has arrived', 'They are at your door.'],
+  };
+  if (!say[state]) go(c.back);
+  await c.db.from('visits').update({ live: { state, at: new Date().toISOString() }, updated_at: new Date().toISOString() }).eq('id', v.id);
+  await c.tell(`Your contractor ${say[state][0]}`, say[state][1]);
+  go(c.back);
+}
+
+/** Notes after the visit. Marks the visit done and tells the other side. */
+export async function saveVisitReport(formData: FormData) {
+  const c = await context(formData);
+  const v = await loadVisit(c, formData);
+  if (c.role !== 'contractor') go(c.back, 'Only the contractor adds visit notes.');
+  if (v.status !== 'confirmed' && v.status !== 'done') go(c.back, 'This visit is not confirmed.');
+  const report = txt(formData, 'report', 1500);
+  await c.db.from('visits').update({ status: 'done', report, updated_at: new Date().toISOString() }).eq('id', v.id);
+  await c.tell(`Visit notes: ${v.title}`, report ? report.slice(0, 200) : 'The visit is done.');
+  go(c.back);
+}
