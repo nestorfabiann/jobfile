@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { requireUser } from '@/lib/session';
 import { supabaseAdmin } from '@/lib/supabase/server';
 import { JOB_TYPES, requireMarketplace } from '@/lib/marketplace';
-import { nearbyAll } from '@/lib/nearby';
+import { nearbyCards } from '@/lib/nearby';
 import { saveZip } from '@/app/projects/zipActions';
 
 export const dynamic = 'force-dynamic';
@@ -18,7 +18,7 @@ export default async function Find({ searchParams }: { searchParams: { trade?: s
   const { data: pr } = await supabaseAdmin().from('profiles').select('*').eq('id', user.id).maybeSingle();
   const zip = ((pr as any)?.zip as string | null) ?? null;
   const trade = searchParams.trade && JOB_TYPES[searchParams.trade] ? searchParams.trade : '';
-  const list = zip ? await nearbyAll(zip, trade) : [];
+  const list = zip ? await nearbyCards(zip, trade) : [];
 
   return (
     <>
@@ -46,16 +46,49 @@ export default async function Find({ searchParams }: { searchParams: { trade?: s
           </div>
           {list.length === 0 ? (
             <div className="card"><p className="muted" style={{ margin: 0 }}>No contractors found{trade ? ` for ${trade}` : ''} near {zip} yet. Post a project and we will tell contractors in your area.</p></div>
-          ) : list.map((c) => (
-            <div key={c.id} className="card">
-              <div className="row" style={{ justifyContent: 'space-between', flexWrap: 'nowrap' }}>
-                <b>{c.name}</b>
-                <span className="muted small">{c.miles} mi</span>
+          ) : list.map((c) => {
+            const initials = c.name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase();
+            const shownTrades = c.trades.slice(0, 2);
+            const more = c.trades.length - shownTrades.length;
+            const chip = (bg: string, fg: string): React.CSSProperties => ({ fontSize: 12, fontWeight: 700, padding: '4px 10px', borderRadius: 999, background: bg, color: fg, whiteSpace: 'nowrap' });
+            return (
+              <div key={c.id} className="card">
+                <div className="row" style={{ gap: 12, flexWrap: 'nowrap', alignItems: 'center' }}>
+                  {c.logo ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={c.logo} alt="" width={56} height={56} style={{ borderRadius: 16, objectFit: 'cover', flex: 'none' }} />
+                  ) : (
+                    <div aria-hidden="true" style={{ width: 56, height: 56, borderRadius: 16, flex: 'none', display: 'grid', placeItems: 'center', background: 'var(--brand)', color: '#fff', fontWeight: 800, fontSize: 20 }}>{initials || '?'}</div>
+                  )}
+                  <div style={{ minWidth: 0, flex: 1 }}>
+                    <div className="row" style={{ gap: 6 }}>
+                      <b style={{ fontSize: 17 }}>{c.name}</b>
+                      {c.verified ? <span style={chip('var(--ok-bg)', 'var(--ok)')}>✓ Verified</span> : null}
+                    </div>
+                    <div className="muted small">
+                      {c.count ? <><b style={{ color: 'var(--warn)' }}>★ {c.avg.toFixed(1)}</b> ({c.count} rating{c.count === 1 ? '' : 's'})</> : 'New on Jobfile · no ratings yet'}
+                      {c.since ? ` · ${Math.max(1, new Date().getFullYear() - c.since)} yr${new Date().getFullYear() - c.since > 1 ? 's' : ''}` : ''}
+                    </div>
+                  </div>
+                  <span className="muted small" style={{ flex: 'none', alignSelf: 'flex-start' }}>{c.miles} mi</span>
+                </div>
+                <div className="row" style={{ gap: 6, flexWrap: 'wrap' }}>
+                  {c.insured ? <span style={chip('var(--home-bg)', 'var(--home)')}>Insured</span> : null}
+                  {shownTrades.map((t) => <span key={t} style={chip('var(--con-bg)', 'var(--con)')}>{t}</span>)}
+                  {more > 0 ? <span style={{ ...chip('transparent', 'var(--ink-2)'), border: '1px solid var(--line)', fontWeight: 500 }}>+ {more} more</span> : null}
+                </div>
+                {c.photos.length ? (
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 6 }}>
+                    {c.photos.map((u, i) => (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img key={i} src={u} alt="" loading="lazy" style={{ width: '100%', aspectRatio: '4 / 3', objectFit: 'cover', borderRadius: 12 }} />
+                    ))}
+                  </div>
+                ) : null}
+                <Link href={`/contractors/${c.id}`} className={`btn${c.count || c.verified ? '' : ' ghost'}`}>View profile</Link>
               </div>
-              {c.trades.length ? <p className="muted small" style={{ margin: 0 }}>{c.trades.join(', ')}</p> : null}
-              <Link href={`/contractors/${c.id}`} className="btn ghost">View profile</Link>
-            </div>
-          ))}
+            );
+          })}
           <p className="muted small">Change your ZIP in <Link href="/settings">Settings</Link>.</p>
         </>
       )}
