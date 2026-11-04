@@ -1,0 +1,76 @@
+<title>Change Order Payments</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: one phone column. Tabs: Approve, Payments (after), Today. Names and amounts are examples. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#c4813f;--orl:#f9efe4;--orb:#ecd4a8;--gr:#1f7a55;--grl:#d9f1e6;--am:#9a5b00;--aml:#fbeccd;--bad:#a63d2f;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--gr:#6fd1a3;--grl:#173a2c;--am:#f0b95a;--aml:#3a2e12;--bad:#f09a8c;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--gr:#6fd1a3;--grl:#173a2c;--am:#f0b95a;--aml:#3a2e12;--bad:#f09a8c;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:14px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:16px}
+h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;text-wrap:balance}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
+.mut{color:var(--mut);font-size:13px;line-height:1.45;margin:0}
+.sw{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.sw button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:8px 2px;border-radius:99px;font:500 12.5px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:44px}.sw button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.sec{display:flex;flex-direction:column;gap:14px}.sec[hidden]{display:none}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.btn{display:block;text-align:center;background:var(--or);color:#fff;border-radius:99px;padding:12px 16px;font:600 14.5px 'IBM Plex Sans',sans-serif;min-height:44px}.btn.gh{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+.pill{font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:99px;white-space:nowrap;background:var(--orl);color:var(--or);border:1px solid var(--orb)}.pill.g{background:var(--grl);color:var(--gr);border-color:transparent}.pill.a{background:var(--aml);color:var(--am);border-color:transparent}.pill.m{background:transparent;color:var(--mut);border-color:var(--line)}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:8px}.tile{background:var(--bg);border-radius:14px;padding:10px 12px;display:flex;flex-direction:column;gap:2px}.tile span{font-size:12px;color:var(--mut);font-weight:600}.tile b{font:800 19px 'Bricolage Grotesque',sans-serif;letter-spacing:-.03em;font-variant-numeric:tabular-nums}.tile.s{background:var(--ink);}.tile.s span{color:var(--bg);opacity:.75}.tile.s b{color:var(--bg)}
+.ms{display:flex;flex-direction:column;gap:6px}.ms .t{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.ms .t b{font-size:15px}.ms .amt{font:800 17px 'Bricolage Grotesque',sans-serif;font-variant-numeric:tabular-nums;white-space:nowrap}
+.co{border-color:var(--orb);background:linear-gradient(0deg,var(--orl),var(--orl)),var(--card)}
+.row{display:flex;justify-content:space-between;gap:10px;font-size:14px;padding:7px 0;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}.row:last-child{border-bottom:0}
+.box{border-radius:14px;padding:12px;font-size:13.5px;line-height:1.45}.box.g{background:var(--grl);color:var(--gr)}.box.a{background:var(--aml);color:var(--am)}
+</style>
+<div class="wrap">
+  <div class="note"><b>Mockup.</b> What happens to payments when a change order is approved. Names and amounts are examples.</div>
+  <div class="sw" id="sw"><button data-s="ap" class="on" type="button">Approve</button><button data-s="af" type="button">Payments, after</button><button data-s="td" type="button">Today</button></div>
+
+  <div id="ap" class="sec">
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;gap:10px"><h3 style="font-size:18px">CO-1 · Extra tile in hallway</h3><span class="pill a">Pending</span></div>
+      <p class="mut">Requested by Nesty's Painting. Adds the hallway to the tile work.</p>
+      <div class="tiles"><div class="tile"><span>Cost</span><b>+$2,000</b></div><div class="tile"><span>Time</span><b>+2 days</b></div></div>
+      <div class="box g"><b>If you approve:</b> this becomes its own payment line, "CO-1: Extra tile in hallway, $2,000". Your contract total goes from $20,000 to $22,000. Nothing is due until the contractor finishes the work and requests it.</div>
+      <a class="btn">Approve</a><a class="btn gh">Decline</a>
+    </div>
+  </div>
+
+  <div id="af" class="sec" hidden>
+    <div class="card"><h2 style="font-size:22px">Payments</h2>
+      <div class="tiles">
+        <div class="tile s"><span>Contract total</span><b>$22,000</b></div>
+        <div class="tile"><span>Paid</span><b>$5,000</b></div>
+        <div class="tile"><span>Requested</span><b>$0</b></div>
+        <div class="tile"><span>Scheduled balance</span><b>$17,000</b></div>
+      </div>
+      <p class="mut">Original agreement $20,000 plus approved changes $2,000. The balance now includes the change order.</p>
+    </div>
+    <div class="card ms"><div class="t"><div><b>Deposit · 25%</b><div class="mut">Paid Oct 14 by check</div></div><div class="amt">$5,000</div></div><span class="pill g" style="width:max-content">Paid</span></div>
+    <div class="card ms"><div class="t"><div><b>Halfway · 50%</b><div class="mut">When the tile is done</div></div><div class="amt">$10,000</div></div><span class="pill m" style="width:max-content">Scheduled</span></div>
+    <div class="card ms"><div class="t"><div><b>Final · 25%</b><div class="mut">After the final walkthrough</div></div><div class="amt">$5,000</div></div><span class="pill m" style="width:max-content">Scheduled</span></div>
+    <div class="card ms co"><div class="t"><div><b>CO-1 · Extra tile in hallway</b><div class="mut">Approved Nov 3. Billed when this work is done.</div></div><div class="amt">$2,000</div></div><span class="pill" style="width:max-content">Change order</span>
+      <a class="btn gh" style="margin-top:2px">Request this payment</a></div>
+    <p class="mut">Contractors request the change order line the same way as the others. The homeowner marks it paid, the contractor confirms the receipt, and the project record shows it.</p>
+  </div>
+
+  <div id="td" class="sec" hidden>
+    <div class="card"><h2 style="font-size:22px">Payments</h2>
+      <div class="tiles">
+        <div class="tile s"><span>Contract total</span><b>$22,000</b></div>
+        <div class="tile"><span>Paid</span><b>$5,000</b></div>
+        <div class="tile"><span>Requested</span><b>$0</b></div>
+        <div class="tile"><span>Scheduled balance</span><b>$15,000</b></div>
+      </div>
+      <div class="box a">Approved change orders (+$2,000) are in the contract total. The schedule below follows the agreed price, so agree with the other side when changes are billed.</div>
+    </div>
+    <div class="note" style="border-style:solid"><b>The problem:</b> $22,000 total, $5,000 paid, but the balance says $15,000, not $17,000. The $2,000 change order has no payment line and no button, so it can't be billed or recorded.</div>
+  </div>
+</div>
+<script>
+var sw=document.getElementById('sw'),ids=['ap','af','td'];
+[].forEach.call(sw.children,function(b){b.onclick=function(){
+  [].forEach.call(sw.children,function(x){x.classList.toggle('on',x===b)});
+  ids.forEach(function(id){document.getElementById(id).hidden=id!==b.dataset.s});window.scrollTo(0,0)}});
+</script>
