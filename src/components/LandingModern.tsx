@@ -181,12 +181,6 @@ export default function LandingModern({ signedIn, nums, children }: { signedIn: 
         ))}
       </section>
 
-      {nums.length > 0 && (
-        <div className="lm-nums" aria-label="Jobfile so far">
-          {nums.map(([n, t]) => (<div key={t}><b>{n}</b><span>{t}</span></div>))}
-        </div>
-      )}
-
       <section className="lm-trust" aria-label="Why people trust Jobfile">
         <div><Svg n="shield" size={20} />Insured and verified</div>
         <div><Svg n="pin" size={20} />Address stays private</div>
