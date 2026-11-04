@@ -241,9 +241,8 @@ details.card > summary { list-style: none; }
 details.card > summary::-webkit-details-marker { display: none; }
 
 details.startp[open] + .startp-hint { display: none; }
-.startp-row { display: grid; grid-template-columns: 1.25fr 1fr; gap: 10px; align-items: start; }
-.startp-row > .startp-hint { grid-column: 1 / -1; margin: 2px 0 0; }
-.startp-row > details.startp[open] { grid-column: 1 / -1; grid-row: 2; }
+.startp-row { display: grid; grid-template-columns: 1fr; gap: 10px; align-items: start; }
+.startp-row > .startp-hint { margin: 0; text-align: center; }
 .startp-row .btn { width: 100%; }
 .startp-row > details.startp > summary.btn { width: 100%; }
 .cpage { display: flex; flex-direction: column; gap: 28px; }

@@ -54,7 +54,7 @@ export default function StartProjectForm({ companyId, companyName, open, heading
     <>
       {form}
       <p className="muted small startp-hint">
-        <b style={{ color: 'var(--ink)' }}>Customer not on Jobfile yet?</b> Tap Start a project and add them by email. They get an invite to join.
+        Got a customer already? Start a project and invite them. They do not need a Jobfile account yet.
       </p>
     </>
   );
