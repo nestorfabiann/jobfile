@@ -4,12 +4,14 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import MenuIcon from '@/components/MenuIcon';
+import { useGetApp } from '@/lib/useGetApp';
 
 /** Signed-in header menu: Home first, then the usual links. Closes on navigation, outside tap and Escape. */
 export default function AppMenu({ marketplace, contractor, admin, signOutAction }: { marketplace: boolean; contractor?: boolean; admin: boolean; signOutAction: () => void | Promise<void> }) {
   const [open, setOpen] = useState(false);
   const path = usePathname();
   const box = useRef<HTMLDivElement>(null);
+  const getApp = useGetApp();
 
   useEffect(() => { setOpen(false); }, [path]);
   useEffect(() => {
@@ -47,7 +49,7 @@ export default function AppMenu({ marketplace, contractor, admin, signOutAction 
       {open && (
         <nav id="appmenu-sheet" className="appmenu-sheet" aria-label="Main">
           {items.map(([href, label, icon]) => (
-            <Link key={href} href={href} aria-current={current(href) ? 'page' : undefined}><MenuIcon name={icon} />{href === '/app' ? <span>{label}<small className="mi-sub">Alerts on your phone</small></span> : label}</Link>
+            <Link key={href} href={href} className={href === '/app' && getApp ? 'mi-new' : undefined} aria-current={current(href) ? 'page' : undefined}><MenuIcon name={icon} />{href === '/app' ? <span>{label}<small className="mi-sub">Alerts on your phone</small></span> : label}{href === '/app' && getApp ? <span className="mi-tag">New</span> : null}</Link>
           ))}
           <hr />
           <form action={signOutAction}><button type="submit" className="menu-out"><MenuIcon name="out" />Sign out</button></form>

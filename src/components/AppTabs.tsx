@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import MenuIcon from '@/components/MenuIcon';
+import { useGetApp } from '@/lib/useGetApp';
 
 const IC: Record<string, string> = {
   home: '<path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/>',
@@ -17,6 +18,7 @@ const IC: Record<string, string> = {
 export default function AppTabs({ contractor, marketplace, waiting, admin, signOutAction }: { contractor: boolean; marketplace: boolean; waiting: number; admin: boolean; signOutAction: () => void | Promise<void> }) {
   const path = usePathname() || '/';
   const [open, setOpen] = useState(false);
+  const getApp = useGetApp();
   useEffect(() => { setOpen(false); }, [path]);
   useEffect(() => {
     if (!open) return;
@@ -51,7 +53,7 @@ export default function AppTabs({ contractor, marketplace, waiting, admin, signO
       {open && <div className="apptabs-shade" onClick={() => setOpen(false)} aria-hidden="true" />}
       {open && (
         <nav className="apptabs-sheet" id="apptabs-sheet" aria-label="More">
-          {links.map(([h, l, i]) => <Link key={h} href={h}><MenuIcon name={i} />{l}</Link>)}
+          {links.map(([h, l, i]) => h === '/app' ? <Link key={h} href={h} className={getApp ? 'mi-new' : undefined}><MenuIcon name={i} /><span>{l}<small className="mi-sub">Alerts on your phone</small></span>{getApp ? <span className="mi-tag">New</span> : null}</Link> : <Link key={h} href={h}><MenuIcon name={i} />{l}</Link>)}
           <form action={signOutAction}><button type="submit"><MenuIcon name="out" />Sign out</button></form>
         </nav>
       )}
