@@ -280,6 +280,23 @@ export async function closeListing(formData: FormData) {
   redirect('/marketplace');
 }
 
+/** Keep an open project taking bids for 30 more days, counted from today or its current end date, whichever is later. */
+export async function extendListing(formData: FormData) {
+  requireMarketplace();
+  const { user } = await requireUser();
+  const l = await loadListing(String(formData.get('listing_id') ?? ''));
+  if (!l || l.homeowner_id !== user.id) redirect('/marketplace');
+  const path = `/marketplace/${l.id}`;
+  if (l.status !== 'open') back(path, 'Only an open project can be extended.');
+  const db = supabaseAdmin();
+  const next = new Date(Math.max(Date.now(), new Date(l.expires_at).getTime()) + 30 * 86400_000).toISOString();
+  await db.from('marketplace_listings').update({ expires_at: next }).eq('id', l.id).eq('status', 'open');
+  const { data: waiting } = await db.from('marketplace_bids').select('bidder_id').eq('listing_id', l.id).eq('status', 'waiting');
+  await notifyUsers({ userIds: Array.from(new Set((waiting ?? []).map((b: any) => b.bidder_id as string))), projectId: null, kind: 'bid', path, title: `${listingTitle(l)} is still open`, body: 'The homeowner kept this project open for 30 more days. Your bid is still waiting.' });
+  revalidatePath(path);
+  redirect(`${path}?extended=1`);
+}
+
 // ---------- Contractor: bid ----------
 
 export async function placeBid(formData: FormData) {
@@ -305,7 +322,7 @@ export async function placeBid(formData: FormData) {
   const start = /^\d{4}-\d{2}-\d{2}$/.test(sd) && sd >= todayIso() ? sd : null;
 
   const db = supabaseAdmin();
-  const { data: existing } = await db.from('marketplace_bids').select('id,status').eq('listing_id', l.id).eq('company_id', co.companyId).maybeSingle();
+  const { data: existing } = await db.from('marketplace_bids').select('id,status,price_cents').eq('listing_id', l.id).eq('company_id', co.companyId).maybeSingle();
   if (existing && (existing.status === 'won' || existing.status === 'not_selected')) back(path, 'Your bid on this project is closed.');
   if (!existing) {
     const { count } = await db.from('marketplace_bids').select('id', { count: 'exact', head: true }).eq('bidder_id', user.id).gt('created_at', new Date(Date.now() - 24 * 3600_000).toISOString());
@@ -320,6 +337,20 @@ export async function placeBid(formData: FormData) {
   }
   if (!existing || existing.status === 'withdrawn') {
     await notifyUsers({ userIds: [l.homeowner_id], projectId: null, kind: 'bid', path: `/marketplace/${l.id}`, title: `New bid on ${listingTitle(l)}: ${dollars(price)}`, body: `${co.name} bid ${dollars(price)}. Open Marketplace to compare your bids.` });
+    // Three waiting bids is the point where comparing becomes useful. Said once, when the third one arrives.
+    const { count: waitingBids } = await db.from('marketplace_bids').select('id', { count: 'exact', head: true }).eq('listing_id', l.id).eq('status', 'waiting');
+    if ((waitingBids ?? 0) === 3) {
+      const { data: ps } = await db.from('marketplace_bids').select('price_cents').eq('listing_id', l.id).eq('status', 'waiting');
+      const prices = (ps ?? []).map((x: any) => x.price_cents as number);
+      await notifyUsers({ userIds: [l.homeowner_id], projectId: null, kind: 'bid', path: `/marketplace/${l.id}`, title: `You have 3 bids to compare on ${listingTitle(l)}`, body: `Prices from ${dollars(Math.min(...prices))} to ${dollars(Math.max(...prices))}. Open the project and tick Compare to see them side by side.`, cta: 'Compare bids' });
+    }
+  } else if (existing.status === 'waiting' && existing.price_cents !== price) {
+    // A price change is worth knowing about, but only once per contractor per day.
+    const title = `${co.name} changed their bid on ${listingTitle(l)}`;
+    const { count: sent } = await db.from('notifications').select('id', { count: 'exact', head: true }).eq('user_id', l.homeowner_id).eq('kind', 'bid').eq('title', title).gt('created_at', new Date(Date.now() - 24 * 3600_000).toISOString());
+    if ((sent ?? 0) === 0) {
+      await notifyUsers({ userIds: [l.homeowner_id], projectId: null, kind: 'bid', path: `/marketplace/${l.id}`, title, body: `From ${dollars(existing.price_cents as number)} to ${dollars(price)}. Open the project to compare.` });
+    }
   }
   revalidatePath(path);
   revalidatePath('/marketplace/bids');
@@ -335,7 +366,14 @@ export async function withdrawBid(formData: FormData) {
     redirect('/marketplace');
     return;
   }
-  await supabaseAdmin().from('marketplace_bids').update({ status: 'withdrawn', updated_at: new Date().toISOString() }).eq('listing_id', listingId).eq('company_id', co.companyId).eq('status', 'waiting');
+  const { data: gone } = await supabaseAdmin().from('marketplace_bids').update({ status: 'withdrawn', updated_at: new Date().toISOString() }).eq('listing_id', listingId).eq('company_id', co.companyId).eq('status', 'waiting').select('id');
+  if ((gone ?? []).length) {
+    const l = await loadListing(listingId);
+    if (l) {
+      const { count: left } = await supabaseAdmin().from('marketplace_bids').select('id', { count: 'exact', head: true }).eq('listing_id', l.id).eq('status', 'waiting');
+      await notifyUsers({ userIds: [l.homeowner_id], projectId: null, kind: 'bid', path: `/marketplace/${l.id}`, title: `${co.name} withdrew their bid on ${listingTitle(l)}`, body: (left ?? 0) > 0 ? `You still have ${left} bid${left === 1 ? '' : 's'} waiting.` : 'You have no bids waiting right now. More contractors can still bid.' });
+    }
+  }
   revalidatePath('/marketplace/bids');
   redirect('/marketplace/bids');
 }

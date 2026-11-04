@@ -51,20 +51,35 @@ export async function zipCoords(zips: string[]): Promise<Map<string, [number, nu
 
 type NewListing = { id: string; homeowner_id: string; job_type: string; zip: string; city: string; items: string[]; ai_low_cents: number | null; ai_high_cents: number | null };
 
+/** Contractors who should hear about a job: taking new jobs, matching trade, alerts on, and inside their own travel distance. */
+async function nearCompanies(l: NewListing): Promise<{ id: string; d: number }[]> {
+  const db = supabaseAdmin();
+  const { data: cos } = await db.from('companies').select('*').eq('job_alerts', true).not('business_zip', 'is', null).limit(500);
+  const candidates = ((cos ?? []) as any[]).filter((c) => !c.hidden_at && availabilityOf(c).mode === 'open' && (!(c.trades ?? []).length || (c.trades as string[]).includes(l.job_type)));
+  if (!candidates.length) return [];
+  const coords = await zipCoords([l.zip, ...candidates.map((c) => c.business_zip as string)]);
+  const here = coords.get(l.zip);
+  if (!here) return [];
+  return candidates.map((c) => {
+    const at = coords.get(c.business_zip as string);
+    return { id: c.id as string, d: at ? miles(here, at) : Infinity, radius: (c.service_radius_mi as number | null) ?? DEFAULT_RADIUS };
+  }).filter((c) => c.d <= c.radius).map((c) => ({ id: c.id, d: c.d }));
+}
+
+/** How many contractors a post reaches. Used for the "We told N contractors" line. Never throws. */
+export async function countMatchingContractors(l: NewListing): Promise<number> {
+  try {
+    return (await nearCompanies(l)).length;
+  } catch {
+    return 0;
+  }
+}
+
 /** Tell contractors whose trades and area match a newly posted job. Never throws. */
 export async function alertMatchingContractors(l: NewListing) {
   try {
     const db = supabaseAdmin();
-    const { data: cos } = await db.from('companies').select('*').eq('job_alerts', true).not('business_zip', 'is', null).limit(500);
-    const candidates = ((cos ?? []) as any[]).filter((c) => !c.hidden_at && availabilityOf(c).mode === 'open' && (!(c.trades ?? []).length || (c.trades as string[]).includes(l.job_type)));
-    if (!candidates.length) return;
-    const coords = await zipCoords([l.zip, ...candidates.map((c) => c.business_zip as string)]);
-    const here = coords.get(l.zip);
-    if (!here) return;
-    const near = candidates.map((c) => {
-      const at = coords.get(c.business_zip as string);
-      return { id: c.id as string, d: at ? miles(here, at) : Infinity, radius: (c.service_radius_mi as number | null) ?? DEFAULT_RADIUS };
-    }).filter((c) => c.d <= c.radius);
+    const near = await nearCompanies(l);
     if (!near.length) return;
 
     const { data: mem } = await db.from('company_members').select('company_id,user_id').in('company_id', near.map((c) => c.id));

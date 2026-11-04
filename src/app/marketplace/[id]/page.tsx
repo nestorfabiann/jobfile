@@ -17,13 +17,14 @@ import ListingPhotoUploader from '@/components/ListingPhotoUploader';
 import BidViewNotice from '@/components/BidViewNotice';
 import { answerRows, detailPercent } from '@/lib/scopeQuestions';
 import { ackBidView, recordBidViews, recordCompared } from '@/lib/bidViews';
-import { acceptBid, closeListing, deleteListingPhoto, deleteListingVideo, placeBid, withdrawBid } from '../actions';
+import { acceptBid, closeListing, deleteListingPhoto, deleteListingVideo, extendListing, placeBid, withdrawBid } from '../actions';
+import { countMatchingContractors, DEFAULT_RADIUS } from '@/lib/matching';
 
 export const dynamic = 'force-dynamic';
 const when = (iso: string) => new Date(iso).toLocaleDateString('en-US', { timeZone: 'America/Chicago', month: 'short', day: 'numeric', year: 'numeric' });
 const range = (a: number | null, b: number | null) => [a, b].filter((x) => x != null).map((x) => dollars(x as number)).join(' – ');
 
-export default async function ListingPage({ params, searchParams }: { params: { id: string }; searchParams: { compare?: string | string[]; insured?: string; open?: string; posted?: string; media?: string; bid?: string; error?: string } }) {
+export default async function ListingPage({ params, searchParams }: { params: { id: string }; searchParams: { compare?: string | string[]; insured?: string; open?: string; posted?: string; extended?: string; media?: string; bid?: string; error?: string } }) {
   requireMarketplace();
   const { user } = await requireUser();
   if (!/^[0-9a-f-]{36}$/i.test(params.id)) notFound();
@@ -35,6 +36,10 @@ export default async function ListingPage({ params, searchParams }: { params: { 
   const companyId = (mem ?? [])[0]?.company_id as string | undefined;
   if (!owner && !companyId) notFound();
   const open = listingOpen(l);
+  const told = owner && searchParams.posted ? await countMatchingContractors({ id: l.id, homeowner_id: l.homeowner_id, job_type: l.job_type, zip: l.zip, city: l.city, items: (l as any).items ?? [], ai_low_cents: l.ai_low_cents, ai_high_cents: l.ai_high_cents } as any) : 0;
+  const msLeft = new Date(l.expires_at).getTime() - Date.now();
+  const daysLeft = Math.max(0, Math.ceil(msLeft / 86400_000));
+  const showExtend = owner && l.status === 'open' && daysLeft <= 7;
 
   const [{ data: photoRows }, { data: bidRows }, { data: videoRows }] = await Promise.all([
     db.from('marketplace_photos').select('id,path').eq('listing_id', l.id).order('created_at'),
@@ -118,7 +123,26 @@ export default async function ListingPage({ params, searchParams }: { params: { 
         </div>
         <p className="muted small">{[l.city, `ZIP ${l.zip}`, l.size_sqft ? `${l.size_sqft.toLocaleString('en-US')} sq ft` : '', `Posted ${when(l.created_at)}`, owner ? '' : `by ${firstNameInitial(l.homeowner_name)}`].filter(Boolean).join(' · ')}</p>
       </div>
-      {searchParams.posted ? <div className="box ok">Your project is posted. Contractors can now send bids. Add photos below to help them price it.</div> : null}
+      {searchParams.posted && told > 0 ? <div className="box ok"><b>Your project is posted.</b> We told {told} contractor{told === 1 ? '' : 's'} within {DEFAULT_RADIUS} miles of {l.zip} who do {l.job_type.toLowerCase()}. Add photos below to help them price it.</div> : null}
+      {searchParams.posted && told === 0 ? (
+        <div className="box warn">
+          <b>Your project is posted.</b> No contractors on Jobfile near {l.zip} do this kind of work yet, so nobody was alerted. You can still invite someone you know, or look for one yourself.
+          <div className="row" style={{ marginTop: 8, gap: 8 }}>
+            <Link href="/invites/new" className="btn">Invite a contractor</Link>
+            <Link href="/find" className="btn ghost">Find contractors</Link>
+          </div>
+        </div>
+      ) : null}
+      {searchParams.extended ? <div className="box ok">Done. This project stays open for 30 more days.</div> : null}
+      {showExtend ? (
+        <div className="box warn">
+          <b>{daysLeft > 0 ? `This post ends in ${daysLeft} day${daysLeft === 1 ? '' : 's'}.` : 'This post has ended.'}</b> After it ends, contractors can no longer bid.
+          <form action={extendListing} style={{ marginTop: 8 }}>
+            <input type="hidden" name="listing_id" value={l.id} />
+            <button className="btn" type="submit">Keep it open 30 more days</button>
+          </form>
+        </div>
+      ) : null}
       {searchParams.media === 'partial' ? <div className="box bad">Your project is posted, but some photos or videos did not upload. You can add them again below.</div> : null}
       {searchParams.bid ? <div className="box ok">Your bid was sent.</div> : null}
       {searchParams.error ? <div className="box bad">{searchParams.error}</div> : null}
