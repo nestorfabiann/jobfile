@@ -1,0 +1,54 @@
+<title>New Change Order Button</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: one phone column. Tabs: Today, Closed, Open. Texts and amounts are examples. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#c4813f;--orl:#f9efe4;--orb:#ecd4a8;--gr:#1f7a55;--grl:#d9f1e6;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--gr:#6fd1a3;--grl:#173a2c;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--gr:#6fd1a3;--grl:#173a2c;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:14px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:16px}
+h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
+.mut{color:var(--mut);font-size:13px;line-height:1.45;margin:0}
+.sw{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.sw button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:8px 2px;border-radius:99px;font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:44px}.sw button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.sec{display:flex;flex-direction:column;gap:14px}.sec[hidden]{display:none}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.old{font-weight:700;min-height:32px;display:flex;align-items:center;font-size:16px}
+.new{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--or);color:#fff;border-radius:99px;padding:13px 18px;font:600 16px 'IBM Plex Sans',sans-serif;min-height:48px}
+.new i{font-style:normal;font-size:20px;line-height:1;font-weight:500}
+.fld{display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:600}.fld span{height:42px;border:1px solid var(--line);border-radius:12px;background:var(--bg);display:flex;align-items:center;padding:0 12px;color:var(--mut);font-weight:400;font-size:14px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.btn{display:block;text-align:center;background:var(--or);color:#fff;border-radius:99px;padding:12px 16px;font:600 15px 'IBM Plex Sans',sans-serif}
+</style>
+<div class="wrap">
+  <div class="note"><b>Mockup.</b> The New change order control on the Changes tab. Texts are examples.</div>
+  <div class="sw" id="sw"><button data-s="td" class="on" type="button">Today</button><button data-s="cl" type="button">New, closed</button><button data-s="op" type="button">New, open</button></div>
+
+  <div id="td" class="sec">
+    <div class="card"><div class="old">New change order</div></div>
+    <p class="mut">Plain white card. It does not look tappable, and nothing says what it is for.</p>
+  </div>
+
+  <div id="cl" class="sec" hidden>
+    <div class="new"><i>+</i> New change order</div>
+    <p class="mut" style="text-align:center">Extra work, new materials or a schedule change. The other side approves before it starts.</p>
+  </div>
+
+  <div id="op" class="sec" hidden>
+    <div class="new"><i>–</i> New change order</div>
+    <div class="card">
+      <div class="fld">Title<span>Move range outlet</span></div>
+      <div class="fld">What changes<span style="height:76px;align-items:flex-start;padding-top:10px">Describe the work, materials and where.</span></div>
+      <div class="two"><div class="fld">Cost (+ or −)<span>$875</span></div><div class="fld">Days added<span>1</span></div></div>
+      <a class="btn">Send for approval</a>
+    </div>
+  </div>
+</div>
+<script>
+var sw=document.getElementById('sw'),ids=['td','cl','op'];
+[].forEach.call(sw.children,function(b){b.onclick=function(){
+  [].forEach.call(sw.children,function(x){x.classList.toggle('on',x===b)});
+  ids.forEach(function(id){document.getElementById(id).hidden=id!==b.dataset.s})}});
+</script>
