@@ -1,0 +1,74 @@
+<title>Phone Alerts</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: one phone column. Four views of phone alerts: the turn-on card, the settings, the lock-screen alert, and the not-on-Home-Screen state. Copy is example copy. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#c4813f;--orl:#f9efe4;--orb:#ecd4a8;--fg:#1f4d3a;--fgl:#e4f0e8;--gr:#1f7a55;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--fgl:#173a2c;--gr:#6fd1a3;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--fgl:#173a2c;--gr:#6fd1a3;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:14px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px}
+h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;text-wrap:balance}h2{font-size:28px;line-height:1.05}h3{font-size:19px}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
+.mut{color:var(--mut);font-size:14.5px;line-height:1.5;margin:0}
+.sw{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.sw button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:6px 2px;border-radius:14px;font:500 12.5px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:52px}.sw button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.sec[hidden]{display:none}.sec{display:flex;flex-direction:column;gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.entry{background:var(--fg);color:#eef7f1;border-radius:24px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.entry b{font:700 17px 'Bricolage Grotesque',sans-serif;display:block}.entry .s{font-size:13.5px;color:#bcd8c8;display:block;margin-top:2px;line-height:1.4}
+.top{display:flex;gap:14px;align-items:center}.top img,.ic{width:52px;height:52px;border-radius:13px;flex:none;background:#c4813f;color:#fff;display:grid;place-items:center;font:800 30px 'Bricolage Grotesque',sans-serif}
+.row2{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.go{background:#fff;color:var(--fg);border-radius:99px;padding:12px 18px;font-weight:700;font-size:14px;min-height:44px;display:inline-flex;align-items:center}.no{color:#bcd8c8;font-weight:600;font-size:14px}
+.tg{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);min-height:56px}.tg:last-child{border:0}.tg b{display:block;font-size:15px}.tg span.d{display:block;font-size:13px;color:var(--mut);margin-top:2px}
+.sl{width:50px;height:30px;border-radius:99px;background:var(--line);position:relative;flex:none;border:0;cursor:pointer}.sl::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.3)}.sl[aria-pressed="true"]{background:var(--gr)}.sl[aria-pressed="true"]::after{left:23px}
+.lock{border-radius:34px;padding:22px 14px 26px;background:linear-gradient(160deg,#27424a,#7a5a3a 70%,#c4813f);display:flex;flex-direction:column;gap:10px;color:#fff;min-height:420px}
+.clock{text-align:center;font:700 64px 'Bricolage Grotesque',sans-serif;letter-spacing:-.03em;line-height:1;margin-top:10px}.date{text-align:center;opacity:.85;margin-bottom:22px}
+.ntf{background:rgba(255,255,255,.88);color:#1b1a18;border-radius:20px;padding:12px;display:flex;gap:10px;align-items:flex-start;backdrop-filter:blur(8px)}.ntf .ic{width:38px;height:38px;border-radius:9px;font-size:22px}.ntf b{font-size:14px;display:block}.ntf span{font-size:13px;color:#4a453f;display:block;margin-top:1px;line-height:1.3}.ntf small{margin-left:auto;font-size:11.5px;color:#6b655e;white-space:nowrap}
+.warn{background:var(--orl);border:1px solid var(--orb);border-radius:14px;padding:12px;font-size:14px;line-height:1.45}
+.btn{display:flex;align-items:center;justify-content:center;background:var(--or);color:#fff;border-radius:99px;min-height:50px;font:700 15px 'IBM Plex Sans',sans-serif}
+.cap{font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--mut)}
+</style>
+<div class="wrap">
+<h2>Alerts on your phone</h2>
+<div class="sw" role="group" aria-label="View"><button type="button" data-v="a" aria-pressed="true">Turn on</button><button type="button" data-v="b" aria-pressed="false">Settings</button><button type="button" data-v="c" aria-pressed="false">Lock screen</button><button type="button" data-v="d" aria-pressed="false">Not installed</button></div>
+
+<section class="sec" data-s="a">
+<p class="mut">Shown on Projects once the app is on the Home Screen. iPhone only lets us ask for permission after a tap, so the card has a button and then Apple's own question appears.</p>
+<div class="entry"><div class="top"><span class="ic">J</span><div><b>Get alerts on your phone</b><span class="s">New bids, visit times and payment requests, even when Jobfile is closed.</span></div></div><div class="row2"><span class="go">Turn on alerts</span><span class="no">Not now</span></div></div>
+<div class="note"><b>Then iPhone asks:</b> “Jobfile” Would Like to Send You Notifications. Allow / Don’t Allow. If they say no, we never ask again and Settings shows how to change it in the iPhone Settings app.</div>
+</section>
+
+<section class="sec" data-s="b" hidden>
+<p class="mut">In Settings, one switch per kind of alert. Defaults are on for the things that need action, off for the rest.</p>
+<div class="card">
+<div class="tg"><div><b>Phone alerts</b><span class="d">On this phone</span></div><button class="sl" type="button" aria-pressed="true" aria-label="Phone alerts"></button></div>
+<div class="tg"><div><b>New bids</b><span class="d">When a contractor bids on your project</span></div><button class="sl" type="button" aria-pressed="true" aria-label="New bids"></button></div>
+<div class="tg"><div><b>Visits</b><span class="d">Requests, times and reminders</span></div><button class="sl" type="button" aria-pressed="true" aria-label="Visits"></button></div>
+<div class="tg"><div><b>Payments and changes</b><span class="d">Payment requests and change orders</span></div><button class="sl" type="button" aria-pressed="true" aria-label="Payments"></button></div>
+<div class="tg"><div><b>Messages</b><span class="d">New messages and questions in a project</span></div><button class="sl" type="button" aria-pressed="false" aria-label="Messages"></button></div>
+<div class="tg"><div><b>Tips and local news</b><span class="d">Occasional updates from Jobfile</span></div><button class="sl" type="button" aria-pressed="false" aria-label="Tips"></button></div>
+</div>
+<p class="mut">These sit alongside the email and text settings you already have. Turning a switch off only stops the phone alert.</p>
+</section>
+
+<section class="sec" data-s="c" hidden>
+<p class="mut">What arrives on the lock screen. It uses the J icon and the same words as the in-app pill. Tapping opens the exact page.</p>
+<div class="lock"><div class="clock">1:24</div><div class="date">Wednesday, November 4</div>
+<div class="ntf"><span class="ic">J</span><div><b>New bid on your bathroom project</b><span>Nesty’s Painting · $5,008</span></div><small>now</small></div>
+<div class="ntf"><span class="ic">J</span><div><b>Visit confirmed</b><span>Thursday, Nov 13 · 10:00 am</span></div><small>2m ago</small></div>
+</div>
+<div class="note"><b>No private details.</b> The phone alert never shows street addresses or phone numbers, only what the in-app alert shows.</div>
+</section>
+
+<section class="sec" data-s="d" hidden>
+<p class="mut">On iPhone, phone alerts only work from the Home Screen app. In a normal browser tab the card explains that instead of showing a dead switch.</p>
+<div class="card"><h3>Alerts need the Home Screen app</h3><p class="mut">Add Jobfile to your Home Screen first, then come back here to turn alerts on. It takes about 10 seconds.</p><div class="btn">Show me how</div></div>
+<div class="warn"><b>Android and computers</b> work in the browser too, with no Home Screen step.</div>
+</section>
+</div>
+<script>
+var bs=document.querySelectorAll('.sw button'),ss=document.querySelectorAll('[data-s]');
+bs.forEach(function(b){b.onclick=function(){bs.forEach(function(x){x.setAttribute('aria-pressed',x===b)});ss.forEach(function(s){s.hidden=s.dataset.s!==b.dataset.v})}});
+document.querySelectorAll('.sl').forEach(function(b){b.onclick=function(){b.setAttribute('aria-pressed',b.getAttribute('aria-pressed')!=='true')}});
+</script>
