@@ -1,0 +1,66 @@
+<title>Landing Tile Colors</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: one phone column. Switch the dark tile color between espresso, forest and orange. Same tiles as the landing page. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#c4813f;--orl:#f9efe4;--orb:#ecd4a8;--gr:#1f7a55;--grl:#d9f1e6;--page:#e9e5dc;--t:#3a2718;--tt:#f6efe6;--tm:#d2c3b2;--ti:rgba(255,255,255,.14);--tg:#f3c98f}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--gr:#6fd1a3;--grl:#173a2c;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--gr:#6fd1a3;--grl:#173a2c;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:14px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:16px}
+h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0}h2{font-size:26px}h3{font-size:19px}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
+.sw{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.sw button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:6px 4px;border-radius:16px;font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:56px;display:flex;flex-direction:column;align-items:center;gap:4px}.sw button i{width:28px;height:14px;border-radius:7px;display:block}.sw button[aria-pressed="true"]{border:2px solid var(--ink)}
+.tile{border-radius:24px;padding:18px;display:flex;flex-direction:column;gap:10px;background:var(--t);color:var(--tt)}
+.tile p{margin:0;font-size:14.5px;line-height:1.5;color:var(--tm)}
+.ti{width:40px;height:40px;border-radius:12px;background:var(--ti);color:var(--tg);display:grid;place-items:center}
+.vc{background:#fff;color:#1b1a18;border-radius:14px;padding:10px 12px;font-size:12.5px;display:flex;flex-direction:column;gap:7px}
+.vr{display:flex;gap:8px;align-items:center}.lg{width:30px;height:30px;border-radius:9px;background:#f9efe4;color:#c4813f;border:1px solid #ecd4a8;display:grid;place-items:center;font:800 14px 'Bricolage Grotesque',sans-serif}.vp{margin-left:auto;font:800 17px 'Bricolage Grotesque',sans-serif}
+.vb{display:flex;gap:6px;flex-wrap:wrap}.vb span{font-size:10.5px;font-weight:700;background:#d9f1e6;color:#1f7a55;border-radius:99px;padding:2px 8px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.sm{border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:6px;font-size:14px}.sm b{font:700 17px 'Bricolage Grotesque',sans-serif}.sm p{margin:0;color:var(--mut)}
+.o{background:var(--orl)}.g{background:var(--grl)}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:8px}.half{background:#fff;color:#1b1a18;border-radius:16px;padding:12px;font-size:12.5px;display:flex;flex-direction:column;gap:6px}.who{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#6b655e}.half>div{display:flex;justify-content:space-between}.half>div span{color:#6b655e}.st{color:#c4813f;letter-spacing:1px}
+.cta{display:block;text-align:center;background:var(--or);color:#fff;border-radius:99px;padding:14px;font:700 15px 'IBM Plex Sans',sans-serif}
+.cta.inv{background:#fff;color:var(--t)}
+</style>
+<div class="wrap">
+<h2>Tile color</h2>
+<p class="note"><b>Tap a color</b> to change the dark tiles and the closing card. Everything else stays the same.</p>
+<div class="sw" role="group" aria-label="Color">
+<button type="button" data-c="e" aria-pressed="true"><i style="background:#3a2718"></i>Espresso</button>
+<button type="button" data-c="f" aria-pressed="false"><i style="background:#1f4d3a"></i>Forest</button>
+<button type="button" data-c="o" aria-pressed="false"><i style="background:#c4813f"></i>Orange</button>
+</div>
+
+<div class="tile">
+<span class="ti" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 4.5-3.2 7.8-8 9-4.8-1.2-8-4.5-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg></span>
+<h3>A profile that wins bids</h3>
+<p>Your insurance badge, work photos and real ratings show on every bid you send.</p>
+<div class="vc"><div class="vr"><span class="lg">N</span><div><b>Nesty’s Painting</b><div style="color:#6b655e;font-size:11.5px">★ 4.9 (12)</div></div><span class="vp">$5,008</span></div><div class="vb"><span>✓ Verified</span><span>Insured to Mar 2027</span></div></div>
+</div>
+
+<div class="two">
+<div class="sm o"><b>Jobs near you</b><p>Pick your trades and area.</p></div>
+<div class="sm g"><b>AI price reference</b><p>See what a job should cost.</p></div>
+</div>
+
+<div class="tile">
+<span class="ti" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.6 5.6 6 .7-4.4 4.1 1.2 6-5.4-3-5.4 3 1.2-6L3.4 9.3l6-.7z"/></svg></span>
+<h3>Rate your homeowners too</h3>
+<p>Homeowners rate you. You rate them. Know who pays on time before you take the job.</p>
+<div class="pair"><div class="half"><span class="who">You get rated</span><span class="st">★★★★★</span><div><span>Quality</span><b>5.0</b></div></div><div class="half"><span class="who">You rate them</span><span class="st">★★★★☆</span><div><span>Paid on time</span><b>5.0</b></div></div></div>
+</div>
+
+<div class="tile" style="text-align:center;align-items:stretch">
+<h3 style="font-size:24px">Ready to find your next job?</h3>
+<p>Free to start. Nothing to download.</p>
+<span class="cta" id="cta">Create your free profile →</span>
+</div>
+</div>
+<script>
+var P={e:{t:'#3a2718',tt:'#f6efe6',tm:'#d2c3b2',ti:'rgba(255,255,255,.14)',tg:'#f3c98f'},f:{t:'#1f4d3a',tt:'#eef7f1',tm:'#bcd8c8',ti:'rgba(255,255,255,.14)',tg:'#a9e6c6'},o:{t:'#c4813f',tt:'#ffffff',tm:'#fdeedd',ti:'rgba(255,255,255,.22)',tg:'#ffffff'}};
+var bs=document.querySelectorAll('.sw button'),r=document.documentElement,cta=document.getElementById('cta');
+bs.forEach(function(b){b.onclick=function(){var p=P[b.dataset.c];bs.forEach(function(x){x.setAttribute('aria-pressed',x===b)});r.style.setProperty('--t',p.t);r.style.setProperty('--tt',p.tt);r.style.setProperty('--tm',p.tm);r.style.setProperty('--ti',p.ti);r.style.setProperty('--tg',p.tg);cta.className=b.dataset.c==='o'?'cta inv':'cta'}});
+</script>
