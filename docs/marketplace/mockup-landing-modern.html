@@ -8,7 +8,7 @@
 :root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--or:#e0933f;--or2:#cd7d2e;--orl:#33281c;--orb:#5a4426;--gr:#6fd1a3;--grl:#173a2c;--bl:#8fbdf0;--bll:#17283d;--page:#0d0c0b;--dark:#0d0c0b;color-scheme:dark}
 *{box-sizing:border-box}
 body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif;line-height:1.5}
-.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:0 48px;padding-left:max(18px,env(safe-area-inset-left,0px));padding-right:max(18px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:44px}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:0 96px;padding-left:max(18px,env(safe-area-inset-left,0px));padding-right:max(18px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:44px}
 h1,h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.035em;margin:0;text-wrap:balance}
 .note{font-size:12.5px;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:12px;padding:8px 12px;margin-top:12px}
 .top{display:flex;justify-content:space-between;align-items:center;padding-top:6px}
@@ -60,6 +60,15 @@ h1,h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-
 .job b{display:block;font-size:15.5px}.job span{font-size:13px;color:var(--mut)}
 .final{background:var(--dark);color:#f3efe8;border-radius:28px;padding:26px 20px;display:flex;flex-direction:column;gap:14px;text-align:center}
 .final h2{font-size:28px}.final p{margin:0;color:#b9b2a7}
+.also h3{font-size:20px;margin-bottom:8px}
+.alt{display:flex;gap:12px;align-items:center;width:100%;text-align:left;border:0;border-bottom:1px solid var(--line);background:transparent;color:inherit;font:inherit;padding:14px 2px;min-height:56px;cursor:pointer}
+.alt svg.i{width:22px;height:22px;stroke:var(--or);fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.alt b{flex:1;font-size:15.5px}.alt .c{width:18px;height:18px;stroke:var(--mut);fill:none;stroke-width:2.2;transition:transform .2s}
+.alt[aria-expanded="true"] .c{transform:rotate(180deg)}
+.alt-d{font-size:14px;color:var(--mut);padding:0 2px 14px 36px;border-bottom:1px solid var(--line);margin:0}
+.bar2{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:var(--card);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(3,1fr);padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px));z-index:5}
+.bar2 a{display:flex;flex-direction:column;align-items:center;gap:3px;min-height:54px;justify-content:center;font-size:11.5px;font-weight:600;color:var(--mut)}
+.bar2 a.on{color:var(--or)}.bar2 svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 @media (prefers-reduced-motion:reduce){.phone,.fade{animation:none}}
 </style>
 <div class="wrap">
@@ -89,12 +98,8 @@ h1,h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-
     <div><svg viewBox="0 0 24 24"><path d="M12 3l2.6 5.6 6 .7-4.4 4.1 1.2 6-5.4-3-5.4 3 1.2-6L3.4 9.3l6-.7z"/></svg>Built for Texas</div>
   </section>
 
-  <section class="bento" aria-label="What you get">
-    <h2 id="bh"></h2>
-    <div class="tile big"><b id="b1t"></b><p id="b1p"></p></div>
-    <div class="tile or"><b id="b2t"></b><p id="b2p"></p></div>
-    <div class="tile gr"><b id="b3t"></b><p id="b3p"></p></div>
-  </section>
+  <section class="bento" aria-label="What you get"><h2 id="bh"></h2><div id="tiles" style="display:contents"></div></section>
+  <section class="also" aria-label="And also"><h3>And also</h3><div id="also"></div></section>
 
   <section class="jobs" aria-label="Open near you">
     <h2>Open near you</h2>
@@ -109,6 +114,7 @@ h1,h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-
     <button class="cta" id="cta2" type="button"></button>
   </section>
 </div>
+<nav class="bar2" aria-label="Main"><a class="on"><svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>Home</a><a><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4-4"/></svg>Open jobs</a><a><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.5-6 8-6s8 2 8 6"/></svg>Sign in</a></nav>
 <script>
 var C={
 ho:{eye:'For homeowners',h:'Get bids from local pros. <em>Run the whole job</em> in one place.',sub:'Post your project, compare real bids, then keep the price, photos and payments in one shared record.',cta:'Post your project, it’s free',fine:'No fees. Your address stays private until you hire.',
@@ -116,7 +122,7 @@ ho:{eye:'For homeowners',h:'Get bids from local pros. <em>Run the whole job</em>
  bh:'Everything for your project',b:[['One shared record','Price, scope, photos, changes and payments, not lost in texts.'],['Know it’s fair','An AI cost reference before you commit.'],['Meet first','Ask for a site visit before you hire.']],fh:'Ready to get bids on your project?'},
 co:{eye:'For contractors',h:'Win the job, then <em>skip the paperwork.</em>',sub:'Find nearby projects, send a bid that shows your insurance and ratings, then run the job with your customer.',cta:'Create your free profile',fine:'No subscription. Nothing taken from jobs you win.',
  steps:[['Find work','New projects in your trade and area come to you.'],['Send a bid','Your logo, badge, insurance and price on every bid.'],['Get paid as you go','Request each milestone. Both sides see what is next.']],
- bh:'Everything to win and run jobs',b:[['A profile that wins bids','Verified badge, insurance, work photos and real ratings.'],['See the job first','Ask for a visit before you price it.'],['Bill extra work','Change orders approved before you start.']],fh:'Ready to find your next job?'}
+ bh:'Everything to win and run jobs',b:[['A profile that wins bids','Your insurance badge, work photos and real ratings show on every bid you send.'],['Jobs near you','Pick your trades and area. New matching projects come to you.'],['AI price reference','See what a job should cost in the area before you bid, so your price is fair and competitive.']],x:[['pay','Payments by milestone','Request each payment when the work is done. Jobfile records them. It does not hold or move your money.'],['doc','Change orders you can bill','Extra work is approved with the price attached before you start it.'],['star','Ratings you earn','Finish a job and the homeowner rates you. Good work builds a public record.'],['cal','See the job first','Ask the homeowner for a visit before you price it.']],fh:'Ready to find your next job?'}
 };
 var P={
 ho:[
@@ -128,7 +134,9 @@ co:[
  '<div class="ph-h">Your bid</div><div class="mini"><span class="logo" style="font-size:15px">N</span> <b>Nesty’s Painting</b><div class="chips" style="margin:6px 0"><span class="on">✓ Verified</span><span class="on">Insured to Mar 2027</span></div><div class="price">$5,008</div><div class="m">4 weeks · starts Nov 19</div></div><div class="mini"><b>Included</b><div class="m">Paint, prep and cleanup</div></div><div class="mini" style="background:var(--or);color:#fff;text-align:center;font-weight:700;border:0">Send bid</div>',
  '<div class="ph-h">Payments</div><div class="mini"><div class="ms"><span>Deposit at signing</span><span class="pill">Confirmed</span></div><div class="ms"><span>Midpoint</span><span class="pill o">Request</span></div><div class="ms"><span>Substantial completion</span><span class="m">Next</span></div><div class="ms"><span>Final walkthrough</span><span class="m">Later</span></div></div><div class="mini"><b>CO-2 +$420</b><div class="m">Approved · own payment line</div></div>']
 };
+var IC={pay:'<rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/>',doc:'<path d="M7 3h8l4 4v14H7z"/><path d="M15 3v4h4"/><path d="M10 13h6M10 17h6"/>',star:'<path d="M12 3l2.6 5.6 6 .7-4.4 4.1 1.2 6-5.4-3-5.4 3 1.2-6L3.4 9.3l6-.7z"/>',cal:'<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/>'};
 var role='ho',step=0;
+document.getElementById('also').addEventListener('click',function(e){var b=e.target.closest('.alt');if(!b)return;var o=b.getAttribute('aria-expanded')!=='true';b.setAttribute('aria-expanded',o);b.nextElementSibling.hidden=!o});
 function paint(first){
  var c=C[role];
  document.getElementById('eyebrow').textContent=c.eye;
@@ -136,7 +144,8 @@ function paint(first){
  document.getElementById('cta1').textContent=c.cta+' →';document.getElementById('cta2').textContent=c.cta+' →';
  document.getElementById('fine').textContent=c.fine;document.getElementById('fh').textContent=c.fh;
  document.getElementById('bh').textContent=c.bh;
- [1,2,3].forEach(function(i){document.getElementById('b'+i+'t').textContent=c.b[i-1][0];document.getElementById('b'+i+'p').textContent=c.b[i-1][1]});
+ document.getElementById('tiles').innerHTML=c.b.map(function(t,i){return '<div class="tile '+(i===0?'big':i===1?'or':'gr')+'"><b>'+t[0]+'</b><p>'+t[1]+'</p></div>'}).join('');
+ document.getElementById('also').innerHTML=c.x.map(function(t,i){return '<button class="alt" type="button" aria-expanded="false" data-i="'+i+'"><svg class="i" viewBox="0 0 24 24">'+IC[t[0]]+'</svg><b>'+t[1]+'</b><svg class="c" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button><p class="alt-d" hidden>'+t[2]+'</p>'}).join('');
  document.getElementById('steps').innerHTML=c.steps.map(function(s,i){return '<button class="st" type="button" data-i="'+i+'" aria-pressed="'+(i===step)+'"><span class="n">'+(i+1)+'</span><span><b>'+s[0]+'</b><span class="d">'+s[1]+'</span></span></button>'}).join('');
  var ph=document.getElementById('phone');ph.innerHTML='<div class="fade">'+P[role][step]+'</div>';
  document.getElementById('s-ho').setAttribute('aria-selected',role==='ho');document.getElementById('s-co').setAttribute('aria-selected',role==='co');
