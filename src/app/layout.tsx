@@ -8,6 +8,7 @@ import { marketplaceEnabled } from '@/lib/marketplace';
 import PubTabs from '@/components/PubTabs';
 import AppMenu from '@/components/AppMenu';
 import HelpButton from '@/components/HelpButton';
+import AlertPill from '@/components/AlertPill';
 import UsageBeacon from '@/components/UsageBeacon';
 import AppTabs from '@/components/AppTabs';
 import { needsCount } from '@/lib/needsCount';
@@ -66,6 +67,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         {tabs && <PubTabs />}
         <HelpButton who={!user ? 'v' : contractor ? 'c' : 'h'} />
         {user && <UsageBeacon />}
+        {user && <AlertPill />}
         {user && <AppTabs contractor={contractor} marketplace={marketplaceEnabled()} waiting={waiting} admin={isAdmin} signOutAction={signOut} />}
       </body>
     </html>
