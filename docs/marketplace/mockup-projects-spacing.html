@@ -1,0 +1,60 @@
+<title>Projects Spacing</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: one phone column, Before / After switch on the top of the homeowner Projects page. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#c4813f;--orl:#f9efe4;--orb:#ecd4a8;--gr:#1f7a55;--grl:#d9f1e6;--page:#e9e5dc;--seg:#e4dfd6}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--gr:#6fd1a3;--grl:#173a2c;--page:#0d0c0b;--seg:#35312c;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--gr:#6fd1a3;--grl:#173a2c;--page:#0d0c0b;--seg:#35312c;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:14px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:16px}
+h1,h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
+.sw{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:var(--seg);border-radius:99px;padding:4px}.sw button{border:0;background:transparent;color:var(--mut);padding:8px;border-radius:99px;font:600 14.5px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:44px}.sw button.on{background:var(--card);color:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.15)}
+.sec{display:flex;flex-direction:column;gap:14px}.sec[hidden]{display:none}
+.mut{color:var(--mut);font-size:15px;line-height:1.5;margin:0}
+.btn{display:block;text-align:center;background:var(--or);color:#fff;border-radius:99px;padding:15px 18px;font:600 17px 'IBM Plex Sans',sans-serif;min-height:52px}
+.btn.gh{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+.lnk{font-weight:700;color:var(--or);text-decoration:underline;font-size:16px}
+.hint{font-size:13.5px;color:var(--mut);line-height:1.5;margin:0;text-align:center}
+.ok{color:var(--gr);font-weight:700;font-size:15px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.pillrow{display:flex;align-items:center;gap:10px;background:var(--grl);color:var(--gr);font-weight:700;font-size:15px;border-radius:16px;padding:12px 14px}.step{display:flex;gap:10px;font-size:14px;line-height:1.45}.step i{font-style:normal;width:22px;height:22px;border-radius:50%;background:var(--grl);color:var(--gr);font-weight:700;font-size:12px;display:grid;place-items:center;flex:none}
+</style>
+<div class="wrap">
+  <div class="note"><b>Mockup.</b> Homeowner Projects page, the circled area. Only spacing and the "all caught up" line change.</div>
+  <div class="sw" id="sw"><button data-s="af" class="on" type="button">After</button><button data-s="bf" type="button">Before</button></div>
+
+  <div id="af" class="sec" style="gap:22px">
+    <div class="sec" style="gap:10px">
+      <a class="btn">Post a project</a>
+      <a class="btn gh">I already have a contractor</a>
+      <p class="hint">Hired someone on your own? Add them here to keep the agreement, photos, payments and messages in one place. They do not need a Jobfile account yet.</p>
+    </div>
+    <div class="pillrow">✓ You're all caught up <span style="font-weight:500;color:var(--mut);font-size:13.5px">Nothing needs you right now</span></div>
+    <div class="sec" style="gap:12px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline"><h2 style="font-size:22px">Hired and ongoing</h2><span class="hint">1</span></div>
+      <div class="card"><b>Kitchen and walls painting</b><span class="hint" style="text-align:left">Nesty's Painting · Work in progress</span></div>
+    </div>
+  </div>
+
+  <div id="bf" class="sec" style="gap:8px" hidden>
+    <div class="sec" style="gap:10px">
+      <a class="btn">Post a project</a>
+      <a class="btn gh">I already have a contractor</a>
+      <p class="hint">Hired someone on your own? Add them here to keep the agreement, photos, payments and messages in one place. They do not need a Jobfile account yet.</p>
+    </div>
+    <span class="ok">✓ You're all caught up</span>
+    <div style="display:flex;justify-content:space-between;align-items:baseline;margin-top:8px"><h2 style="font-size:22px">Hired and ongoing</h2><span class="hint">1</span></div>
+    <div class="card"><b>Kitchen and walls painting</b><span class="hint" style="text-align:left">Nesty's Painting · Work in progress</span></div>
+  </div>
+
+  <div class="note" style="border-style:solid"><b>What changes:</b> about 24px of room between each block, the "all caught up" line becomes a soft green row so it reads as its own item, and the section heading gets clear air above it. The same spacing applies on the contractor Projects page.</div>
+</div>
+<script>
+var sw=document.getElementById('sw');
+[].forEach.call(sw.children,function(b){b.onclick=function(){
+  [].forEach.call(sw.children,function(x){x.classList.toggle('on',x===b)});
+  ['af','bf'].forEach(function(id){document.getElementById(id).hidden=id!==b.dataset.s})}});
+</script>
