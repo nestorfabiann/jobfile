@@ -1,0 +1,84 @@
+<title>Admin App Installs</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: one phone column. Admin page with summary tiles, a filter, and a list of people. Names, emails and numbers are examples. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#c4813f;--orl:#f9efe4;--orb:#ecd4a8;--fg:#1f4d3a;--fgl:#e4f0e8;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--fgl:#173a2c;--fg:#8fd0ab;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--fgl:#173a2c;--fg:#8fd0ab;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:14px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px}
+h2{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;font-size:28px;line-height:1.05;text-wrap:balance}
+h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;font-size:18px}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
+.mut{color:var(--mut);font-size:14.5px;line-height:1.5;margin:0}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.t{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:13px;display:flex;flex-direction:column;gap:3px}
+.t b{font:800 30px 'Bricolage Grotesque',sans-serif;letter-spacing:-.03em;line-height:1;font-variant-numeric:tabular-nums}
+.t span{font-size:13px;color:var(--mut);line-height:1.3}
+.t.g{background:var(--fg);border-color:var(--fg)}.t.g b,.t.g span{color:#fff}.t.g span{opacity:.85}
+.bar{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:9px}
+.bar .tr{display:flex;height:14px;border-radius:99px;overflow:hidden;background:var(--line)}
+.bar .tr i{display:block;height:100%}
+.lg{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;color:var(--mut)}.lg b{color:var(--ink)}.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px}
+.sw{display:flex;gap:6px;flex-wrap:wrap}.sw button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:6px 14px;border-radius:99px;font:500 13.5px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:40px}.sw button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.list{display:flex;flex-direction:column;gap:8px}
+.p{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:6px}
+.p .top{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}.p .top b{font-size:15px;display:block}.p .top span{font-size:12.5px;color:var(--mut)}
+.chips{display:flex;gap:5px;flex-wrap:wrap}
+.c{border-radius:99px;padding:2px 9px;font-size:12px;font-weight:600;white-space:nowrap}
+.c.in{background:var(--fgl);color:var(--fg)}.c.al{background:var(--orl);color:var(--or)}.c.web{background:#eef0f4;color:#4a4f5c}.c.dv{background:transparent;border:1px solid var(--line);color:var(--mut);font-weight:500}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .c.web{background:#2a2d35;color:#b8bcc8}}
+.p small{color:var(--mut);font-size:12.5px}
+.rules{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:9px}
+.rules ul{margin:0;padding-left:18px;color:var(--mut);font-size:14px;line-height:1.5;display:flex;flex-direction:column;gap:6px}.rules li b{color:var(--ink)}
+</style>
+<div class="wrap">
+  <div class="note"><b>Mockup.</b> New Admin page under Usage. Names, emails and numbers are examples.</div>
+  <h2>App installs</h2>
+  <p class="mut">Who has opened Jobfile from the Home Screen, and who has alerts on. Counts start the day this goes live.</p>
+  <div class="tiles">
+    <div class="t g"><b>12</b><span>Opened as an installed app</span></div>
+    <div class="t"><b>9</b><span>Have phone alerts on</span></div>
+    <div class="t"><b>40</b><span>Web only (never installed)</span></div>
+    <div class="t"><b>23%</b><span>Of active people installed</span></div>
+  </div>
+  <div class="bar">
+    <h3>Last 30 days</h3>
+    <div class="tr" role="img" aria-label="12 installed, 40 web only"><i style="width:23%;background:var(--fg)"></i><i style="width:77%;background:var(--line)"></i></div>
+    <div class="lg"><span><i class="dot" style="background:var(--fg)"></i><b>12</b> installed</span><span><i class="dot" style="background:var(--line)"></i><b>40</b> web only</span></div>
+  </div>
+  <div class="sw" role="group" aria-label="Filter">
+    <button type="button" data-f="all" aria-pressed="true">Everyone</button>
+    <button type="button" data-f="in" aria-pressed="false">Installed</button>
+    <button type="button" data-f="al" aria-pressed="false">Alerts on</button>
+    <button type="button" data-f="web" aria-pressed="false">Web only</button>
+  </div>
+  <div class="list" id="list"></div>
+  <div class="rules"><h3>How it works</h3><ul>
+    <li><b>Installed</b> means the person opened Jobfile from its Home Screen icon at least once. It is noted on each visit.</li>
+    <li><b>Alerts on</b> comes from the phones that turned alerts on. On iPhone that only works from the installed app.</li>
+    <li><b>Starts at launch.</b> Anyone who installed before this goes live shows as installed after their next visit.</li>
+    <li><b>Removing the icon</b> is not detectable, so "installed" means "has used it that way", not "still on the Home Screen".</li>
+    <li><b>Admins only.</b> Same access as the other Usage pages.</li>
+  </ul></div>
+</div>
+<script>
+var P=[
+['Maria G.','maria.g@example.com','Contractor','in','al','iPhone','Today'],
+['Jerry S.','jerry.s@example.com','Homeowner','in','al','iPhone','Yesterday'],
+['Luis R.','luis.r@example.com','Contractor','in','','Android','2 days ago'],
+['Dana W.','dana.w@example.com','Homeowner','web','','iPhone','Today'],
+['Chris T.','chris.t@example.com','Contractor','web','','Desktop','3 days ago'],
+['Ana P.','ana.p@example.com','Homeowner','in','al','Android','Today']];
+function draw(f){
+ var h='';P.filter(function(p){return f==='all'||(f==='in'&&p[3]==='in')||(f==='al'&&p[4]==='al')||(f==='web'&&p[3]==='web')}).forEach(function(p){
+  h+='<div class="p"><div class="top"><div><b>'+p[0]+'</b><span>'+p[1]+'</span></div><span>'+p[2]+'</span></div><div class="chips">'+
+  (p[3]==='in'?'<span class="c in">Installed</span>':'<span class="c web">Web only</span>')+(p[4]?'<span class="c al">Alerts on</span>':'')+'<span class="c dv">'+p[5]+'</span></div><small>Last seen '+p[6]+'</small></div>'});
+ document.getElementById('list').innerHTML=h||'<p class="mut">Nobody here yet.</p>';
+}
+document.querySelectorAll('.sw button').forEach(function(b){b.addEventListener('click',function(){
+ document.querySelectorAll('.sw button').forEach(function(x){x.setAttribute('aria-pressed',x===b)});draw(b.dataset.f)})});
+draw('all');
+</script>
