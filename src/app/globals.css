@@ -550,3 +550,8 @@ html { scroll-behavior: smooth; }
 .appmenu-sheet a.mi-new { margin: 2px 0; padding-top: 10px; padding-bottom: 10px; }
 .appmenu-sheet a > span:not(.mi-tag) { display: flex; flex-direction: column; gap: 2px; line-height: 1.25; min-width: 0; }
 .appmenu-sheet .mi-sub { white-space: nowrap; }
+/* Current page in the header menu is a quiet grey, so it never competes with the green Get the app row */
+.appmenu-sheet a[aria-current='page'] { background: #f1ede5; color: var(--ink); }
+@media (prefers-color-scheme: dark) { body .appmenu-sheet a[aria-current='page'] { background: var(--surface-2); } }
+.appmenu-sheet a.mi-new { margin: 10px 0 8px; }
+.apptabs-sheet a.mi-new { margin: 8px 0 6px; }
