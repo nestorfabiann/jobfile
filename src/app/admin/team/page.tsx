@@ -9,6 +9,19 @@ const DESC: Record<string, string> = {
   support: 'Help messages, and can look up users and projects. Read only.',
 };
 
+// [area, Moderator, Verifier, Support]
+const MATRIX: [string, string, string, string][] = [
+  ['Reviews and flags', '✓', '–', '–'],
+  ['Help messages', '✓', '–', '✓'],
+  ['Marketplace listings', '✓', '–', '–'],
+  ['Verification and insurance', '–', '✓', '–'],
+  ['Users and projects', '–', '–', 'view'],
+  ['Broadcast messages', '–', '–', '–'],
+  ['Usage and funnels', '–', '–', '–'],
+  ['Audit log', 'own', 'own', 'own'],
+  ['Admin team', '–', '–', '–'],
+];
+
 export default async function Team({ searchParams }: { searchParams: { saved?: string; removed?: string; error?: string } }) {
   const { db } = await requireAdmin(); // Owner only
   let rows: { id: string; email: string; name: string; role: string; added_by: string; created_at: string }[] = [];
@@ -84,8 +97,29 @@ export default async function Team({ searchParams }: { searchParams: { saved?: s
       </details>
 
       <div className="card">
-        <h2 style={{ fontSize: 18 }}>What each role can open</h2>
-        <p className="muted small" style={{ margin: 0 }}><b>Owner:</b> everything, including this page. <b>Moderator:</b> Reviews, Marketplace, Help. <b>Verifier:</b> Insurance. <b>Support:</b> Help, and Users and Projects without edit buttons or private conversations. Everyone can see their own entries in the Audit log. Pages a role cannot use are hidden from the menu and blocked if the address is typed in.</p>
+        <h2 style={{ fontSize: 18 }}>What each role can do</h2>
+        <div style={{ overflowX: 'auto' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
+            <thead>
+              <tr>
+                {['Area', 'Owner', 'Mod', 'Verifier', 'Support'].map((h, i) => (
+                  <th key={h} className="muted small" style={{ textAlign: i ? 'center' : 'left', padding: '8px 4px', borderBottom: '1px solid var(--line)', fontWeight: 700 }}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {MATRIX.map(([label, mod, ver, sup]) => (
+                <tr key={label}>
+                  <td style={{ padding: '9px 4px', borderBottom: '1px solid var(--line)' }}>{label}</td>
+                  {['✓', mod, ver, sup].map((v, i) => (
+                    <td key={i} style={{ textAlign: 'center', padding: '9px 4px', borderBottom: '1px solid var(--line)', color: v === '–' ? 'var(--line)' : 'var(--ok)', fontWeight: 700 }}>{v}</td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p className="muted small" style={{ margin: 0 }}>Pages a role cannot use are hidden from the menu and blocked if the address is typed in. Support sees Users and Projects without edit buttons or private conversations.</p>
       </div>
     </>
   );
