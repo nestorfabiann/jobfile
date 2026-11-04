@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { requireAnyAdmin, ROLE_AREAS, type Area } from '@/lib/admin';
+import { requireAnyAdmin, ROLE_AREAS, type AdminRole, type Area } from '@/lib/admin';
 
 // [link, label, area a team member needs]. Links with no area are Owner only.
 const LINKS: [string, string, Area | null][] = [
@@ -21,8 +21,10 @@ const LINKS: [string, string, Area | null][] = [
 ];
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  const { role } = await requireAnyAdmin();
-  const shown = LINKS.filter(([, , area]) => role === 'owner' || (area !== null && ROLE_AREAS[role].includes(area)));
+  const who = await requireAnyAdmin();
+  const role: AdminRole = who.role;
+  const allowed: Area[] = role === 'owner' ? [] : ROLE_AREAS[role];
+  const shown = LINKS.filter(([, , area]) => role === 'owner' || (area !== null && allowed.includes(area)));
   return (
     <div className="stack" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <nav className="row" aria-label="Admin">
