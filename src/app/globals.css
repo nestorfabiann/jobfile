@@ -417,3 +417,12 @@ html { scroll-behavior: smooth; }
 .hp-sheet > * { flex: none; }
 .hp-search { max-width: 100%; }
 .hp-chips { max-width: 100%; }
+
+.lm-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.lm-half { background: var(--surface); color: var(--ink); border-radius: 16px; padding: 12px; font-size: 12.5px; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.lm-half > div { display: flex; justify-content: space-between; gap: 6px; }
+.lm-half > div span { color: var(--ink-2); }
+.lm-who { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-2); }
+.lm-st5 { color: var(--accent); letter-spacing: 1px; }
+.lm-both { display: flex; gap: 12px; align-items: flex-start; background: var(--home-bg); border-radius: 18px; padding: 14px; font-size: 14.5px; line-height: 1.45; }
+.lm-both > span:first-child { width: 34px; height: 34px; border-radius: 10px; background: var(--surface); color: var(--home); display: grid; place-items: center; flex: none; }

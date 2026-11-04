@@ -80,8 +80,9 @@ const COPY = {
       ['A profile that wins bids', 'Your insurance badge, work photos and real ratings show on every bid you send.', 'shield', 'bid'],
       ['Jobs near you', 'Pick your trades and area. New matching projects come to you.', 'pin', 'pin'],
       ['AI price reference', 'See what a job should cost in the area before you bid, so your price is fair and competitive.', 'spark', 'price'],
+      ['Rate your homeowners too', 'Homeowners rate you. You rate them. Know who pays on time, decides fast and gives access before you take the job.', 'star', 'both'],
     ],
-    also: [['pay', 'Payments by milestone', 'Request each payment when the work is done. Jobfile records them. It does not hold or move your money.'], ['doc', 'Change orders you can bill', 'Extra work is approved with the price attached before you start it.'], ['star', 'Ratings you earn', 'Finish a job and the homeowner rates you. Good work builds a public record.'], ['cal', 'See the job first', 'Ask the homeowner for a visit before you price it.']],
+    also: [['pay', 'Payments by milestone', 'Request each payment when the work is done. Jobfile records them. It does not hold or move your money.'], ['doc', 'Change orders you can bill', 'Extra work is approved with the price attached before you start it.'], ['cal', 'See the job first', 'Ask the homeowner for a visit before you price it.']],
     fh: 'Ready to find your next job?',
   },
 } as const;
@@ -125,7 +126,15 @@ function Screen({ side, step }: { side: Side; step: number }): ReactNode {
     <div className="lm-mini"><b>CO-2 +$420</b><div className="lm-vm">Approved · own payment line</div></div></>);
 }
 
+const Both = () => (
+  <div className="lm-pair">
+    <div className="lm-half"><span className="lm-who">You get rated</span><span className="lm-st5" aria-label="5 stars">★★★★★</span><div><span>Quality</span><b>5.0</b></div><div><span>On time</span><b>4.8</b></div></div>
+    <div className="lm-half"><span className="lm-who">You rate them</span><span className="lm-st5" aria-label="4 stars">★★★★☆</span><div><span>Paid on time</span><b>5.0</b></div><div><span>Quick decisions</span><b>4.0</b></div></div>
+  </div>
+);
+
 function Visual({ k }: { k: string }) {
+  if (k === 'both') return <Both />;
   if (k === 'ins') return <BidCard name="Plano Pro Paint" sub="★ 4.8 (12) · work photos" />;
   if (k === 'bid') return <BidCard name="Nesty’s Painting" sub="★ 4.9 (12)" price="$5,008" />;
   if (k === 'pin') return <Radius />;
@@ -185,10 +194,17 @@ export default function LandingModern({ signedIn, nums, children }: { signedIn: 
         <div><Svg n="star" size={20} />Built for Texas</div>
       </section>
 
+      {side === 'ho' && (
+        <div className="lm-both" role="note">
+          <span aria-hidden="true"><Svg n="shield" size={20} /></span>
+          <span><b>Ratings go both ways.</b> You rate your contractor and they rate you, so both sides show up prepared and work gets done right.</span>
+        </div>
+      )}
+
       <section className="lm-bento" aria-label="What you get">
         <h2>{c.bh}</h2>
         {c.tiles.map(([t, d, ic, vis], i) => (
-          <div key={t} className={`lm-tile ${i === 0 ? 'big' : i === 1 ? 'or' : 'gr'}`}>
+          <div key={t} className={`lm-tile ${i === 0 || i === 3 ? 'big' : i === 1 ? 'or' : 'gr'}`}>
             <span className="lm-ti"><Svg n={ic} /></span>
             <b>{t}</b>
             <p>{d}</p>

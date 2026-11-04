@@ -4,7 +4,7 @@ import { supabaseAdmin } from '@/lib/supabase/server';
 import StarInput from '@/components/StarInput';
 import Stars from '@/components/Stars';
 import PendingButton from '@/components/PendingButton';
-import { catsFor, homeownerReviews, homeownerSummaryVisible, REVEAL_DAYS, revealedBy, summarize, type ReviewRow } from '@/lib/reviews';
+import { PRO_CATS, catsFor, homeownerReviews, homeownerSummaryVisible, REVEAL_DAYS, revealedBy, summarize, type ReviewRow } from '@/lib/reviews';
 import { replyToReview, submitReview } from './actions';
 import InviteCard from '@/components/InviteCard';
 
@@ -126,6 +126,12 @@ export default async function Rating({
         <div className="card">
           <b>Private summary: this homeowner&apos;s past projects</b>
           <div className="row"><span className="rvbig">{hs.avg.toFixed(1)}</span><div><Stars n={hs.avg} /><div className="muted small">{hs.count} past project{hs.count > 1 ? 's' : ''}</div></div></div>
+          {Object.entries(hs.cats).map(([k, v]) => (
+            <div className="row small" key={k} style={{ justifyContent: 'space-between' }}>
+              <span className="muted">{PRO_CATS[k as keyof typeof PRO_CATS] ?? k}</span>
+              <b>{v.toFixed(1)}</b>
+            </div>
+          ))}
           <p className="muted small">Only you, as a contractor on this project, see this summary. It shows scores only, never comments or other contractors&apos; names.</p>
         </div>
       )}

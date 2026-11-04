@@ -33,6 +33,8 @@ export const HELP: HelpItem[] = [
   { topic: 'projects', who: 'h', q: 'What is the homestead notice?', a: 'A Texas step for work on your homestead. Jobfile shows it on the Overview and Agreement tabs so you can complete it before work begins.' },
   { topic: 'trust', who: 'h', q: 'Who can see my address?', a: 'Your street address stays private until you hire a contractor. Bidders see only the general area.' },
   { topic: 'trust', who: 'both', q: 'What does Insured and verified mean?', a: 'The contractor has uploaded proof of insurance and it was checked. The badge shows the date it is good through.' },
+  { topic: 'trust', who: 'c', q: 'Can I rate the homeowner?', a: 'Yes. After you mark a job complete, you can rate the homeowner on communication, quick decisions, paying on time and site access. Ratings stay hidden until both sides rate or 14 days pass.' },
+  { topic: 'trust', who: 'h', q: 'Does the contractor rate me too?', a: 'Yes. Ratings go both ways. After a job is complete, the contractor rates you on communication, quick decisions, paying on time and site access. Both ratings stay hidden until you both rate or 14 days pass.' },
   { topic: 'trust', who: 'both', q: 'How do ratings work?', a: 'After a job is complete, the homeowner rates the contractor. Ratings build a public record for the contractor.' },
 ];
 
