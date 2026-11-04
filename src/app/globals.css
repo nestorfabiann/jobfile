@@ -252,3 +252,11 @@ details.startp[open] + .startp-hint { display: none; }
 .landing { display: flex; flex-direction: column; gap: 32px; }
 
 .appmenu-sheet button.menu-out { color: var(--bad); }
+
+/* New change order: an orange button that opens the form. */
+details.conew > summary { list-style: none; width: 100%; gap: 8px; }
+details.conew > summary::-webkit-details-marker { display: none; }
+details.conew > summary::before { content: "+"; font-size: 20px; font-weight: 500; line-height: 1; }
+details.conew[open] > summary::before { content: "\2013"; }
+.conew-hint { text-align: center; margin: 0; }
+details.conew[open] ~ .conew-hint { display: none; }

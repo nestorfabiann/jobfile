@@ -54,9 +54,10 @@ export default async function Changes({
       {!executed ? (
         <div className="box warn">Change orders open once both sides have signed the agreement. Until then, edit the agreement directly.</div>
       ) : (
-        <details className="card">
-          <summary>New change order</summary>
-          <form action={createChangeOrder} className="stack" style={{ marginTop: 10 }}>
+        <>
+        <details className="conew">
+          <summary className="btn accent">New change order</summary>
+          <form action={createChangeOrder} className="card stack" style={{ marginTop: 10 }}>
             <input type="hidden" name="project_id" value={project.id} />
             <label className="fld">Title<input name="title" required placeholder="Move range outlet" /></label>
             <label className="fld">
@@ -76,6 +77,8 @@ export default async function Changes({
             <div className="row"><button className="btn" type="submit">Send for approval</button></div>
           </form>
         </details>
+        <p className="muted small conew-hint">Extra work, new materials or a schedule change. The other side approves before it starts.</p>
+        </>
       )}
 
       {executed && changes.length === 0 && (
