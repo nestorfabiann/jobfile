@@ -44,6 +44,8 @@ export default async function ProjectLayout({
         </div>
       </div>
 
+      <ProjectTabs id={project.id} priceCheck={role === 'homeowner' && priceCheckEnabled()} rating={!!project.completed_at} money={role === 'contractor'} dots={dots} />
+
       {role === 'contractor' && !homeownerJoined && (
         <div className="box warn">
           {homeownerName} has not signed in yet. Messages and the agreement are also emailed to {project.homeowner_email} with a
@@ -52,14 +54,15 @@ export default async function ProjectLayout({
       )}
 
       {project.is_homestead && (
-        <div className="box warn">
-          <b>Homestead job.</b> Texas requires a written contract, signed by both spouses if the owner is married, before work or
-          materials start, and filed with the county clerk. Track these steps on the Agreement tab. Have a Texas construction
-          attorney review your contract.
-        </div>
+        <details className="box warn">
+          <summary style={{ cursor: 'pointer' }}><b>Homestead job.</b> Texas has extra contract rules. Tap to read them.</summary>
+          <p style={{ margin: '8px 0 0' }}>
+            Texas requires a written contract, signed by both spouses if the owner is married, before work or materials start, and
+            filed with the county clerk. Track these steps on the Agreement tab. Have a Texas construction attorney review your contract.
+          </p>
+        </details>
       )}
 
-      <ProjectTabs id={project.id} priceCheck={role === 'homeowner' && priceCheckEnabled()} rating={!!project.completed_at} money={role === 'contractor'} dots={dots} />
       {children}
     </>
   );

@@ -36,7 +36,7 @@ export default function ProjectTabs({ id, priceCheck = false, rating = false, mo
     ...(priceCheck ? [[`${base}/price-check`, 'Price check']] : []),
   ];
   return (
-    <nav className="ptabs" aria-label="Project sections">
+    <nav className="ptabs" aria-label="Project sections" style={{ gridTemplateColumns: `repeat(${tabs.length === 9 || tabs.length === 6 ? 3 : 4}, 1fr)` }}>
       {tabs.map(([href, label]) => {
         const active = href === base ? path === base : path === href || path.startsWith(`${href}/`);
         return (
