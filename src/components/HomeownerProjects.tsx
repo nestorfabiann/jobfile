@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import HomeScreenCard from '@/components/HomeScreenCard';
 import TradeIcon from '@/components/TradeIcon';
 import KitchenArt from '@/components/KitchenArt';
 import InviteCard from '@/components/InviteCard';
@@ -60,6 +61,7 @@ export default function HomeownerProjects(p: {
         <p className="muted small" style={{ margin: 0, textAlign: 'center' }}>Hired someone on your own? Add them here to keep the agreement, photos, payments and messages in one place. They do not need a Jobfile account yet.</p>
       </div>
 
+      {!first && <HomeScreenCard />}
       {p.error ? <div className="box bad">{p.error}</div> : null}
       {p.needsCard}
       {p.zipCard}

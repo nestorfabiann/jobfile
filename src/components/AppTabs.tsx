@@ -41,6 +41,7 @@ export default function AppTabs({ contractor, marketplace, waiting, admin, signO
     ['/settings', 'Settings', 'set'],
     ...(contractor ? ([['/settings/business', 'Business profile', 'biz']] as [string, string, string][]) : []),
     ['/invite', 'Invite friends', 'inv'],
+    ['/app', 'Add to Home Screen', 'app'],
     ['/help', 'Help and contact', 'help'],
     ...(admin ? ([['/admin', 'Admin', 'adm']] as [string, string, string][]) : []),
   ];

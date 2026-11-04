@@ -16,8 +16,11 @@ import { needsCount } from '@/lib/needsCount';
 export const metadata: Metadata = {
   title: 'Jobfile',
   description: 'A shared record for home improvement projects.',
+  applicationName: 'Jobfile',
+  icons: { icon: '/icons/icon-192.png', apple: '/icons/apple-touch-icon.png' },
+  appleWebApp: { capable: true, title: 'Jobfile', statusBarStyle: 'default' },
 };
-export const viewport: Viewport = { width: 'device-width', initialScale: 1 };
+export const viewport: Viewport = { width: 'device-width', initialScale: 1, themeColor: '#c4813f' };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const {
