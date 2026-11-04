@@ -231,20 +231,29 @@ export default function VisitCard({ visit: v, role, where: w }: { visit: Visit; 
 }
 
 /** Start a visit: a homeowner asks a bidder; a contractor proposes times; on a project either side can add one. */
-export function NewVisit({ role, where: w, again }: { role: Role; where: Where; again?: boolean }) {
+export function NewVisit({ role, where: w, again, noDetails }: { role: Role; where: Where; again?: boolean; noDetails?: boolean }) {
   if (w.scope === 'listing') {
     if (role !== 'contractor') return null;
     return (
-      <form action={askToSeeJob} className="stack">
+      <form action={askToSeeJob} style={{ background: 'var(--warn-bg)', border: '1.5px solid color-mix(in srgb, var(--accent) 35%, var(--surface))', borderRadius: 22, padding: 16, display: 'flex', flexDirection: 'column', gap: 10 }}>
         <Hidden w={w} />
+        <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+          <span aria-hidden="true" style={{ width: 44, height: 44, borderRadius: 13, background: 'var(--accent)', color: 'var(--accent-fg, #fff)', display: 'grid', placeItems: 'center', flex: 'none' }}>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="5" width="18" height="16" rx="3" /><path d="M3 10h18M8 3v4M16 3v4" /></svg>
+          </span>
+          <div style={{ minWidth: 0 }}>
+            <b style={{ fontSize: 17, lineHeight: 1.2, display: 'block' }}>Not sure what to charge? See the job first.</b>
+            <span className="muted small" style={{ display: 'block', marginTop: 4 }}>{noDetails ? 'The homeowner left the detail questions blank, so a visit can help you price it right.' : 'Answers help, but seeing the space is the surest way to a firm price.'}</span>
+          </div>
+        </div>
         <details>
-          <summary className="btn ghost" style={{ display: 'flex', justifyContent: 'center' }}>Ask to see the job first</summary>
+          <summary className="btn accent" style={{ display: 'flex', justifyContent: 'center' }}>Ask to see the job first</summary>
           <div className="stack" style={{ marginTop: 10 }}>
-            <span className="small">Want a firmer price? Ask the homeowner for a visit before you bid. They suggest times, you pick one. Their address stays private until they hire.</span>
             <label className="fld">Note (optional)<input name="note" placeholder="I want to check the ceiling height." maxLength={400} /></label>
             <div className="row"><button className="btn accent" type="submit">Send request</button></div>
           </div>
         </details>
+        <span className="muted small">The homeowner suggests times, you pick one. Their address stays private until they hire.</span>
       </form>
     );
   }

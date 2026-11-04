@@ -350,7 +350,7 @@ export default async function ListingPage({ params, searchParams }: { params: { 
           {open && (!myBid || myBid.status === 'withdrawn') && (
             <>
               {preRows.map((v) => <VisitCard key={v.id} visit={v} role="contractor" where={preWhere} />)}
-              {!preRows.some((v) => v.status !== 'done') && <NewVisit role="contractor" where={preWhere} />}
+              {!preRows.some((v) => v.status !== 'done') && <NewVisit role="contractor" where={preWhere} noDetails={rows.length === 0} />}
             </>
           )}
           {myBid && myBid.status === 'won' && l.project_id && <><div className="box ok">You won this job.</div><Link className="btn" href={`/projects/${l.project_id}/overview`}>Open the project</Link></>}
