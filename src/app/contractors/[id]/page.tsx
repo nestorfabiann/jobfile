@@ -6,6 +6,7 @@ import Stars from '@/components/Stars';
 import { companyReviews, HOME_CATS, summarize } from '@/lib/reviews';
 import { reportReview } from './actions';
 import { isAdminEmail } from '@/lib/admin';
+import { companyOutsideRatings } from '@/lib/googleRatings';
 import { fmtDate, INSURANCE_KINDS, isCurrent, signedUrls, type InsuranceKind } from '@/lib/companyProfile';
 
 export const dynamic = 'force-dynamic';
@@ -75,6 +76,7 @@ export default async function Profile({ params, searchParams }: { params: { id: 
     ['License or registration', c.license_note ? `${c.license_note} (stated by the contractor)` : ''],
   ].filter(([, v]) => !!v) as [string, string][];
   const reviews = await companyReviews(c.id);
+  const outside = await companyOutsideRatings(c.id);
   const s = summarize(reviews);
   const years = c.year_started ? new Date().getFullYear() - Number(c.year_started) : 0;
   const factLine = [s.count > 0 ? `★ ${s.avg.toFixed(1)} · ${s.count} review${s.count > 1 ? 's' : ''}` : '', years >= 1 ? `${years} year${years > 1 ? 's' : ''}` : ''].filter(Boolean).join(' · ');
@@ -168,6 +170,19 @@ export default async function Profile({ params, searchParams }: { params: { id: 
             ))}
           </div>
           <p className="muted small">Every review is from a homeowner who completed a project with this contractor on Jobfile.</p>
+        </div>
+      )}
+
+      {outside.length > 0 && (
+        <div className="card">
+          <h2 style={{ margin: 0 }}>Also rated elsewhere</h2>
+          {outside.map((o) => (
+            <div className="row" key={o.source} style={{ justifyContent: 'space-between' }}>
+              <div><b>Google</b> <span className="rvbig" style={{ fontSize: 22 }}>{o.rating.toFixed(1)}</span> <span className="muted small">{o.count} review{o.count > 1 ? 's' : ''}</span></div>
+              {o.url && <a className="small" href={o.url} target="_blank" rel="noopener noreferrer nofollow">See on Google</a>}
+            </div>
+          ))}
+          <p className="muted small">Linked by the contractor and shown as Google reports it. It is not part of the Jobfile score.</p>
         </div>
       )}
 

@@ -20,6 +20,7 @@ export default async function Verification({ searchParams }: { searchParams: { a
       <div className="row">
         <a className={`btn ${all ? 'ghost' : ''}`} href="/admin/verification">Pending</a>
         <a className={`btn ${all ? '' : 'ghost'}`} href="/admin/verification?all=1">All</a>
+        <a className="btn ghost" href="/admin/linked-ratings">Linked Google pages</a>
       </div>
       {(data ?? []).length === 0 && <div className="card"><p className="muted">{all ? 'No certificates yet.' : 'Nothing waiting for review.'}</p></div>}
       {(data ?? []).map((i: any) => (

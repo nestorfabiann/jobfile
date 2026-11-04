@@ -3,7 +3,8 @@ import { redirect } from 'next/navigation';
 import { myOwnedCompany, SERVICES, LANGUAGES, PAYMENTS, INSURANCE_KINDS, signedUrls, fmtDate, isCurrent, type InsuranceKind } from '@/lib/companyProfile';
 import { supabaseAdmin } from '@/lib/supabase/server';
 import { WorkPhotoUploader, InsuranceUploader } from '@/components/BusinessUploaders';
-import { saveBusinessProfile, deleteBusinessPhoto, removeInsurance } from './actions';
+import { saveBusinessProfile, deleteBusinessPhoto, removeInsurance, linkGoogleRating, unlinkGoogleRating } from './actions';
+import { googleConfigured } from '@/lib/googleRatings';
 import BusinessTabs from '@/components/BusinessTabs';
 import ProfileMeter from '@/components/ProfileMeter';
 import { profileMeter } from '@/lib/profileMeter';
@@ -29,6 +30,10 @@ export default async function Business({ searchParams }: { searchParams: { saved
   const has = (arr: string[] | null | undefined, v: string) => (arr ?? []).includes(v);
 
   const pm = await profileMeter(me.companyId);
+  let gr: any = null;
+  if (googleConfigured()) {
+    try { gr = (await db.from('company_ratings').select('*').eq('company_id', me.companyId).eq('source', 'google').maybeSingle()).data; } catch { gr = null; }
+  }
 
   return (
     <>
@@ -48,6 +53,30 @@ export default async function Business({ searchParams }: { searchParams: { saved
         <section className="card" aria-label="Availability">
           <h2 id="bp-availability" style={{ scrollMarginTop: 80 }}>Availability</h2>
           <AvailabilityForm company={c ?? {}} back="/settings/business" />
+        </section>
+      )}
+
+      {googleConfigured() && (
+        <section className="card" aria-label="Your ratings elsewhere">
+          <h2 id="bp-ratings" style={{ scrollMarginTop: 80 }}>Your ratings elsewhere</h2>
+          <p className="muted">Link your Google page. Homeowners see it next to your Jobfile score. It is never mixed into the Jobfile score.</p>
+          {gr ? (
+            <div className="stack">
+              <div className="row" style={{ justifyContent: 'space-between' }}>
+                <span><b>{gr.place_name}</b><br /><span className="muted small">{gr.place_address}</span></span>
+                <span className={`pill ${gr.status === 'approved' ? 'ok' : 'warn'}`}>{gr.status === 'approved' ? 'Showing' : 'Waiting for review'}</span>
+              </div>
+              {gr.status === 'approved' && gr.rating != null && <p className="muted small">Google shows {Number(gr.rating).toFixed(1)} from {gr.review_count} reviews. Updated daily.</p>}
+              {gr.status === 'pending' && <p className="muted small">The name or ZIP did not match your business, so an admin will look at it. It will show once approved.</p>}
+              <form action={unlinkGoogleRating}><button type="submit" className="btn ghost">Remove link</button></form>
+            </div>
+          ) : (
+            <form action={linkGoogleRating} className="stack">
+              <label className="fld">Google Maps link, or your business name and city<input name="google_link" maxLength={400} placeholder="https://maps.app.goo.gl/..." /></label>
+              <p className="muted small">In Google Maps, open your business, tap Share, and paste the link here.</p>
+              <button type="submit" className="btn">Link Google page</button>
+            </form>
+          )}
         </section>
       )}
 

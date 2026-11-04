@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 import { supabaseAdmin } from '@/lib/supabase/server';
 import { JOB_TYPES, marketplaceEnabled } from '@/lib/marketplace';
+import { findPlace, googleConfigured, sameBusiness, searchPhrase } from '@/lib/googleRatings';
 import { cleanUrl, instagramUrl, intOrNull, INSURANCE_KINDS, LANGUAGES, myOwnedCompany, PAYMENTS, pickFrom, SERVICES, type InsuranceKind } from '@/lib/companyProfile';
 
 const IMG: Record<string, string> = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' };
@@ -156,4 +157,45 @@ export async function removeInsurance(formData: FormData) {
   }
   revalidatePath('/settings/business');
   redirect('/settings/business?saved=1');
+}
+
+const BACK = '/settings/business';
+const oops = (m: string) => redirect(`${BACK}?error=${encodeURIComponent(m)}#bp-ratings`);
+
+/** Links a Google Business page. A matching name and ZIP goes live at once; anything else waits for an admin. */
+export async function linkGoogleRating(formData: FormData) {
+  const { companyId } = await owner();
+  if (!googleConfigured()) return oops('Google ratings are not turned on yet.');
+  const input = txt(formData, 'google_link', 400);
+  if (!input) return oops('Paste your Google Maps link or type your business name and city.');
+  const db = supabaseAdmin();
+  const { data: c } = await db.from('companies').select('name,business_zip').eq('id', companyId).single<any>();
+  const zip = String(c?.business_zip ?? '');
+  let place;
+  try {
+    const q = await searchPhrase(input, zip);
+    if (!q) return oops('We could not read that link. Open your business in Google Maps, tap Share, and paste that link.');
+    place = await findPlace(q);
+  } catch (e) {
+    if ((e as { digest?: string }).digest?.startsWith('NEXT_REDIRECT')) throw e;
+    return oops('Google did not answer. Try again in a moment.');
+  }
+  if (!place) return oops('We could not find that business on Google. Try typing the name and city instead.');
+  const match = sameBusiness(place.name, String(c?.name ?? '')) && (!zip || place.address.includes(zip));
+  const { error } = await db.from('company_ratings').upsert({
+    company_id: companyId, source: 'google', link: input, place_id: place.id, place_name: place.name, place_address: place.address, maps_url: place.url,
+    rating: place.rating, review_count: place.count, status: match ? 'approved' : 'pending', fetched_at: new Date().toISOString(),
+  });
+  if (error) return oops('Could not save the link. Try again.');
+  revalidatePath(BACK);
+  revalidatePath(`/contractors/${companyId}`);
+  redirect(`${BACK}?saved=1#bp-ratings`);
+}
+
+export async function unlinkGoogleRating() {
+  const { companyId } = await owner();
+  await supabaseAdmin().from('company_ratings').delete().eq('company_id', companyId).eq('source', 'google');
+  revalidatePath(BACK);
+  revalidatePath(`/contractors/${companyId}`);
+  redirect(`${BACK}?saved=1#bp-ratings`);
 }
