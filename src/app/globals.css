@@ -413,3 +413,7 @@ html { scroll-behavior: smooth; }
 .hp-q button[aria-expanded='true'] svg { transform: rotate(180deg); }
 .hp-q p { margin: 0 0 14px; font-size: 14px; line-height: 1.5; color: var(--ink-2); }
 @media (prefers-reduced-motion: reduce) { .hp-q button svg { transition: none; } }
+.hp-sheet, .hp-sheet * { box-sizing: border-box; }
+.hp-sheet > * { flex: none; }
+.hp-search { max-width: 100%; }
+.hp-chips { max-width: 100%; }
