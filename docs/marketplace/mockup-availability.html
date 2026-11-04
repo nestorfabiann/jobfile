@@ -1,0 +1,87 @@
+<title>Contractor Availability</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: one phone column. Tabs: Projects switch, Business profile, Homeowner sees. All names and dates are examples. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#cd7d2e;--orl:#f9efe4;--orb:#ecd4a8;--gr:#1f7a55;--grl:#d9f1e6;--am:#9a5b00;--aml:#fbeccd;--bl:#1d5fa8;--bll:#e0ecf8;--page:#e9e5dc;--star:#d88a1d}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--gr:#6fd1a3;--grl:#173a2c;--am:#f0b95a;--aml:#3a2e12;--bl:#8fbdf0;--bll:#17283d;--page:#0d0c0b;--star:#f0b95a;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--gr:#6fd1a3;--grl:#173a2c;--am:#f0b95a;--aml:#3a2e12;--bl:#8fbdf0;--bll:#17283d;--page:#0d0c0b;--star:#f0b95a;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:14px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:16px}
+h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;text-wrap:balance}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
+.mut{color:var(--mut);font-size:14px;line-height:1.5;margin:0}
+.sw{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.sw button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:8px 2px;border-radius:99px;font:500 12.5px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:44px}.sw button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.sec{display:flex;flex-direction:column;gap:16px}.sec[hidden]{display:none}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.pill{font-size:12px;font-weight:700;padding:4px 10px;border-radius:99px;white-space:nowrap}.pill.g{background:var(--grl);color:var(--gr)}.pill.a{background:var(--aml);color:var(--am)}.pill.n{background:var(--bg);color:var(--mut);border:1px solid var(--line);font-weight:500}.pill.b{background:var(--bll);color:var(--bl)}.pill.o{background:var(--orl);color:var(--or);border:1px solid var(--orb)}
+.opt{display:flex;gap:12px;align-items:flex-start;border:1.5px solid var(--line);border-radius:18px;padding:14px;background:var(--card)}
+.opt.on{border-color:var(--or);background:var(--orl)}
+.rd{width:22px;height:22px;border-radius:50%;border:2px solid var(--line);flex:none;margin-top:1px}.opt.on .rd{border-color:var(--or);background:radial-gradient(var(--or) 0 45%,transparent 50%)}
+.opt b{display:block;font-size:15.5px}.opt span{font-size:13px;color:var(--mut);line-height:1.45}
+.sel{border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:15px;background:var(--bg);display:flex;justify-content:space-between;margin-top:8px}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:99px;padding:8px 8px 8px 16px}
+.bar .dot{width:10px;height:10px;border-radius:50%;background:var(--gr);display:inline-block;margin-right:8px}
+.bar .dot.am{background:var(--am)}
+.bar button{border:0;border-radius:99px;background:var(--grl);color:var(--gr);font:700 13px 'IBM Plex Sans',sans-serif;padding:0 14px;min-height:40px}
+.bar button.am{background:var(--aml);color:var(--am)}
+.top{display:flex;gap:12px;align-items:center}
+.logo{width:56px;height:56px;border-radius:16px;flex:none;display:grid;place-items:center;font:800 20px 'Bricolage Grotesque',sans-serif;color:#fff}
+.nm{min-width:0;flex:1}.nm b{font:700 17px 'Bricolage Grotesque',sans-serif;letter-spacing:-.02em;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.sub{font-size:13px;color:var(--mut);margin-top:2px}.sub .st{color:var(--star);font-weight:700}
+.mi{font-size:13px;color:var(--mut);flex:none;align-self:flex-start}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.btn{display:block;text-align:center;border:1px solid var(--line);color:var(--ink);border-radius:99px;padding:12px 18px;font:600 15px 'IBM Plex Sans',sans-serif;min-height:46px}.btn.pr{background:var(--or);border-color:var(--or);color:#fff}
+.kv{display:flex;justify-content:space-between;gap:10px;font-size:14.5px;padding:9px 0;border-bottom:1px solid var(--line)}.kv:last-child{border-bottom:0}
+.tg{width:44px;height:26px;border-radius:99px;background:var(--line);position:relative;flex:none}.tg::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff}.tg.on{background:var(--gr)}.tg.on::after{left:21px}
+</style>
+<div class="wrap">
+  <div class="note"><b>Mockup.</b> A contractor availability switch. Names and dates are examples.</div>
+  <div class="sw" id="sw"><button data-s="pr" class="on" type="button">Projects</button><button data-s="bp" type="button">Business profile</button><button data-s="ho" type="button">Homeowner sees</button></div>
+
+  <div id="pr" class="sec">
+    <h2 style="font-size:24px">Projects</h2>
+    <p class="mut">One tap on the Projects page, so it is easy to change.</p>
+    <div class="bar"><span><i class="dot"></i><b style="font-size:14.5px">Taking new jobs</b></span><button type="button">Change</button></div>
+    <p class="mut" style="font-size:12.5px">After you switch, the bar looks like this:</p>
+    <div class="bar"><span><i class="dot am"></i><b style="font-size:14.5px">Booked until Jan 15</b></span><button class="am" type="button">Change</button></div>
+    <div class="note" style="border-style:solid">A week before the date, Jobfile sends a reminder: "Your booked status ends Jan 15. Keep it, or start taking new jobs?" On the date it switches back by itself, so nobody stays hidden by accident.</div>
+  </div>
+
+  <div id="bp" class="sec" hidden>
+    <h2 style="font-size:24px">Availability</h2>
+    <div class="opt on"><i class="rd"></i><div><b>Taking new jobs</b><span>You show up in Find contractors and get alerts for new jobs that match.</span></div></div>
+    <div class="opt"><i class="rd"></i><div><b>Booked until a date</b><span>You stay visible with a "Booked until" tag. No new-job alerts. Switches back on its own.</span>
+      <div class="sel"><span>Until</span><b>Jan 15, 2027</b></div></div></div>
+    <div class="opt"><i class="rd"></i><div><b>Paused</b><span>Hidden from Find contractors, no alerts. Your current projects keep working.</span></div></div>
+    <div class="card"><h3 style="font-size:16px">Whatever you pick</h3>
+      <div class="kv"><span>Your active projects</span><b>Unchanged</b></div>
+      <div class="kv"><span>You can still bid on a job</span><b>Yes</b></div>
+      <div class="kv"><span>Homeowners can still open your profile</span><b>Yes, unless Paused</b></div>
+    </div>
+  </div>
+
+  <div id="ho" class="sec" hidden>
+    <h2 style="font-size:24px">Find contractors</h2>
+    <div class="card">
+      <div class="top"><div class="logo" style="background:#2f6f8f">NP</div>
+        <div class="nm"><b>Nesty's Painting <span class="pill g">✓ Verified</span></b><div class="sub"><span class="st">★ 5.0</span> (1 rating) · 12 yrs</div></div><span class="mi">10 mi</span></div>
+      <div class="chips"><span class="pill a">Booked until Jan 15</span><span class="pill b">Insured</span><span class="pill o">Painting</span></div>
+      <div class="btn">View profile</div>
+    </div>
+    <div class="card">
+      <div class="top"><div class="logo" style="background:#8a5a2b">GR</div>
+        <div class="nm"><b>Garcia Roofing <span class="pill g">✓ Verified</span></b><div class="sub"><span class="st">★ 4.8</span> (23 ratings) · 9 yrs</div></div><span class="mi">18 mi</span></div>
+      <div class="chips"><span class="pill g">Taking new jobs</span><span class="pill b">Insured</span><span class="pill o">Roofing</span></div>
+      <div class="btn pr">View profile</div>
+    </div>
+    <div class="note" style="border-style:solid">Contractors who are taking jobs sort first. Booked ones drop below them, with the date shown. Paused contractors do not appear.</div>
+  </div>
+</div>
+<script>
+var sw=document.getElementById('sw'),ids=['pr','bp','ho'];
+[].forEach.call(sw.children,function(b){b.onclick=function(){
+  [].forEach.call(sw.children,function(x){x.classList.toggle('on',x===b)});
+  ids.forEach(function(id){document.getElementById(id).hidden=id!==b.dataset.s});window.scrollTo(0,0)}});
+</script>
