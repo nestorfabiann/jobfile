@@ -1,0 +1,85 @@
+<title>Jobfile Help</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: one phone column. Switch between the help button on a page, the answers sheet (step 1) and the ask-a-question chat (step 2). Questions and answers are examples. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#c4813f;--orl:#f9efe4;--orb:#ecd4a8;--gr:#1f7a55;--grl:#d9f1e6;--am:#9a5b00;--aml:#fbeccd;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--gr:#6fd1a3;--grl:#173a2c;--am:#f0b95a;--aml:#3a2e12;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--gr:#6fd1a3;--grl:#173a2c;--am:#f0b95a;--aml:#3a2e12;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:14px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:16px}
+h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;text-wrap:balance}h2{font-size:26px}h3{font-size:19px}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
+.mut{color:var(--mut);font-size:13px;line-height:1.45;margin:0}
+.sw{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.sw button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:8px 4px;border-radius:99px;font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:44px}.sw button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.sec[hidden]{display:none}.sec{display:flex;flex-direction:column;gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:14px;display:flex;flex-direction:column;gap:8px}
+.pill{font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:99px;background:var(--orl);color:var(--or);border:1px solid var(--orb)}
+.screen{position:relative;border:1px solid var(--line);border-radius:26px;background:var(--bg);padding:14px;min-height:300px;display:flex;flex-direction:column;gap:10px;overflow:hidden}
+.fab{position:absolute;right:14px;bottom:14px;width:52px;height:52px;border-radius:50%;background:var(--or);color:#fff;display:grid;place-items:center;font:800 22px 'Bricolage Grotesque',sans-serif;box-shadow:0 8px 20px -6px rgba(0,0,0,.35)}
+.bub{position:absolute;right:74px;bottom:20px;background:var(--ink);color:var(--bg);border-radius:14px;padding:8px 11px;font-size:12.5px;max-width:150px}
+.ghost{height:14px;border-radius:7px;background:var(--line)}
+.srch{height:46px;border:1.5px solid var(--line);border-radius:99px;background:var(--card);display:flex;align-items:center;padding:0 16px;color:var(--mut);font-size:14.5px}
+.chips{display:flex;gap:8px;flex-wrap:wrap}.chip{border:1.5px solid var(--line);background:var(--card);border-radius:99px;padding:9px 14px;font:600 13.5px 'IBM Plex Sans',sans-serif;min-height:44px;display:flex;align-items:center}.chip.on{border-color:var(--or);background:var(--orl);color:var(--or)}
+.q{border-bottom:1px solid var(--line)}.q button{all:unset;box-sizing:border-box;width:100%;display:flex;justify-content:space-between;gap:12px;align-items:center;min-height:56px;padding:12px 2px;cursor:pointer;font-weight:600;font-size:15px}.q button:focus-visible{outline:2px solid var(--or)}
+.q p{margin:0 0 14px;font-size:14px;line-height:1.5;color:var(--mut)}
+.q svg{flex:none;transition:transform .2s}.q button[aria-expanded="true"] svg{transform:rotate(180deg)}
+.sheet{background:var(--card);border:1px solid var(--line);border-radius:26px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.grab{width:40px;height:4px;border-radius:3px;background:var(--line);align-self:center}
+.hh{display:flex;justify-content:space-between;align-items:center}
+.msg{max-width:88%;padding:11px 14px;border-radius:18px;font-size:14.5px;line-height:1.5}.me{align-self:flex-end;background:var(--or);color:#fff;border-bottom-right-radius:6px}.ai{align-self:flex-start;background:var(--orl);border:1px solid var(--orb);border-bottom-left-radius:6px}
+.src{font-size:12px;color:var(--mut);margin-top:6px}
+.sug{display:flex;gap:8px;flex-wrap:wrap}.sug span{border:1.5px solid var(--line);border-radius:99px;padding:8px 12px;font-size:13px;background:var(--card);font-weight:500}
+.inp{display:flex;gap:8px}.inp div{flex:1;height:46px;border:1.5px solid var(--line);border-radius:99px;padding:0 16px;display:flex;align-items:center;color:var(--mut);font-size:14.5px;background:var(--bg)}.inp b{width:46px;height:46px;border-radius:50%;background:var(--or);color:#fff;display:grid;place-items:center}
+.btn{display:block;text-align:center;border:1.5px solid var(--line);border-radius:99px;padding:12px 16px;font:600 14.5px 'IBM Plex Sans',sans-serif;min-height:44px;background:transparent;color:var(--ink)}
+.warn{background:var(--aml);color:var(--am);border-radius:14px;padding:10px 12px;font-size:13px;line-height:1.45}
+</style>
+<div class="wrap">
+<h2>Jobfile Help</h2>
+<p class="note"><b>Two steps.</b> Step 1 is a help button with ready answers, free to run. Step 2 adds a question box that answers only from approved Jobfile help text. Everything below is example copy.</p>
+<div class="sw" role="group" aria-label="View"><button type="button" data-v="a" aria-pressed="true">The button</button><button type="button" data-v="b" aria-pressed="false">1 Answers</button><button type="button" data-v="c" aria-pressed="false">2 Ask</button></div>
+
+<section class="sec" data-s="a">
+<p class="mut">A round Help button floats at the bottom right of every page, above the tab bar. It shows a short hint the first time, then stays quiet.</p>
+<div class="screen"><h3>Projects</h3><div class="ghost" style="width:60%"></div><div class="card"><div class="ghost" style="width:70%"></div><div class="ghost" style="width:40%"></div></div><div class="card"><div class="ghost" style="width:55%"></div><div class="ghost" style="width:80%"></div></div><div class="bub">Questions? Tap here.</div><div class="fab" aria-label="Help">?</div></div>
+</section>
+
+<section class="sec" data-s="b" hidden>
+<div class="sheet">
+<div class="grab"></div>
+<div class="hh"><h3>How can we help?</h3><span class="pill">Contractor</span></div>
+<div class="srch">Search help</div>
+<div class="chips"><span class="chip on">On this page</span><span class="chip">Bidding</span><span class="chip">Payments</span><span class="chip">Visits</span></div>
+<div id="faq">
+<div class="q"><button type="button" aria-expanded="false"><span>Does Jobfile hold or move my money?</span><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button><p hidden>No. Jobfile records payments between you and the homeowner. You are paid directly the way you agreed.</p></div>
+<div class="q"><button type="button" aria-expanded="false"><span>How do I request a milestone payment?</span><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button><p hidden>Open the project, go to Payments, and tap Request on the next milestone. The homeowner confirms when they have paid.</p></div>
+<div class="q"><button type="button" aria-expanded="false"><span>Can I see the job before I bid?</span><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button><p hidden>Yes, if the homeowner allows visits. Tap "See the job first" on the project and suggest times.</p></div>
+<div class="q"><button type="button" aria-expanded="false"><span>What is a change order?</span><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button><p hidden>Extra work with a price. The homeowner approves it before you start, and it gets its own payment line.</p></div>
+</div>
+<div class="btn">Can't find it? Ask a question →</div>
+</div>
+</section>
+
+<section class="sec" data-s="c" hidden>
+<div class="sheet">
+<div class="grab"></div>
+<div class="hh"><h3>Ask Jobfile</h3><span class="pill">Contractor</span></div>
+<div class="msg ai">Hi. I can answer questions about how Jobfile works. Ask me anything about bids, visits, payments or projects.</div>
+<div class="msg me">Do I pay anything when I win a job?</div>
+<div class="msg ai">No. Jobfile is free to use and takes nothing from jobs you win.<div class="src">From: Pricing and fees</div></div>
+<div class="msg me">What if the homeowner doesn't pay?</div>
+<div class="msg ai">Jobfile records payments but does not collect or guarantee them, so I can't promise a payout. For money disputes, talk to the homeowner first or check with a lawyer.<div class="src">From: Payments by milestone</div></div>
+<div class="warn">Answers come from Jobfile's help pages and can be wrong. Do not rely on them for legal or tax decisions.</div>
+<div class="sug"><span>How do bids work?</span><span>How do I get rated?</span></div>
+<div class="inp"><div>Ask a question</div><b aria-hidden="true">↑</b></div>
+<div class="btn">Not what you need? Message support</div>
+<p class="mut">Limits: 15 questions per person per day, short answers, and a monthly spend cap. It never sees your project data.</p>
+</div>
+</section>
+</div>
+<script>
+var bs=document.querySelectorAll('.sw button'),ss=document.querySelectorAll('[data-s]');
+bs.forEach(function(b){b.onclick=function(){bs.forEach(function(x){x.setAttribute('aria-pressed',x===b)});ss.forEach(function(s){s.hidden=s.dataset.s!==b.dataset.v})}});
+document.querySelectorAll('.q button').forEach(function(b){b.onclick=function(){var o=b.getAttribute('aria-expanded')==='true';b.setAttribute('aria-expanded',!o);b.nextElementSibling.hidden=o}});
+</script>
