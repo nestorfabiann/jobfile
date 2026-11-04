@@ -75,12 +75,18 @@ export default function LandingPitch({ aiOn, signedIn }: { aiOn: boolean; signed
           <div className="card">
             <h3 style={{ margin: 0 }}>What a homeowner sees when you bid</h3>
             <div className="card" style={{ background: 'var(--bg)', gap: 6 }}>
-              <div className="row" style={{ justifyContent: 'space-between', flexWrap: 'nowrap' }}><b>Your Company Name</b><span className="muted small">★ 4.9 (12)</span></div>
-              <span className="pill ok" style={{ width: 'max-content' }}>✓ Insured to Mar 2027</span>
+              <div className="row" style={{ justifyContent: 'space-between', flexWrap: 'nowrap' }}>
+                <span className="row" style={{ flexWrap: 'nowrap', gap: 10, minWidth: 0 }}>
+                  <span aria-hidden="true" style={{ width: 40, height: 40, borderRadius: 12, flex: 'none', display: 'grid', placeItems: 'center', fontWeight: 800, fontSize: 17, background: 'var(--accent-soft, #f9efe4)', color: 'var(--accent)', border: '1px solid var(--line)' }}>Y</span>
+                  <b>Your Company Name</b>
+                </span>
+                <span className="muted small">★ 4.9 (12)</span>
+              </div>
+              <div className="row" style={{ gap: 6 }}><span className="pill ok">✓ Verified</span><span className="pill ok">✓ Insured to Mar 2027</span></div>
               <div style={{ fontSize: 24, fontWeight: 800 }}>$18,400</div>
               <div className="muted small">2 weeks · Starts Nov 12</div>
             </div>
-            <span className="muted small">Example bid card. Insurance and ratings come from your profile.</span>
+            <span className="muted small">Example bid card. Your logo, verified badge, insurance and ratings come from your profile.</span>
           </div>
           <Link className="btn" href={go}>Create your free contractor profile →</Link>
         </>
