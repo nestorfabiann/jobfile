@@ -260,3 +260,6 @@ details.conew > summary::before { content: "+"; font-size: 20px; font-weight: 50
 details.conew[open] > summary::before { content: "\2013"; }
 .conew-hint { text-align: center; margin: 0; }
 details.conew[open] ~ .conew-hint { display: none; }
+
+.ptabs a { position: relative; }
+.ptab-dot { position: absolute; top: 6px; right: 8px; width: 9px; height: 9px; border-radius: 50%; background: var(--bad); }

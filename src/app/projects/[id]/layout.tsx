@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { loadProject } from '@/lib/project';
 import ProjectTabs from '@/components/ProjectTabs';
 import { priceCheckEnabled } from '@/lib/pricecheck';
+import { addDays, todayChi } from '@/lib/schedule';
 
 export default async function ProjectLayout({
   children,
@@ -10,7 +11,19 @@ export default async function ProjectLayout({
   children: React.ReactNode;
   params: { id: string };
 }) {
-  const { project, role, contractorName, homeownerName, homeownerJoined } = await loadProject(params.id);
+  const { sb, project, role, contractorName, homeownerName, homeownerJoined } = await loadProject(params.id);
+
+  // A red dot on a tab means something there needs the homeowner: a choice due soon, or a date that moved.
+  const dots: string[] = [];
+  if (role === 'homeowner') {
+    const soon = addDays(todayChi(), 3);
+    const [{ count: due }, { count: moved }] = await Promise.all([
+      sb.from('selections').select('id', { count: 'exact', head: true }).eq('project_id', project.id).eq('status', 'open').lte('needed_by', soon),
+      sb.from('schedule_changes').select('id', { count: 'exact', head: true }).eq('project_id', project.id).is('homeowner_seen_at', null),
+    ]);
+    if ((due ?? 0) > 0) dots.push('Selections');
+    if ((moved ?? 0) > 0) dots.push('Schedule');
+  }
 
   return (
     <>
@@ -40,7 +53,7 @@ export default async function ProjectLayout({
         </div>
       )}
 
-      <ProjectTabs id={project.id} priceCheck={role === 'homeowner' && priceCheckEnabled()} rating={!!project.completed_at} money={role === 'contractor'} />
+      <ProjectTabs id={project.id} priceCheck={role === 'homeowner' && priceCheckEnabled()} rating={!!project.completed_at} money={role === 'contractor'} dots={dots} />
       {children}
     </>
   );

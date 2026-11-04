@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-export default function ProjectTabs({ id, priceCheck = false, rating = false, money = false }: { id: string; priceCheck?: boolean; rating?: boolean; money?: boolean }) {
+export default function ProjectTabs({ id, priceCheck = false, rating = false, money = false, dots = [] }: { id: string; priceCheck?: boolean; rating?: boolean; money?: boolean; dots?: string[] }) {
   const path = usePathname();
   const base = `/projects/${id}`;
   const tabs = [
@@ -27,6 +27,7 @@ export default function ProjectTabs({ id, priceCheck = false, rating = false, mo
         return (
           <Link key={href} href={href} aria-current={active ? 'page' : undefined}>
             {label}
+            {dots.includes(label) ? <span className="ptab-dot" aria-label="Needs you" /> : null}
           </Link>
         );
       })}
