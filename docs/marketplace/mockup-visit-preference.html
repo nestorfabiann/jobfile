@@ -1,0 +1,121 @@
+<title>Visit Preference</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: one phone column. Tabs: On a bid, Pick a time, Schedule, Access notes. Names, dates and times are examples. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#c4813f;--orl:#f9efe4;--orb:#ecd4a8;--gr:#1f7a55;--grl:#d9f1e6;--am:#9a5b00;--aml:#fbeccd;--bl:#1d5fa8;--bll:#e0ecf8;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--gr:#6fd1a3;--grl:#173a2c;--am:#f0b95a;--aml:#3a2e12;--bl:#8fbdf0;--bll:#17283d;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--gr:#6fd1a3;--grl:#173a2c;--am:#f0b95a;--aml:#3a2e12;--bl:#8fbdf0;--bll:#17283d;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:14px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:16px}
+h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;text-wrap:balance}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
+.mut{color:var(--mut);font-size:13px;line-height:1.45;margin:0}
+.sw{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}.sw button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:8px 4px;border-radius:99px;font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:44px}.sw button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.sec{display:flex;flex-direction:column;gap:14px}.sec[hidden]{display:none}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.btn{display:block;text-align:center;background:var(--or);color:#fff;border-radius:99px;padding:12px 16px;font:600 14.5px 'IBM Plex Sans',sans-serif;min-height:44px}.btn.gh{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+.pill{font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:99px;white-space:nowrap;background:var(--orl);color:var(--or);border:1px solid var(--orb)}.pill.g{background:var(--grl);color:var(--gr);border-color:transparent}.pill.a{background:var(--aml);color:var(--am);border-color:transparent}.pill.b{background:var(--bll);color:var(--bl);border-color:transparent}.pill.m{background:transparent;color:var(--mut);border-color:var(--line)}
+.nm{display:flex;gap:10px;align-items:center}.logo{width:38px;height:38px;border-radius:11px;background:var(--orl);color:var(--or);border:1px solid var(--orb);display:grid;place-items:center;font:800 15px 'Bricolage Grotesque',sans-serif;flex:none}
+.slot{display:flex;justify-content:space-between;align-items:center;gap:10px;border:1.5px solid var(--line);border-radius:16px;padding:12px 14px;font-size:14.5px;background:var(--card)}.slot b{display:block;font-size:15px}.slot.on{border-color:var(--or);background:var(--orl)}.slot .rd{width:20px;height:20px;border-radius:50%;border:2px solid var(--line);flex:none}.slot.on .rd{border-color:var(--or);background:radial-gradient(var(--or) 45%,transparent 50%)}
+.row{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--line)}.row:last-child{border-bottom:0}.row b{font-size:14.5px}.who{font-size:12.5px;color:var(--mut)}
+.ok{background:var(--grl);color:var(--gr);border-radius:14px;padding:11px 12px;font-size:13.5px;line-height:1.45}
+.warn{background:var(--aml);color:var(--am);border-radius:14px;padding:11px 12px;font-size:13.5px;line-height:1.45}
+.in{height:44px;border:1px solid var(--line);border-radius:14px;background:var(--bg);display:flex;align-items:center;padding:0 14px;color:var(--mut);font-size:14.5px}.in.v{color:var(--ink)}
+.fld{display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:600}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ico{width:34px;height:34px;border-radius:10px;background:var(--bll);color:var(--bl);display:grid;place-items:center;font-size:16px;flex:none}
+
+.chips{display:flex;gap:8px;flex-wrap:wrap}.chip{border:1.5px solid var(--line);background:var(--card);border-radius:99px;padding:9px 14px;font:600 13.5px 'IBM Plex Sans',sans-serif;min-height:44px;display:flex;align-items:center}.chip.on{border-color:var(--or);background:var(--orl);color:var(--or)}
+.days{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}.d{border:1.5px solid var(--line);border-radius:14px;padding:8px 0;text-align:center;font-size:12px;color:var(--mut);background:var(--card)}.d b{display:block;font-size:17px;color:var(--ink)}.d.on{border-color:var(--or);background:var(--orl)}.d.on b{color:var(--or)}
+.steps{display:flex;align-items:center;gap:0;font-size:11.5px;color:var(--mut)}.st{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;text-align:center}.dot{width:22px;height:22px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;font-size:11px;background:var(--card)}.st.done .dot{background:var(--gr);border-color:var(--gr);color:#fff}.st.now .dot{border-color:var(--or);color:var(--or)}.st.now{color:var(--ink);font-weight:700}.bar{height:2px;background:var(--line);flex:.5;margin-bottom:18px}.bar.done{background:var(--gr)}
+.big{font:800 30px 'Bricolage Grotesque',sans-serif;letter-spacing:-.03em;line-height:1}
+.hero{background:var(--orl);border:1px solid var(--orb);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:8px}
+.tl{display:flex;gap:10px;align-items:flex-start;font-size:13.5px}.tl i{width:10px;height:10px;border-radius:50%;background:var(--gr);margin-top:5px;flex:none;font-style:normal}.tl i.off{background:var(--line)}
+.pic{width:64px;height:64px;border-radius:12px;background:var(--line);display:grid;place-items:center;color:var(--mut);font-size:11px}
+
+.vcta{background:var(--orl);border:1.5px solid var(--orb);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.vcta .top{display:flex;gap:12px;align-items:flex-start}
+.vcta .cal{width:44px;height:44px;border-radius:13px;background:var(--or);color:#fff;display:grid;place-items:center;flex:none;font-size:20px}
+.vcta h3{font-size:17px;line-height:1.2}
+.opt{border:1px solid var(--line);border-radius:14px;padding:10px 12px;font-size:13px;color:var(--mut);background:var(--card)}
+.fakein{height:44px;border:1px solid var(--line);border-radius:14px;background:var(--card)}
+.lab{font-size:13px;font-weight:600}
+
+.vcta{background:var(--orl);border:1.5px solid var(--orb);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.vcta .top{display:flex;gap:12px;align-items:flex-start}
+.vcta .cal{width:44px;height:44px;border-radius:13px;background:var(--or);color:#fff;display:grid;place-items:center;flex:none;font-size:20px}
+.vcta h3{font-size:17px;line-height:1.2}
+.opts{display:flex;flex-direction:column;gap:8px}
+.opt{display:flex;gap:10px;align-items:center;border:1.5px solid var(--line);border-radius:16px;padding:12px 14px;background:var(--card);font-size:14.5px}.opt b{display:block}.opt .who{font-size:12.5px;color:var(--mut)}
+.opt.on{border-color:var(--or);background:var(--orl)}.rd{width:20px;height:20px;border-radius:50%;border:2px solid var(--line);flex:none}.opt.on .rd{border-color:var(--or);background:radial-gradient(var(--or) 45%,transparent 50%)}
+.chips{display:flex;gap:8px;flex-wrap:wrap}.chip{border:1.5px solid var(--line);background:var(--card);border-radius:99px;padding:9px 14px;font:600 13.5px 'IBM Plex Sans',sans-serif;min-height:44px;display:flex;align-items:center}.chip.on{border-color:var(--or);background:var(--orl);color:var(--or)}
+.fakein{height:44px;border:1px solid var(--line);border-radius:14px;background:var(--card)}
+.lab{font-size:13px;font-weight:600}
+.tag{display:flex;gap:8px;flex-wrap:wrap;align-items:center;background:var(--grl);color:var(--gr);border-radius:14px;padding:10px 12px;font-size:13.5px;line-height:1.4}
+</style>
+<div class="wrap">
+  <div class="note"><b>Mockup 4.</b> Visit preference when a homeowner posts a project, and what contractors see. Tap the tabs. Names and times are examples.</div>
+  <div class="sw" id="sw"><button data-s="a" class="on" type="button">Posting form</button><button data-s="b" type="button">Contractor sees (yes)</button><button data-s="c" type="button">Contractor sees (maybe)</button><button data-s="d" type="button">Contractor sees (no)</button></div>
+
+  <div id="a" class="sec">
+    <div class="card">
+      <h3 style="font-size:20px">Site visits</h3>
+      <p class="mut">Contractors often want to see the space before they price it. Tell them what works for you. Your address stays private until you hire.</p>
+      <div class="lab">Open to a visit before bids?</div>
+      <div class="opts">
+        <div class="opt on"><span class="rd"></span><div><b>Yes, happy to show the job</b><span class="who">Contractors can ask and you pick a time</span></div></div>
+        <div class="opt"><span class="rd"></span><div><b>Maybe, ask me first</b><span class="who">You approve each request</span></div></div>
+        <div class="opt"><span class="rd"></span><div><b>No, bids only</b><span class="who">You can still visit after you hire</span></div></div>
+      </div>
+      <div class="lab">When are you usually free?</div>
+      <div class="chips"><span class="chip on">Weekday evenings</span><span class="chip on">Saturdays</span><span class="chip">Weekday mornings</span><span class="chip">Sundays</span></div>
+      <a class="btn">Publish project</a>
+      <p class="mut">You can change this later on your project page.</p>
+    </div>
+  </div>
+
+  <div id="b" class="sec" hidden>
+    <div class="card"><h3 style="font-size:20px">Place a bid</h3>
+      <div class="tag"><b>✓ Open to visits</b> · Weekday evenings, Saturdays</div>
+      <div class="vcta">
+        <div class="top"><span class="cal">▦</span><div><h3>Not sure what to charge? See the job first.</h3><p class="mut" style="margin-top:4px">The homeowner is happy to show the job and is usually free weekday evenings and Saturdays.</p></div></div>
+        <a class="btn">Ask to see the job first</a>
+        <p class="mut">Pick from times that already work for them. Their address stays private until they hire.</p>
+      </div>
+      <div class="lab">Your price ($)</div><div class="fakein"></div>
+      <a class="btn gh">Send bid</a>
+    </div>
+    <div class="note" style="border-style:solid">The request goes in with the homeowner's free times already attached, so the contractor taps days that fit instead of guessing.</div>
+  </div>
+
+  <div id="c" class="sec" hidden>
+    <div class="card"><h3 style="font-size:20px">Place a bid</h3>
+      <div class="tag" style="background:var(--aml);color:var(--am)"><b>Visits by request</b> · Weekday evenings, Saturdays</div>
+      <div class="vcta">
+        <div class="top"><span class="cal">▦</span><div><h3>Not sure what to charge? See the job first.</h3><p class="mut" style="margin-top:4px">The homeowner wants to approve each visit request first.</p></div></div>
+        <a class="btn">Ask to see the job first</a>
+      </div>
+      <div class="lab">Your price ($)</div><div class="fakein"></div>
+      <a class="btn gh">Send bid</a>
+    </div>
+    <div class="card"><h3 style="font-size:16px">Homeowner's view</h3>
+      <div class="row" style="display:flex;justify-content:space-between;gap:10px"><div><b>Nesty's Painting</b><div class="who">asks to see the job</div></div><span class="pill a">Your turn</span></div>
+      <div style="display:flex;gap:8px"><a class="btn" style="flex:1">Approve</a><a class="btn gh" style="flex:1">Not now</a></div>
+      <p class="mut">Approve and you suggest times. Not now sends a polite note and the contractor can still bid.</p>
+    </div>
+  </div>
+
+  <div id="d" class="sec" hidden>
+    <div class="card"><h3 style="font-size:20px">Place a bid</h3>
+      <div class="tag" style="background:var(--card);color:var(--mut);border:1px solid var(--line)"><b>Bids only</b> · This homeowner is not taking visits before hiring</div>
+      <div class="lab">Your price ($)</div><div class="fakein"></div>
+      <a class="btn gh">Send bid</a>
+    </div>
+    <div class="note" style="border-style:solid">The Ask to see the job first card is hidden. After hiring, either side can still add a visit on the project Schedule.</div>
+  </div>
+</div>
+<script>
+document.querySelectorAll('#sw button').forEach(function(b){b.addEventListener('click',function(){document.querySelectorAll('#sw button').forEach(function(x){x.classList.remove('on')});b.classList.add('on');['a','b','c','d'].forEach(function(s){document.getElementById(s).hidden=s!==b.dataset.s})})});
+</script>
