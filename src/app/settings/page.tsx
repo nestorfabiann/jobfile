@@ -2,6 +2,7 @@ import { requireUser } from '@/lib/session';
 import Link from 'next/link';
 import { saveSettings } from './actions';
 import { myOwnedCompany } from '@/lib/companyProfile';
+import PushSettings from '@/components/PushAlerts';
 import { asLang, translateEnabled } from '@/lib/translate';
 
 export default async function Settings({ searchParams }: { searchParams: { saved?: string; error?: string } }) {
@@ -34,6 +35,8 @@ export default async function Settings({ searchParams }: { searchParams: { saved
           </div>
         </div>
       )}
+
+      <PushSettings />
 
       <form action={saveSettings} className="card">
         <h2>You</h2>

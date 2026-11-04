@@ -2,6 +2,7 @@ import { supabaseAdmin } from './supabase/server';
 import { alertHref } from '@/lib/alertPath';
 
 import { unsubLink } from '@/lib/unsub';
+import { sendPush } from '@/lib/push';
 const APP_URL = () => (process.env.APP_URL || 'http://localhost:3000').replace(/\/$/, '');
 
 const esc = (s: string) =>
@@ -131,6 +132,7 @@ export async function notifyUsers(a: Alert) {
         if (r.ok) update.sms_sent_at = new Date().toISOString();
         else if (r.error) errors.push(r.error);
       }
+      if (!quiet) await sendPush(p.id as string, { kind: a.kind, title: a.title, body: a.body, url: `/n/${row.id}` });
       if (errors.length) update.error = errors.join(' | ');
       if (Object.keys(update).length) await admin.from('notifications').update(update).eq('id', row.id);
     }),

@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import HomeScreenCard from '@/components/HomeScreenCard';
+import { PushCard } from '@/components/PushAlerts';
 import TradeIcon from '@/components/TradeIcon';
 import KitchenArt from '@/components/KitchenArt';
 import InviteCard from '@/components/InviteCard';
@@ -62,6 +63,7 @@ export default function HomeownerProjects(p: {
       </div>
 
       {!first && <HomeScreenCard />}
+      {!first && <PushCard />}
       {p.error ? <div className="box bad">{p.error}</div> : null}
       {p.needsCard}
       {p.zipCard}

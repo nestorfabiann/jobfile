@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import HomeScreenCard from '@/components/HomeScreenCard';
+import { PushCard } from '@/components/PushAlerts';
 import KitchenArt from '@/components/KitchenArt';
 import StartProjectForm from '@/components/StartProjectForm';
 import InviteCard from '@/components/InviteCard';
@@ -95,6 +96,7 @@ export default function ContractorProjects(p: {
       )}
 
       {!first && <HomeScreenCard />}
+      {!first && <PushCard />}
       {p.error ? <div className="box bad">{p.error}</div> : null}
       {p.needsCard}
       {p.invites}
