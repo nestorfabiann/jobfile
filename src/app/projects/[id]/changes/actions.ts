@@ -98,7 +98,13 @@ export async function decideChange(formData: FormData) {
     senderRole: role,
     kind: 'change',
     title: (n) => `CO-${co.number} was ${finalStatus} on ${n}`,
-    body: `${co.title} (${signedDollars(co.cost_cents as number)}) was ${finalStatus}.`,
+    body: `${co.title} (${signedDollars(co.cost_cents as number)}) was ${finalStatus}.${
+      finalStatus === 'approved'
+        ? ` ${role === 'homeowner' ? ((co.cost_cents as number) > 0 ? 'You can start the work. Request payment from the Payments tab when it is done.' : 'You can start the work.') : ''}`
+        : finalStatus === 'declined'
+          ? ` ${role === 'homeowner' ? 'You can message your customer, or send a revised change order.' : 'You can message your contractor, or send a revised change order.'}`
+          : ''
+    }`.trim(),
   });
 
   revalidatePath(page(project.id));
