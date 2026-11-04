@@ -58,7 +58,11 @@ export default async function Business({ searchParams }: { searchParams: { saved
 
       {googleConfigured() && (
         <section className="card" aria-label="Your ratings elsewhere">
-          <h2 id="bp-ratings" style={{ scrollMarginTop: 80 }}>Bring your Google reviews with you</h2>
+          <div className="row" style={{ justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'nowrap' }}>
+            <h2 id="bp-ratings" style={{ scrollMarginTop: 80, margin: 0 }}>Bring your Google reviews with you</h2>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img className="rt2-logo" src="/brand/google-maps.png" alt="Google Maps" width={64} height={57} style={{ width: 64, flex: 'none', margin: 0 }} />
+          </div>
           <p className="muted">Homeowners see your Google rating right beside your Jobfile score, on your profile and on your bids. It is never mixed into the Jobfile score.</p>
           {gr ? (
             <div className="stack">
@@ -67,6 +71,7 @@ export default async function Business({ searchParams }: { searchParams: { saved
                 <span className={`pill ${gr.status === 'approved' ? 'ok' : 'warn'}`}>{gr.status === 'approved' ? 'Showing' : 'Waiting for review'}</span>
               </div>
               {gr.status === 'approved' && gr.rating != null && <p className="muted small">Google shows {Number(gr.rating).toFixed(1)} from {gr.review_count} reviews. Updated daily.</p>}
+              {gr.status === 'approved' && gr.rating != null && <p className="muted small" style={{ margin: 0 }}>Rating and reviews from Google Maps</p>}
               {gr.status === 'pending' && <p className="muted small">The name or ZIP did not match your business, so an admin will look at it. It will show once approved.</p>}
               <form action={unlinkGoogleRating}><button type="submit" className="btn ghost">Remove link</button></form>
             </div>
