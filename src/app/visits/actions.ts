@@ -46,7 +46,7 @@ async function context(formData: FormData) {
 
   // Before any bid: a contractor asks to see the job, and the homeowner answers.
   if (scope === 'listing') {
-    const { data: l } = await db.from('marketplace_listings').select('id,homeowner_id,status,job_type,title').eq('id', String(formData.get('listing_id') ?? '')).maybeSingle();
+    const { data: l } = await db.from('marketplace_listings').select('id,homeowner_id,status,job_type').eq('id', String(formData.get('listing_id') ?? '')).maybeSingle();
     if (!l) go(safeReturn, 'That project was not found.');
     const role: Role | null = l!.homeowner_id === user.id ? 'homeowner' : null;
     let asContractor = false;
