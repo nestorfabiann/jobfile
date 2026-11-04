@@ -9,6 +9,7 @@ import { fmtDate, INSURANCE_KINDS, isCurrent, signedUrls } from '@/lib/companyPr
 import { firstNameInitial, listingOpen, listingTitle, requireMarketplace, type Bid, type Listing } from '@/lib/marketplace';
 import RangeBar from '@/components/RangeBar';
 import AcceptBid from '@/components/AcceptBid';
+import ProgressStrip from '@/components/ProgressStrip';
 import BidCompare, { type CompareCol } from '@/components/BidCompare';
 import CompareBar from '@/components/CompareBar';
 import InsuranceBadge from '@/components/InsuranceBadge';
@@ -106,6 +107,13 @@ export default async function ListingPage({ params, searchParams }: { params: { 
   const compareBids = owner ? visible.filter((b) => wanted.includes(b.id)) : [];
   const cmpIds = new Set(compareBids.map((b) => b.id));
   if (compareBids.length >= 2) await recordCompared(db, compareBids.map((b) => b.id));
+  const waitingN = visible.filter((b) => b.status === 'waiting').length;
+  const strip = !owner ? null
+    : l.status === 'awarded' ? { now: l.project_id ? 4 : 3, title: l.project_id ? 'Hired. Your project has started.' : 'Hired.', text: l.project_id ? 'Everything now happens in your shared project: messages, agreement, photos and payments.' : 'Your contractor has been chosen.', action: l.project_id ? { href: `/projects/${l.project_id}`, label: 'Open your project' } : undefined }
+    : !open ? null
+    : waitingN === 0 ? { now: 1, title: 'Next: wait for bids, or add photos.', text: 'No bids yet. Most bids arrive within 2 days. Photos and a budget range help contractors price it.' }
+    : waitingN === 1 ? { now: 1, title: 'Next: wait for more bids, or message this contractor.', text: '1 contractor has bid. Having 2 or 3 lets you compare side by side.' }
+    : { now: 2, title: `Next: compare your ${waitingN} bids.`, text: 'Tick Compare on up to 3 bids to see price, time, rating and insurance side by side. When you are ready, accept one to hire.' };
   const rows = answerRows(l.job_type, l.answers);
   const pctDetail = detailPercent(l.job_type, l.answers);
   const hasAI = l.ai_low_cents != null && l.ai_high_cents != null;
@@ -123,6 +131,7 @@ export default async function ListingPage({ params, searchParams }: { params: { 
         </div>
         <p className="muted small">{[l.city, `ZIP ${l.zip}`, l.size_sqft ? `${l.size_sqft.toLocaleString('en-US')} sq ft` : '', `Posted ${when(l.created_at)}`, owner ? '' : `by ${firstNameInitial(l.homeowner_name)}`].filter(Boolean).join(' · ')}</p>
       </div>
+      {strip && <ProgressStrip {...strip} />}
       {searchParams.posted && told > 0 ? <div className="box ok"><b>Your project is posted.</b> We told {told} contractor{told === 1 ? '' : 's'} within {DEFAULT_RADIUS} miles of {l.zip} who do {l.job_type.toLowerCase()}. Add photos below to help them price it.</div> : null}
       {searchParams.posted && told === 0 ? (
         <div className="box warn">
@@ -227,6 +236,7 @@ export default async function ListingPage({ params, searchParams }: { params: { 
           {compareBids.length >= 2 && (
             <BidCompare
               backHref={`/marketplace/${l.id}`}
+              aiRange={hasAI ? { lo: l.ai_low_cents as number, hi: l.ai_high_cents as number, likely: l.ai_likely_cents ?? null } : null}
               cols={compareBids.map((b): CompareCol => {
                 const c = info.get(b.company_id);
                 return {
@@ -236,6 +246,7 @@ export default async function ListingPage({ params, searchParams }: { params: { 
                   rating: c && c.count > 0 ? { avg: c.avg, count: c.count } : null,
                   insurance: c?.insured ? 'ok' : c?.pending ? 'wait' : 'none', until: c?.until ? fmtDate(c.until) : '',
                   inclusions: b.inclusions, canAccept: open && b.status === 'waiting', messageHref: `/marketplace/${l.id}?open=${b.id}#bid-${b.id}`,
+                  logo: c?.logo ?? '', verified: !!c?.verified, profileHref: `/contractors/${b.company_id}`,
                 };
               })}
             />
