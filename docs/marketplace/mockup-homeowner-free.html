@@ -1,0 +1,55 @@
+<title>Homeowner Free Pill</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: one phone column, Before / After switch. Wording is a draft. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#cd7d2e;--orb:#ecd4a8;--gr:#1f7a55;--grl:#d9f1e6;--page:#e9e5dc;--seg:#e4dfd6}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orb:#5a4426;--gr:#6fd1a3;--grl:#173a2c;--page:#0d0c0b;--seg:#35312c;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orb:#5a4426;--gr:#6fd1a3;--grl:#173a2c;--page:#0d0c0b;--seg:#35312c;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:14px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:16px}
+h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;text-wrap:balance}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
+.sw{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:var(--seg);border-radius:99px;padding:4px}.sw button{border:0;background:transparent;color:var(--mut);padding:8px;border-radius:99px;font:600 14.5px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:44px}.sw button.on{background:var(--card);color:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.15)}
+.sec{display:flex;flex-direction:column;gap:16px}.sec[hidden]{display:none}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.card.free{background:var(--grl);border-color:transparent}.card.free span{font-size:13.5px}
+.pill{font-size:12px;font-weight:700;padding:4px 10px;border-radius:99px;background:var(--grl);color:var(--gr);width:max-content}
+.btn{display:block;text-align:center;background:var(--or);color:#fff;border-radius:99px;padding:13px 18px;font:600 15px 'IBM Plex Sans',sans-serif;min-height:46px}
+.row{display:flex;gap:10px;align-items:flex-start}.row span.n{width:22px;height:22px;border-radius:50%;background:var(--grl);color:var(--gr);font-size:12px;font-weight:700;display:grid;place-items:center;flex:none}
+.row b{display:block;font-size:15px}.row small{color:var(--mut);font-size:13px}
+</style>
+<div class="wrap">
+  <div class="note"><b>Mockup.</b> Signed-out home page, "For homeowners" tab. Only the "Free" message moves.</div>
+  <div class="sw" id="sw"><button data-s="af" class="on" type="button">After</button><button data-s="bf" type="button">Before</button></div>
+
+  <div id="af" class="sec">
+    <h2 style="font-size:24px">One shared record that protects you both</h2>
+    <span class="pill">Free for homeowners</span>
+    <div class="card free"><h3>Free to post. No fees at all.</h3><span>It costs nothing to post a project, compare bids or run the job in Jobfile.</span></div>
+    <div class="card"><h3>How it works for homeowners</h3>
+      <div class="row"><span class="n">1</span><div><b>Post your project</b><small>Tap the work you want done, add photos, set a budget range and location in minutes.</small></div></div>
+      <div class="row"><span class="n">2</span><div><b>Compare bids</b><small>Local contractors send proposals. Review them side by side.</small></div></div>
+    </div>
+    <div class="card"><h3>Why homeowners use Jobfile</h3><small style="color:var(--mut)">(same five reasons as today)</small></div>
+    <a class="btn">Post a project, it's free →</a>
+  </div>
+
+  <div id="bf" class="sec" hidden>
+    <h2 style="font-size:24px">One shared record that protects you both</h2>
+    <div class="card"><h3>How it works for homeowners</h3>
+      <div class="row"><span class="n">1</span><div><b>Post your project</b><small>Tap the work you want done, add photos, set a budget range and location in minutes.</small></div></div>
+      <div class="row"><span class="n">2</span><div><b>Compare bids</b><small>Local contractors send proposals. Review them side by side.</small></div></div>
+    </div>
+    <div class="card"><h3>Why homeowners use Jobfile</h3><small style="color:var(--mut)">(same five reasons as today)</small></div>
+    <span class="pill">Free for homeowners</span>
+    <a class="btn">Post a project, it's free →</a>
+  </div>
+</div>
+<script>
+var sw=document.getElementById('sw');
+[].forEach.call(sw.children,function(b){b.onclick=function(){
+  [].forEach.call(sw.children,function(x){x.classList.toggle('on',x===b)});
+  ['af','bf'].forEach(function(id){document.getElementById(id).hidden=id!==b.dataset.s})}});
+</script>
