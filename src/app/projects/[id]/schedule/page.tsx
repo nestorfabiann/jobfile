@@ -1,6 +1,8 @@
 import { loadProject } from '@/lib/project';
 import { supabaseAdmin } from '@/lib/supabase/server';
 import { addDays, fmtDay, fmtRange, scheduleState, todayChi, type Phase } from '@/lib/schedule';
+import VisitCard, { NewVisit } from '@/components/VisitCard';
+import { chiDay, fmtWhen, type Visit } from '@/lib/visits';
 import { addPhase, changePhaseDates, deletePhase, makeStarter, setPhaseStatus } from './actions';
 
 const stamp = (iso: string) => new Date(iso).toLocaleDateString('en-US', { timeZone: 'America/Chicago', month: 'short', day: 'numeric' });
@@ -8,15 +10,17 @@ const stamp = (iso: string) => new Date(iso).toLocaleDateString('en-US', { timeZ
 export default async function Schedule({ params, searchParams }: { params: { id: string }; searchParams: { error?: string } }) {
   const { sb, project, role } = await loadProject(params.id);
   const today = todayChi();
-  const [{ data: phaseRows }, { data: chgRows }, { data: agr }, { data: selRows }] = await Promise.all([
+  const [{ data: phaseRows }, { data: chgRows }, { data: agr }, { data: selRows }, { data: visitData }] = await Promise.all([
     sb.from('project_phases').select('*').eq('project_id', project.id).order('position'),
     sb.from('schedule_changes').select('*').eq('project_id', project.id).order('created_at', { ascending: false }).limit(20),
     sb.from('agreements').select('start_date,end_date,executed_at').eq('project_id', project.id).maybeSingle(),
     sb.from('selections').select('id,title,needed_by,status').eq('project_id', project.id).eq('status', 'open'),
+    supabaseAdmin().from('visits').select('*').eq('project_id', project.id).neq('status', 'canceled').order('created_at'),
   ]);
   const phases = (phaseRows ?? []) as Phase[];
   const changes = (chgRows ?? []) as any[];
   const state = scheduleState(phases, today);
+  const visits = (visitData ?? []) as unknown as Visit[];
 
   // The homeowner has now seen the date changes.
   if (role === 'homeowner' && changes.some((c) => !c.homeowner_seen_at)) {
@@ -32,6 +36,11 @@ export default async function Schedule({ params, searchParams }: { params: { id:
   });
   ((selRows ?? []) as any[]).forEach((s) => {
     if (s.needed_by && s.needed_by <= week) soon.push({ key: `c${s.id}`, when: s.needed_by, day: s.needed_by < today ? 'Overdue' : fmtDay(s.needed_by), text: `Choose: ${s.title}`, who: 'Homeowner' });
+  });
+  visits.forEach((v) => {
+    if (v.status !== 'confirmed' || !v.scheduled_for) return;
+    const d = chiDay(v.scheduled_for);
+    if (d >= today && d <= week) soon.push({ key: `v${v.id}`, when: d, day: fmtWhen(v.scheduled_for), text: v.title, who: 'Both' });
   });
   soon.sort((a, b) => a.when.localeCompare(b.when));
 
@@ -105,6 +114,13 @@ export default async function Schedule({ params, searchParams }: { params: { id:
           ))}
         </div>
       )}
+
+      <div className="card stack">
+        <h2>Visits</h2>
+        {visits.length === 0 && <p className="muted small">No visits planned. Add one for a measure, an inspection or the final walkthrough.</p>}
+        {visits.map((v) => <VisitCard key={v.id} visit={v} role={role} where={{ scope: 'project', projectId: project.id, returnPath: `/projects/${project.id}/schedule` }} />)}
+        <NewVisit role={role} where={{ scope: 'project', projectId: project.id, returnPath: `/projects/${project.id}/schedule` }} />
+      </div>
 
       {soon.length > 0 && (
         <div className="card">

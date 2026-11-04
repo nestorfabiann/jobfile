@@ -434,6 +434,8 @@ export async function acceptBid(formData: FormData) {
   if (bid.note) await db.from('messages').insert({ project_id: project.id, sender_id: bid.bidder_id, sender_role: 'contractor', tag: null, body: `My bid note:\n\n${bid.note}`.slice(0, 4000) });
 
   await db.from('marketplace_listings').update({ project_id: project.id }).eq('id', l.id);
+  // Visits already arranged with the winner carry over to the new project's schedule.
+  await db.from('visits').update({ project_id: project.id }).eq('bid_id', bid.id).neq('status', 'canceled');
   await db.from('marketplace_bids').update({ status: 'won', updated_at: new Date().toISOString() }).eq('id', bid.id);
   const { data: lost } = await db.from('marketplace_bids').update({ status: 'not_selected', updated_at: new Date().toISOString() }).eq('listing_id', l.id).eq('status', 'waiting').select('bidder_id');
 

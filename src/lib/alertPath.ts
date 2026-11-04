@@ -10,6 +10,7 @@ const TAB: Record<string, string> = {
   schedule: '/schedule',
   selection: '/selections',
   document: '/documents',
+  visit: '/schedule',
 };
 
 export function alertHref(projectId: string | null | undefined, kind: string | null | undefined): string {

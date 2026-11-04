@@ -19,6 +19,8 @@ import BidViewNotice from '@/components/BidViewNotice';
 import { answerRows, detailPercent } from '@/lib/scopeQuestions';
 import { ackBidView, recordBidViews, recordCompared } from '@/lib/bidViews';
 import { acceptBid, closeListing, deleteListingPhoto, deleteListingVideo, extendListing, placeBid, withdrawBid } from '../actions';
+import VisitCard, { NewVisit } from '@/components/VisitCard';
+import type { Visit } from '@/lib/visits';
 import { countMatchingContractors, DEFAULT_RADIUS } from '@/lib/matching';
 
 export const dynamic = 'force-dynamic';
@@ -71,6 +73,14 @@ export default async function ListingPage({ params, searchParams }: { params: { 
   );
   const visible = owner ? allBids.filter((b) => b.status !== 'withdrawn') : [];
   const myBid = companyId ? allBids.find((b) => b.company_id === companyId) : undefined;
+  // Site visits on bids: the homeowner sees them for every bid, a contractor only for their own.
+  const visitBidIds = owner ? visible.map((b) => b.id) : myBid ? [myBid.id] : [];
+  const visitRows = visitBidIds.length ? (((await db.from('visits').select('*').in('bid_id', visitBidIds).neq('status', 'canceled')).data ?? []) as unknown as Visit[]) : [];
+  const visitFor = (bidId: string, role: 'homeowner' | 'contractor', bidOpen: boolean) => {
+    const v = visitRows.find((x) => x.bid_id === bidId);
+    const where = { scope: 'bid' as const, bidId, returnPath: `/marketplace/${l.id}?open=${bidId}#bid-${bidId}` };
+    return v ? <VisitCard visit={v} role={role} where={where} /> : open && bidOpen ? <NewVisit role={role} where={where} /> : null;
+  };
   // Viewed signals: the homeowner's visit is noted for the contractor; the contractor opening their bid clears the Needs you row.
   if (owner) await recordBidViews(db, visible as any[]);
   else if (myBid) await ackBidView(db, myBid as any);
@@ -290,6 +300,7 @@ export default async function ListingPage({ params, searchParams }: { params: { 
                 {b.inclusions ? <p className="small"><b>Included:</b> {b.inclusions}</p> : null}
                 {b.note ? <p className="small" style={{ whiteSpace: 'pre-wrap' }}>{b.note}</p> : null}
                 {thread(b.id, c?.name ?? 'the contractor', b.status === 'waiting')}
+                {visitFor(b.id, 'homeowner', b.status === 'waiting')}
                 {open && b.status === 'waiting' && (
                   <AcceptBid action={acceptBid} bidId={b.id} name={c?.name ?? 'this contractor'} price={dollars(b.price_cents)} />
                 )}
@@ -330,6 +341,7 @@ export default async function ListingPage({ params, searchParams }: { params: { 
             </form>
           ) : null}
           {myBid && myBid.status !== 'withdrawn' && thread(myBid.id, 'the homeowner', myBid.status === 'waiting')}
+          {myBid && myBid.status !== 'withdrawn' && visitFor(myBid.id, 'contractor', myBid.status === 'waiting')}
           {open && myBid && myBid.status === 'waiting' && (
             <form action={withdrawBid}><input type="hidden" name="listing_id" value={l.id} /><button className="btn ghost" type="submit">Withdraw my bid</button></form>
           )}

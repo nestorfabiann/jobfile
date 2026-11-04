@@ -67,5 +67,28 @@ export async function GET(req: Request) {
       sent++;
     } catch { /* keep going */ }
   }
+  // Confirmed visits in the next 36 hours: remind both sides once.
+  const { data: soonVisits } = await db.from('visits').select('*').eq('status', 'confirmed').is('remind_sent_at', null).gte('scheduled_for', new Date(now).toISOString()).lte('scheduled_for', new Date(now + 36 * 3600 * 1000).toISOString()).limit(200);
+  for (const v of (soonVisits ?? []) as any[]) {
+    try {
+      const when = new Date(v.scheduled_for).toLocaleString('en-US', { timeZone: 'America/Chicago', weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+      const title = `Reminder: ${v.title} ${when}`;
+      if (v.project_id) {
+        const zero = '00000000-0000-0000-0000-000000000000';
+        for (const r of ['homeowner', 'contractor'] as const) {
+          await notifyOtherSide({ projectId: v.project_id, senderId: zero, senderRole: r, kind: 'visit', title: () => title, body: 'Open the Schedule tab for access notes or to reschedule.' });
+        }
+      } else if (v.bid_id) {
+        const { data: bid } = await db.from('marketplace_bids').select('company_id,listing_id').eq('id', v.bid_id).maybeSingle();
+        const { data: lst } = bid ? await db.from('marketplace_listings').select('homeowner_id').eq('id', bid.listing_id).maybeSingle() : { data: null };
+        const { data: mem } = bid ? await db.from('company_members').select('user_id').eq('company_id', bid.company_id) : { data: [] };
+        const path = `/marketplace/${bid?.listing_id}?open=${v.bid_id}#bid-${v.bid_id}`;
+        const ids = [lst?.homeowner_id as string | undefined, ...((mem ?? []) as any[]).map((m) => m.user_id as string)].filter(Boolean) as string[];
+        if (ids.length) await notifyUsers({ userIds: ids, projectId: null, kind: 'visit', title, body: 'Open the bid to see the details or reschedule.', path, cta: 'Open bid' });
+      }
+      await db.from('visits').update({ remind_sent_at: new Date().toISOString() }).eq('id', v.id);
+      sent++;
+    } catch { /* keep going */ }
+  }
   return NextResponse.json({ ok: true, checked: (listings ?? []).length, sent });
 }

@@ -1,3 +1,5 @@
+import { supabaseAdmin } from '@/lib/supabase/server';
+import { visitTodo, type Visit } from '@/lib/visits';
 import Link from 'next/link';
 import { loadProject } from '@/lib/project';
 import ProjectTabs from '@/components/ProjectTabs';
@@ -24,6 +26,10 @@ export default async function ProjectLayout({
     if ((due ?? 0) > 0) dots.push('Selections');
     if ((moved ?? 0) > 0) dots.push('Schedule');
   }
+
+  // A visit waiting on this person (pick a time, or propose times) also lights up Schedule.
+  const { data: vrows } = await supabaseAdmin().from('visits').select('*').eq('project_id', project.id).in('status', ['requested', 'proposed']);
+  if (((vrows ?? []) as unknown as Visit[]).some((v) => visitTodo(v, role as 'homeowner' | 'contractor')) && !dots.includes('Schedule')) dots.push('Schedule');
 
   return (
     <>
