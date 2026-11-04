@@ -1,0 +1,60 @@
+<title>Completed Projects</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: one phone column. Contractor Projects page with a jump bar, ongoing card, and an always-visible Completed section with a summary. Names and amounts are examples. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#c4813f;--orl:#f9efe4;--orb:#ecd4a8;--gr:#1f7a55;--grl:#d9f1e6;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--gr:#6fd1a3;--grl:#173a2c;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--gr:#6fd1a3;--grl:#173a2c;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:14px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:16px}
+h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;text-wrap:balance}
+h2{font-size:26px}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
+.mut{color:var(--mut);font-size:13px;line-height:1.45;margin:0}
+.sw{display:grid;grid-template-columns:1fr 1fr;gap:6px}.sw button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:8px 4px;border-radius:99px;font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:44px}.sw button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.sec[hidden]{display:none}.sec{display:flex;flex-direction:column;gap:16px}
+.jump{display:flex;gap:8px;overflow-x:auto}.jump a{flex:none;border:1.5px solid var(--line);background:var(--card);color:var(--ink);text-decoration:none;border-radius:99px;padding:9px 14px;font:600 13.5px 'IBM Plex Sans',sans-serif;min-height:44px;display:flex;align-items:center;gap:6px}
+.jump a b{background:var(--orl);color:var(--or);border-radius:99px;padding:1px 8px;font-size:12px}
+.hd{display:flex;justify-content:space-between;align-items:baseline;gap:10px}.hd span{color:var(--mut);font-size:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.top{display:flex;gap:12px;align-items:center}.th{width:56px;height:56px;border-radius:14px;background:var(--orl);border:1px solid var(--orb);flex:none}.top b{font:700 16px 'Bricolage Grotesque',sans-serif;display:block}.who{font-size:13px;color:var(--mut)}
+.prog{height:8px;border-radius:5px;background:var(--line)}.prog i{display:block;height:100%;border-radius:5px;background:var(--or)}.prog.full i{background:var(--gr)}
+.pill{font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:99px;white-space:nowrap;background:var(--orl);color:var(--or);border:1px solid var(--orb)}.pill.g{background:var(--grl);color:var(--gr);border-color:transparent}
+.meta{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:13px;color:var(--mut)}
+.sum{display:grid;grid-template-columns:repeat(3,1fr);background:var(--grl);border-radius:20px;padding:14px 8px;text-align:center}
+.sum b{display:block;font:800 22px 'Bricolage Grotesque',sans-serif;letter-spacing:-.03em;color:var(--gr);font-variant-numeric:tabular-nums}.sum span{font-size:12px;color:var(--mut)}
+.stars{color:var(--or);letter-spacing:1px;font-size:13px}
+.empty{border:1.5px dashed var(--line);border-radius:22px;padding:20px 16px;display:flex;flex-direction:column;gap:6px;text-align:center;align-items:center;background:var(--card)}
+.empty .ic{width:44px;height:44px;border-radius:14px;background:var(--grl);color:var(--gr);display:grid;place-items:center}
+.btn{display:block;text-align:center;border:1.5px solid var(--line);color:var(--ink);border-radius:99px;padding:12px 16px;font:600 14.5px 'IBM Plex Sans',sans-serif;min-height:44px;background:transparent}
+</style>
+<div class="wrap">
+<h2>Completed projects</h2>
+<p class="note"><b>Contractor Projects page.</b> Completed is always there now, even before your first finished job. Tap the switch to see both states. Names and amounts are examples.</p>
+<div class="sw" role="group" aria-label="State"><button type="button" id="b1" aria-pressed="true">With finished jobs</button><button type="button" id="b2" aria-pressed="false">No finished jobs yet</button></div>
+
+<div class="jump" aria-label="Jump to"><a href="#ongoing">Ongoing <b>2</b></a><a href="#bids">Bids <b>2</b></a><a href="#done">Completed <b id="cnt">3</b></a></div>
+
+<section id="ongoing" class="sec"><div class="hd"><h2>Ongoing projects</h2><span>2</span></div>
+<div class="card"><div class="top"><div class="th"></div><div><b>Kitchen and walls painting</b><div class="who">Jerry still · 727 plano tx</div></div></div><div class="prog"><i style="width:18%"></i></div><div class="meta"><span class="pill g">Work in progress</span><span>$1,001.60 of $5,883 paid</span></div></div></section>
+
+<section id="bids" class="sec"><div class="hd"><h2>Your bids</h2><span>2 waiting</span></div><p class="mut">Bids list stays as it is today.</p></section>
+
+<section id="done" class="sec">
+<div class="hd"><h2>Completed projects</h2><span id="dn">3</span></div>
+<div id="full" class="sec">
+<div class="sum"><div><b>3</b><span>Jobs done</span></div><div><b>$14,200</b><span>Billed</span></div><div><b>4.9 ★</b><span>Avg rating</span></div></div>
+<div class="card"><div class="top"><div class="th"></div><div><b>Fence replacement</b><div class="who">Maria Lopez · Frisco</div></div></div><div class="prog full"><i style="width:100%"></i></div><div class="meta"><span class="pill g">Completed Oct 28</span><span>$4,800 paid in full</span></div><div class="stars" aria-label="5 stars">★★★★★ <span class="who">"On time and tidy."</span></div></div>
+<div class="card"><div class="top"><div class="th"></div><div><b>Bathroom paint</b><div class="who">Sam Ortiz · McKinney</div></div></div><div class="prog full"><i style="width:100%"></i></div><div class="meta"><span class="pill g">Completed Sep 14</span><span>$3,100 paid in full</span></div><div class="stars" aria-label="5 stars">★★★★★</div></div>
+<a class="btn" href="#done">See all completed</a>
+</div>
+<div id="none" class="empty" hidden><div class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4 10-10"/></svg></div><b>Nothing finished yet</b><p class="mut">Jobs you finish show here, with what you billed and the rating each homeowner gives you.</p></div>
+</section>
+</div>
+<script>
+var f=document.getElementById('full'),n=document.getElementById('none'),b1=document.getElementById('b1'),b2=document.getElementById('b2');
+function set(has){f.hidden=!has;n.hidden=has;b1.setAttribute('aria-pressed',has);b2.setAttribute('aria-pressed',!has);var c=has?'3':'0';document.getElementById('cnt').textContent=c;document.getElementById('dn').textContent=c}
+b1.onclick=function(){set(true)};b2.onclick=function(){set(false)};
+</script>
