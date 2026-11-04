@@ -12,6 +12,7 @@ export default function ProjectTabs({ id, priceCheck = false, rating = false, mo
     [`${base}/agreement`, 'Agreement'],
     [`${base}/photos`, 'Photos'],
     [`${base}/schedule`, 'Schedule'],
+    [`${base}/selections`, 'Selections'],
     [`${base}/changes`, 'Changes'],
     [`${base}/payments`, 'Payments'],
     ...(money ? [[`${base}/money`, 'My money']] : []),
