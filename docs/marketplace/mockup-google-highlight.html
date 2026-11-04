@@ -1,0 +1,116 @@
+<title>Google Rating Highlight</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: one phone column. Switch between the profile, a bid card, and the Business settings box. Names and numbers are examples. The dashed slot stands in for Google's official logo file. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#c4813f;--orl:#f9efe4;--orb:#ecd4a8;--fg:#1f4d3a;--fgl:#e4f0e8;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--fgl:#173a2c;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--fgl:#173a2c;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:14px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px}
+h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;text-wrap:balance}h2{font-size:28px;line-height:1.05}h3{font-size:18px}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
+.mut{color:var(--mut);font-size:14.5px;line-height:1.5;margin:0}
+.sw{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.sw button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:6px 4px;border-radius:99px;font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:44px}.sw button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.sec{display:flex;flex-direction:column;gap:14px}.sec[hidden]{display:none}
+.stage{display:flex;justify-content:center;padding:22px 0 8px;border-radius:30px;background:radial-gradient(120% 80% at 50% 0%,var(--orl),transparent 70%)}
+.ph{width:min(290px,80%);height:580px;background:#faf8f4;color:#1b1a18;border:7px solid #1b1a18;border-radius:36px;position:relative;overflow:hidden;box-shadow:0 22px 44px -18px rgba(27,26,24,.45);display:flex;flex-direction:column}
+.url{height:44px;background:#f3f1ec;display:flex;align-items:center;justify-content:center;font-size:11px;color:#6b655e;padding-top:10px;flex:none}
+.body{flex:1;padding:14px;display:flex;flex-direction:column;gap:9px;font-size:12px;line-height:1.45;overflow:hidden}
+.body h4{font:800 19px/1.05 'Bricolage Grotesque',sans-serif;letter-spacing:-.03em;margin:0}
+.body p{margin:0;color:#5c564f}
+.hd{display:flex;gap:10px;align-items:center}.av{width:46px;height:46px;border-radius:14px;background:#1f4d3a;color:#fff;font:800 18px 'Bricolage Grotesque',sans-serif;display:grid;place-items:center;flex:none}
+.vb{display:inline-block;background:#e4f0e8;color:#1f4d3a;font-weight:600;font-size:10.5px;border-radius:99px;padding:2px 8px;margin-top:3px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.sc{border-radius:16px;padding:11px;display:flex;flex-direction:column;gap:3px;min-height:112px}
+.sc b{font:800 30px 'Bricolage Grotesque',sans-serif;letter-spacing:-.03em;line-height:1}
+.sc .st{font-size:12px;letter-spacing:1px}.sc small{font-size:10.5px;line-height:1.3}
+.jf{background:#1f4d3a;color:#fff}.jf .st{color:#f3c98f}.jf small{opacity:.85}
+.gg{background:#fff;border:1.5px solid #ecd4a8}.gg .st{color:#c4813f}.gg small{color:#6b655e}
+.src{display:flex;align-items:center;gap:6px;font-size:10px;text-transform:uppercase;letter-spacing:.07em;font-weight:600}
+.slot{border:1.5px dashed #b9b2a7;border-radius:5px;padding:1px 5px;font-size:9px;text-transform:none;letter-spacing:0;color:#6b655e;font-weight:500}
+.sc a{color:#1d5fa8;font-size:10.5px;margin-top:auto}
+.trust{background:#f9efe4;border-radius:12px;padding:9px 10px;font-size:11.5px;color:#5c564f}.trust b{color:#1b1a18}
+.row{display:flex;justify-content:space-between;align-items:center;gap:8px;background:#fff;border:1px solid #e4dfd6;border-radius:12px;padding:8px 10px}
+.bid{background:#fff;border:1px solid #e4dfd6;border-radius:14px;padding:11px;display:flex;flex-direction:column;gap:7px}
+.bid .top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}.bid .top b{font-size:13px;display:block}
+.bid .price{font:800 18px 'Bricolage Grotesque',sans-serif}
+.chips{display:flex;gap:5px;flex-wrap:wrap}
+.chip{border-radius:99px;padding:3px 8px;font-size:10.5px;font-weight:600;white-space:nowrap}
+.cj{background:#e4f0e8;color:#1f4d3a}.cg{background:#f9efe4;color:#8a5a1a}.cv{background:#eef0f4;color:#4a4f5c}
+.btn{border:0;border-radius:12px;padding:10px;font:600 12.5px 'IBM Plex Sans',sans-serif;text-align:center;background:#1f4d3a;color:#fff}
+.fld{background:#fff;border:1px solid #e4dfd6;border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:6px}
+.inp{border:1px solid #d6d0c6;border-radius:9px;padding:8px 9px;font-size:11px;color:#8a8379;background:#faf8f4}
+.meter{background:#fff;border:1px solid #e4dfd6;border-radius:12px;padding:9px 10px}.bar{height:7px;border-radius:9px;background:#efe9de;margin:6px 0;overflow:hidden}.bar i{display:block;height:100%;width:72%;background:#c4813f}
+.todo{display:flex;justify-content:space-between;font-size:11px;padding:3px 0}.todo span:last-child{color:#c4813f;font-weight:600}
+.rules{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:9px}
+.rules ul{margin:0;padding-left:18px;color:var(--mut);font-size:14px;line-height:1.5;display:flex;flex-direction:column;gap:6px}.rules li b{color:var(--ink)}
+</style>
+<div class="wrap">
+  <div class="note"><b>Mockup.</b> Google rating given equal weight beside the Jobfile score. The dashed "logo" slot is where Google's official logo file goes. Names and numbers are examples.</div>
+  <h2>Two kinds of proof, side by side</h2>
+  <div class="sw" role="group" aria-label="Screen">
+    <button type="button" data-s="prof" aria-pressed="true">Profile</button>
+    <button type="button" data-s="bid" aria-pressed="false">Bid card</button>
+    <button type="button" data-s="set" aria-pressed="false">Settings</button>
+  </div>
+
+  <div class="sec" id="prof"><div class="stage"><div class="ph">
+    <div class="url">jobfile.com/pros/nestys-painting</div>
+    <div class="body">
+      <div class="hd"><div class="av">N</div><div><h4>Nesty's Painting</h4><span class="vb">Insurance verified</span></div></div>
+      <div class="two">
+        <div class="sc jf"><span class="src">On Jobfile</span><b>4.9</b><span class="st">★★★★★</span><small>14 finished projects, every one verified</small></div>
+        <div class="sc gg"><span class="src"><span class="slot">logo</span>Google Maps</span><b>4.8</b><span class="st">★★★★★</span><small>212 reviews</small><a>See on Google</a></div>
+      </div>
+      <div class="trust"><b>Proven twice.</b> Jobfile scores come from real projects here. The Google rating is linked by the contractor and shown as Google reports it.</div>
+      <p>Interior and exterior painting, cabinets, drywall repair. Family-owned, 10 years.</p>
+    </div>
+  </div></div>
+  <p class="mut">The Google card moves up beside the Jobfile score, same size and weight. The Jobfile card stays dark green because it is the verified one. A short line explains the difference.</p></div>
+
+  <div class="sec" id="bid" hidden><div class="stage"><div class="ph">
+    <div class="url">Bids on your project</div>
+    <div class="body">
+      <h4 style="font-size:17px">3 bids on Kitchen repaint</h4>
+      <div class="bid"><div class="top"><div><b>Nesty's Painting</b><span class="mut" style="font-size:11px">Dallas, 6 mi</span></div><span class="price">$2,850</span></div>
+        <div class="chips"><span class="chip cj">★ 4.9 Jobfile · 14</span><span class="chip cg">★ 4.8 Google · 212</span><span class="chip cv">Insured</span></div>
+        <div class="btn">See bid</div></div>
+      <div class="bid"><div class="top"><div><b>Lone Star Painting</b><span class="mut" style="font-size:11px">Plano, 14 mi</span></div><span class="price">$3,100</span></div>
+        <div class="chips"><span class="chip cj">★ 5.0 Jobfile · 2</span><span class="chip cg">★ 4.6 Google · 87</span></div>
+        <div class="btn">See bid</div></div>
+      <div class="bid"><div class="top"><div><b>Reyes Home Pros</b><span class="mut" style="font-size:11px">Garland, 9 mi</span></div><span class="price">$2,600</span></div>
+        <div class="chips"><span class="chip cv">New on Jobfile</span><span class="chip cg">★ 4.7 Google · 143</span></div>
+        <div class="btn">See bid</div></div>
+    </div>
+  </div></div>
+  <p class="mut">Where it helps most. A brand-new contractor still shows a trusted track record through Google, and homeowners compare bidders at a glance.</p></div>
+
+  <div class="sec" id="set" hidden><div class="stage"><div class="ph">
+    <div class="url">Settings · Business profile</div>
+    <div class="body">
+      <h4 style="font-size:17px">Bring your Google reviews with you</h4>
+      <p>Homeowners see your Google rating next to your Jobfile score. Contractors who link theirs get more bids opened.</p>
+      <div class="fld"><b style="font-size:12px">Google Maps link, or business name and city</b><div class="inp">https://maps.app.goo.gl/...</div><div class="btn">Link Google page</div></div>
+      <div class="meter"><b style="font-size:12px">Profile 72% complete</b><div class="bar"><i></i></div>
+        <div class="todo"><span>Insurance verified</span><span>Done</span></div>
+        <div class="todo"><span>Link your Google rating</span><span>+8%</span></div>
+        <div class="todo"><span>Add 3 more work photos</span><span>+6%</span></div></div>
+    </div>
+  </div></div>
+  <p class="mut">The link box gets a reason to exist, and "Link your Google rating" joins the profile completeness list.</p></div>
+
+  <div class="rules"><h3>Rules</h3><ul>
+    <li><b>Attribution stays.</b> Google's logo or "Google Maps" text goes on every place a Google rating shows.</li>
+    <li><b>Never blended.</b> The Jobfile score is separate, always.</li>
+    <li><b>Hidden when unlinked,</b> unapproved, or older than 30 days.</li>
+    <li><b>The "Contractors who link get more bids opened" line</b> only goes live if we can measure it. I will not ship a claim we cannot back up, so that sentence is a placeholder.</li>
+  </ul></div>
+</div>
+<script>
+document.querySelectorAll('.sw button').forEach(function(b){b.addEventListener('click',function(){
+  document.querySelectorAll('.sw button').forEach(function(x){x.setAttribute('aria-pressed',x===b)});
+  ['prof','bid','set'].forEach(function(id){document.getElementById(id).hidden=id!==b.dataset.s});
+})});
+</script>
