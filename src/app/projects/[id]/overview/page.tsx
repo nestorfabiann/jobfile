@@ -41,7 +41,9 @@ export default async function Overview({ params, searchParams }: { params: { id:
   const signed = new Set((sigRows ?? []).map((s) => s.role as string));
   const pms = ((msRows2 ?? []) as (Milestone & { pay_status: string })[]).map((m) => ({ ...m, pct: Number(m.pct) }));
   const dueAmts = milestoneAmounts(t.base, pms);
-  const sumBy = (st: string) => pms.reduce((s, m, i) => (m.pay_status === st ? s + dueAmts[i] : s), 0);
+  // Approved change orders that add cost are billed on their own lines, tracked like milestones.
+  const coBill = (cos as any[]).filter((c) => c.status === 'approved' && c.cost_cents > 0);
+  const sumBy = (st: string) => pms.reduce((s, m, i) => (m.pay_status === st ? s + dueAmts[i] : s), 0) + coBill.reduce((s, c) => ((c.pay_status ?? 'scheduled') === st ? s + c.cost_cents : s), 0);
   const confirmed = sumBy('confirmed');
   const pending = sumBy('paid');
   const photos = photoRows ?? [];
@@ -66,6 +68,10 @@ export default async function Overview({ params, searchParams }: { params: { id:
       todo.push({ text: `Payment requested: ${m.label} (${dollars(dueAmts[i])}).`, href: `${base}/payments` });
     if (role === 'contractor' && m.pay_status === 'paid')
       todo.push({ text: `Confirm you received ${dollars(dueAmts[i])} for ${m.label}.`, href: `${base}/payments` });
+  });
+  coBill.forEach((c) => {
+    if (role === 'homeowner' && c.pay_status === 'requested') todo.push({ text: `Payment requested: CO-${c.number} (${dollars(c.cost_cents)}).`, href: `${base}/payments` });
+    if (role === 'contractor' && c.pay_status === 'paid') todo.push({ text: `Confirm you received ${dollars(c.cost_cents)} for CO-${c.number}.`, href: `${base}/payments` });
   });
   if (role === 'contractor' && openFixes) todo.push({ text: `${openFixes} detail${openFixes === 1 ? '' : 's'} to fix.`, href: `${base}/photos` });
   if (role === 'homeowner' && awaitingConfirm)
@@ -93,7 +99,7 @@ export default async function Overview({ params, searchParams }: { params: { id:
     (signedUrls ?? []).forEach((s) => s.path && s.signedUrl && urls.set(s.path, s.signedUrl));
   }
 
-  const allPaid = pms.length === 0 || pms.every((m) => m.pay_status === 'confirmed');
+  const allPaid = (pms.length === 0 || pms.every((m) => m.pay_status === 'confirmed')) && coBill.every((c) => c.pay_status === 'confirmed');
   const checks = [
     { ok: allPaid, text: allPaid ? 'Final payment confirmed received' : 'Some payments are not confirmed yet' },
     { ok: openFixes === 0 && awaitingConfirm === 0, text: openFixes === 0 && awaitingConfirm === 0 ? 'No open punch-list items' : `${openFixes + awaitingConfirm} punch-list item${openFixes + awaitingConfirm === 1 ? '' : 's'} still open` },

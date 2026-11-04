@@ -28,7 +28,7 @@ export async function projectTasks(userId: string, projects: P[], myCompanyIds: 
     db.from('project_members').select('project_id,role').eq('user_id', userId).in('project_id', ids),
     db.from('agreements').select('project_id,sent_at,executed_at,updated_at').in('project_id', ids),
     db.from('agreement_signatures').select('project_id,role').in('project_id', ids),
-    db.from('change_orders').select('id,project_id,number,title,cost_cents,days,requested_role,status,created_at,decided_by,decided_at,description').in('project_id', ids),
+    db.from('change_orders').select('*').in('project_id', ids),
     db.from('agreement_milestones').select('id,project_id,position,label,pct,pay_status,requested_at,paid_at').in('project_id', ids).order('position'),
     db.from('agreement_items').select('id,project_id,position,title,description,kind,price_cents').in('project_id', ids),
   ]);
@@ -65,6 +65,12 @@ export async function projectTasks(userId: string, projects: P[], myCompanyIds: 
 
     // Payments: the homeowner pays a requested milestone; the contractor confirms one marked paid.
     const mine = (ms ?? []).filter((m: any) => m.project_id === p.id) as (Milestone & { pay_status: string; requested_at: string | null; paid_at: string | null })[];
+    // Approved change orders that add cost are billed on their own lines.
+    (cos ?? []).filter((c: any) => c.project_id === p.id && c.status === 'approved' && Number(c.cost_cents) > 0).forEach((c: any) => {
+      const amt = dollars(Number(c.cost_cents));
+      if (role === 'homeowner' && c.pay_status === 'requested') out.push({ key: `pay-co-${c.id}`, icon: 'pay', title: `Pay CO-${c.number} (${amt})`, sub: `${p.name} · requested by your contractor`, href: here('payment'), go: 'Open', at: c.requested_at ?? new Date().toISOString() });
+      if (role === 'contractor' && c.pay_status === 'paid') out.push({ key: `conf-co-${c.id}`, icon: 'pay', title: `Confirm payment received (${amt})`, sub: `${p.name} · CO-${c.number}`, href: here('payment'), go: 'Confirm', at: c.paid_at ?? new Date().toISOString() });
+    });
     if (mine.length) {
       const its = (items ?? []).filter((i: any) => i.project_id === p.id) as Item[];
       const chg = (cos ?? []).filter((c: any) => c.project_id === p.id) as ChangeOrder[];

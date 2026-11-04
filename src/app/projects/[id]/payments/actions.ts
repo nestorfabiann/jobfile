@@ -28,12 +28,19 @@ async function load(formData: FormData) {
     admin.from('agreement_milestones').select('*').eq('project_id', ctx.project.id).order('position'),
     admin.from('agreement_items').select('price_cents').eq('project_id', ctx.project.id),
   ]);
+  // A change order line has the same steps as a milestone. Its amount is the approved cost.
+  if (String(formData.get('kind') ?? '') === 'co') {
+    const { data: co } = await admin.from('change_orders').select('*').eq('id', id).eq('project_id', ctx.project.id).maybeSingle();
+    if (!co || co.status !== 'approved' || Number(co.cost_cents) <= 0) fail(ctx.project.id, 'That change order cannot be billed.');
+    const m = { id: co.id as string, label: `CO-${co.number}: ${co.title}`, pay_status: ((co.pay_status as string) ?? 'scheduled') as string };
+    return { ...ctx, admin, m, amount: Number(co.cost_cents), tbl: 'change_orders' as const };
+  }
   const list = ((ms ?? []) as (Milestone & { pay_status: string })[]).map((m) => ({ ...m, pct: Number(m.pct) }));
   const idx = list.findIndex((m) => m.id === id);
   if (idx === -1) fail(ctx.project.id, 'That milestone was not found.');
   const base = (items ?? []).reduce((s, i) => s + Number(i.price_cents), 0);
   const amount = milestoneAmounts(base, list)[idx];
-  return { ...ctx, admin, m: list[idx], amount };
+  return { ...ctx, admin, m: list[idx], amount, tbl: 'agreement_milestones' as const };
 }
 
 function done(projectId: string): never {
@@ -44,11 +51,11 @@ function done(projectId: string): never {
 
 /** Contractor asks for the next payment. */
 export async function requestPayment(formData: FormData) {
-  const { role, user, project, admin, m, amount } = await load(formData);
+  const { role, user, project, admin, m, amount, tbl } = await load(formData);
   if (role !== 'contractor') fail(project.id, 'Only the contractor can request a payment.');
   if (m.pay_status !== 'scheduled') fail(project.id, 'That payment was already requested.');
 
-  await admin.from('agreement_milestones').update({ pay_status: 'requested', requested_at: new Date().toISOString() }).eq('id', m.id);
+  await admin.from(tbl).update({ pay_status: 'requested', requested_at: new Date().toISOString() }).eq('id', m.id);
   await notifyOtherSide({
     projectId: project.id,
     senderId: user.id,
@@ -62,22 +69,22 @@ export async function requestPayment(formData: FormData) {
 
 /** Contractor takes a request back. */
 export async function cancelRequest(formData: FormData) {
-  const { role, project, admin, m } = await load(formData);
+  const { role, project, admin, m, tbl } = await load(formData);
   if (role !== 'contractor') fail(project.id, 'Only the contractor can cancel a request.');
   if (m.pay_status !== 'requested') fail(project.id, 'Nothing to cancel.');
-  await admin.from('agreement_milestones').update({ pay_status: 'scheduled', requested_at: null }).eq('id', m.id);
+  await admin.from(tbl).update({ pay_status: 'scheduled', requested_at: null }).eq('id', m.id);
   done(project.id);
 }
 
 /** Homeowner says they paid, and how. */
 export async function markPaid(formData: FormData) {
-  const { role, user, project, admin, m, amount } = await load(formData);
+  const { role, user, project, admin, m, amount, tbl } = await load(formData);
   if (role !== 'homeowner') fail(project.id, 'Only the homeowner marks a payment as paid.');
   if (m.pay_status !== 'requested') fail(project.id, 'The contractor has not requested this payment.');
   const method = METHODS.includes(String(formData.get('method'))) ? String(formData.get('method')) : 'other';
 
   await admin
-    .from('agreement_milestones')
+    .from(tbl)
     .update({ pay_status: 'paid', paid_at: new Date().toISOString(), paid_method: method })
     .eq('id', m.id);
   await notifyOtherSide({
@@ -93,13 +100,13 @@ export async function markPaid(formData: FormData) {
 
 /** Contractor confirms the money arrived, and whether a lien waiver was handed over. */
 export async function confirmReceived(formData: FormData) {
-  const { role, user, project, admin, m, amount } = await load(formData);
+  const { role, user, project, admin, m, amount, tbl } = await load(formData);
   if (role !== 'contractor') fail(project.id, 'Only the contractor confirms receipt.');
   if (m.pay_status !== 'paid') fail(project.id, 'This payment has not been marked paid.');
   const lien = formData.get('lien_waiver') === 'on';
 
   await admin
-    .from('agreement_milestones')
+    .from(tbl)
     .update({ pay_status: 'confirmed', confirmed_at: new Date().toISOString(), lien_waiver: lien })
     .eq('id', m.id);
   await notifyOtherSide({
@@ -115,8 +122,8 @@ export async function confirmReceived(formData: FormData) {
 
 /** Homeowner flags that a "paid" mark was a mistake, or contractor says money did not arrive. */
 export async function reopenPayment(formData: FormData) {
-  const { project, admin, m } = await load(formData);
+  const { project, admin, m, tbl } = await load(formData);
   if (m.pay_status !== 'paid') fail(project.id, 'Only a payment waiting for confirmation can be sent back.');
-  await admin.from('agreement_milestones').update({ pay_status: 'requested', paid_at: null, paid_method: null }).eq('id', m.id);
+  await admin.from(tbl).update({ pay_status: 'requested', paid_at: null, paid_method: null }).eq('id', m.id);
   done(project.id);
 }

@@ -22,7 +22,7 @@ export async function moneyFor(db: SupabaseClient, projectIds: string[]): Promis
   const [{ data: items }, { data: ms }, { data: cos }, { data: ex }] = await Promise.all([
     db.from('agreement_items').select('project_id,price_cents').in('project_id', projectIds),
     db.from('agreement_milestones').select('id,project_id,position,label,pct,pay_status').in('project_id', projectIds).order('position'),
-    db.from('change_orders').select('project_id,status,cost_cents,days').in('project_id', projectIds),
+    db.from('change_orders').select('*').in('project_id', projectIds),
     db.from('project_expenses').select('project_id,amount_cents,category').in('project_id', projectIds),
   ]);
   for (const id of projectIds) {
@@ -31,7 +31,8 @@ export async function moneyFor(db: SupabaseClient, projectIds: string[]): Promis
     const mine = (ms ?? []).filter((x: any) => x.project_id === id).map((x: any) => ({ ...x, pct: Number(x.pct) })) as unknown as (Milestone & { pay_status: string })[];
     const due = milestoneAmounts(t.base, mine);
     m.total = t.total;
-    m.received = mine.reduce((s, x, i) => (x.pay_status === 'confirmed' ? s + due[i] : s), 0);
+    m.received = mine.reduce((s, x, i) => (x.pay_status === 'confirmed' ? s + due[i] : s), 0)
+      + (cos ?? []).filter((c: any) => c.project_id === id && c.status === 'approved' && c.pay_status === 'confirmed' && Number(c.cost_cents) > 0).reduce((s: number, c: any) => s + Number(c.cost_cents), 0);
     (ex ?? []).filter((e: any) => e.project_id === id).forEach((e: any) => {
       const c: Cat = isCat(e.category) ? e.category : 'other';
       m.spent += Number(e.amount_cents);
