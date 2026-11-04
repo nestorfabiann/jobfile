@@ -100,6 +100,12 @@ export default async function Changes({
               <span className="muted">{daysText(c.days)}</span>
             </div>
             {c.decided_at ? <p className="muted small">{label} · {stamp(c.decided_at)}</p> : null}
+            {c.status === 'pending' && !mine && c.cost_cents > 0 && (
+              <div className="box ok"><b>If you approve:</b> this becomes its own payment line, CO-{c.number}: {c.title}, {dollars(c.cost_cents)}. The contract total goes up by {dollars(c.cost_cents)}. Nothing is due until the work is done and the contractor requests the payment.</div>
+            )}
+            {c.status === 'pending' && !mine && c.cost_cents < 0 && (
+              <div className="box ok"><b>If you approve:</b> this is a credit of {dollars(-c.cost_cents)}. The contract total and your remaining balance go down by that amount.</div>
+            )}
             {c.status === 'pending' && (
               <form action={decideChange} className="row">
                 <input type="hidden" name="project_id" value={project.id} />

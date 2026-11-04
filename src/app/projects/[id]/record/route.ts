@@ -4,7 +4,7 @@ import { supabaseAdmin } from '@/lib/supabase/server';
 import { buildProjectRecord } from '@/lib/projectRecord';
 import { revealedBy, type ReviewRow } from '@/lib/reviews';
 import { jpegInfo } from '@/lib/pdfDoc';
-import type { AgreementRow, ChangeOrder, Item, Milestone, Signature } from '@/lib/agreement';
+import { milestoneAmounts, sumItems, type AgreementRow, type ChangeOrder, type Item, type Milestone, type Signature } from '@/lib/agreement';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 30;
@@ -63,6 +63,22 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
     ? reviewRows.map((x) => ({ reviewer_role: x.reviewer_role, overall: x.overall, comment: x.comment, reply: x.reply ?? null, created_at: x.created_at }))
     : [];
 
+  // Payments come from the payment schedule: each agreed milestone, and each approved change order that was billed.
+  const msList = (ms ?? []).map((m: any) => ({ ...m, pct: Number(m.pct) })) as (Milestone & Record<string, any>)[];
+  const due = milestoneAmounts(sumItems((items ?? []) as Item[]), msList);
+  const asRow = (label: string, amount: number, x: Record<string, any>) => ({
+    paid_on: (x.paid_at as string) ?? (x.confirmed_at as string) ?? '',
+    amount_cents: amount,
+    method: (x.paid_method as string) ?? 'other',
+    status: x.pay_status === 'confirmed' ? 'receipt confirmed' : 'awaiting confirmation',
+    note: `${label}${x.pay_status === 'confirmed' ? (x.lien_waiver ? '. Lien waiver provided.' : '. No lien waiver recorded.') : ''}`,
+    recorded_role: 'homeowner',
+  });
+  const payRows = !include.payments ? [] : [
+    ...msList.map((m, i) => ({ m, i })).filter(({ m }) => m.pay_status === 'paid' || m.pay_status === 'confirmed').map(({ m, i }) => asRow(m.label, due[i], m)),
+    ...((cos ?? []) as any[]).filter((c) => c.status === 'approved' && Number(c.cost_cents) > 0 && (c.pay_status === 'paid' || c.pay_status === 'confirmed')).map((c) => asRow(`CO-${c.number}: ${c.title}`, Number(c.cost_cents), c)),
+  ].sort((a, b) => a.paid_on.localeCompare(b.paid_on));
+
   const pdf = buildProjectRecord({
     projectName: project.name,
     address: project.address,
@@ -75,7 +91,7 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
     milestones: (ms ?? []).map((m: any) => ({ ...m, pct: Number(m.pct) })) as Milestone[],
     signatures: (sigs ?? []) as Signature[],
     changes: (cos ?? []) as ChangeOrder[],
-    payments: (pays ?? []) as any[],
+    payments: payRows,
     messages: (msgs ?? []) as any[],
     photos,
     photosOmitted: omitted,
