@@ -47,7 +47,7 @@ export default function HomeownerProjects(p: {
     );
 
   return (
-    <>
+    <div className="cpage">
       <div className="stack">
         <h1>{first ? `Welcome${p.firstName ? `, ${p.firstName}` : ''}` : `Hi ${p.firstName || 'there'}`}</h1>
         <p className="muted">{first ? 'Tell us about your project and local contractors will send bids. It is free.' : 'Here is where your projects stand.'}</p>
@@ -205,6 +205,6 @@ export default function HomeownerProjects(p: {
       )}
 
       {p.alerts}
-    </>
+    </div>
   );
 }
