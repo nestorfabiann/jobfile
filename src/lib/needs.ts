@@ -1,9 +1,11 @@
 import { supabaseAdmin } from '@/lib/supabase/server';
 import { dollars } from '@/lib/money';
 import { alertHref } from '@/lib/alertPath';
+import { visitTodo, type Visit } from '@/lib/visits';
+import { addDays, todayChi } from '@/lib/schedule';
 import { milestoneAmounts, totals, type ChangeOrder, type Item, type Milestone } from '@/lib/agreement';
 
-export type NeedIcon = 'sign' | 'co' | 'pay' | 'bid' | 'msg' | 'star' | 'job' | 'done';
+export type NeedIcon = 'sign' | 'co' | 'pay' | 'bid' | 'msg' | 'star' | 'job' | 'done' | 'visit' | 'choice' | 'cal';
 export type NeedItem = { key: string; icon: NeedIcon; title: string; sub: string; href: string; go: string; at: string };
 
 /** "Today", "Waiting 1 day", "Waiting 4 days", and whether it has waited long enough to flag. */
@@ -24,13 +26,17 @@ export async function projectTasks(userId: string, projects: P[], myCompanyIds: 
   if (!active.length) return [];
   const ids = active.map((p) => p.id);
   const db = supabaseAdmin();
-  const [{ data: pm }, { data: ags }, { data: sigs }, { data: cos }, { data: ms }, { data: items }] = await Promise.all([
+  const soon = addDays(todayChi(), 7);
+  const [{ data: pm }, { data: ags }, { data: sigs }, { data: cos }, { data: ms }, { data: items }, { data: vis }, { data: sels }, { data: moved }] = await Promise.all([
     db.from('project_members').select('project_id,role').eq('user_id', userId).in('project_id', ids),
     db.from('agreements').select('project_id,sent_at,executed_at,updated_at').in('project_id', ids),
     db.from('agreement_signatures').select('project_id,role').in('project_id', ids),
     db.from('change_orders').select('*').in('project_id', ids),
     db.from('agreement_milestones').select('*').in('project_id', ids).order('position'),
     db.from('agreement_items').select('id,project_id,position,title,description,kind,price_cents').in('project_id', ids),
+    db.from('visits').select('*').in('project_id', ids).in('status', ['requested', 'proposed']),
+    db.from('selections').select('id,project_id,title,needed_by,created_at').in('project_id', ids).eq('status', 'open'),
+    db.from('schedule_changes').select('project_id,created_at').in('project_id', ids).is('homeowner_seen_at', null),
   ]);
   const roleOf = (p: P): 'contractor' | 'homeowner' => {
     if (p.company_id && myCompanyIds.includes(p.company_id)) return 'contractor';
@@ -71,6 +77,22 @@ export async function projectTasks(userId: string, projects: P[], myCompanyIds: 
       if (role === 'homeowner' && c.pay_status === 'requested') out.push({ key: `pay-co-${c.id}`, icon: 'pay', title: `Pay CO-${c.number} (${amt})`, sub: `${p.name} · requested by your contractor`, href: here('payment'), go: 'Open', at: c.requested_at ?? new Date().toISOString() });
       if (role === 'contractor' && c.pay_status === 'paid') out.push({ key: `conf-co-${c.id}`, icon: 'pay', title: `Confirm payment received (${amt})`, sub: `${p.name} · CO-${c.number}`, href: here('payment'), go: 'Confirm', at: c.paid_at ?? new Date().toISOString() });
     });
+    // Site visits waiting on this person: times to propose, or a time to pick.
+    ((vis ?? []) as unknown as (Visit & { updated_at?: string })[]).filter((v) => v.project_id === p.id).forEach((v) => {
+      const todo = visitTodo(v, role);
+      if (!todo) return;
+      out.push({ key: `visit-${v.id}`, icon: 'visit', title: todo === 'pick' ? `Pick a time for ${v.title.toLowerCase()}` : `Propose times for ${v.title.toLowerCase()}`, sub: todo === 'pick' ? `${p.name} · ${v.slots.length} time${v.slots.length === 1 ? '' : 's'} suggested` : p.name, href: here('visit'), go: todo === 'pick' ? 'Pick' : 'Propose', at: v.updated_at ?? v.created_at });
+    });
+
+    // Homeowner: choices due within a week, and date changes not yet seen.
+    if (role === 'homeowner') {
+      ((sels ?? []) as any[]).filter((x) => x.project_id === p.id && x.needed_by && x.needed_by <= soon).forEach((x) => {
+        out.push({ key: `sel-${x.id}`, icon: 'choice', title: `Choose: ${x.title}`, sub: `${p.name} · needed by ${new Date(`${x.needed_by}T12:00:00`).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`, href: here('selection'), go: 'Choose', at: x.created_at });
+      });
+      const mv = ((moved ?? []) as any[]).filter((x) => x.project_id === p.id).sort((a, b) => String(a.created_at).localeCompare(String(b.created_at)))[0];
+      if (mv) out.push({ key: `moved-${p.id}`, icon: 'cal', title: 'A date changed on your schedule', sub: `${p.name} · see what moved and why`, href: here('schedule'), go: 'See', at: mv.created_at });
+    }
+
     if (mine.length) {
       const its = (items ?? []).filter((i: any) => i.project_id === p.id) as Item[];
       const chg = (cos ?? []).filter((c: any) => c.project_id === p.id) as ChangeOrder[];

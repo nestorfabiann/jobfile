@@ -9,6 +9,9 @@ const ICONS: Record<NeedIcon, JSX.Element> = {
   bid: <><path d="M3 12l9-8 9 8" /><path d="M6 10v10h12V10" /></>,
   msg: <path d="M4 5h16v11H9l-5 4z" />,
   star: <path d="M12 3l2.6 5.6 6 .7-4.4 4.1 1.2 6-5.4-3-5.4 3 1.2-6L3.4 9.3l6-.7z" />,
+  visit: <><rect x="3" y="5" width="18" height="16" rx="3" /><path d="M3 10h18M8 3v4M16 3v4" /></>,
+  cal: <><rect x="3" y="5" width="18" height="16" rx="3" /><path d="M3 10h18M8 3v4M16 3v4M9 15h6" /></>,
+  choice: <><path d="M5 6h14M5 12h14M5 18h9" /><path d="M17 17l2 2 3-4" /></>,
   job: <><circle cx="11" cy="11" r="6" /><path d="M20 20l-4-4" /></>,
 };
 

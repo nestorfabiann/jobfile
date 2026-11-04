@@ -7,6 +7,8 @@ import { dollars, signedDollars, daysText } from '@/lib/money';
 import { milestoneAmounts, totals, type ChangeOrder, type Item, type Milestone } from '@/lib/agreement';
 import { setStage, requestFinish } from './actions';
 import FinishCard from '@/components/FinishCard';
+import NeedsYou from '@/components/NeedsYou';
+import { projectTasks, type NeedItem } from '@/lib/needs';
 
 const TZ = 'America/Chicago';
 const day = (d: string) => new Date(`${d.slice(0, 10)}T12:00:00`).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
@@ -53,43 +55,24 @@ export default async function Overview({ params, searchParams }: { params: { id:
 
   const stage = project.completed_at ? 3 : project.closeout_started_at ? 2 : executed ? 1 : 0;
 
-  // What is waiting on this person.
-  const todo: { text: string; href: string }[] = [];
-  if (!executed) {
-    if (role === 'contractor' && !agr?.sent_at) todo.push({ text: 'Finish the agreement and send it to the homeowner.', href: `${base}/agreement` });
-    else if (agr?.sent_at && !signed.has(role)) todo.push({ text: 'Review and sign the agreement.', href: `${base}/agreement` });
-    else if (agr?.sent_at && signed.has(role) && !signed.has(other)) todo.push({ text: 'Waiting for the other side to sign the agreement.', href: `${base}/agreement` });
-  }
-  cos.filter((c) => c.status === 'pending' && c.requested_role !== role).forEach((c) =>
-    todo.push({ text: `Approve or decline CO-${c.number}: ${c.title} (${signedDollars(c.cost_cents)}).`, href: `${base}/changes` }),
-  );
-  pms.forEach((m, i) => {
-    if (role === 'homeowner' && m.pay_status === 'requested')
-      todo.push({ text: `Payment requested: ${m.label} (${dollars(dueAmts[i])}).`, href: `${base}/payments` });
-    if (role === 'contractor' && m.pay_status === 'paid')
-      todo.push({ text: `Confirm you received ${dollars(dueAmts[i])} for ${m.label}.`, href: `${base}/payments` });
-  });
-  coBill.forEach((c) => {
-    if (role === 'homeowner' && c.pay_status === 'requested') todo.push({ text: `Payment requested: CO-${c.number} (${dollars(c.cost_cents)}).`, href: `${base}/payments` });
-    if (role === 'contractor' && c.pay_status === 'paid') todo.push({ text: `Confirm you received ${dollars(c.cost_cents)} for CO-${c.number}.`, href: `${base}/payments` });
-  });
-  if (role === 'contractor' && openFixes) todo.push({ text: `${openFixes} detail${openFixes === 1 ? '' : 's'} to fix.`, href: `${base}/photos` });
-  if (role === 'homeowner' && awaitingConfirm)
-    todo.push({ text: `Check ${awaitingConfirm} fixed detail${awaitingConfirm === 1 ? '' : 's'} and confirm.`, href: `${base}/photos` });
+  // What is waiting on this person: the shared task list (agreement, change orders, payments, visits, choices) plus a few project-only items.
+  const todo: NeedItem[] = await projectTasks(user.id, [{ id: project.id, name: project.name as string, company_id: (project.company_id as string | null) ?? null, completed_at: project.completed_at as string | null }], role === 'contractor' && project.company_id ? [project.company_id as string] : []);
+  const waiting = executed || !agr?.sent_at || !signed.has(role) || signed.has(other) ? '' : 'Waiting for the other side to sign the agreement.';
+  const photoAt = (st: string) => String((photos.filter((p) => p.status === st)[0] as any)?.created_at ?? new Date().toISOString());
+  if (role === 'contractor' && openFixes) todo.push({ key: 'fixes', icon: 'job', title: `${openFixes} detail${openFixes === 1 ? '' : 's'} to fix`, sub: project.name as string, href: `${base}/photos`, go: 'Open', at: photoAt('open') });
+  if (role === 'homeowner' && awaitingConfirm) todo.push({ key: 'confirm-fixes', icon: 'done', title: `Check ${awaitingConfirm} fixed detail${awaitingConfirm === 1 ? '' : 's'} and confirm`, sub: project.name as string, href: `${base}/photos`, go: 'Check', at: photoAt('fixed') });
   const msgs = msgRows ?? [];
   const lastQ = msgs.findIndex((m) => m.tag === 'question' && m.sender_role !== role);
   if (lastQ !== -1 && !msgs.slice(0, lastQ).some((m) => m.sender_role === role))
-    todo.push({ text: 'Answer a question in Messages.', href: base });
+    todo.push({ key: 'question', icon: 'msg', title: 'Answer a question in Messages', sub: project.name as string, href: base, go: 'Reply', at: String((msgs[lastQ] as any).created_at) });
 
   // After completion, ask each side to rate until they have.
   if (project.completed_at) {
     const { data: myReview } = await sb.from('reviews').select('id').eq('project_id', project.id).eq('reviewer_role', role).maybeSingle();
     if (!myReview)
-      todo.unshift({
-        text: `Project complete. Rate your experience with ${role === 'homeowner' ? contractorName : homeownerName}.`,
-        href: `${base}/rating`,
-      });
+      todo.push({ key: 'rate', icon: 'star', title: `Project complete. Rate your experience with ${role === 'homeowner' ? contractorName : homeownerName}`, sub: project.name as string, href: `${base}/rating`, go: 'Rate', at: String(project.completed_at) });
   }
+  todo.sort((x, y) => x.at.localeCompare(y.at));
 
   // Latest photos, with short-lived private links.
   const recent = photos.slice(0, 4);
@@ -162,18 +145,8 @@ export default async function Overview({ params, searchParams }: { params: { id:
         />
       )}
 
-      <section className="card" aria-label="Needs your attention">
-        <h2>Needs your attention</h2>
-        {todo.length === 0 ? (
-          <p className="muted">Nothing waiting on you.</p>
-        ) : (
-          <ul className="stack" style={{ listStyle: 'none', margin: 0, padding: 0 }}>
-            {todo.map((x, i) => (
-              <li key={i} className="todo"><Link href={x.href}>{x.text}</Link></li>
-            ))}
-          </ul>
-        )}
-      </section>
+      <NeedsYou items={todo} caughtUp compact />
+      {waiting ? <p className="muted small" style={{ margin: 0 }}>{waiting}</p> : null}
 
       {executed ? (
         <section className="card" aria-label="Money">
