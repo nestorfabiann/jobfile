@@ -1,0 +1,75 @@
+<title>Change Order Form</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: one phone column. Tabs: Today, Adds cost, Credit. Texts and amounts are examples. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#c4813f;--orl:#f9efe4;--orb:#ecd4a8;--gr:#1f7a55;--grl:#d9f1e6;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--gr:#6fd1a3;--grl:#173a2c;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--gr:#6fd1a3;--grl:#173a2c;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:14px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:16px}
+h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
+.mut{color:var(--mut);font-size:13px;line-height:1.45;margin:0}
+.sw{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.sw button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:8px 2px;border-radius:99px;font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:44px}.sw button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.sec{display:flex;flex-direction:column;gap:14px}.sec[hidden]{display:none}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.fld{display:flex;flex-direction:column;gap:6px;font-size:13.5px;font-weight:600}
+.in{height:46px;border:1px solid var(--line);border-radius:14px;background:var(--bg);display:flex;align-items:center;padding:0 14px;color:var(--mut);font-weight:400;font-size:15px}.in.v{color:var(--ink)}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:var(--bg);border:1px solid var(--line);border-radius:99px;padding:4px}
+.seg button{border:0;background:transparent;color:var(--mut);border-radius:99px;min-height:42px;font:600 13.5px 'IBM Plex Sans',sans-serif;cursor:pointer;padding:6px 8px;line-height:1.2}
+.seg button.on{background:var(--or);color:#fff}.seg button.cr.on{background:var(--gr)}
+.hint{font-size:13px;line-height:1.45;border-radius:12px;padding:10px 12px}.hint.g{background:var(--grl);color:var(--gr)}.hint.o{background:var(--orl);color:var(--mut)}
+.pre{display:flex;align-items:center;gap:8px}.pre b{font:800 20px 'Bricolage Grotesque',sans-serif;color:var(--gr)}.pre .in{flex:1}
+.btn{display:block;text-align:center;background:var(--or);color:#fff;border-radius:99px;padding:13px 20px;font:600 15.5px 'IBM Plex Sans',sans-serif;min-height:46px}.btn.cr{background:var(--gr)}
+</style>
+<div class="wrap">
+  <div class="note"><b>Mockup.</b> The New change order form, with a clear way to choose a credit. Texts and amounts are examples.</div>
+  <div class="sw" id="sw"><button data-s="td" class="on" type="button">Today</button><button data-s="ad" type="button">Adds cost</button><button data-s="cr" type="button">Credit</button></div>
+
+  <div id="td" class="sec">
+    <div class="card">
+      <div class="fld">Title<div class="in">Move range outlet</div></div>
+      <div class="fld">Price change (USD, negative for a credit)<div class="in">0</div></div>
+      <div class="fld">Schedule change (days)<div class="in">0</div></div>
+    </div>
+    <div class="note" style="border-style:solid"><b>The problem:</b> the iPhone number keypad has no minus sign, so a credit cannot be typed, and the hint is easy to miss.</div>
+  </div>
+
+  <div id="ad" class="sec" hidden>
+    <div class="card">
+      <div class="fld">Title<div class="in v">Extra tile in hallway</div></div>
+      <div class="fld">What changes<div class="in" style="height:72px;align-items:flex-start;padding-top:12px">Describe the work, materials and where.</div></div>
+      <div class="fld">What kind of change?
+        <div class="seg"><button class="on" type="button">Adds cost</button><button class="cr" type="button">Credit to homeowner</button></div></div>
+      <div class="fld">Added cost<div class="pre"><b style="color:var(--ink)">+$</b><div class="in v">2,000</div></div></div>
+      <div class="hint o">The homeowner approves it. It becomes its own payment line, billed when the work is done.</div>
+      <div class="fld">Schedule
+        <div class="seg"><button class="on" type="button">Adds days</button><button type="button">Saves days</button></div>
+        <div class="in v">2</div></div>
+      <a class="btn">Send for approval</a>
+    </div>
+  </div>
+
+  <div id="cr" class="sec" hidden>
+    <div class="card">
+      <div class="fld">Title<div class="in v">Skip the closet paint</div></div>
+      <div class="fld">What changes<div class="in v" style="height:72px;align-items:flex-start;padding-top:12px">The closet will not be painted.</div></div>
+      <div class="fld">What kind of change?
+        <div class="seg"><button type="button">Adds cost</button><button class="cr on" type="button">Credit to homeowner</button></div></div>
+      <div class="fld">Credit amount<div class="pre"><b>−$</b><div class="in v">500</div></div></div>
+      <div class="hint g"><b>This lowers the contract price by $500</b> and reduces the last payments that have not been requested yet. Your final payment goes from $1,250 to $750.</div>
+      <div class="fld">Schedule
+        <div class="seg"><button type="button">Adds days</button><button class="on" type="button">Saves days</button></div>
+        <div class="in v">1</div></div>
+      <a class="btn cr">Send credit for approval</a>
+    </div>
+  </div>
+</div>
+<script>
+var sw=document.getElementById('sw'),ids=['td','ad','cr'];
+[].forEach.call(sw.children,function(b){b.onclick=function(){
+  [].forEach.call(sw.children,function(x){x.classList.toggle('on',x===b)});
+  ids.forEach(function(id){document.getElementById(id).hidden=id!==b.dataset.s});window.scrollTo(0,0)}});
+</script>
