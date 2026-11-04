@@ -15,10 +15,13 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
     await db.from('notifications').update({ read_at: now }).eq('user_id', user.id).eq('kind', 'job_match').is('read_at', null);
     path = '/marketplace';
   } else if (/^[0-9a-f-]{36}$/.test(params.id)) {
-    const { data: n } = await db.from('notifications').select('project_id,kind').eq('id', params.id).eq('user_id', user.id).maybeSingle();
+    const { data: n } = await db.from('notifications').select('*').eq('id', params.id).eq('user_id', user.id).maybeSingle();
     if (n) {
       await db.from('notifications').update({ read_at: now }).eq('id', params.id).eq('user_id', user.id);
-      path = alertHref(n.project_id as string | null, n.kind as string);
+      const to = new URL(req.url).searchParams.get('to') ?? '';
+      const saved = String((n as { path?: string | null }).path ?? '');
+      const ok = (x: string) => x.startsWith('/') && !x.startsWith('//');
+      path = ok(saved) ? saved : ok(to) ? to : alertHref(n.project_id as string | null, n.kind as string);
     }
   }
   return NextResponse.redirect(new URL(path, req.url), 303);

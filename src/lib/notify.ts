@@ -98,11 +98,10 @@ export async function notifyUsers(a: Alert) {
 
   await Promise.allSettled(
     (profiles ?? []).filter((p) => !p.banned_at).map(async (p) => {
-      const { data: row } = await admin
-        .from('notifications')
-        .insert({ user_id: p.id, project_id: a.projectId, kind: a.kind, title: a.title, body: a.body })
-        .select('id')
-        .single();
+      const base = { user_id: p.id, project_id: a.projectId, kind: a.kind, title: a.title, body: a.body };
+      // The page to open is stored with the alert when the column exists (migration 034). Without it, alerts still work.
+      let { data: row } = await admin.from('notifications').insert(a.path ? { ...base, path: a.path } : base).select('id').single();
+      if (!row && a.path) ({ data: row } = await admin.from('notifications').insert(base).select('id').single());
       if (!row) return;
 
       let quiet = false;
@@ -132,7 +131,7 @@ export async function notifyUsers(a: Alert) {
         if (r.ok) update.sms_sent_at = new Date().toISOString();
         else if (r.error) errors.push(r.error);
       }
-      if (!quiet) await sendPush(p.id as string, { kind: a.kind, title: a.title, body: a.body, url: `/n/${row.id}` });
+      if (!quiet) await sendPush(p.id as string, { kind: a.kind, title: a.title, body: a.body, url: a.path ? `/n/${row.id}?to=${encodeURIComponent(a.path)}` : `/n/${row.id}` });
       if (errors.length) update.error = errors.join(' | ');
       if (Object.keys(update).length) await admin.from('notifications').update(update).eq('id', row.id);
     }),
