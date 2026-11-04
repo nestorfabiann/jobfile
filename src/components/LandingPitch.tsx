@@ -87,6 +87,11 @@ export default function LandingPitch({ aiOn, signedIn }: { aiOn: boolean; signed
       ) : (
         <>
           <h2 style={{ fontSize: 24 }}>One shared record that protects you both</h2>
+          <span className="pill ok" style={{ width: 'max-content' }}>Free for homeowners</span>
+          <div className="card" style={{ background: 'var(--ok-bg, #d9f1e6)', borderColor: 'transparent' }}>
+            <h3 style={{ margin: 0 }}>Free to post. No fees at all.</h3>
+            <span className="small">It costs nothing to post a project, compare bids or run the job in Jobfile.</span>
+          </div>
           <div className="card">
             <h3 style={{ margin: 0 }}>How it works for homeowners</h3>
             {steps([
@@ -111,7 +116,6 @@ export default function LandingPitch({ aiOn, signedIn }: { aiOn: boolean; signed
               </div>
             ))}
           </div>
-          <span className="pill ok" style={{ width: 'max-content' }}>Free for homeowners</span>
           <Link className="btn" href={post}>Post a project, it&apos;s free →</Link>
         </>
       )}
