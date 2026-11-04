@@ -1,0 +1,63 @@
+<title>Bid Card Logo</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: one phone column. Before and after of the example bid card on the contractor landing page. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#c4813f;--orl:#f9efe4;--orb:#ecd4a8;--gr:#1f7a55;--grl:#d9f1e6;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--gr:#6fd1a3;--grl:#173a2c;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--gr:#6fd1a3;--grl:#173a2c;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:14px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:16px}
+h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;text-wrap:balance}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
+.sw{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}.sw button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:8px 4px;border-radius:99px;font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:44px}.sw button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.sec{display:flex;flex-direction:column;gap:14px}.sec[hidden]{display:none}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.inner{background:var(--bg);border:1px solid var(--line);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:8px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.nm{display:flex;align-items:center;gap:10px;min-width:0}.nm b{font-size:16px;line-height:1.2}
+.logo{width:40px;height:40px;border-radius:12px;background:var(--orl);color:var(--or);border:1px solid var(--orb);display:grid;place-items:center;font:800 17px 'Bricolage Grotesque',sans-serif;flex:none}
+.pill{font-size:12px;font-weight:700;padding:4px 10px;border-radius:99px;white-space:nowrap;background:var(--grl);color:var(--gr)}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.mut{color:var(--mut);font-size:13px;line-height:1.45}
+.btn{display:block;text-align:center;background:var(--or);color:#fff;border-radius:99px;padding:13px 18px;font:600 15px 'IBM Plex Sans',sans-serif}
+</style>
+<div class="wrap">
+  <div class="note"><b>Mockup.</b> The example bid card on the contractor landing page, before and after. The company name and numbers are examples.</div>
+  <div class="sw" id="sw"><button data-s="af" class="on" type="button">After</button><button data-s="bf" type="button">Today</button></div>
+
+  <div id="af" class="sec">
+    <div class="card">
+      <h3 style="font-size:19px">What a homeowner sees when you bid</h3>
+      <div class="inner">
+        <div class="top"><div class="nm"><span class="logo">Y</span><b>Your Company Name</b></div><span class="mut">★ 4.9 (12)</span></div>
+        <div class="tags"><span class="pill">✓ Verified</span><span class="pill">✓ Insured to Mar 2027</span></div>
+        <div style="font:800 26px 'Bricolage Grotesque',sans-serif;letter-spacing:-.03em">$18,400</div>
+        <div class="mut">2 weeks · Starts Nov 12</div>
+      </div>
+      <span class="mut">Example bid card. Your logo, verified badge, insurance and ratings come from your profile.</span>
+    </div>
+    <a class="btn">Create your free contractor profile →</a>
+  </div>
+
+  <div id="bf" class="sec" hidden>
+    <div class="card">
+      <h3 style="font-size:19px">What a homeowner sees when you bid</h3>
+      <div class="inner">
+        <div class="top"><b style="font-size:16px">Your Company Name</b><span class="mut">★ 4.9 (12)</span></div>
+        <div class="tags"><span class="pill">✓ Insured to Mar 2027</span></div>
+        <div style="font:800 26px 'Bricolage Grotesque',sans-serif;letter-spacing:-.03em">$18,400</div>
+        <div class="mut">2 weeks · Starts Nov 12</div>
+      </div>
+      <span class="mut">Example bid card. Insurance and ratings come from your profile.</span>
+    </div>
+    <a class="btn">Create your free contractor profile →</a>
+  </div>
+</div>
+<script>
+var sw=document.getElementById('sw'),ids=['af','bf'];
+[].forEach.call(sw.children,function(b){b.onclick=function(){
+  [].forEach.call(sw.children,function(x){x.classList.toggle('on',x===b)});
+  ids.forEach(function(id){document.getElementById(id).hidden=id!==b.dataset.s})}});
+</script>
