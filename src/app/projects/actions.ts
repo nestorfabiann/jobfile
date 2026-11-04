@@ -83,6 +83,7 @@ export async function createProject(formData: FormData) {
       userIds: [existing.id],
       projectId: project.id,
       kind: 'invite',
+      path: `/projects/${project.id}`,
       title: `${companyName} added you to ${name}`,
       body: `${companyName} opened a project for you on Jobfile. You can message them, review the agreement and follow progress there.`,
     });

@@ -19,7 +19,7 @@ async function sendInvite(inv: Pick<Invite, 'contractor_email' | 'homeowner_name
   const body = `${homeownerLabel} wants to work with you on "${inv.project_name}".${inv.message ? `\n\n"${inv.message}"` : ''}\n\nSign in with this email address (${inv.contractor_email}) and open Projects to accept or decline.`;
   const { data: existing } = await db.from('profiles').select('id').eq('email', inv.contractor_email).maybeSingle();
   if (existing) {
-    await notifyUsers({ userIds: [existing.id as string], projectId: null, kind: 'invite', title, body, force: true });
+    await notifyUsers({ userIds: [existing.id as string], projectId: null, kind: 'invite', path: '/projects', title, body, force: true });
   } else {
     await sendEmail({ to: inv.contractor_email, subject: title, text: body, link: `${APP_URL()}/login?email=${encodeURIComponent(inv.contractor_email)}` });
   }
@@ -87,7 +87,7 @@ export async function declineInvite(formData: FormData) {
   if (!invite || side !== 'contractor') redirect('/projects');
   const { data: done } = await supabaseAdmin().from('project_invites').update({ status: 'declined', responded_at: new Date().toISOString() }).eq('id', invite.id).eq('status', 'pending').select('id');
   if ((done ?? []).length) {
-    await notifyUsers({ userIds: [invite.homeowner_id], projectId: null, kind: 'invite', title: `Your invite for ${invite.project_name} was declined`, body: 'The contractor chose not to take this project. You can invite someone else.' });
+    await notifyUsers({ userIds: [invite.homeowner_id], projectId: null, kind: 'invite', path: '/projects', title: `Your invite for ${invite.project_name} was declined`, body: 'The contractor chose not to take this project. You can invite someone else.' });
   }
   revalidatePath('/projects');
   redirect('/projects');
@@ -156,6 +156,7 @@ export async function acceptInvite(formData: FormData) {
     userIds: [invite.homeowner_id],
     projectId: project.id,
     kind: 'invite',
+    path: `/projects/${project.id}/agreement`,
     title: `${coName} accepted your invite for ${invite.project_name}`,
     body: 'Your project is open. Next, the contractor writes up the scope and price in the Agreement tab for you to approve.',
   });

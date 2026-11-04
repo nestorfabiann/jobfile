@@ -170,6 +170,7 @@ export async function reviewInsurance(_: Result | null, f: FormData): Promise<Re
     userIds: (owners ?? []).map((o) => o.user_id as string),
     projectId: null,
     kind: 'admin',
+    path: '/settings/business',
     title: decision === 'approved' ? 'Your insurance was verified' : 'Your insurance certificate needs another look',
     body: decision === 'approved' ? 'The Insurance verified badge now shows on your public profile.' : `Reason: ${note}. Open Settings, Business profile to upload a new one.`,
     force: true,
