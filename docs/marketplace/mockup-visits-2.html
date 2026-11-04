@@ -1,0 +1,123 @@
+<title>Site Visits Ideas</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: one phone column. Tabs: On a bid, Pick a time, Schedule, Access notes. Names, dates and times are examples. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#c4813f;--orl:#f9efe4;--orb:#ecd4a8;--gr:#1f7a55;--grl:#d9f1e6;--am:#9a5b00;--aml:#fbeccd;--bl:#1d5fa8;--bll:#e0ecf8;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--gr:#6fd1a3;--grl:#173a2c;--am:#f0b95a;--aml:#3a2e12;--bl:#8fbdf0;--bll:#17283d;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--gr:#6fd1a3;--grl:#173a2c;--am:#f0b95a;--aml:#3a2e12;--bl:#8fbdf0;--bll:#17283d;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:14px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:16px}
+h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;text-wrap:balance}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
+.mut{color:var(--mut);font-size:13px;line-height:1.45;margin:0}
+.sw{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}.sw button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:8px 4px;border-radius:99px;font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:44px}.sw button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.sec{display:flex;flex-direction:column;gap:14px}.sec[hidden]{display:none}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.btn{display:block;text-align:center;background:var(--or);color:#fff;border-radius:99px;padding:12px 16px;font:600 14.5px 'IBM Plex Sans',sans-serif;min-height:44px}.btn.gh{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+.pill{font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:99px;white-space:nowrap;background:var(--orl);color:var(--or);border:1px solid var(--orb)}.pill.g{background:var(--grl);color:var(--gr);border-color:transparent}.pill.a{background:var(--aml);color:var(--am);border-color:transparent}.pill.b{background:var(--bll);color:var(--bl);border-color:transparent}.pill.m{background:transparent;color:var(--mut);border-color:var(--line)}
+.nm{display:flex;gap:10px;align-items:center}.logo{width:38px;height:38px;border-radius:11px;background:var(--orl);color:var(--or);border:1px solid var(--orb);display:grid;place-items:center;font:800 15px 'Bricolage Grotesque',sans-serif;flex:none}
+.slot{display:flex;justify-content:space-between;align-items:center;gap:10px;border:1.5px solid var(--line);border-radius:16px;padding:12px 14px;font-size:14.5px;background:var(--card)}.slot b{display:block;font-size:15px}.slot.on{border-color:var(--or);background:var(--orl)}.slot .rd{width:20px;height:20px;border-radius:50%;border:2px solid var(--line);flex:none}.slot.on .rd{border-color:var(--or);background:radial-gradient(var(--or) 45%,transparent 50%)}
+.row{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--line)}.row:last-child{border-bottom:0}.row b{font-size:14.5px}.who{font-size:12.5px;color:var(--mut)}
+.ok{background:var(--grl);color:var(--gr);border-radius:14px;padding:11px 12px;font-size:13.5px;line-height:1.45}
+.warn{background:var(--aml);color:var(--am);border-radius:14px;padding:11px 12px;font-size:13.5px;line-height:1.45}
+.in{height:44px;border:1px solid var(--line);border-radius:14px;background:var(--bg);display:flex;align-items:center;padding:0 14px;color:var(--mut);font-size:14.5px}.in.v{color:var(--ink)}
+.fld{display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:600}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ico{width:34px;height:34px;border-radius:10px;background:var(--bll);color:var(--bl);display:grid;place-items:center;font-size:16px;flex:none}
+
+.chips{display:flex;gap:8px;flex-wrap:wrap}.chip{border:1.5px solid var(--line);background:var(--card);border-radius:99px;padding:9px 14px;font:600 13.5px 'IBM Plex Sans',sans-serif;min-height:44px;display:flex;align-items:center}.chip.on{border-color:var(--or);background:var(--orl);color:var(--or)}
+.days{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}.d{border:1.5px solid var(--line);border-radius:14px;padding:8px 0;text-align:center;font-size:12px;color:var(--mut);background:var(--card)}.d b{display:block;font-size:17px;color:var(--ink)}.d.on{border-color:var(--or);background:var(--orl)}.d.on b{color:var(--or)}
+.steps{display:flex;align-items:center;gap:0;font-size:11.5px;color:var(--mut)}.st{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;text-align:center}.dot{width:22px;height:22px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;font-size:11px;background:var(--card)}.st.done .dot{background:var(--gr);border-color:var(--gr);color:#fff}.st.now .dot{border-color:var(--or);color:var(--or)}.st.now{color:var(--ink);font-weight:700}.bar{height:2px;background:var(--line);flex:.5;margin-bottom:18px}.bar.done{background:var(--gr)}
+.big{font:800 30px 'Bricolage Grotesque',sans-serif;letter-spacing:-.03em;line-height:1}
+.hero{background:var(--orl);border:1px solid var(--orb);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:8px}
+.tl{display:flex;gap:10px;align-items:flex-start;font-size:13.5px}.tl i{width:10px;height:10px;border-radius:50%;background:var(--gr);margin-top:5px;flex:none;font-style:normal}.tl i.off{background:var(--line)}
+.pic{width:64px;height:64px;border-radius:12px;background:var(--line);display:grid;place-items:center;color:var(--mut);font-size:11px}
+</style>
+<div class="wrap">
+  <div class="note"><b>Mockup 2.</b> Ways to make site visits easier and more alive. Tap the tabs. Each one is a separate idea, so you can keep any or all. Names, dates and times are examples.</div>
+  <div class="sw" id="sw"><button data-s="a" class="on" type="button">1 · Easier time picker</button><button data-s="b" type="button">2 · Visit card with progress</button><button data-s="c" type="button">3 · Day of the visit</button><button data-s="d" type="button">4 · After the visit</button></div>
+
+  <div id="a" class="sec">
+    <div class="note" style="border-style:solid"><b>Today:</b> the contractor types three dates and times. <b>Idea:</b> tap a day, tap a time of day. Two taps per option, and the homeowner can say when they are free first.</div>
+    <div class="card">
+      <h3 style="font-size:18px">Propose times</h3>
+      <div class="fld">Pick days (up to 3)</div>
+      <div class="days"><div class="d on">Thu<b>13</b></div><div class="d">Fri<b>14</b></div><div class="d on">Sat<b>15</b></div><div class="d">Sun<b>16</b></div><div class="d">Mon<b>17</b></div></div>
+      <div class="fld">Time of day</div>
+      <div class="chips"><span class="chip">Morning 8-11</span><span class="chip on">10:00 am</span><span class="chip">Noon</span><span class="chip">Afternoon 2-5</span><span class="chip">Evening</span></div>
+      <div class="fld">How long?</div>
+      <div class="chips"><span class="chip">15 min</span><span class="chip on">30 min</span><span class="chip">1 hour</span></div>
+      <div class="ok">The homeowner sees: <b>Thu, Nov 13 · 10:00 am</b> and <b>Sat, Nov 15 · 10:00 am</b></div>
+      <a class="btn">Send 2 times</a>
+    </div>
+    <div class="card">
+      <h3 style="font-size:16px">Homeowner can go first</h3>
+      <p class="mut">When requesting, the homeowner can say what suits them, so the contractor picks from times that already work.</p>
+      <div class="chips"><span class="chip on">Weekday evenings</span><span class="chip on">Saturdays</span><span class="chip">Weekday mornings</span><span class="chip">Any time</span></div>
+      <a class="btn gh">Request a site visit</a>
+    </div>
+  </div>
+
+  <div id="b" class="sec" hidden>
+    <div class="note" style="border-style:solid"><b>Idea:</b> a visit card that shows where things stand, how soon it is, and what to do next, with one button.</div>
+    <div class="hero">
+      <div style="display:flex;justify-content:space-between;align-items:center"><span class="pill g">Confirmed</span><span class="who">In 2 days</span></div>
+      <div class="big">Thu, Nov 13</div>
+      <div style="font-size:17px;font-weight:600">10:00 am · about 30 minutes</div>
+      <div class="who">Nesty's Painting · 727 Plano TX</div>
+      <div class="steps" style="margin-top:6px"><div class="st done"><span class="dot">✓</span>Requested</div><span class="bar done"></span><div class="st done"><span class="dot">✓</span>Times sent</div><span class="bar done"></span><div class="st done"><span class="dot">✓</span>Confirmed</div><span class="bar"></span><div class="st"><span class="dot"></span>Visited</div></div>
+      <div class="two" style="margin-top:6px"><a class="btn">Add to my calendar</a><a class="btn gh">Directions</a></div>
+      <div class="two"><a class="btn gh">Reschedule</a><a class="btn gh">Cancel</a></div>
+    </div>
+    <div class="card">
+      <h3 style="font-size:16px">Before they arrive</h3>
+      <div class="row"><div><b>Access notes</b><div class="who">Side gate, code 4821 · dog, friendly · driveway</div></div><span class="pill g">Added</span></div>
+      <div class="row"><div><b>Things to have ready</b><div class="who">Paint colors you like, a list of rooms</div></div><span class="pill m">Contractor asks</span></div>
+    </div>
+    <div class="card">
+      <h3 style="font-size:16px">Your turn: pick a time</h3>
+      <p class="mut">While waiting for you, the card says so and shows a red dot on the Schedule tab and a text alert.</p>
+      <div class="slot on"><div><b>Thu, Nov 13 · 10:00 am</b><span class="who">Free for you? Nothing else on your schedule</span></div><span class="rd"></span></div>
+      <div class="slot"><div><b>Sat, Nov 15 · 10:00 am</b><span class="who">Conflicts with Selections due that day</span></div><span class="rd"></span></div>
+    </div>
+  </div>
+
+  <div id="c" class="sec" hidden>
+    <div class="note" style="border-style:solid"><b>Idea:</b> on the day, one tap tells the other side where you are. No texting back and forth.</div>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between"><h3 style="font-size:18px">Today · 10:00 am</h3><span class="pill a">Starting soon</span></div>
+      <p class="mut">Contractor's view</p>
+      <a class="btn">I'm on my way</a>
+      <div class="chips"><span class="chip">Running 15 min late</span><span class="chip">Running 30 min late</span></div>
+    </div>
+    <div class="card">
+      <p class="mut">Homeowner's view, a few minutes later</p>
+      <div class="tl"><i></i><div><b>Nesty's Painting is on the way</b><div class="who">9:41 am · arriving around 10:00</div></div></div>
+      <div class="tl"><i class="off"></i><div><b>Arrived</b></div></div>
+      <div class="ok">Gate code and parking notes are right here when they get to the door.</div>
+    </div>
+    <div class="card"><p class="mut">Each tap also sends a short alert to the other side. Nothing shares a live location.</p></div>
+  </div>
+
+  <div id="d" class="sec" hidden>
+    <div class="note" style="border-style:solid"><b>Idea:</b> the visit ends with something useful. The contractor leaves notes and photos, and a firm price can follow right away.</div>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between"><h3 style="font-size:18px">Visit notes</h3><span class="pill g">Visited</span></div>
+      <p class="mut">From Nesty's Painting · Thu, Nov 13</p>
+      <p style="margin:0;font-size:14.5px;line-height:1.5">Kitchen is about 14 by 12 feet. Ceiling needs a skim coat near the vent. Cabinets in good shape for repainting.</p>
+      <div style="display:flex;gap:8px"><span class="pic">Photo</span><span class="pic">Photo</span><span class="pic">Photo</span></div>
+      <div class="warn"><b>Found something new?</b> The contractor can update the bid. You see what changed.</div>
+    </div>
+    <div class="card">
+      <h3 style="font-size:16px">What next?</h3>
+      <a class="btn">Update my bid</a>
+      <a class="btn gh">Ask for another visit</a>
+      <p class="mut">The homeowner gets a prompt after the visit: <b>How did it go?</b> with Hire, Still deciding, and Not for me.</p>
+    </div>
+  </div>
+</div>
+<script>
+document.querySelectorAll('#sw button').forEach(function(b){b.addEventListener('click',function(){document.querySelectorAll('#sw button').forEach(function(x){x.classList.remove('on')});b.classList.add('on');['a','b','c','d'].forEach(function(s){document.getElementById(s).hidden=s!==b.dataset.s})})});
+</script>
