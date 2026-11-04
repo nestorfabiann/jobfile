@@ -11,7 +11,7 @@ export default function AppMenu({ marketplace, contractor, admin, signOutAction 
   const [open, setOpen] = useState(false);
   const path = usePathname();
   const box = useRef<HTMLDivElement>(null);
-  const getApp = useGetApp();
+  const { installed, nudge: getApp } = useGetApp();
 
   useEffect(() => { setOpen(false); }, [path]);
   useEffect(() => {
@@ -48,7 +48,7 @@ export default function AppMenu({ marketplace, contractor, admin, signOutAction 
       </button>
       {open && (
         <nav id="appmenu-sheet" className="appmenu-sheet" aria-label="Main">
-          {items.map(([href, label, icon]) => (
+          {items.filter(([href]) => !(href === '/app' && installed)).map(([href, label, icon]) => (
             <Link key={href} href={href} className={href === '/app' && getApp ? 'mi-new' : undefined} aria-current={current(href) ? 'page' : undefined}><MenuIcon name={icon} />{href === '/app' ? <span>{label}<small className="mi-sub">Alerts on your phone</small></span> : label}{href === '/app' && getApp ? <span className="mi-tag">New</span> : null}</Link>
           ))}
           <hr />
