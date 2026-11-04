@@ -104,14 +104,17 @@ export async function askToSeeJob(formData: FormData) {
   const c = await context(formData);
   if (c.scope !== 'listing' || c.role !== 'contractor') go(c.back, 'Only a contractor asks this on a post.');
   if (c.listingStatus !== 'open') go(c.back, 'This project is no longer taking bids.');
+  const { data: pl } = await c.db.from('marketplace_listings').select('*').eq('id', c.key.listing_id).maybeSingle();
+  const pref = ((pl as any)?.visit_pref as string | undefined) ?? 'yes';
+  if (pref === 'no') go(c.back, 'This homeowner is taking bids only, with no visits before hiring.');
   const { count } = await c.db.from('visits').select('id', { count: 'exact', head: true }).eq('listing_id', c.key.listing_id).eq('created_by', c.user.id).is('bid_id', null).in('status', ['requested', 'proposed', 'confirmed']);
   if ((count ?? 0) > 0) go(c.back, 'You already asked to see this job.');
   const since = new Date(Date.now() - 86400000).toISOString();
   const { count: today } = await c.db.from('visits').select('id', { count: 'exact', head: true }).eq('created_by', c.user.id).is('bid_id', null).gte('created_at', since);
   if ((today ?? 0) >= 10) go(c.back, 'You have asked to see 10 jobs today. Try again tomorrow.');
-  const { error } = await c.db.from('visits').insert({ ...c.key, title: 'Site visit', note: txt(formData, 'note', 400), status: 'requested', requested_role: 'contractor', last_role: 'contractor', created_by: c.user.id });
+  const { error } = await c.db.from('visits').insert({ ...c.key, title: 'Site visit', note: txt(formData, 'note', 400), status: pref === 'maybe' ? 'asked' : 'requested', requested_role: 'contractor', last_role: 'contractor', created_by: c.user.id });
   if (error) go(c.back, 'Could not save the request.');
-  await c.tell('A contractor wants to see your job first', 'Open your project and suggest times that work for you. They can still bid after.');
+  await c.tell('A contractor wants to see your job first', pref === 'maybe' ? 'Open your project to approve or decline. They can still bid either way.' : 'Open your project and suggest times that work for you. They can still bid after.');
   go(c.back);
 }
 
@@ -236,4 +239,36 @@ export async function saveVisitReport(formData: FormData) {
   await c.db.from('visits').update({ status: 'done', report, updated_at: new Date().toISOString() }).eq('id', v.id);
   await c.tell(`Visit notes: ${v.title}`, report ? report.slice(0, 200) : 'The visit is done.');
   go(c.back);
+}
+
+
+/** The homeowner answers a visit request on a post set to "ask me first". */
+export async function answerVisitAsk(formData: FormData) {
+  const c = await context(formData);
+  const v = await loadVisit(c, formData);
+  if (c.scope !== 'listing' || c.role !== 'homeowner') go(c.back, 'Only the homeowner answers this.');
+  if (v.status !== 'asked') go(c.back);
+  if (String(formData.get('answer') ?? '') === 'yes') {
+    await c.db.from('visits').update({ status: 'requested', updated_at: new Date().toISOString() }).eq('id', v.id);
+    await c.tell('Your visit request was approved', 'The homeowner will suggest times. You can still bid any time.');
+  } else {
+    await c.db.from('visits').update({ status: 'canceled', updated_at: new Date().toISOString() }).eq('id', v.id);
+    await c.tell('Not a visit right now', 'The homeowner is not scheduling a visit for this project yet. You can still send a bid.');
+  }
+  go(c.back);
+}
+
+/** The homeowner changes visit preference and free times on their post. */
+export async function setVisitPref(formData: FormData) {
+  requireMarketplace();
+  const { user } = await requireUser();
+  const db = supabaseAdmin();
+  const back = (() => { const r = String(formData.get('return_path') ?? ''); return r.startsWith('/') && !r.startsWith('//') ? r : '/marketplace'; })();
+  const { data: l } = await db.from('marketplace_listings').select('id,homeowner_id').eq('id', String(formData.get('listing_id') ?? '')).maybeSingle();
+  if (!l || l.homeowner_id !== user.id) go(back, 'Not allowed.');
+  const pref = ['yes', 'maybe', 'no'].includes(String(formData.get('visit_pref'))) ? String(formData.get('visit_pref')) : 'yes';
+  const free = formData.getAll('visit_free').map(String).filter((x) => ['Weekday mornings', 'Weekday evenings', 'Saturdays', 'Sundays'].includes(x)).join(', ');
+  const { error } = await db.from('marketplace_listings').update({ visit_pref: pref, visit_free: free }).eq('id', l!.id);
+  if (error) go(back, 'Could not save. Check that the database step was run.');
+  go(back);
 }

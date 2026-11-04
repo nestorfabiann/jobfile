@@ -3,7 +3,7 @@ const TZ = 'America/Chicago';
 export type Visit = {
   id: string; listing_id: string | null; bid_id: string | null; project_id: string | null;
   title: string; note: string; duration_text: string;
-  status: 'requested' | 'proposed' | 'confirmed' | 'done' | 'canceled';
+  status: 'asked' | 'requested' | 'proposed' | 'confirmed' | 'done' | 'canceled';
   slots: string[]; scheduled_for: string | null;
   requested_role: 'contractor' | 'homeowner' | null; last_role: 'contractor' | 'homeowner' | null;
   created_by: string | null; access: { gate?: string; pets?: string; parking?: string; other?: string } | null;
@@ -38,7 +38,8 @@ export const chiDay = (iso: string) => new Date(iso).toLocaleDateString('en-CA',
 export const other = (role: 'contractor' | 'homeowner') => (role === 'contractor' ? 'homeowner' : 'contractor');
 
 /** What this viewer should do about a visit, if anything. */
-export function visitTodo(v: Visit, role: 'contractor' | 'homeowner'): 'propose' | 'pick' | null {
+export function visitTodo(v: Visit, role: 'contractor' | 'homeowner'): 'propose' | 'pick' | 'approve' | null {
+  if (v.status === 'asked') return role === 'homeowner' ? 'approve' : null;
   if (v.status === 'requested' && v.requested_role && v.requested_role !== role) return 'propose';
   if (v.status === 'proposed' && v.last_role && v.last_role !== role) return 'pick';
   return null;

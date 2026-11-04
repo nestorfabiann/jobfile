@@ -136,8 +136,11 @@ async function createListingInner(formData: FormData): Promise<CreateResult> {
     ...(ref ? { ai_low_cents: ref.low * 100, ai_high_cents: ref.high * 100, ai_likely_cents: ref.likely * 100, ai_confidence: ref.confidence, ai_breakdown: ref.breakdown, ai_notes: ref.notes } : {}),
   };
   const cols = 'id,homeowner_id,job_type,zip,city,items,ai_low_cents,ai_high_cents';
-  let { data: l, error } = await db.from('marketplace_listings').insert({ ...row, answers }).select(cols).single();
-  // Until the 023 column exists, post without the answers rather than fail.
+  const visitPref = ['yes', 'maybe', 'no'].includes(String(formData.get('visit_pref'))) ? String(formData.get('visit_pref')) : 'yes';
+  const visitFree = formData.getAll('visit_free').map(String).filter((x) => ['Weekday mornings', 'Weekday evenings', 'Saturdays', 'Sundays'].includes(x)).join(', ');
+  let { data: l, error } = await db.from('marketplace_listings').insert({ ...row, answers, visit_pref: visitPref, visit_free: visitFree }).select(cols).single();
+  // Until the 023 and 032 columns exist, post without them rather than fail.
+  if (error && /visit_/i.test(error.message ?? '')) ({ data: l, error } = await db.from('marketplace_listings').insert({ ...row, answers }).select(cols).single());
   if (error && /answers/i.test(error.message ?? '')) ({ data: l, error } = await db.from('marketplace_listings').insert(row).select(cols).single());
   if (error || !l) return bad('Could not post the project. Check that the database step was run.');
   await alertMatchingContractors(l as any);

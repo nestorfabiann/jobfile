@@ -1,9 +1,10 @@
 import { calendarUrl, countdown, fmtWhen, visitTodo, type Visit } from '@/lib/visits';
 import { addDays, todayChi } from '@/lib/schedule';
-import { askToSeeJob, cancelVisit, declineTimes, pickVisitTime, proposeVisit, requestVisit, saveAccess, saveVisitReport, setVisitLive } from '@/app/visits/actions';
+import VisitPrefFields from '@/components/VisitPrefFields';
+import { answerVisitAsk, askToSeeJob, setVisitPref, cancelVisit, declineTimes, pickVisitTime, proposeVisit, requestVisit, saveAccess, saveVisitReport, setVisitLive } from '@/app/visits/actions';
 
 type Role = 'contractor' | 'homeowner';
-type Where = { scope: 'bid' | 'project' | 'listing'; listingId?: string; bidId?: string; projectId?: string; returnPath: string; address?: string };
+type Where = { scope: 'bid' | 'project' | 'listing'; listingId?: string; bidId?: string; projectId?: string; returnPath: string; address?: string; free?: string };
 
 function Hidden({ w, id }: { w: Where; id?: string }) {
   return (
@@ -78,7 +79,7 @@ const LIVE: Record<string, string> = { on_way: 'is on the way', late15: 'is runn
 export default function VisitCard({ visit: v, role, where: w }: { visit: Visit; role: Role; where: Where }) {
   if (v.status === 'canceled') return null;
   const todo = visitTodo(v, role);
-  const pill = v.status === 'done' ? ['Visited', 'ok'] : v.status === 'confirmed' ? ['Confirmed', 'ok'] : todo ? ['Your turn', 'warn'] : ['Waiting', ''];
+  const pill = v.status === 'asked' ? (todo ? ['Your turn', 'warn'] : ['Waiting', '']) : v.status === 'done' ? ['Visited', 'ok'] : v.status === 'confirmed' ? ['Confirmed', 'ok'] : todo ? ['Your turn', 'warn'] : ['Waiting', ''];
   const acc = v.access ?? {};
   const accessLines = [['Gate or entry', acc.gate], ['Pets', acc.pets], ['Parking', acc.parking], ['Other', acc.other]].filter(([, x]) => x);
   const at = v.status === 'done' ? 3 : v.status === 'confirmed' ? 2 : v.status === 'proposed' ? 1 : 0;
@@ -106,10 +107,22 @@ export default function VisitCard({ visit: v, role, where: w }: { visit: Visit; 
       {v.note ? <span className="small">Note: {v.note}</span> : null}
       <Steps at={at} />
 
+      {v.status === 'asked' && todo === 'approve' && (
+        <form action={answerVisitAsk} className="stack">
+          <Hidden w={w} id={v.id} />
+          <span className="small">This contractor asks to see the job before bidding. Approve and you suggest times. Not now sends a polite note, and they can still bid.</span>
+          <div className="row">
+            <button className="btn accent" name="answer" value="yes">Approve</button>
+            <button className="btn ghost" name="answer" value="no">Not now</button>
+          </div>
+        </form>
+      )}
+      {v.status === 'asked' && !todo && <span className="small muted">Waiting for the homeowner to approve. You can still bid any time.</span>}
+
       {v.status === 'requested' && todo === 'propose' && (
         <form action={proposeVisit} className="stack">
           <Hidden w={w} id={v.id} />
-          <span className="small"><b>{role === 'contractor' ? 'The homeowner' : 'The contractor'} would like a visit.</b> Tap the days that work for you.</span>
+          <span className="small"><b>{role === 'contractor' ? 'The homeowner' : 'The contractor'} would like a visit.</b> Tap the days that work for you.{w.free ? ` You said you are usually free: ${w.free}.` : ''}</span>
           <TimePicker />
           <div className="row"><button className="btn accent" type="submit">Send times</button></div>
         </form>
@@ -231,9 +244,10 @@ export default function VisitCard({ visit: v, role, where: w }: { visit: Visit; 
 }
 
 /** Start a visit: a homeowner asks a bidder; a contractor proposes times; on a project either side can add one. */
-export function NewVisit({ role, where: w, again, noDetails }: { role: Role; where: Where; again?: boolean; noDetails?: boolean }) {
+export function NewVisit({ role, where: w, again, noDetails, pref, free }: { role: Role; where: Where; again?: boolean; noDetails?: boolean; pref?: string; free?: string }) {
   if (w.scope === 'listing') {
     if (role !== 'contractor') return null;
+    if (pref === 'no') return <div className="small" style={{ border: '1px solid var(--line)', borderRadius: 14, padding: '10px 12px' }}><b>Bids only.</b> <span className="muted">This homeowner is not taking visits before hiring.</span></div>;
     return (
       <form action={askToSeeJob} style={{ background: 'var(--warn-bg)', border: '1.5px solid color-mix(in srgb, var(--accent) 35%, var(--surface))', borderRadius: 22, padding: 16, display: 'flex', flexDirection: 'column', gap: 10 }}>
         <Hidden w={w} />
@@ -243,7 +257,7 @@ export function NewVisit({ role, where: w, again, noDetails }: { role: Role; whe
           </span>
           <div style={{ minWidth: 0 }}>
             <b style={{ fontSize: 17, lineHeight: 1.2, display: 'block' }}>Not sure what to charge? See the job first.</b>
-            <span className="muted small" style={{ display: 'block', marginTop: 4 }}>{noDetails ? 'The homeowner left the detail questions blank, so a visit can help you price it right.' : 'Answers help, but seeing the space is the surest way to a firm price.'}</span>
+            <span className="muted small" style={{ display: 'block', marginTop: 4 }}>{pref === 'maybe' ? 'The homeowner wants to approve each visit request first.' : free ? `The homeowner is happy to show the job and is usually free ${free.toLowerCase()}.` : noDetails ? 'The homeowner left the detail questions blank, so a visit can help you price it right.' : 'Answers help, but seeing the space is the surest way to a firm price.'}</span>
           </div>
         </div>
         <details>
@@ -285,6 +299,22 @@ export function NewVisit({ role, where: w, again, noDetails }: { role: Role; whe
         {w.scope === 'project' && <label className="fld">What is it for?<input name="title" placeholder="Final walkthrough" maxLength={120} /></label>}
         <TimePicker />
         <div className="row"><button className="btn" type="submit">Send times</button></div>
+      </form>
+    </details>
+  );
+}
+
+
+/** Homeowner: change visit preference after posting. */
+export function VisitPrefEditor({ listingId, returnPath, pref, free }: { listingId: string; returnPath: string; pref: string; free: string }) {
+  return (
+    <details className="card">
+      <summary style={{ cursor: 'pointer', fontWeight: 700 }}>Site visits: {pref === 'no' ? 'bids only' : pref === 'maybe' ? 'ask me first' : 'open'}{free ? ` · ${free}` : ''}</summary>
+      <form action={setVisitPref} className="stack" style={{ marginTop: 10 }}>
+        <input type="hidden" name="listing_id" value={listingId} />
+        <input type="hidden" name="return_path" value={returnPath} />
+        <VisitPrefFields pref={pref} free={free} />
+        <div className="row"><button className="btn" type="submit">Save</button></div>
       </form>
     </details>
   );

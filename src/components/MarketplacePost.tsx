@@ -1,5 +1,6 @@
 'use client';
 
+import VisitPrefFields from '@/components/VisitPrefFields';
 import TradeIcon from '@/components/TradeIcon';
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -310,6 +311,10 @@ export default function MarketplacePost({ types, aiOn, draft }: { types: Types; 
           <input type="checkbox" name="is_homestead" />
           <span>This is my homestead.<span className="muted small" style={{ display: 'block' }}>Texas has extra contract rules for homestead jobs. Jobfile will track them.</span></span>
         </label>
+        <h2>Site visits</h2>
+        <p className="muted small">Contractors often want to see the space before they price it. Tell them what works for you. Your address stays private until you hire.</p>
+        <VisitPrefFields />
+        <p className="muted small">You can change this later on your project page.</p>
         {nudge && !media.length ? (
           <div className="card" role="alertdialog" aria-label="No photos yet" style={{ gap: 10 }}>
             <b>No photos yet</b>

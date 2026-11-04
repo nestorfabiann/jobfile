@@ -19,7 +19,7 @@ import BidViewNotice from '@/components/BidViewNotice';
 import { answerRows, detailPercent } from '@/lib/scopeQuestions';
 import { ackBidView, recordBidViews, recordCompared } from '@/lib/bidViews';
 import { acceptBid, closeListing, deleteListingPhoto, deleteListingVideo, extendListing, placeBid, withdrawBid } from '../actions';
-import VisitCard, { NewVisit } from '@/components/VisitCard';
+import VisitCard, { NewVisit, VisitPrefEditor } from '@/components/VisitCard';
 import type { Visit } from '@/lib/visits';
 import { countMatchingContractors, DEFAULT_RADIUS } from '@/lib/matching';
 
@@ -85,7 +85,7 @@ export default async function ListingPage({ params, searchParams }: { params: { 
     const { data: cos } = ms?.length ? await db.from('companies').select('id,name').in('id', (ms as any[]).map((m) => m.company_id)) : { data: [] };
     (ms ?? []).forEach((m: any) => preNames.set(m.user_id, ((cos ?? []) as any[]).find((c) => c.id === m.company_id)?.name ?? 'A contractor'));
   }
-  const preWhere = { scope: 'listing' as const, listingId: l.id, returnPath: `/marketplace/${l.id}` };
+  const preWhere = { scope: 'listing' as const, listingId: l.id, returnPath: `/marketplace/${l.id}`, free: l.visit_free || undefined };
   const visitFor = (bidId: string, role: 'homeowner' | 'contractor', bidOpen: boolean) => {
     const mine = visitRows.filter((x) => x.bid_id === bidId);
     const where = { scope: 'bid' as const, bidId, returnPath: `/marketplace/${l.id}?open=${bidId}#bid-${bidId}` };
@@ -251,6 +251,8 @@ export default async function ListingPage({ params, searchParams }: { params: { 
         </div>
       )}
 
+      {owner && open && <VisitPrefEditor listingId={l.id} returnPath={`/marketplace/${l.id}`} pref={l.visit_pref ?? 'yes'} free={l.visit_free ?? ''} />}
+
       {owner && preRows.length > 0 && (
         <div className="card stack">
           <h2>Visit requests</h2>
@@ -350,7 +352,7 @@ export default async function ListingPage({ params, searchParams }: { params: { 
           {open && (!myBid || myBid.status === 'withdrawn') && (
             <>
               {preRows.map((v) => <VisitCard key={v.id} visit={v} role="contractor" where={preWhere} />)}
-              {!preRows.some((v) => v.status !== 'done') && <NewVisit role="contractor" where={preWhere} noDetails={rows.length === 0} />}
+              {!preRows.some((v) => v.status !== 'done') && <NewVisit role="contractor" where={preWhere} noDetails={rows.length === 0} pref={l.visit_pref ?? 'yes'} free={l.visit_free ?? ''} />}
             </>
           )}
           {myBid && myBid.status === 'won' && l.project_id && <><div className="box ok">You won this job.</div><Link className="btn" href={`/projects/${l.project_id}/overview`}>Open the project</Link></>}
