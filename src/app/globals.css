@@ -546,3 +546,7 @@ html { scroll-behavior: smooth; }
 .apptabs-sheet a > span:not(.mi-tag) { display: flex; flex-direction: column; gap: 2px; min-width: 0; line-height: 1.25; }
 .apptabs-sheet .mi-sub { display: block; font: 400 13px 'IBM Plex Sans', system-ui, sans-serif; color: var(--ink-2); }
 .apptabs-sheet a.mi-new { min-height: 60px; }
+.appmenu-sheet { width: 272px; }
+.appmenu-sheet a.mi-new { margin: 2px 0; padding-top: 10px; padding-bottom: 10px; }
+.appmenu-sheet a > span:not(.mi-tag) { display: flex; flex-direction: column; gap: 2px; line-height: 1.25; min-width: 0; }
+.appmenu-sheet .mi-sub { white-space: nowrap; }
