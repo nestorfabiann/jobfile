@@ -22,10 +22,11 @@ export default async function Home() {
   const inv = (to: string) => (signedIn ? to : `/login?next=${encodeURIComponent(to)}`);
   return (
     <div className="landing">
-      <div className="row" style={{ justifyContent: 'space-between', alignItems: 'center' }}>
-        <b style={{ fontFamily: "'Bricolage Grotesque', system-ui, sans-serif", fontSize: 22, letterSpacing: '-0.03em' }}>Jobfile</b>
-        {signedIn ? <Link className="pill" href="/projects">Go to Projects →</Link> : <Link className="pill" href="/login">Sign in</Link>}
-      </div>
+      {signedIn && (
+        <div className="row" style={{ justifyContent: 'flex-end' }}>
+          <Link className="pill" href="/projects">Go to Projects →</Link>
+        </div>
+      )}
       <LandingModern signedIn={signedIn} nums={nums}>
         <section className="lm-have" aria-label="Bring your own contractor or customer">
           <h2>Already have a contractor or a customer?</h2>
