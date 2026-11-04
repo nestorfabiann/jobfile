@@ -1,0 +1,68 @@
+<title>Post Follow-up</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: one phone column. Tabs: Just posted, Notices, Expiring. Counts, names and dates are examples. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#c4813f;--orl:#f9efe4;--orb:#ecd4a8;--gr:#1f7a55;--grl:#d9f1e6;--am:#9a5b00;--aml:#fbeccd;--bl:#1d5fa8;--bll:#e0ecf8;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--gr:#6fd1a3;--grl:#173a2c;--am:#f0b95a;--aml:#3a2e12;--bl:#8fbdf0;--bll:#17283d;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--gr:#6fd1a3;--grl:#173a2c;--am:#f0b95a;--aml:#3a2e12;--bl:#8fbdf0;--bll:#17283d;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:14px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:16px}
+h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;text-wrap:balance}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
+.mut{color:var(--mut);font-size:14px;line-height:1.5;margin:0}
+.sw{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.sw button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:8px 2px;border-radius:99px;font:500 12.5px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:44px}.sw button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.sec{display:flex;flex-direction:column;gap:14px}.sec[hidden]{display:none}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.ok{background:var(--grl);color:var(--gr);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:4px}.ok b{font-size:15.5px}.ok span{font-size:13.5px;color:var(--ink);line-height:1.45}
+.warn{background:var(--aml);color:var(--am);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:4px}.warn b{font-size:15.5px}.warn span{font-size:13.5px;color:var(--ink);line-height:1.45}
+.btn{display:block;text-align:center;background:var(--or);color:#fff;border-radius:99px;padding:13px 18px;font:600 15px 'IBM Plex Sans',sans-serif;min-height:46px}.btn.gh{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+.pill{font-size:12px;font-weight:700;padding:4px 10px;border-radius:99px;white-space:nowrap;background:var(--orl);color:var(--or);border:1px solid var(--orb)}.pill.g{background:var(--grl);color:var(--gr);border-color:transparent}.pill.a{background:var(--aml);color:var(--am);border-color:transparent}
+.nt{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--line)}.nt:last-child{border-bottom:0}.nt i{font-style:normal;width:34px;height:34px;border-radius:11px;background:var(--orl);color:var(--or);display:grid;place-items:center;flex:none;font-size:16px}
+.nt b{display:block;font-size:14.5px;line-height:1.35}.nt span{font-size:13px;color:var(--mut);line-height:1.4}
+.row{display:flex;justify-content:space-between;gap:10px;font-size:14.5px;padding:8px 0;border-bottom:1px solid var(--line)}.row:last-child{border-bottom:0}
+</style>
+<div class="wrap">
+  <div class="note"><b>Mockup.</b> What the homeowner sees after posting, the extra notices they get, and the expiring-post prompt. Counts, names and dates are examples.</div>
+  <div class="sw" id="sw"><button data-s="po" class="on" type="button">Just posted</button><button data-s="no" type="button">Notices</button><button data-s="ex" type="button">Expiring</button></div>
+
+  <div id="po" class="sec">
+    <h2 style="font-size:24px">Kitchen remodel</h2>
+    <div class="ok"><b>Your project is posted.</b><span>We told <b style="display:inline">7 contractors</b> within 25 miles of 75074 who do kitchen remodels. Most bids arrive within 2 days. Add photos below to help them price it.</span></div>
+    <p class="mut" style="font-size:12.5px">If nobody matches, the box looks like this:</p>
+    <div class="warn"><b>Your project is posted.</b><span>No contractors on Jobfile near 75074 do this kind of work yet, so nobody was alerted. You can still invite someone you know, or look for one yourself.</span>
+      <a class="btn" style="margin-top:8px">Invite a contractor</a><a class="btn gh">Find contractors</a></div>
+    <div class="note" style="border-style:solid">"7" counts contractors who are taking new jobs, do this trade, travel this far and have alerts on. Booked and paused contractors are not counted.</div>
+  </div>
+
+  <div id="no" class="sec" hidden>
+    <h2 style="font-size:24px">Notices for the homeowner</h2>
+    <div class="card" style="padding-block:6px">
+      <div class="nt"><i>✎</i><div><b>Garcia Roofing changed their bid</b><span>From $18,400 to $17,900 on Kitchen remodel. Open to compare.</span></div></div>
+      <div class="nt"><i>↩</i><div><b>Lopez Home Repair withdrew their bid</b><span>You still have 2 bids on Kitchen remodel.</span></div></div>
+      <div class="nt"><i>⏱</i><div><b>No bids yet on Kitchen remodel</b><span>It has been 3 days. Adding photos or a budget range usually helps, or you can invite a contractor you know.</span></div></div>
+      <div class="nt"><i>⚖</i><div><b>You have 3 bids to compare</b><span>Prices from $17,900 to $21,200. Open the comparison to see them side by side.</span></div></div>
+    </div>
+    <div class="note" style="border-style:solid"><b>Not too noisy:</b> a price change is sent once per contractor per day, the "3 bids" nudge once per post, and the no-bids notice once at 3 days. Each also goes by email once email is set up.</div>
+  </div>
+
+  <div id="ex" class="sec" hidden>
+    <h2 style="font-size:24px">Kitchen remodel</h2>
+    <div class="warn"><b>This post ends in 3 days.</b><span>It has been open 27 days with 2 bids. After it ends, contractors can no longer bid.</span>
+      <a class="btn" style="margin-top:8px">Keep it open 30 more days</a><a class="btn gh">Let it end</a></div>
+    <div class="card">
+      <h3 style="font-size:16px">Reminders sent</h3>
+      <div class="row"><span>7 days before it ends</span><span class="pill g">Notice + email</span></div>
+      <div class="row"><span>3 days before it ends</span><span class="pill g">Notice + email</span></div>
+      <div class="row"><span>When it ends</span><span class="pill">Notice</span></div>
+    </div>
+    <div class="note" style="border-style:solid">Contractors with a bid on a post that is extended get a short notice that it is still open. If it ends with bids still waiting, the homeowner is asked once to pick one or close it, so contractors are not left hanging.</div>
+  </div>
+</div>
+<script>
+var sw=document.getElementById('sw'),ids=['po','no','ex'];
+[].forEach.call(sw.children,function(b){b.onclick=function(){
+  [].forEach.call(sw.children,function(x){x.classList.toggle('on',x===b)});
+  ids.forEach(function(id){document.getElementById(id).hidden=id!==b.dataset.s});window.scrollTo(0,0)}});
+</script>
