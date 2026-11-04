@@ -1,107 +1,95 @@
-<title>Project Tabs Options</title>
+<title>New Project Tabs</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-/* Layout: one project page header shown with two ways to make the tab row obvious. A = fade and arrow, B = two-row grid. */
-:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#cd7d2e;--orl:#f9efe4;--orb:#ecd4a8;--page:#e9e5dc}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--page:#0d0c0b;color-scheme:dark}}
-:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--page:#0d0c0b;color-scheme:dark}
+/* Layout: one phone column. Tabs: Where, Schedule, Selections, Documents. Names, dates and items are examples. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#c4813f;--orl:#f9efe4;--orb:#ecd4a8;--gr:#1f7a55;--grl:#d9f1e6;--am:#9a5b00;--aml:#fbeccd;--bl:#1d5fa8;--bll:#e0ecf8;--rd:#a63d2f;--rdl:#f8dcd6;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--gr:#6fd1a3;--grl:#173a2c;--am:#f0b95a;--aml:#3a2e12;--bl:#8fbdf0;--bll:#17283d;--rd:#f09a8c;--rdl:#3d1f1a;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--gr:#6fd1a3;--grl:#173a2c;--am:#f0b95a;--aml:#3a2e12;--bl:#8fbdf0;--bll:#17283d;--rd:#f09a8c;--rdl:#3d1f1a;--page:#0d0c0b;color-scheme:dark}
 *{box-sizing:border-box}
 body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
-.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh}
-.g{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
-h1,h2{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0}
-.sw{display:flex;gap:6px;padding-block:10px;border-bottom:1px dashed var(--line)}
-.sw button{flex:1;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:9px 6px;border-radius:99px;font:500 12.5px 'IBM Plex Sans',system-ui,sans-serif;cursor:pointer}
-.sw button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-.sec[hidden]{display:none}
-.body{padding-block:16px 40px;display:flex;flex-direction:column;gap:14px}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:14px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:16px}
+h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;text-wrap:balance}
 .note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
-.mut{color:var(--mut);font-size:14px;line-height:1.5}
-.pill{font-size:12.5px;font-weight:600;padding:6px 12px;border-radius:99px;background:var(--orl);color:var(--or);border:1px solid var(--orb);width:max-content}
-.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:18px;display:flex;flex-direction:column;gap:8px}
-.card b{font:800 22px 'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.02em}
-.lbl{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--or);font-weight:600}
-.ctl{display:flex;gap:6px;flex-wrap:wrap}
-.ctl button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:7px 12px;border-radius:99px;font:500 12.5px 'IBM Plex Sans',system-ui,sans-serif;cursor:pointer}
-.ctl button.on{background:var(--orl);color:var(--or);border-color:var(--orb)}
-button:focus-visible{outline:2px solid var(--or);outline-offset:2px}
-
-/* Option A: fade + arrow */
-.tw{position:relative;border-bottom:1px solid var(--line)}
-.tr{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;scroll-behavior:smooth;padding-right:44px}
-.tr::-webkit-scrollbar{display:none}
-.tr span{flex:none;padding:12px 14px;font-size:15px;font-weight:600;color:var(--mut);border-bottom:3px solid transparent;margin-bottom:-1px;cursor:pointer}
-.tr span.cur{color:var(--ink);border-bottom-color:var(--or)}
-.fade{position:absolute;right:0;top:0;bottom:0;width:64px;pointer-events:none;background:linear-gradient(90deg,transparent,var(--bg) 78%);transition:opacity .2s}
-.arr{position:absolute;right:0;top:50%;transform:translateY(-50%);width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--or);font-size:18px;line-height:1;cursor:pointer;display:grid;place-items:center;box-shadow:0 2px 8px #0002;transition:opacity .2s}
-.end .fade,.end .arr{opacity:0;pointer-events:none}
-
-/* Option B: two-row grid */
-.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding-block:10px;border-bottom:1px solid var(--line)}
-.grid span{text-align:center;padding:10px 4px;border-radius:12px;font-size:13.5px;font-weight:600;color:var(--mut);border:1px solid transparent;cursor:pointer;white-space:nowrap}
-.grid span.cur{background:var(--orl);color:var(--or);border-color:var(--orb)}
+.mut{color:var(--mut);font-size:13px;line-height:1.45;margin:0}
+.sw{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}.sw button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:8px 4px;border-radius:99px;font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:44px}.sw button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.sec{display:flex;flex-direction:column;gap:14px}.sec[hidden]{display:none}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.btn{display:block;text-align:center;background:var(--or);color:#fff;border-radius:99px;padding:12px 16px;font:600 14.5px 'IBM Plex Sans',sans-serif;min-height:44px}.btn.gh{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+.pill{font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:99px;white-space:nowrap;background:var(--orl);color:var(--or);border:1px solid var(--orb)}.pill.g{background:var(--grl);color:var(--gr);border-color:transparent}.pill.a{background:var(--aml);color:var(--am);border-color:transparent}.pill.b{background:var(--bll);color:var(--bl);border-color:transparent}.pill.r{background:var(--rdl);color:var(--rd);border-color:transparent}.pill.m{background:transparent;color:var(--mut);border-color:var(--line)}
+.tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.tabs span{text-align:center;font-size:12.5px;font-weight:600;color:var(--mut);padding:11px 2px;border-radius:99px}.tabs .on{background:var(--orl);color:var(--or);border:1px solid var(--orb)}.tabs .new{color:var(--ink);border:1px dashed var(--orb)}
+.row{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--line)}.row:last-child{border-bottom:0}.row b{font-size:14.5px}.row .l{min-width:0}
+.dot{width:12px;height:12px;border-radius:50%;flex:none;margin-top:5px;border:2px solid var(--line)}.dot.d{background:var(--gr);border-color:var(--gr)}.dot.n{background:var(--or);border-color:var(--or)}
+.ph{display:flex;gap:10px}.ph .dot{margin-top:4px}.ph .c{flex:1;min-width:0;border-bottom:1px solid var(--line);padding-bottom:10px}.ph:last-child .c{border-bottom:0}
+.warn{background:var(--aml);color:var(--am);border-radius:14px;padding:11px 12px;font-size:13.5px;line-height:1.45}
+.ok{background:var(--grl);color:var(--gr);border-radius:14px;padding:11px 12px;font-size:13.5px;line-height:1.45}
+.thumb{width:44px;height:44px;border-radius:10px;background:var(--orl);border:1px solid var(--orb);flex:none;display:grid;place-items:center;font-size:12px;color:var(--or);font-weight:700}
+.sw2{display:flex;gap:8px;align-items:center}.sw2 i{width:22px;height:22px;border-radius:50%;border:1px solid var(--line);display:inline-block}
+.who{font-size:12px;color:var(--mut)}
 </style>
-
 <div class="wrap">
-  <div class="sw g"><button class="on" data-s="a" type="button">A · Fade + arrow</button><button data-s="b" type="button">B · Two rows</button></div>
+  <div class="note"><b>Mockup.</b> Three new project tabs: Schedule, Selections and Documents. Names, dates and items are examples.</div>
+  <div class="sw" id="sw"><button data-s="wh" class="on" type="button">Where they go</button><button data-s="sc" type="button">Schedule</button><button data-s="se" type="button">Selections</button><button data-s="dc" type="button">Documents</button></div>
 
-  <!-- A -->
-  <div class="sec" id="a">
-    <div class="body g">
-      <div class="note"><b>Option A.</b> The row still scrolls, but the right edge fades out and a <b>›</b> button sits on it. Tap it, or swipe. At the end the fade and arrow disappear. Tap a tab below to see it scroll into view.</div>
-      <h1 style="font-size:32px">Kitchen remodel</h1>
-      <span class="pill">You: contractor</span>
-    </div>
-    <div class="tw g" id="tw">
-      <div class="tr" id="tr">
-        <span class="cur">Overview</span><span>Messages</span><span>Agreement</span><span>Photos</span><span>Changes</span><span>Payments</span><span>Ratings</span><span>Price check</span>
-      </div>
-      <div class="fade"></div>
-      <button class="arr" id="arr" type="button" aria-label="Show more tabs">›</button>
-    </div>
-    <div class="body g">
-      <div class="mut">Try: tap <b>Payments</b>. In the real app the bar also scrolls so the tab you are on is never hidden.</div>
-      <div class="card"><span class="lbl">Agreed price</span><b>$25,000</b></div>
-    </div>
+  <div id="wh" class="sec">
+    <h2 style="font-size:22px">Kitchen remodel</h2>
+    <div class="tabs"><span class="on">Overview</span><span>Messages</span><span>Agreement</span><span>Photos</span><span>Changes</span><span>Payments</span><span class="new">Schedule</span><span class="new">Selections</span><span class="new">Documents</span></div>
+    <div class="note" style="border-style:solid">The three new tabs are dashed. The tab row grows from 2 rows to 3. A red dot on a tab means something needs you, for example a selection due in 2 days. The contractor's "My money" tab stays where it is.</div>
+    <div class="card"><h3 style="font-size:16px">Why these three</h3>
+      <p class="mut"><b style="color:var(--ink)">Schedule:</b> 41% of homeowners in a Houzz survey said a clear timeline would have helped.</p>
+      <p class="mut"><b style="color:var(--ink)">Selections:</b> late choices are a common cause of delay, and the agreement already says they can move the schedule.</p>
+      <p class="mut"><b style="color:var(--ink)">Documents:</b> permits, insurance, warranties and receipts in one place.</p></div>
   </div>
 
-  <!-- B -->
-  <div class="sec" id="b" hidden>
-    <div class="body g">
-      <div class="note"><b>Option B.</b> Every tab is on screen, four per row. Nothing scrolls, so nothing is hidden. Costs about 50px of height on each project page.</div>
-      <h1 style="font-size:32px">Kitchen remodel</h1>
-      <span class="pill">You: contractor</span>
+  <div id="sc" class="sec" hidden>
+    <div class="card"><div style="display:flex;justify-content:space-between;gap:10px;align-items:center"><h2 style="font-size:20px">Schedule</h2><span class="pill g">On track</span></div>
+      <p class="mut">Nov 12 to Nov 26 · 2 weeks. Dates come from the signed agreement. Changes below are logged with a reason.</p></div>
+    <div class="card" style="gap:0">
+      <div class="ph"><span class="dot d"></span><div class="c"><b>Demo and prep</b><div class="who">Nov 12 to Nov 13 · done</div></div></div>
+      <div class="ph"><span class="dot n"></span><div class="c"><b>Cabinets and tile</b><div class="who">Nov 14 to Nov 20 · in progress</div><span class="pill b" style="margin-top:6px;display:inline-block">Tile arrives Nov 14</span></div></div>
+      <div class="ph"><span class="dot"></span><div class="c"><b>Paint and trim</b><div class="who">Nov 21 to Nov 24</div></div></div>
+      <div class="ph"><span class="dot"></span><div class="c"><b>Cleanup and walkthrough</b><div class="who">Nov 25 to Nov 26</div></div></div>
     </div>
-    <div class="grid g" id="grid">
-      <span class="cur">Overview</span><span>Messages</span><span>Agreement</span><span>Photos</span><span>Changes</span><span>Payments</span><span>Ratings</span><span>Price check</span>
+    <div class="card"><h3 style="font-size:16px">Coming up this week</h3>
+      <div class="row"><div class="l"><b>Thu Nov 14 · 8:00 am</b><div class="who">Tile delivery. Someone should be home.</div></div><span class="pill m">Both</span></div>
+      <div class="row"><div class="l"><b>Fri Nov 15</b><div class="who">Pick the backsplash. Due in 2 days.</div></div><span class="pill a">You</span></div></div>
+    <div class="card"><h3 style="font-size:16px">Date changes</h3>
+      <div class="warn"><b>Paint and trim moved 1 day later</b> (Nov 20 to Nov 21). Reason: tile delivery was delayed. Logged by the contractor Nov 8. <b>Homeowner saw it Nov 8.</b></div>
+      <a class="btn gh">Change a date</a></div>
+  </div>
+
+  <div id="se" class="sec" hidden>
+    <div class="card"><div style="display:flex;justify-content:space-between;gap:10px;align-items:center"><h2 style="font-size:20px">Selections</h2><span class="pill a">2 need you</span></div>
+      <p class="mut">Choices the homeowner makes, each with a date. A late choice can move the schedule, so the contractor sees the cost of waiting.</p></div>
+    <div class="card" style="gap:0">
+      <div class="row"><div class="l" style="display:flex;gap:10px"><span class="thumb">▦</span><div><b>Backsplash tile</b><div class="who">Needed by Nov 15 · affects Cabinets and tile</div></div></div><span class="pill r">Due in 2 days</span></div>
+      <div class="row"><div class="l" style="display:flex;gap:10px"><span class="thumb">▭</span><div><b>Cabinet pulls</b><div class="who">Needed by Nov 18</div></div></div><span class="pill a">Open</span></div>
+      <div class="row"><div class="l" style="display:flex;gap:10px"><span class="thumb"><span class="sw2"><i style="background:#d8d2c4"></i></span></span><div><b>Wall color</b><div class="who">Chosen Nov 6: Swiss Coffee, satin</div></div></div><span class="pill g">Chosen</span></div>
+      <div class="row"><div class="l" style="display:flex;gap:10px"><span class="thumb">▤</span><div><b>Countertop</b><div class="who">Chosen Nov 3: quartz, Calacatta</div></div></div><span class="pill g">Chosen</span></div>
     </div>
-    <div class="body g">
-      <div class="mut">Homeowners see fewer tabs (Ratings and Price check show only when they apply), so their grid is often a single row.</div>
-      <div class="card"><span class="lbl">Agreed price</span><b>$25,000</b></div>
+    <div class="card"><h3 style="font-size:16px">Backsplash tile</h3>
+      <p class="mut">Contractor note: "Order by Friday so it arrives Nov 14."</p>
+      <div class="ok">If you choose by Nov 15, the schedule stays on track.</div>
+      <a class="btn">Mark as chosen</a><a class="btn gh">Add a photo or link</a></div>
+  </div>
+
+  <div id="dc" class="sec" hidden>
+    <div class="card"><div style="display:flex;justify-content:space-between;gap:10px;align-items:center"><h2 style="font-size:20px">Documents</h2><span class="pill g">3 of 5 on file</span></div>
+      <p class="mut">Everything both sides may need later, in one place. Both can see it.</p></div>
+    <div class="card" style="gap:0">
+      <div class="row"><div class="l"><b>Permit</b><div class="who">Contractor pulls it · City of Plano</div></div><span class="pill a">Applied Nov 5</span></div>
+      <div class="row"><div class="l"><b>Certificate of insurance</b><div class="who">Insured to Mar 2027</div></div><span class="pill g">On file</span></div>
+      <div class="row"><div class="l"><b>Signed agreement</b><div class="who">Signed Oct 12 by both</div></div><span class="pill g">On file</span></div>
+      <div class="row"><div class="l"><b>Material receipts</b><div class="who">2 uploaded</div></div><span class="pill g">On file</span></div>
+      <div class="row"><div class="l"><b>Warranty and manuals</b><div class="who">Added when the job is done</div></div><span class="pill m">After the job</span></div>
     </div>
+    <a class="btn">Add a document</a>
+    <div class="note" style="border-style:solid">The signed agreement, the insurance certificate and the lien waivers already in Payments appear here automatically. Anything added here can be included in the project record PDF.</div>
   </div>
 </div>
-
 <script>
-var tr=document.getElementById('tr'),tw=document.getElementById('tw');
-function upd(){tw.classList.toggle('end',tr.scrollLeft+tr.clientWidth>=tr.scrollWidth-4)}
-tr.addEventListener('scroll',upd);window.addEventListener('resize',upd);upd();
-document.getElementById('arr').addEventListener('click',function(){tr.scrollBy({left:tr.clientWidth*0.7})});
-function pick(box,sel){
-  box.querySelectorAll(sel).forEach(function(s){
-    s.addEventListener('click',function(){
-      box.querySelectorAll(sel).forEach(function(x){x.classList.toggle('cur',x===s)});
-      if(box===tr){var l=s.offsetLeft-(tr.clientWidth-s.offsetWidth)/2;tr.scrollTo({left:Math.max(0,l),behavior:'smooth'})}
-    });
-  });
-}
-pick(tr,'span');pick(document.getElementById('grid'),'span');
-document.querySelectorAll('.sw button').forEach(function(b){
-  b.addEventListener('click',function(){
-    document.querySelectorAll('.sw button').forEach(function(x){x.classList.toggle('on',x===b)});
-    ['a','b'].forEach(function(id){document.getElementById(id).hidden=(id!==b.dataset.s)});
-    upd();
-  });
-});
+var sw=document.getElementById('sw'),ids=['wh','sc','se','dc'];
+[].forEach.call(sw.children,function(b){b.onclick=function(){
+  [].forEach.call(sw.children,function(x){x.classList.toggle('on',x===b)});
+  ids.forEach(function(id){document.getElementById(id).hidden=id!==b.dataset.s});window.scrollTo(0,0)}});
 </script>
