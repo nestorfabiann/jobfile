@@ -1,0 +1,106 @@
+<title>Welcome Alerts Screen</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: one phone column. Switch between the two first-time screens (in Safari, installed app) and the later reminder. Copy is example copy. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#c4813f;--orl:#f9efe4;--orb:#ecd4a8;--fg:#1f4d3a;--fgl:#e4f0e8;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--fgl:#173a2c;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--fgl:#173a2c;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:14px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px}
+h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;text-wrap:balance}h2{font-size:28px;line-height:1.05}h3{font-size:18px}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
+.mut{color:var(--mut);font-size:14.5px;line-height:1.5;margin:0}
+.sw{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.sw button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:6px 4px;border-radius:99px;font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:44px}.sw button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.sec{display:flex;flex-direction:column;gap:14px}.sec[hidden]{display:none}
+.stage{display:flex;justify-content:center;padding:22px 0 8px;border-radius:30px;background:radial-gradient(120% 80% at 50% 0%,var(--orl),transparent 70%)}
+.ph{width:min(270px,76%);height:520px;background:#faf8f4;color:#1b1a18;border:7px solid #1b1a18;border-radius:36px;position:relative;overflow:hidden;box-shadow:0 22px 44px -18px rgba(27,26,24,.45);display:flex;flex-direction:column}
+.url{height:44px;background:#f3f1ec;display:flex;align-items:center;justify-content:center;font-size:11px;color:#6b655e;padding-top:10px;flex:none}
+.body{flex:1;padding:18px 16px 14px;display:flex;flex-direction:column;gap:10px;font-size:12px;line-height:1.45}
+.logo{font:800 17px 'Bricolage Grotesque',sans-serif}.logo i{font-style:normal;color:#c4813f}
+.body h4{font:800 21px/1.05 'Bricolage Grotesque',sans-serif;letter-spacing:-.03em;margin:4px 0 0}
+.body p{margin:0;color:#5c564f}
+.bell{width:58px;height:58px;border-radius:18px;background:#c4813f;display:grid;place-items:center;position:relative}
+.bell::after{content:"";position:absolute;inset:-6px;border-radius:22px;border:2px solid #c4813f;animation:p 1.6s ease-out infinite}
+@keyframes p{from{transform:scale(.85);opacity:1}to{transform:scale(1.25);opacity:0}}
+@media (prefers-reduced-motion:reduce){.bell::after{animation:none}}
+.list{display:flex;flex-direction:column;gap:6px;margin:2px 0}
+.li{display:flex;gap:8px;align-items:center;background:#fff;border:1px solid #e4dfd6;border-radius:12px;padding:8px 10px;font-size:11.5px}
+.li b{display:block;font-size:12px}.dot{width:8px;height:8px;border-radius:50%;background:#1f4d3a;flex:none}
+.go{margin-top:auto;display:flex;flex-direction:column;gap:6px}
+.btn{border:0;border-radius:14px;padding:12px;font:600 13px 'IBM Plex Sans',sans-serif;text-align:center}
+.pri{background:#1f4d3a;color:#fff}.ghost{background:transparent;color:#6b655e}
+.stp{display:flex;gap:9px;align-items:center;background:#fff;border:1px solid #e4dfd6;border-radius:12px;padding:8px 10px;font-size:11.5px}
+.stp .n{width:22px;height:22px;border-radius:50%;background:#f9efe4;color:#c4813f;font-weight:700;display:grid;place-items:center;flex:none;font-size:11px}
+.tabs{height:50px;background:#fff;border-top:1px solid #e4dfd6;display:flex;justify-content:space-around;align-items:center;font-size:9.5px;color:#6b655e;flex:none}
+.card{background:#fff;border:1px solid #e4dfd6;border-radius:14px;padding:11px;display:flex;gap:9px;align-items:center;font-size:11px}
+.card .ic{width:34px;height:34px;border-radius:11px;background:#c4813f;display:grid;place-items:center;flex:none}
+.card b{display:block;font-size:12px}.card .t{margin-left:auto;background:#1f4d3a;color:#fff;border-radius:10px;padding:7px 10px;font-weight:600}
+.rules{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:9px}
+.rules ul{margin:0;padding-left:18px;color:var(--mut);font-size:14px;line-height:1.5;display:flex;flex-direction:column;gap:6px}.rules li b{color:var(--ink)}
+</style>
+<div class="wrap">
+  <div class="note"><b>Mockup.</b> The first-time welcome screen for phone alerts. It shows once per person and never again. Example copy.</div>
+  <h2>Turn on alerts, once</h2>
+  <p class="mut">Shown right after someone first signs in. Pick a case to see what they would see.</p>
+  <div class="sw" role="group" aria-label="Case">
+    <button type="button" data-s="safari" aria-pressed="true">iPhone in Safari</button>
+    <button type="button" data-s="app" aria-pressed="false">Installed app</button>
+    <button type="button" data-s="later" aria-pressed="false">After "Not now"</button>
+  </div>
+
+  <div class="sec" id="safari"><div class="stage"><div class="ph">
+    <div class="url">jobfile-rosy.vercel.app</div>
+    <div class="body">
+      <div class="logo">Job<i>file</i></div>
+      <h4>Never miss a bid or a message</h4>
+      <p>On iPhone, alerts work from the Home Screen. Two quick steps first.</p>
+      <div class="stp"><span class="n">1</span><span>Tap <b>Share</b>, then <b>Add to Home Screen</b></span></div>
+      <div class="stp"><span class="n">2</span><span>Open Jobfile from your Home Screen. We will ask once.</span></div>
+      <div class="go"><div class="btn pri">Show me how</div><div class="btn ghost">Not now</div></div>
+    </div>
+  </div></div>
+  <p class="mut">Safari can't ask for alerts on iPhone, so this screen teaches the install first and links to the full Add to Home Screen guide.</p></div>
+
+  <div class="sec" id="app" hidden><div class="stage"><div class="ph">
+    <div class="body" style="padding-top:34px">
+      <div class="bell"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg></div>
+      <h4>Get alerts on this phone</h4>
+      <p>We only send what matters. You choose which kinds.</p>
+      <div class="list">
+        <div class="li"><span class="dot"></span><span><b>New bids</b>When a contractor bids on your project</span></div>
+        <div class="li"><span class="dot"></span><span><b>Visits</b>Requests, times and reminders</span></div>
+        <div class="li"><span class="dot"></span><span><b>Payments and changes</b>Requests and change orders</span></div>
+      </div>
+      <p style="font-size:11px">Change this any time in Settings.</p>
+      <div class="go"><div class="btn pri">Turn on alerts</div><div class="btn ghost">Not now</div></div>
+    </div>
+  </div></div>
+  <p class="mut">Tapping "Turn on alerts" triggers the iPhone permission prompt (it must come from a tap). Messages and tips start off, as they do today.</p></div>
+
+  <div class="sec" id="later" hidden><div class="stage"><div class="ph">
+    <div class="url">Projects</div>
+    <div class="body">
+      <div class="logo">Job<i>file</i></div>
+      <h4 style="font-size:19px">Projects</h4>
+      <div class="card"><span class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/></svg></span><span><b>Phone alerts are off</b>Get bids and replies</span><span class="t">Turn on</span></div>
+      <div class="li" style="margin-top:4px"><span class="dot" style="background:#c4813f"></span><span><b>Kitchen repaint</b>2 bids waiting</span></div>
+    </div>
+    <div class="tabs"><span>Home</span><span>Projects</span><span>Post</span><span>Menu</span></div>
+  </div></div>
+  <p class="mut">After "Not now" the welcome screen is gone for good. This small card on Projects stays as the gentle reminder.</p></div>
+
+  <div class="rules"><h3>How it behaves</h3><ul>
+    <li><b>Once only.</b> Saved on the account and the phone, so it never comes back, even after signing out.</li>
+    <li><b>Not forced.</b> "Not now" is always there. Nothing blocks reaching Projects.</li>
+    <li><b>Skipped</b> if alerts are already on, the browser can't do alerts, or they dismissed the card before.</li>
+    <li><b>Installed later?</b> If someone chose "Not now" in Safari, the installed app shows the Turn on screen once, since that is the first time it can work.</li>
+  </ul></div>
+</div>
+<script>
+document.querySelectorAll('.sw button').forEach(function(b){b.addEventListener('click',function(){
+  document.querySelectorAll('.sw button').forEach(function(x){x.setAttribute('aria-pressed',x===b)});
+  ['safari','app','later'].forEach(function(id){document.getElementById(id).hidden=id!==b.dataset.s});
+})});
+</script>
