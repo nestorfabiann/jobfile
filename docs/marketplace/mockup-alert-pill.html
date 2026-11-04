@@ -1,0 +1,54 @@
+<title>Alert Pill</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: one phone column. A fake app screen with a pill that drops from the top. Pick a style and an alert, tap Show. Alerts are examples. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#c4813f;--orl:#f9efe4;--orb:#ecd4a8;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:14px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px}
+h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0}h2{font-size:26px}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
+.lab{font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--mut)}
+.sw{display:grid;gap:6px}.sw.c2{grid-template-columns:1fr 1fr}.sw.c3{grid-template-columns:repeat(3,1fr)}
+.sw button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:6px 4px;border-radius:14px;font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:48px}.sw button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.go{border:0;background:var(--or);color:#fff;border-radius:99px;min-height:50px;font:700 15px 'IBM Plex Sans',sans-serif;cursor:pointer}
+.screen{position:relative;border:1px solid var(--line);border-radius:30px;background:var(--card);height:460px;overflow:hidden;padding:64px 14px 14px;display:flex;flex-direction:column;gap:10px}
+.g{border-radius:8px;background:var(--line);height:14px}.cardx{border:1px solid var(--line);border-radius:18px;padding:12px;display:flex;flex-direction:column;gap:8px;background:var(--bg)}
+.pill{position:absolute;left:50%;top:12px;width:min(calc(100% - 24px),360px);transform:translate(-50%,-130%);opacity:0;display:flex;align-items:center;gap:12px;border-radius:99px;padding:10px 12px 10px 18px;transition:transform .45s cubic-bezier(.2,.9,.3,1.2),opacity .3s;cursor:pointer;border:0;text-align:left;font:inherit;color:inherit;z-index:3}
+.pill.show{transform:translate(-50%,0);opacity:1}
+.pill .t{flex:1;min-width:0}.pill b{display:block;font-size:15px;line-height:1.2}.pill span.d{display:block;font-size:13px;line-height:1.3;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pill .i{width:44px;height:44px;border-radius:99px;display:grid;place-items:center;flex:none}
+.k{background:#0b0b0b;color:#fff;box-shadow:0 12px 26px -10px rgba(0,0,0,.6)}.k .d{color:#9a958d}.k .i{background:#3a2718;color:#f3c98f}
+.f{background:#1f4d3a;color:#eef7f1;box-shadow:0 12px 26px -10px rgba(31,77,58,.6)}.f .d{color:#bcd8c8}.f .i{background:rgba(255,255,255,.16);color:#f3c98f}
+.s{background:#f6ecd8;color:#1b1a18;border:1.5px solid #ecd4a8;box-shadow:0 12px 26px -12px rgba(154,91,0,.45)}.s .d{color:#6b655e}.s .i{background:#fff;color:#9a5b00}
+@media (prefers-reduced-motion:reduce){.pill{transition:opacity .2s}}
+</style>
+<div class="wrap">
+<h2>Alert pill</h2>
+<p class="note"><b>Try it.</b> Pick a style and an alert, then tap Show. In the app it appears on its own when something new arrives, stays about 5 seconds, and tapping it opens that page.</p>
+<span class="lab">Style</span>
+<div class="sw c3" id="sty" role="group" aria-label="Style"><button type="button" data-k="k" aria-pressed="false">Black</button><button type="button" data-k="f" aria-pressed="true">Forest</button><button type="button" data-k="s" aria-pressed="false">Sand</button></div>
+<span class="lab">Alert</span>
+<div class="sw c2" id="al" role="group" aria-label="Alert"><button type="button" data-a="0" aria-pressed="true">New bid</button><button type="button" data-a="1" aria-pressed="false">Visit confirmed</button><button type="button" data-a="2" aria-pressed="false">Payment requested</button><button type="button" data-a="3" aria-pressed="false">Message</button></div>
+<button class="go" id="go" type="button">Show alert</button>
+<div class="screen">
+<button class="pill f" id="pill" type="button" aria-live="polite"><span class="i" id="ic"></span><span class="t"><b id="tt"></b><span class="d" id="dd"></span></span></button>
+<b style="font:800 22px 'Bricolage Grotesque',sans-serif">Projects</b>
+<div class="cardx"><div class="g" style="width:60%"></div><div class="g" style="width:85%"></div></div>
+<div class="cardx"><div class="g" style="width:45%"></div><div class="g" style="width:70%"></div></div>
+<div class="cardx"><div class="g" style="width:55%"></div><div class="g" style="width:80%"></div></div>
+</div>
+<p class="note">The 5 second timer pauses while someone is touching the pill, alerts queue if two arrive together, and a quiet "Notifications" list keeps everything the pill showed.</p>
+</div>
+<script>
+var A=[{t:'New bid on your bathroom project',d:'Nesty’s Painting · $5,008',i:'<path d="M12 3v18M7 8h7a3 3 0 010 6H8a3 3 0 000 6h9"/>'},{t:'Visit confirmed',d:'Thursday, Nov 13 · 10:00 am',i:'<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/>'},{t:'Payment requested',d:'Midpoint · $2,500 · Kitchen painting',i:'<rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/>'},{t:'Message from Jerry',d:'Can you start Monday instead?',i:'<path d="M4 5h16v11H9l-5 4z"/>'}];
+var sty='f',al=0,tm,pill=document.getElementById('pill');
+function bind(id,key,fn){document.querySelectorAll('#'+id+' button').forEach(function(b){b.onclick=function(){document.querySelectorAll('#'+id+' button').forEach(function(x){x.setAttribute('aria-pressed',x===b)});fn(b.dataset[key])}})}
+bind('sty','k',function(v){sty=v;show()});bind('al','a',function(v){al=+v;show()});
+function show(){var a=A[al];pill.className='pill '+sty;document.getElementById('tt').textContent=a.t;document.getElementById('dd').textContent=a.d;document.getElementById('ic').innerHTML='<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">'+a.i+'</svg>';void pill.offsetWidth;pill.classList.add('show');clearTimeout(tm);tm=setTimeout(function(){pill.classList.remove('show')},5000)}
+document.getElementById('go').onclick=show;pill.onclick=function(){pill.classList.remove('show')};
+setTimeout(show,500);
+</script>
