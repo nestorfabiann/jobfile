@@ -1,0 +1,90 @@
+<title>Get The App Wording</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: one column. Four places the wording changes, each shown before and after. Example copy. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#c4813f;--orl:#f9efe4;--orb:#ecd4a8;--fg:#1f4d3a;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:14px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px}
+h2{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;font-size:28px;line-height:1.05;text-wrap:balance}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
+.sw{display:grid;grid-template-columns:1fr 1fr;gap:6px}.sw button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:6px 4px;border-radius:99px;font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:44px}.sw button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.sec{display:flex;flex-direction:column;gap:12px}.sec[hidden]{display:none}
+.lab{font-size:12px;text-transform:uppercase;letter-spacing:.08em;font-weight:600;color:var(--mut)}
+.mut{color:var(--mut);font-size:14.5px;line-height:1.5;margin:0}
+.menu{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:8px;display:flex;flex-direction:column;gap:2px}
+.mi{display:flex;gap:12px;align-items:center;padding:11px 12px;border-radius:14px;font-weight:600;font-size:15.5px}
+.mi svg{flex:none}.mi small{display:block;font-weight:400;font-size:12.5px;color:var(--mut);margin-top:1px}
+.mi.hl{background:var(--orl)}
+.old{opacity:.7}
+.gc{background:var(--fg);color:#fff;border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.gc .t{display:flex;gap:12px;align-items:center}.gc img{width:54px;height:54px;border-radius:14px;background:var(--or);display:grid;place-items:center;flex:none}
+.ic{width:54px;height:54px;border-radius:14px;background:var(--or);display:grid;place-items:center;flex:none;font:800 30px 'Bricolage Grotesque',sans-serif;color:#fff}
+.gc b{font:800 19px/1.15 'Bricolage Grotesque',sans-serif;letter-spacing:-.02em;display:block}.gc span.s{font-size:14px;opacity:.85;line-height:1.4}
+.gc .r{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.gc .go{background:#fff;color:var(--fg);border-radius:99px;padding:11px 18px;font-weight:600;font-size:14.5px}.gc .no{opacity:.8;font-size:14px}
+.pg{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:18px;display:flex;flex-direction:column;gap:10px}
+.pg h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;font-size:26px;line-height:1.05;text-wrap:balance}
+.pg .b{display:flex;gap:10px;align-items:flex-start;font-size:14.5px;line-height:1.4}.pg .b i{flex:none;width:22px;height:22px;border-radius:50%;background:var(--orl);color:var(--or);font-style:normal;font-weight:700;display:grid;place-items:center;font-size:12px}
+.pg .b b{display:block}
+.wel{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:18px;display:flex;flex-direction:column;gap:10px}
+.wel .bell{width:56px;height:56px;border-radius:18px;background:var(--or);display:grid;place-items:center}
+.wel h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;font-size:26px;line-height:1.05;text-wrap:balance}
+.btn{border-radius:99px;padding:13px;text-align:center;font-weight:600;background:var(--fg);color:#fff}
+</style>
+<div class="wrap">
+  <div class="note"><b>Mockup.</b> Wording only. "Get the app" replaces "Add to Home Screen" in four places. Example copy.</div>
+  <h2>Get the app</h2>
+  <div class="sw" role="group" aria-label="Place">
+    <button type="button" data-s="menu" aria-pressed="true">Menu</button>
+    <button type="button" data-s="card" aria-pressed="false">Projects card</button>
+    <button type="button" data-s="page" aria-pressed="false">The page</button>
+    <button type="button" data-s="wel" aria-pressed="false">Welcome</button>
+  </div>
+
+  <div class="sec" id="menu">
+    <div class="lab">Now</div>
+    <div class="menu old"><div class="mi"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="3" width="10" height="18" rx="2"/><path d="M12 8v6M9 11h6"/></svg>Add to Home Screen</div></div>
+    <div class="lab">Proposed</div>
+    <div class="menu"><div class="mi hl"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c4813f" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="3" width="10" height="18" rx="2"/><path d="M12 8v6M9 11h6"/></svg><span>Get the app<small>Alerts on your phone</small></span></div></div>
+    <p class="mut">A second line names the payoff, so people know why to tap it.</p>
+  </div>
+
+  <div class="sec" id="card" hidden>
+    <div class="lab">Now</div>
+    <div class="gc old"><div class="t"><div class="ic">J</div><div><b>Keep Jobfile on your Home Screen</b><span class="s">Opens full screen. Takes 10 seconds.</span></div></div><div class="r"><span class="go">Show me how</span><span class="no">Not now</span></div></div>
+    <div class="lab">Proposed</div>
+    <div class="gc"><div class="t"><div class="ic">J</div><div><b>Get Jobfile on your phone</b><span class="s">Instant alerts when a contractor bids or replies. Takes 10 seconds.</span></div></div><div class="r"><span class="go">Show me how</span><span class="no">Not now</span></div></div>
+  </div>
+
+  <div class="sec" id="page" hidden>
+    <div class="pg">
+      <h3>Get the Jobfile app</h3>
+      <p class="mut" style="margin:0">Bids and replies on your phone in about 10 seconds. No App Store needed.</p>
+      <div class="b"><i>1</i><div><b>Instant alerts</b>Know the moment a contractor bids or a homeowner replies.</div></div>
+      <div class="b"><i>2</i><div><b>One tap to open</b>Jobfile sits on your Home Screen with the other apps.</div></div>
+      <div class="b"><i>3</i><div><b>Full screen</b>No browser bars. It looks and feels like an app.</div></div>
+    </div>
+    <p class="mut">The three benefits come first, then the existing step-by-step guide with the animated phone. The steps still say "Add to Home Screen" because that is the button on the iPhone.</p>
+  </div>
+
+  <div class="sec" id="wel" hidden>
+    <div class="wel">
+      <div class="bell"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg></div>
+      <h3>Get the app, never miss a bid</h3>
+      <p class="mut" style="margin:0">On iPhone, alerts work from the Home Screen. Two quick steps. No App Store needed.</p>
+      <div class="btn">Show me how</div>
+      <div class="mut" style="text-align:center">Not now</div>
+    </div>
+    <p class="mut">The one-time welcome screen uses the same words. Help answers and the Home Screen card get matching wording.</p>
+  </div>
+</div>
+<script>
+document.querySelectorAll('.sw button').forEach(function(b){b.addEventListener('click',function(){
+  document.querySelectorAll('.sw button').forEach(function(x){x.setAttribute('aria-pressed',x===b)});
+  ['menu','card','page','wel'].forEach(function(id){document.getElementById(id).hidden=id!==b.dataset.s});
+})});
+</script>
