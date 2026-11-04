@@ -7,6 +7,7 @@ import { adminRoleOf } from '@/lib/admin';
 import { marketplaceEnabled } from '@/lib/marketplace';
 import PubTabs from '@/components/PubTabs';
 import AppMenu from '@/components/AppMenu';
+import HelpButton from '@/components/HelpButton';
 import UsageBeacon from '@/components/UsageBeacon';
 import AppTabs from '@/components/AppTabs';
 import { needsCount } from '@/lib/needsCount';
@@ -63,6 +64,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         )}
         <main className="in">{children}</main>
         {tabs && <PubTabs />}
+        <HelpButton who={!user ? 'v' : contractor ? 'c' : 'h'} />
         {user && <UsageBeacon />}
         {user && <AppTabs contractor={contractor} marketplace={marketplaceEnabled()} waiting={waiting} admin={isAdmin} signOutAction={signOut} />}
       </body>
