@@ -1,0 +1,109 @@
+<title>Needs You Overview</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: one phone column. Tabs: On a bid, Pick a time, Schedule, Access notes. Names, dates and times are examples. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#c4813f;--orl:#f9efe4;--orb:#ecd4a8;--gr:#1f7a55;--grl:#d9f1e6;--am:#9a5b00;--aml:#fbeccd;--bl:#1d5fa8;--bll:#e0ecf8;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--gr:#6fd1a3;--grl:#173a2c;--am:#f0b95a;--aml:#3a2e12;--bl:#8fbdf0;--bll:#17283d;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--gr:#6fd1a3;--grl:#173a2c;--am:#f0b95a;--aml:#3a2e12;--bl:#8fbdf0;--bll:#17283d;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:14px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:16px}
+h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;text-wrap:balance}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
+.mut{color:var(--mut);font-size:13px;line-height:1.45;margin:0}
+.sw{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}.sw button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:8px 4px;border-radius:99px;font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:44px}.sw button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.sec{display:flex;flex-direction:column;gap:14px}.sec[hidden]{display:none}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.btn{display:block;text-align:center;background:var(--or);color:#fff;border-radius:99px;padding:12px 16px;font:600 14.5px 'IBM Plex Sans',sans-serif;min-height:44px}.btn.gh{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+.pill{font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:99px;white-space:nowrap;background:var(--orl);color:var(--or);border:1px solid var(--orb)}.pill.g{background:var(--grl);color:var(--gr);border-color:transparent}.pill.a{background:var(--aml);color:var(--am);border-color:transparent}.pill.b{background:var(--bll);color:var(--bl);border-color:transparent}.pill.m{background:transparent;color:var(--mut);border-color:var(--line)}
+.nm{display:flex;gap:10px;align-items:center}.logo{width:38px;height:38px;border-radius:11px;background:var(--orl);color:var(--or);border:1px solid var(--orb);display:grid;place-items:center;font:800 15px 'Bricolage Grotesque',sans-serif;flex:none}
+.slot{display:flex;justify-content:space-between;align-items:center;gap:10px;border:1.5px solid var(--line);border-radius:16px;padding:12px 14px;font-size:14.5px;background:var(--card)}.slot b{display:block;font-size:15px}.slot.on{border-color:var(--or);background:var(--orl)}.slot .rd{width:20px;height:20px;border-radius:50%;border:2px solid var(--line);flex:none}.slot.on .rd{border-color:var(--or);background:radial-gradient(var(--or) 45%,transparent 50%)}
+.row{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--line)}.row:last-child{border-bottom:0}.row b{font-size:14.5px}.who{font-size:12.5px;color:var(--mut)}
+.ok{background:var(--grl);color:var(--gr);border-radius:14px;padding:11px 12px;font-size:13.5px;line-height:1.45}
+.warn{background:var(--aml);color:var(--am);border-radius:14px;padding:11px 12px;font-size:13.5px;line-height:1.45}
+.in{height:44px;border:1px solid var(--line);border-radius:14px;background:var(--bg);display:flex;align-items:center;padding:0 14px;color:var(--mut);font-size:14.5px}.in.v{color:var(--ink)}
+.fld{display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:600}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ico{width:34px;height:34px;border-radius:10px;background:var(--bll);color:var(--bl);display:grid;place-items:center;font-size:16px;flex:none}
+
+.chips{display:flex;gap:8px;flex-wrap:wrap}.chip{border:1.5px solid var(--line);background:var(--card);border-radius:99px;padding:9px 14px;font:600 13.5px 'IBM Plex Sans',sans-serif;min-height:44px;display:flex;align-items:center}.chip.on{border-color:var(--or);background:var(--orl);color:var(--or)}
+.days{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}.d{border:1.5px solid var(--line);border-radius:14px;padding:8px 0;text-align:center;font-size:12px;color:var(--mut);background:var(--card)}.d b{display:block;font-size:17px;color:var(--ink)}.d.on{border-color:var(--or);background:var(--orl)}.d.on b{color:var(--or)}
+.steps{display:flex;align-items:center;gap:0;font-size:11.5px;color:var(--mut)}.st{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;text-align:center}.dot{width:22px;height:22px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;font-size:11px;background:var(--card)}.st.done .dot{background:var(--gr);border-color:var(--gr);color:#fff}.st.now .dot{border-color:var(--or);color:var(--or)}.st.now{color:var(--ink);font-weight:700}.bar{height:2px;background:var(--line);flex:.5;margin-bottom:18px}.bar.done{background:var(--gr)}
+.big{font:800 30px 'Bricolage Grotesque',sans-serif;letter-spacing:-.03em;line-height:1}
+.hero{background:var(--orl);border:1px solid var(--orb);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:8px}
+.tl{display:flex;gap:10px;align-items:flex-start;font-size:13.5px}.tl i{width:10px;height:10px;border-radius:50%;background:var(--gr);margin-top:5px;flex:none;font-style:normal}.tl i.off{background:var(--line)}
+.pic{width:64px;height:64px;border-radius:12px;background:var(--line);display:grid;place-items:center;color:var(--mut);font-size:11px}
+
+.vcta{background:var(--orl);border:1.5px solid var(--orb);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.vcta .top{display:flex;gap:12px;align-items:flex-start}
+.vcta .cal{width:44px;height:44px;border-radius:13px;background:var(--or);color:#fff;display:grid;place-items:center;flex:none;font-size:20px}
+.vcta h3{font-size:17px;line-height:1.2}
+.opt{border:1px solid var(--line);border-radius:14px;padding:10px 12px;font-size:13px;color:var(--mut);background:var(--card)}
+.fakein{height:44px;border:1px solid var(--line);border-radius:14px;background:var(--card)}
+.lab{font-size:13px;font-weight:600}
+
+.vcta{background:var(--orl);border:1.5px solid var(--orb);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.vcta .top{display:flex;gap:12px;align-items:flex-start}
+.vcta .cal{width:44px;height:44px;border-radius:13px;background:var(--or);color:#fff;display:grid;place-items:center;flex:none;font-size:20px}
+.vcta h3{font-size:17px;line-height:1.2}
+.opts{display:flex;flex-direction:column;gap:8px}
+.opt{display:flex;gap:10px;align-items:center;border:1.5px solid var(--line);border-radius:16px;padding:12px 14px;background:var(--card);font-size:14.5px}.opt b{display:block}.opt .who{font-size:12.5px;color:var(--mut)}
+.opt.on{border-color:var(--or);background:var(--orl)}.rd{width:20px;height:20px;border-radius:50%;border:2px solid var(--line);flex:none}.opt.on .rd{border-color:var(--or);background:radial-gradient(var(--or) 45%,transparent 50%)}
+.chips{display:flex;gap:8px;flex-wrap:wrap}.chip{border:1.5px solid var(--line);background:var(--card);border-radius:99px;padding:9px 14px;font:600 13.5px 'IBM Plex Sans',sans-serif;min-height:44px;display:flex;align-items:center}.chip.on{border-color:var(--or);background:var(--orl);color:var(--or)}
+.fakein{height:44px;border:1px solid var(--line);border-radius:14px;background:var(--card)}
+.lab{font-size:13px;font-weight:600}
+.tag{display:flex;gap:8px;flex-wrap:wrap;align-items:center;background:var(--grl);color:var(--gr);border-radius:14px;padding:10px 12px;font-size:13.5px;line-height:1.4}
+
+.todo{display:flex;flex-direction:column;gap:8px;background:var(--orl);border:1px solid var(--line);border-radius:22px;padding:16px}
+.todo h3{font-size:20px}.todo h3 span{color:var(--or)}
+.item{display:flex;gap:12px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:12px;min-height:56px;color:var(--ink);text-decoration:none}
+.item .ic{width:34px;height:34px;border-radius:11px;background:var(--orl);color:var(--or);display:grid;place-items:center;flex:none;font-size:16px}
+.item .tx{flex:1;min-width:0}.item .tx b{display:block;font-size:14.5px;line-height:1.3}.item .tx .s{display:block;font-size:13px;color:var(--mut)}
+.age{display:inline-block;margin-top:4px;font-size:12px;font-weight:700;padding:2px 8px;border-radius:99px;background:var(--orl);color:var(--or)}.age.late{background:var(--aml);color:#b3261e}
+.go{color:var(--or);font-weight:600;font-size:13px;white-space:nowrap}
+.plain{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:16px}.plain li{padding:8px 0;border-bottom:1px solid var(--line);list-style:none;font-size:14.5px;color:var(--or);text-decoration:underline}.plain ul{margin:0;padding:0}
+.caught{display:flex;gap:10px;align-items:center;background:var(--grl);color:var(--gr);font-weight:700;font-size:15px;border-radius:16px;padding:12px 14px}
+.tabrow{display:flex;gap:6px;overflow-x:auto;font-size:12.5px;color:var(--mut)}.tabrow span{padding:8px 10px;border-radius:99px;border:1px solid var(--line);background:var(--card);white-space:nowrap}.tabrow .a{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+</style>
+<div class="wrap">
+  <div class="note"><b>Mockup 5.</b> "Needs your attention" on a project Overview, matching the "Needs you" card on the Projects page. Tap the tabs. Names and times are examples.</div>
+  <div class="sw" id="sw"><button data-s="a" class="on" type="button">Today</button><button data-s="b" type="button">Homeowner</button><button data-s="c" type="button">Contractor</button><button data-s="d" type="button">All caught up</button></div>
+
+  <div id="a" class="sec">
+    <div class="tabrow"><span class="a">Overview</span><span>Messages</span><span>Agreement</span><span>Schedule</span></div>
+    <div class="plain"><h3 style="font-size:20px;margin-bottom:6px">Needs your attention</h3><ul><li>Approve change order CO-2</li><li>Sign the agreement</li></ul></div>
+    <div class="note" style="border-style:solid">This is how it looks today: a plain list of links, with no age, no icon and no sign of what is urgent. Visits, Selections and schedule changes do not appear.</div>
+  </div>
+
+  <div id="b" class="sec" hidden>
+    <div class="tabrow"><span class="a">Overview</span><span>Messages</span><span>Agreement</span><span>Schedule</span></div>
+    <div class="todo">
+      <h3>Needs you <span>3</span></h3>
+      <p class="mut">Oldest first. Each one leaves this list when it is done.</p>
+      <a class="item"><span class="ic">±</span><span class="tx"><b>Approve change order CO-2 (+$420)</b><span class="s">Add under-cabinet lighting</span><span class="age late">Waiting 4 days</span></span><span class="go">Review ›</span></a>
+      <a class="item"><span class="ic">▦</span><span class="tx"><b>Pick a time for the site visit</b><span class="s">Nesty's Painting suggested 2 times</span><span class="age">Today</span></span><span class="go">Pick ›</span></a>
+      <a class="item"><span class="ic">✓</span><span class="tx"><b>Choose: Kitchen backsplash tile</b><span class="s">Needed by Fri, Nov 7</span><span class="age">Due in 3 days</span></span><span class="go">Choose ›</span></a>
+    </div>
+    <div class="note" style="border-style:solid">Same card as the Projects page, scoped to this one project. Red means it has waited a long time or is past due. Tapping a row opens the right tab.</div>
+  </div>
+
+  <div id="c" class="sec" hidden>
+    <div class="tabrow"><span class="a">Overview</span><span>Messages</span><span>Agreement</span><span>Schedule</span></div>
+    <div class="todo">
+      <h3>Needs you <span>2</span></h3>
+      <p class="mut">Oldest first. Each one leaves this list when it is done.</p>
+      <a class="item"><span class="ic">$</span><span class="tx"><b>Request the deposit payment</b><span class="s">Agreement signed, $1,200 deposit due</span><span class="age late">Waiting 5 days</span></span><span class="go">Request ›</span></a>
+      <a class="item"><span class="ic">▦</span><span class="tx"><b>Propose times for the final walkthrough</b><span class="s">The homeowner asked for a visit</span><span class="age">Today</span></span><span class="go">Propose ›</span></a>
+    </div>
+  </div>
+
+  <div id="d" class="sec" hidden>
+    <div class="tabrow"><span class="a">Overview</span><span>Messages</span><span>Agreement</span><span>Schedule</span></div>
+    <div class="caught"><span>✓ You're all caught up</span><span style="font-weight:500;font-size:13px">Nothing needs you right now</span></div>
+    <div class="note" style="border-style:solid">When nothing is waiting, the card shrinks to this one green line instead of taking up a whole section.</div>
+  </div>
+</div>
+<script>
+document.querySelectorAll('#sw button').forEach(function(b){b.addEventListener('click',function(){document.querySelectorAll('#sw button').forEach(function(x){x.classList.remove('on')});b.classList.add('on');['a','b','c','d'].forEach(function(s){document.getElementById(s).hidden=s!==b.dataset.s})})});
+</script>
