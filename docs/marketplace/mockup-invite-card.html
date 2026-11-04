@@ -1,0 +1,68 @@
+<title>Invite Card Options</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: one phone column. Switch between today's invite card and a tinted version in sand or sage. Job card below shows the contrast. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#c4813f;--orl:#f9efe4;--orb:#ecd4a8;--gr:#1f7a55;--grl:#d9f1e6;--page:#e9e5dc;--ct:#fff;--cb:#e4dfd6;--ci:#f9efe4;--cic:#c4813f}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--gr:#6fd1a3;--grl:#173a2c;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--gr:#6fd1a3;--grl:#173a2c;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:14px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:16px}
+h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;text-wrap:balance}h2{font-size:26px}h3{font-size:24px;line-height:1.1}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
+.mut{color:var(--mut);font-size:14.5px;line-height:1.5;margin:0}
+.sw{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.sw button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:6px 4px;border-radius:16px;font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:56px;display:flex;flex-direction:column;align-items:center;gap:4px}.sw button i{width:28px;height:14px;border-radius:7px;display:block;border:1px solid var(--line)}.sw button[aria-pressed="true"]{border:2px solid var(--ink)}
+.inv{background:var(--ct);border:1.5px solid var(--cb);border-radius:26px;padding:22px 18px;display:flex;flex-direction:column;gap:14px}
+.ic{width:44px;height:44px;border-radius:14px;background:var(--ci);color:var(--cic);display:grid;place-items:center}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.b{display:flex;align-items:center;justify-content:center;gap:8px;min-height:48px;border-radius:99px;font:600 14.5px 'IBM Plex Sans',sans-serif;border:1.5px solid var(--line);background:var(--card);color:var(--ink);white-space:nowrap}
+.b.f{background:var(--or);border-color:var(--or);color:#fff}
+.new{display:none}.v-new .new{display:flex}.v-new .old{display:none}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0;padding:0;list-style:none}
+.steps li{font-size:12.5px;line-height:1.35;color:var(--mut);display:flex;flex-direction:column;gap:6px}.steps b{color:var(--ink);font-size:13px;display:block}
+.n{width:24px;height:24px;border-radius:50%;background:var(--ci);color:var(--cic);display:grid;place-items:center;font-weight:700;font-size:12px}
+.jc{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:14px;display:flex;flex-direction:column;gap:6px}.jc b{font:700 16px 'Bricolage Grotesque',sans-serif}
+.pill{font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:99px;background:var(--orl);color:var(--or);border:1px solid var(--orb);width:max-content}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.hint{background:#1f4d3a;color:#eef7f1;border-radius:14px;padding:8px 12px;font-size:13px;width:max-content}
+.cta{display:flex;align-items:center;justify-content:center;background:var(--or);color:#fff;border-radius:99px;min-height:54px;font:700 16px 'IBM Plex Sans',sans-serif}
+</style>
+<div class="wrap v-new" id="w">
+<h2>Invite card</h2>
+<p class="note"><b>Tap an option.</b> "Today" is the white card as it is now. Sand and Sage add the envelope icon, a tint, steps that are always visible and buttons with icons.</p>
+<div class="sw" role="group" aria-label="Style">
+<button type="button" data-c="t" aria-pressed="false"><i style="background:#fff"></i>Today</button>
+<button type="button" data-c="s" aria-pressed="true"><i style="background:#f6ecd8"></i>Sand</button>
+<button type="button" data-c="g" aria-pressed="false"><i style="background:#e4f0e8"></i>Sage</button>
+</div>
+
+<div class="inv" id="card">
+<span class="ic new" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M3.5 7l8.5 6 8.5-6"/></svg></span>
+<h3>Already have a contractor or a customer?</h3>
+<p class="mut">Jobfile works for any job. Invite them by email, free, no account needed first.</p>
+<div class="two">
+<span class="b f"><svg class="new" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8M5 10v10h14V10"/></svg>I’m a homeowner</span>
+<span class="b"><svg class="new" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 00-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 005.4-5.4l-2.5 2.5-2.5-2.5z"/></svg>I’m a contractor</span>
+</div>
+<ol class="steps new" style="display:none" id="st">
+<li><span class="n">1</span><span><b>Start it</b>Add the job and who it is with.</span></li>
+<li><span class="n">2</span><span><b>Send invite</b>They join with one tap.</span></li>
+<li><span class="n">3</span><span><b>Run it</b>Price, photos, payments.</span></li>
+</ol>
+<span class="mut old" style="font-size:14px;font-weight:600">▸ How inviting works</span>
+</div>
+
+<h2 style="font-size:22px">Open near you</h2>
+<div class="jc"><span class="pill">Bathroom</span><b>Bathroom: Replace the tub, New tile floor</b><span class="mut" style="font-size:13px">Plano · 3 bids</span></div>
+
+<p class="note"><b>Two small cleanups also shown in this change</b></p>
+<div class="jc"><b>Help hint</b><span class="mut" style="font-size:13px">Today the hint sits over the page text. It would move above the Help button, and disappear after one tap or 6 seconds.</span><div class="hint">Questions? Tap here.</div></div>
+<div class="jc"><b>"Built for Texas" shows twice</b><span class="mut" style="font-size:13px">It appears in the trust row and in the homeowner "And also" list. The list entry would go, and the trust row keeps it.</span></div>
+</div>
+<script>
+var C={t:{ct:'#fff',cb:'#e4dfd6',ci:'#f9efe4',cic:'#c4813f'},s:{ct:'#f6ecd8',cb:'#ecd4a8',ci:'#fff',cic:'#9a5b00'},g:{ct:'#e4f0e8',cb:'#b9d8c6',ci:'#fff',cic:'#1f4d3a'}};
+var bs=document.querySelectorAll('.sw button'),r=document.documentElement,w=document.getElementById('w'),st=document.getElementById('st');
+function set(k){var p=C[k];['ct','cb','ci','cic'].forEach(function(n){r.style.setProperty('--'+n,p[n])});w.classList.toggle('v-new',k!=='t');st.style.display=k==='t'?'none':'grid';bs.forEach(function(x){x.setAttribute('aria-pressed',x.dataset.c===k)})}
+bs.forEach(function(b){b.onclick=function(){set(b.dataset.c)}});set('s');
+</script>
