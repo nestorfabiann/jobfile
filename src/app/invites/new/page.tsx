@@ -12,7 +12,7 @@ export default async function NewInvite({ searchParams }: { searchParams: { erro
       <div className="stack">
         <Link href="/projects" className="small">‹ Projects</Link>
         <h1>Start a project</h1>
-        <p className="muted">Describe the job, then invite your contractor. They see it only after they accept.</p>
+        <p className="muted">Describe the job, then invite your contractor. They see it only after they accept. <b>They do not need a Jobfile account yet. They join free from the email link.</b></p>
       </div>
       {searchParams.error ? <div className="box bad">{searchParams.error}</div> : null}
       <form action={createInvite} className="card">

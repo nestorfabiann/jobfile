@@ -54,9 +54,10 @@ export default function HomeownerProjects(p: {
         {p.needsName && <Link href="/settings" className="small" style={{ fontWeight: 700 }}>Add your name in Settings</Link>}
       </div>
 
-      <div className="stack" style={{ gap: 4 }}>
+      <div className="stack" style={{ gap: 10 }}>
         <Link className="btn" href="/marketplace/new">{first ? 'Post your first project' : 'Post a project'}</Link>
-        <Link href="/invites/new" style={{ fontWeight: 700, padding: '10px 0', display: 'inline-block' }}>I already have a contractor</Link>
+        <Link className="btn ghost" href="/invites/new">I already have a contractor</Link>
+        <p className="muted small" style={{ margin: 0, textAlign: 'center' }}>Hired someone on your own? Add them here to keep the agreement, photos, payments and messages in one place. They do not need a Jobfile account yet.</p>
       </div>
 
       {p.error ? <div className="box bad">{p.error}</div> : null}
