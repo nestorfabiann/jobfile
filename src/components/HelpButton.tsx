@@ -19,7 +19,9 @@ export default function HelpButton({ who }: { who: Who }) {
   const openerRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    try { if (!localStorage.getItem('jf-help-seen')) setHint(true); } catch { /* no storage */ }
+    let t: ReturnType<typeof setTimeout> | undefined;
+    try { if (!localStorage.getItem('jf-help-seen')) { setHint(true); t = setTimeout(() => setHint(false), 6000); } } catch { /* no storage */ }
+    return () => { if (t) clearTimeout(t); };
   }, []);
   useEffect(() => {
     if (!open) return;

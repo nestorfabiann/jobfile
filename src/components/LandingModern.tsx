@@ -65,7 +65,7 @@ const COPY = {
       ['Know it’s fair', 'An AI cost reference for your project before you commit, so you are not guessing.', 'spark', 'price'],
       ['Your details stay private', 'Your address and contact info go only to the contractor you hire.', 'lock', 'priv'],
     ],
-    also: [['doc', 'Everything in one record', 'Price, scope, photos, changes and payments in one place, not lost in texts.'], ['cal', 'Meet before you hire', 'Ask for a site visit and pick a time that works.'], ['star', 'Built for Texas', 'Homestead steps are tracked for you.']],
+    also: [['doc', 'Everything in one record', 'Price, scope, photos, changes and payments in one place, not lost in texts.'], ['cal', 'Meet before you hire', 'Ask for a site visit and pick a time that works.']],
     fh: 'Ready to get bids on your project?',
   },
   co: {

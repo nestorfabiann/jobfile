@@ -29,20 +29,26 @@ export default async function Home() {
       )}
       <LandingModern signedIn={signedIn} nums={nums}>
         <section className="lm-have" aria-label="Bring your own contractor or customer">
+          <span className="lm-envl" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width={24} height={24} fill="none" stroke="currentColor" strokeWidth={1.9} strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="5" width="18" height="14" rx="3" /><path d="M3.5 7l8.5 6 8.5-6" /></svg>
+          </span>
           <h2>Already have a contractor or a customer?</h2>
           <p className="muted" style={{ margin: 0 }}>Jobfile works for any job. Invite them by email, free, no account needed first.</p>
           <div className="two">
-            <Link className="btn ghost" style={{ padding: '9px 8px', whiteSpace: 'nowrap' }} href={inv('/invites/new')}>I&apos;m a homeowner</Link>
-            <Link className="btn ghost" style={{ padding: '9px 8px', whiteSpace: 'nowrap' }} href={inv('/projects')}>I&apos;m a contractor</Link>
+            <Link className="lm-ib fill" href={inv('/invites/new')}>
+              <svg viewBox="0 0 24 24" width={18} height={18} fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3 11l9-8 9 8M5 10v10h14V10" /></svg>
+              I&apos;m a homeowner
+            </Link>
+            <Link className="lm-ib" href={inv('/projects')}>
+              <svg viewBox="0 0 24 24" width={18} height={18} fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M14.7 6.3a4 4 0 00-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 005.4-5.4l-2.5 2.5-2.5-2.5z" /></svg>
+              I&apos;m a contractor
+            </Link>
           </div>
-          <details>
-            <summary style={{ cursor: 'pointer', fontWeight: 600 }}>How inviting works</summary>
-            <ol className="lm-inv" style={{ marginTop: 10 }}>
-              <li><b>Start the project.</b> Add the job name and who it is with.</li>
-              <li><b>Send an invite.</b> They join with one tap. Nothing to download.</li>
-              <li><b>Run it together.</b> Price, photos, payments, change orders and messages.</li>
-            </ol>
-          </details>
+          <ol className="lm-isteps">
+            <li><span className="lm-in">1</span><span><b>Start it</b>Add the job and who it is with.</span></li>
+            <li><span className="lm-in">2</span><span><b>Send invite</b>They join with one tap.</span></li>
+            <li><span className="lm-in">3</span><span><b>Run it</b>Price, photos, payments.</span></li>
+          </ol>
         </section>
 
         <section className="stack" style={{ gap: 12 }} aria-label="Open near you">
