@@ -1,0 +1,82 @@
+<title>Find Contractors Cards</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: one phone column, Before / After switch. Names, ratings and distances are made-up examples. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#cd7d2e;--orl:#f9efe4;--orb:#ecd4a8;--gr:#1f7a55;--grl:#d9f1e6;--bl:#1d5fa8;--bll:#e0ecf8;--page:#e9e5dc;--seg:#e4dfd6;--star:#d88a1d}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--gr:#6fd1a3;--grl:#173a2c;--bl:#8fbdf0;--bll:#17283d;--page:#0d0c0b;--seg:#35312c;--star:#f0b95a;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--gr:#6fd1a3;--grl:#173a2c;--bl:#8fbdf0;--bll:#17283d;--page:#0d0c0b;--seg:#35312c;--star:#f0b95a;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:14px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px}
+h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;text-wrap:balance}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
+.sw{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:var(--seg);border-radius:99px;padding:4px}.sw button{border:0;background:transparent;color:var(--mut);padding:8px;border-radius:99px;font:600 14.5px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:44px}.sw button.on{background:var(--card);color:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.15)}
+.sec{display:flex;flex-direction:column;gap:14px}.sec[hidden]{display:none}
+.mut{color:var(--mut);font-size:14px;margin:0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.top{display:flex;gap:12px;align-items:center}
+.logo{width:56px;height:56px;border-radius:16px;flex:none;display:grid;place-items:center;font:800 20px 'Bricolage Grotesque',sans-serif;color:#fff}
+.nm{min-width:0;flex:1}.nm b{font:700 17px 'Bricolage Grotesque',sans-serif;letter-spacing:-.02em;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.sub{font-size:13px;color:var(--mut);margin-top:2px}.sub .st{color:var(--star);font-weight:700}
+.mi{font-size:13px;color:var(--mut);flex:none;align-self:flex-start}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.pill{font-size:12px;font-weight:700;padding:4px 10px;border-radius:99px;white-space:nowrap}.pill.g{background:var(--grl);color:var(--gr)}.pill.b{background:var(--bll);color:var(--bl)}.pill.o{background:var(--orl);color:var(--or);border:1px solid var(--orb)}.pill.n{background:var(--bg);color:var(--mut);border:1px solid var(--line);font-weight:500}
+.ph{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.ph i{aspect-ratio:4/3;border-radius:12px;display:block}
+.btn{display:block;text-align:center;border:1px solid var(--line);color:var(--ink);border-radius:99px;padding:12px 18px;font:600 15px 'IBM Plex Sans',sans-serif;min-height:46px}
+.btn.pr{background:var(--or);border-color:var(--or);color:#fff}
+.old b{font:600 16px 'IBM Plex Sans',sans-serif;display:block}
+.ok{display:inline-flex;gap:4px;align-items:center}
+</style>
+<div class="wrap">
+  <div class="note"><b>Mockup.</b> Find contractors results. The logo, verified badge, rating, insurance, work photos and years in business all come from the profile the contractor already filled in. Names and numbers are examples.</div>
+  <div class="sw" id="sw"><button data-s="af" class="on" type="button">After</button><button data-s="bf" type="button">Before</button></div>
+
+  <div id="af" class="sec">
+    <p class="mut">Contractors on Jobfile within 50 miles of 75074. <b style="color:var(--ink)">3 found</b></p>
+
+    <div class="card">
+      <div class="top"><div class="logo" style="background:#2f6f8f">NP</div>
+        <div class="nm"><b>Nesty's Painting <span class="pill g">✓ Verified</span></b><div class="sub"><span class="st">★ 5.0</span> (1 rating) · 12 years</div></div>
+        <span class="mi">10 mi</span></div>
+      <div class="chips"><span class="pill b">Insured</span><span class="pill o">Painting</span><span class="pill o">Drywall and carpentry</span><span class="pill n">+ 14 more</span></div>
+      <div class="ph"><i style="background:#d9b48a"></i><i style="background:#b9c7b0"></i><i style="background:#c9b8d0"></i></div>
+      <div class="btn pr">View profile</div>
+    </div>
+
+    <div class="card">
+      <div class="top"><div class="logo" style="background:#8a5a2b">GR</div>
+        <div class="nm"><b>Garcia Roofing <span class="pill g">✓ Verified</span></b><div class="sub"><span class="st">★ 4.8</span> (23 ratings) · 9 years</div></div>
+        <span class="mi">18 mi</span></div>
+      <div class="chips"><span class="pill b">Insured</span><span class="pill o">Roofing</span><span class="pill o">Siding and exterior</span></div>
+      <div class="ph"><i style="background:#c7a98c"></i><i style="background:#9fb3c8"></i><i style="background:#d6c58f"></i></div>
+      <div class="btn pr">View profile</div>
+    </div>
+
+    <div class="card">
+      <div class="top"><div class="logo" style="background:#7a7a72">LH</div>
+        <div class="nm"><b>Lopez Home Repair</b><div class="sub">New on Jobfile · no ratings yet</div></div>
+        <span class="mi">31 mi</span></div>
+      <div class="chips"><span class="pill o">Drywall and carpentry</span><span class="pill o">Decks and patios</span></div>
+      <div class="btn">View profile</div>
+    </div>
+    <p class="mut" style="font-size:13px">Verified and Insured badges only show when Jobfile has checked them. Contractors with no logo or photos show their initials, and the photo strip is left out.</p>
+  </div>
+
+  <div id="bf" class="sec" hidden>
+    <p class="mut">Contractors on Jobfile within 50 miles of 75074.</p>
+    <div class="card old">
+      <div style="display:flex;justify-content:space-between"><b>Nesty's Painting</b><span class="mi">10 mi</span></div>
+      <p class="mut" style="font-size:13px">Kitchen remodel, Bathroom, Painting, Roofing, Flooring, Landscaping, Plumbing, Electrical, HVAC, Windows and doors, Siding and exterior, Fencing, Decks and patios, Concrete and driveways, Drywall and carpentry, Garage</p>
+      <div class="btn">View profile</div>
+    </div>
+  </div>
+
+  <div class="note" style="border-style:solid"><b>Sorting:</b> verified and well-rated contractors can rise a little within the distance order, so a good pro 18 miles away is not buried under an unrated one 5 miles away. Say if you would rather keep it strictly by distance.</div>
+</div>
+<script>
+var sw=document.getElementById('sw');
+[].forEach.call(sw.children,function(b){b.onclick=function(){
+  [].forEach.call(sw.children,function(x){x.classList.toggle('on',x===b)});
+  ['af','bf'].forEach(function(id){document.getElementById(id).hidden=id!==b.dataset.s})}});
+</script>
