@@ -225,6 +225,18 @@ export default async function Overview({ params, searchParams }: { params: { id:
         {fixes.length > 0 && <p className="muted small">{openFixes} open · {awaitingConfirm} waiting to be confirmed · {fixes.length - openFixes - awaitingConfirm} done</p>}
       </section>
 
+      <section className="card" aria-label="Project record">
+        <h2>Project record</h2>
+        <p className="muted">One PDF with the agreement, change orders, payments, photos and messages. Handy for resale, insurance, warranty claims and taxes.</p>
+        <form method="get" action={`${base}/record`} className="stack">
+          <input type="hidden" name="go" value="1" />
+          <label className="row small"><input type="checkbox" name="payments" defaultChecked /> Payment log</label>
+          <label className="row small"><input type="checkbox" name="photos" defaultChecked /> Photos</label>
+          <label className="row small"><input type="checkbox" name="messages" defaultChecked /> Messages</label>
+          <button className="btn" type="submit">Download PDF</button>
+        </form>
+      </section>
+
     </>
   );
 }
