@@ -7,6 +7,9 @@ const TAB: Record<string, string> = {
   review: '/rating',
   stage: '/overview',
   finish_request: '/overview',
+  schedule: '/schedule',
+  selection: '/selections',
+  document: '/documents',
 };
 
 export function alertHref(projectId: string | null | undefined, kind: string | null | undefined): string {
