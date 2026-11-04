@@ -1,0 +1,148 @@
+<title>Jobfile Landing Modern</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: one phone column. Choose a side at the top and the whole page follows. A live phone preview changes with each step. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#cd7d2e;--or2:#b36a22;--orl:#f9efe4;--orb:#ecd4a8;--gr:#1f7a55;--grl:#d9f1e6;--bl:#1d5fa8;--bll:#e0ecf8;--page:#e9e5dc;--dark:#1b1a18}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--or:#e0933f;--or2:#cd7d2e;--orl:#33281c;--orb:#5a4426;--gr:#6fd1a3;--grl:#173a2c;--bl:#8fbdf0;--bll:#17283d;--page:#0d0c0b;--dark:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--or:#e0933f;--or2:#cd7d2e;--orl:#33281c;--orb:#5a4426;--gr:#6fd1a3;--grl:#173a2c;--bl:#8fbdf0;--bll:#17283d;--page:#0d0c0b;--dark:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif;line-height:1.5}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:0 48px;padding-left:max(18px,env(safe-area-inset-left,0px));padding-right:max(18px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:44px}
+h1,h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.035em;margin:0;text-wrap:balance}
+.note{font-size:12.5px;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:12px;padding:8px 12px;margin-top:12px}
+.top{display:flex;justify-content:space-between;align-items:center;padding-top:6px}
+.logo{font:800 22px 'Bricolage Grotesque',sans-serif;letter-spacing:-.04em}.logo span{color:var(--or)}
+.signin{font-size:14px;font-weight:600;border:1.5px solid var(--line);border-radius:99px;padding:9px 16px;min-height:40px;display:flex;align-items:center}
+.hero{display:flex;flex-direction:column;gap:18px}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--or2)}
+.hero h1{font-size:40px;line-height:1.02}
+.hero h1 em{font-style:normal;color:var(--or)}
+.sub{font-size:17px;color:var(--mut);margin:0}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:4px;background:var(--line);border-radius:99px;padding:4px}
+.seg button{border:0;border-radius:99px;min-height:48px;font:600 15px 'IBM Plex Sans',sans-serif;background:transparent;color:var(--mut);cursor:pointer;transition:background .2s}
+.seg button[aria-selected="true"]{background:var(--card);color:var(--ink);box-shadow:0 1px 5px rgba(0,0,0,.14)}
+.cta{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--or);color:#fff;border:0;border-radius:99px;min-height:54px;font:700 16px 'IBM Plex Sans',sans-serif;cursor:pointer;width:100%}
+.cta.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+.fine{font-size:13px;color:var(--mut);text-align:center;margin:-4px 0 0}
+/* phone preview */
+.stage{position:relative;display:flex;justify-content:center;padding:26px 0 8px;background:radial-gradient(120% 80% at 50% 0%,var(--orl),transparent 70%);border-radius:30px;margin-inline:-6px}
+.phone{width:min(260px,70%);background:var(--card);border:7px solid var(--dark);border-radius:36px;padding:14px 12px 16px;box-shadow:0 22px 44px -18px rgba(27,26,24,.45);animation:float 6s ease-in-out infinite;min-height:330px}
+@keyframes float{50%{transform:translateY(-7px)}}
+.ph-h{font:800 13px 'Bricolage Grotesque',sans-serif;letter-spacing:-.02em;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+.mini{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:9px 10px;margin-bottom:8px;font-size:11.5px}
+.mini b{font-size:12.5px}.mini .m{color:var(--mut)}
+.price{font:800 18px 'Bricolage Grotesque',sans-serif}
+.pill{display:inline-block;font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;background:var(--grl);color:var(--gr)}
+.pill.o{background:var(--orl);color:var(--or2)}.pill.b{background:var(--bll);color:var(--bl)}
+.chips{display:flex;gap:5px;flex-wrap:wrap}.chips span{font-size:10.5px;border:1px solid var(--line);border-radius:99px;padding:3px 8px;background:var(--card)}.chips .on{background:var(--orl);border-color:var(--orb);color:var(--or2);font-weight:700}
+.bar{height:6px;border-radius:4px;background:var(--line);position:relative;margin:7px 0 3px}.bar i{position:absolute;top:0;bottom:0;border-radius:4px;background:var(--orb)}.bar u{position:absolute;top:-3px;width:3px;height:12px;background:var(--ink);border-radius:2px}
+.ms{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--line);font-size:11px}.ms:last-child{border:0}
+.fade{animation:in .35s ease}@keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+/* steps */
+.steps{display:flex;flex-direction:column;gap:10px}
+.steps h2{font-size:26px;margin-bottom:4px}
+.st{display:flex;gap:14px;align-items:flex-start;text-align:left;border:1.5px solid var(--line);background:var(--card);border-radius:20px;padding:14px 16px;cursor:pointer;width:100%;font:inherit;color:inherit;min-height:64px}
+.st .n{width:32px;height:32px;border-radius:50%;background:var(--line);color:var(--mut);display:grid;place-items:center;font-weight:700;flex:none}
+.st b{display:block;font:700 17px 'Bricolage Grotesque',sans-serif}.st span.d{color:var(--mut);font-size:14px;display:block;margin-top:2px}
+.st[aria-pressed="true"]{border-color:var(--or);background:var(--orl)}.st[aria-pressed="true"] .n{background:var(--or);color:#fff}
+.trust{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.trust div{display:flex;gap:10px;align-items:center;font-size:14px;font-weight:600;border:1px solid var(--line);border-radius:16px;padding:12px;background:var(--card)}
+.trust svg{width:20px;height:20px;stroke:var(--or);fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.bento{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.bento h2{grid-column:1/-1;font-size:26px}
+.tile{border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:6px;background:var(--card);border:1px solid var(--line)}
+.tile.big{grid-column:1/-1;background:var(--dark);color:#f3efe8;border:0}.tile.big p{color:#b9b2a7}
+.tile b{font:700 17px 'Bricolage Grotesque',sans-serif}.tile p{margin:0;font-size:14px;color:var(--mut)}
+.tile.or{background:var(--orl);border-color:var(--orb)}.tile.gr{background:var(--grl);border-color:transparent}
+.jobs{display:flex;flex-direction:column;gap:10px}.jobs h2{font-size:26px}
+.job{display:flex;justify-content:space-between;gap:10px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px 16px}
+.job b{display:block;font-size:15.5px}.job span{font-size:13px;color:var(--mut)}
+.final{background:var(--dark);color:#f3efe8;border-radius:28px;padding:26px 20px;display:flex;flex-direction:column;gap:14px;text-align:center}
+.final h2{font-size:28px}.final p{margin:0;color:#b9b2a7}
+@media (prefers-reduced-motion:reduce){.phone,.fade{animation:none}}
+</style>
+<div class="wrap">
+  <div class="note">Mockup. A modernized landing page. Tap the side switch and the steps to see the page respond. Names and numbers are examples.</div>
+  <div class="top"><span class="logo">Job<span>file</span></span><span class="signin">Sign in</span></div>
+
+  <section class="hero">
+    <span class="eyebrow" id="eyebrow">Home improvement marketplace</span>
+    <h1 id="h1"></h1>
+    <p class="sub" id="sub"></p>
+    <div class="seg" role="tablist" aria-label="I am a"><button role="tab" id="s-ho" aria-selected="true">I&rsquo;m a homeowner</button><button role="tab" id="s-co" aria-selected="false">I&rsquo;m a contractor</button></div>
+    <button class="cta" id="cta1" type="button"></button>
+    <p class="fine" id="fine"></p>
+  </section>
+
+  <section class="stage" aria-label="Preview of the app"><div class="phone" id="phone"></div></section>
+
+  <section class="steps" aria-label="How it works">
+    <h2>Three steps. Tap one.</h2>
+    <div id="steps"></div>
+  </section>
+
+  <section class="trust" aria-label="Why people trust Jobfile">
+    <div><svg viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 4.5-3.2 7.8-8 9-4.8-1.2-8-4.5-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg>Insured and verified</div>
+    <div><svg viewBox="0 0 24 24"><path d="M12 21s7-6.2 7-11a7 7 0 10-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>Address stays private</div>
+    <div><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Free, no fees</div>
+    <div><svg viewBox="0 0 24 24"><path d="M12 3l2.6 5.6 6 .7-4.4 4.1 1.2 6-5.4-3-5.4 3 1.2-6L3.4 9.3l6-.7z"/></svg>Built for Texas</div>
+  </section>
+
+  <section class="bento" aria-label="What you get">
+    <h2 id="bh"></h2>
+    <div class="tile big"><b id="b1t"></b><p id="b1p"></p></div>
+    <div class="tile or"><b id="b2t"></b><p id="b2p"></p></div>
+    <div class="tile gr"><b id="b3t"></b><p id="b3p"></p></div>
+  </section>
+
+  <section class="jobs" aria-label="Open near you">
+    <h2>Open near you</h2>
+    <div class="job"><div><b>Kitchen and walls painting</b><span>Plano · 1,800 sq ft · 2 bids</span></div><span class="pill o">$6,000 – $6,500</span></div>
+    <div class="job"><div><b>Bathroom remodel</b><span>Frisco · 3 bids</span></div><span class="pill o">$14,000 – $18,000</span></div>
+    <button class="cta ghost" type="button">See all open jobs</button>
+  </section>
+
+  <section class="final">
+    <h2 id="fh"></h2>
+    <p>Free to start. Nothing to download.</p>
+    <button class="cta" id="cta2" type="button"></button>
+  </section>
+</div>
+<script>
+var C={
+ho:{eye:'For homeowners',h:'Get bids from local pros. <em>Run the whole job</em> in one place.',sub:'Post your project, compare real bids, then keep the price, photos and payments in one shared record.',cta:'Post your project, it’s free',fine:'No fees. Your address stays private until you hire.',
+ steps:[['Post it','Pick the work, add photos and a budget. Takes a few minutes.'],['Compare bids','See price, insurance and ratings side by side.'],['Run the job','Schedule, changes and payments in one place.']],
+ bh:'Everything for your project',b:[['One shared record','Price, scope, photos, changes and payments, not lost in texts.'],['Know it’s fair','An AI cost reference before you commit.'],['Meet first','Ask for a site visit before you hire.']],fh:'Ready to get bids on your project?'},
+co:{eye:'For contractors',h:'Win the job, then <em>skip the paperwork.</em>',sub:'Find nearby projects, send a bid that shows your insurance and ratings, then run the job with your customer.',cta:'Create your free profile',fine:'No subscription. Nothing taken from jobs you win.',
+ steps:[['Find work','New projects in your trade and area come to you.'],['Send a bid','Your logo, badge, insurance and price on every bid.'],['Get paid as you go','Request each milestone. Both sides see what is next.']],
+ bh:'Everything to win and run jobs',b:[['A profile that wins bids','Verified badge, insurance, work photos and real ratings.'],['See the job first','Ask for a visit before you price it.'],['Bill extra work','Change orders approved before you start.']],fh:'Ready to find your next job?'}
+};
+var P={
+ho:[
+ '<div class="ph-h">New project <span class="pill o">Draft</span></div><div class="mini"><b>What work?</b><div class="chips" style="margin-top:6px"><span class="on">Walls</span><span class="on">Trim and doors</span><span>Ceiling</span></div></div><div class="mini"><b>Budget</b><div class="m">$6,000 to $6,500</div></div><div class="mini"><b>Site visits</b><div class="m">Yes, weekday evenings</div></div><div class="mini" style="background:var(--or);color:#fff;text-align:center;font-weight:700;border:0">Publish project</div>',
+ '<div class="ph-h">3 bids <span class="pill b">Compare</span></div><div class="mini"><b>Nesty’s Painting</b> <span class="pill">✓ Verified</span><div class="price">$5,008</div><div class="bar"><i style="left:20%;width:55%"></i><u style="left:48%"></u></div><div class="m">Typical range · insured to Mar 2027</div></div><div class="mini"><b>Plano Pro Paint</b><div class="price">$6,200</div><div class="m">★ 4.8 · 12 reviews</div></div><div class="mini"><b>Lone Star Finishes</b><div class="price">$5,750</div><div class="m">★ 4.9 · 8 reviews</div></div>',
+ '<div class="ph-h">Needs you <span class="pill o">2</span></div><div class="mini"><b>Pick a time for the site visit</b><div class="m">Thu, Nov 13 · 10:00 am</div></div><div class="mini"><b>Choose: Kitchen tile</b><div class="m">Needed by Fri</div></div><div class="mini"><b>Payments</b><div class="ms"><span>Deposit</span><span class="pill">Paid</span></div><div class="ms"><span>Midpoint</span><span class="pill o">Requested</span></div></div>'],
+co:[
+ '<div class="ph-h">Open near you <span class="pill b">3</span></div><div class="mini"><b>Kitchen and walls painting</b><div class="m">Plano · 1,800 sq ft</div><div class="price" style="font-size:14px">$6,000 – $6,500</div></div><div class="mini"><b>Bathroom remodel</b><div class="m">Frisco · 3 bids</div></div><div class="mini"><b>Fence replacement</b><div class="m">McKinney · 0 bids</div></div>',
+ '<div class="ph-h">Your bid</div><div class="mini"><span class="logo" style="font-size:15px">N</span> <b>Nesty’s Painting</b><div class="chips" style="margin:6px 0"><span class="on">✓ Verified</span><span class="on">Insured to Mar 2027</span></div><div class="price">$5,008</div><div class="m">4 weeks · starts Nov 19</div></div><div class="mini"><b>Included</b><div class="m">Paint, prep and cleanup</div></div><div class="mini" style="background:var(--or);color:#fff;text-align:center;font-weight:700;border:0">Send bid</div>',
+ '<div class="ph-h">Payments</div><div class="mini"><div class="ms"><span>Deposit at signing</span><span class="pill">Confirmed</span></div><div class="ms"><span>Midpoint</span><span class="pill o">Request</span></div><div class="ms"><span>Substantial completion</span><span class="m">Next</span></div><div class="ms"><span>Final walkthrough</span><span class="m">Later</span></div></div><div class="mini"><b>CO-2 +$420</b><div class="m">Approved · own payment line</div></div>']
+};
+var role='ho',step=0;
+function paint(first){
+ var c=C[role];
+ document.getElementById('eyebrow').textContent=c.eye;
+ document.getElementById('h1').innerHTML=c.h;document.getElementById('sub').textContent=c.sub;
+ document.getElementById('cta1').textContent=c.cta+' →';document.getElementById('cta2').textContent=c.cta+' →';
+ document.getElementById('fine').textContent=c.fine;document.getElementById('fh').textContent=c.fh;
+ document.getElementById('bh').textContent=c.bh;
+ [1,2,3].forEach(function(i){document.getElementById('b'+i+'t').textContent=c.b[i-1][0];document.getElementById('b'+i+'p').textContent=c.b[i-1][1]});
+ document.getElementById('steps').innerHTML=c.steps.map(function(s,i){return '<button class="st" type="button" data-i="'+i+'" aria-pressed="'+(i===step)+'"><span class="n">'+(i+1)+'</span><span><b>'+s[0]+'</b><span class="d">'+s[1]+'</span></span></button>'}).join('');
+ var ph=document.getElementById('phone');ph.innerHTML='<div class="fade">'+P[role][step]+'</div>';
+ document.getElementById('s-ho').setAttribute('aria-selected',role==='ho');document.getElementById('s-co').setAttribute('aria-selected',role==='co');
+}
+document.getElementById('steps').addEventListener('click',function(e){var b=e.target.closest('.st');if(!b)return;step=+b.dataset.i;paint()});
+document.getElementById('s-ho').addEventListener('click',function(){role='ho';step=0;paint()});
+document.getElementById('s-co').addEventListener('click',function(){role='co';step=0;paint()});
+paint();
+</script>
