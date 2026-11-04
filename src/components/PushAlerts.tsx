@@ -25,7 +25,7 @@ async function post(body: unknown) {
   return r.ok;
 }
 
-function usePush() {
+export function usePush() {
   const [state, setState] = useState<State>('loading');
   const [prefs, setPrefs] = useState<Prefs | null>(null);
   const [key, setKey] = useState('');

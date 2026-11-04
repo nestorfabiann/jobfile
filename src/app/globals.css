@@ -499,3 +499,19 @@ html { scroll-behavior: smooth; }
 .hp-sl[aria-pressed='true'] { background: var(--ok); }
 .hp-sl[aria-pressed='true']::after { left: 23px; }
 @media (prefers-reduced-motion: reduce) { .hp-sl::after { transition: none; } }
+
+/* First-time phone alerts welcome */
+.wa { position: fixed; inset: 0; z-index: 200; background: var(--bg); overflow-y: auto; display: flex; padding: calc(20px + env(safe-area-inset-top, 0px)) 20px calc(20px + env(safe-area-inset-bottom, 0px)); }
+.wa-in { margin: auto; width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: 12px; }
+.wa-bell { width: 64px; height: 64px; border-radius: 20px; background: #c4813f; display: grid; place-items: center; }
+.wa h2 { font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 30px; line-height: 1.05; letter-spacing: -0.03em; margin: 6px 0 0; text-wrap: balance; }
+.wa p { margin: 0; color: var(--ink-2); font-size: 16px; line-height: 1.5; }
+.wa .wa-sm { font-size: 14px; }
+.wa-li, .wa-st { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; font-size: 15px; }
+.wa-li b { display: block; }
+.wa-li span { color: var(--ink-2); font-size: 14px; }
+.wa-st { display: flex; gap: 12px; align-items: center; }
+.wa-st > span { width: 26px; height: 26px; border-radius: 50%; background: var(--warn-bg); color: #c4813f; font-weight: 700; display: grid; place-items: center; flex: none; font-size: 13px; }
+.wa-go { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+.wa-go .btn { text-align: center; min-height: 48px; }
+.wa-go > button:not(.btn) { background: transparent; border: 0; color: var(--ink-2); font: 500 15px 'IBM Plex Sans', system-ui, sans-serif; min-height: 44px; cursor: pointer; }
