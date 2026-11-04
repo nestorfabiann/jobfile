@@ -1,6 +1,7 @@
 import { loadProject } from '@/lib/project';
 import { dollars, signedDollars, daysText } from '@/lib/money';
-import { totals, type ChangeOrder, type Item } from '@/lib/agreement';
+import { creditRoom, milestoneAmounts, totals, type ChangeOrder, type Item, type Milestone } from '@/lib/agreement';
+import ChangeOrderForm from '@/components/ChangeOrderForm';
 import { createChangeOrder, decideChange } from './actions';
 
 const TZ = 'America/Chicago';
@@ -23,14 +24,21 @@ export default async function Changes({
 }) {
   const { sb, project, role, contractorName, homeownerName } = await loadProject(params.id);
 
-  const [{ data: agr }, { data: itemRows }, { data: coRows }] = await Promise.all([
+  const [{ data: agr }, { data: itemRows }, { data: coRows }, { data: msRows }] = await Promise.all([
     sb.from('agreements').select('executed_at').eq('project_id', project.id).maybeSingle(),
     sb.from('agreement_items').select('price_cents').eq('project_id', project.id),
     sb.from('change_orders').select('*').eq('project_id', project.id).order('number', { ascending: false }),
+    sb.from('agreement_milestones').select('*').eq('project_id', project.id).order('position'),
   ]);
   const changes = (coRows ?? []) as ChangeOrder[];
   const t = totals((itemRows ?? []) as Item[], changes);
   const executed = !!agr?.executed_at;
+  // For the credit hint: what is left to reduce, and the final payment as it stands now.
+  const sched = ((msRows ?? []) as any[]).map((m) => ({ ...m, pct: Number(m.pct) })) as Milestone[];
+  const amts = milestoneAmounts(t.base, sched);
+  const roomCents = creditRoom(t.base, sched);
+  const last = sched.length - 1;
+  const finalCents = last >= 0 && (sched[last].pay_status ?? 'scheduled') === 'scheduled' ? amts[last] : 0;
   const nameOf = (r: string) => (r === 'contractor' ? contractorName : homeownerName);
 
   return (
@@ -57,25 +65,7 @@ export default async function Changes({
         <>
         <details className="conew">
           <summary className="btn accent">New change order</summary>
-          <form action={createChangeOrder} className="card stack" style={{ marginTop: 10 }}>
-            <input type="hidden" name="project_id" value={project.id} />
-            <label className="fld">Title<input name="title" required placeholder="Move range outlet" /></label>
-            <label className="fld">
-              What changes
-              <textarea name="description" rows={3} placeholder="Describe the work, materials and where." />
-            </label>
-            <div className="grid2">
-              <label className="fld">
-                Price change (USD, negative for a credit)
-                <input name="cost" inputMode="decimal" placeholder="0" />
-              </label>
-              <label className="fld">
-                Schedule change (days)
-                <input name="days" inputMode="numeric" placeholder="0" />
-              </label>
-            </div>
-            <div className="row"><button className="btn" type="submit">Send for approval</button></div>
-          </form>
+          <ChangeOrderForm action={createChangeOrder} projectId={project.id} finalCents={finalCents} roomCents={roomCents} />
         </details>
         <p className="muted small conew-hint">Extra work, new materials or a schedule change. The other side approves before it starts.</p>
         </>
