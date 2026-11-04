@@ -2,6 +2,7 @@ import { supabaseAdmin } from '@/lib/supabase/server';
 import { visitTodo, type Visit } from '@/lib/visits';
 import Link from 'next/link';
 import { loadProject } from '@/lib/project';
+import HomesteadNotice from '@/components/HomesteadNotice';
 import ProjectTabs from '@/components/ProjectTabs';
 import { priceCheckEnabled } from '@/lib/pricecheck';
 import { addDays, todayChi } from '@/lib/schedule';
@@ -53,15 +54,7 @@ export default async function ProjectLayout({
         </div>
       )}
 
-      {project.is_homestead && (
-        <details className="box warn">
-          <summary style={{ cursor: 'pointer' }}><b>Homestead job.</b> Texas has extra contract rules. Tap to read them.</summary>
-          <p style={{ margin: '8px 0 0' }}>
-            Texas requires a written contract, signed by both spouses if the owner is married, before work or materials start, and
-            filed with the county clerk. Track these steps on the Agreement tab. Have a Texas construction attorney review your contract.
-          </p>
-        </details>
-      )}
+      {project.is_homestead && <HomesteadNotice id={project.id} />}
 
       {children}
     </>
