@@ -1,5 +1,6 @@
 import { supabaseAdmin } from '@/lib/supabase/server';
 import { isCurrent } from '@/lib/companyProfile';
+import { googleConfigured } from '@/lib/googleRatings';
 
 export type MeterItem = { label: string; ok: boolean; cta: string; href: string };
 
@@ -22,6 +23,11 @@ export async function profileMeter(companyId: string): Promise<{ pct: number; it
     { label: 'Short “About us” text', ok: String(c.about ?? '').trim().length >= 40, cta: 'Write', href: '/settings/business#bp-about' },
     { label: 'Year you started', ok: !!c.year_started, cta: 'Add', href: '/settings/business#bp-where' },
   ];
+  if (googleConfigured()) {
+    let linked = false;
+    try { linked = !!(await db.from('company_ratings').select('company_id').eq('company_id', companyId).eq('source', 'google').maybeSingle()).data; } catch { linked = false; }
+    items.push({ label: 'Link your Google rating', ok: linked, cta: 'Link', href: '/settings/business#bp-ratings' });
+  }
   const done = items.filter((i) => i.ok).length;
   return { pct: Math.round((done / items.length) * 100), items };
 }

@@ -515,3 +515,18 @@ html { scroll-behavior: smooth; }
 .wa-go { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
 .wa-go .btn { text-align: center; min-height: 48px; }
 .wa-go > button:not(.btn) { background: transparent; border: 0; color: var(--ink-2); font: 500 15px 'IBM Plex Sans', system-ui, sans-serif; min-height: 44px; cursor: pointer; }
+
+/* Jobfile and Google ratings side by side on a contractor profile */
+.rt2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.rt2 > div { border-radius: 18px; padding: 14px; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.rt2 b { font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 36px; letter-spacing: -0.03em; line-height: 1; }
+.rt2 small { font-size: 12.5px; line-height: 1.35; }
+.rt2-src { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; }
+.rt2-jf { background: #1f4d3a; color: #fff; }
+.rt2-jf small { opacity: 0.85; }
+.rt2-g { background: var(--surface); border: 1.5px solid #ecd4a8; }
+.rt2-g small { color: var(--ink-2); }
+.rt2-g a { margin-top: auto; font-size: 13px; }
+.rt2-note { grid-column: 1 / -1; margin: 0; background: var(--warn-bg); border-radius: 14px; padding: 10px 12px; font-size: 13.5px; line-height: 1.45; color: var(--ink-2); }
+.rt2-note b { font-size: inherit; letter-spacing: 0; font-family: inherit; color: var(--ink); }
+@media (max-width: 360px) { .rt2 { grid-template-columns: 1fr; } }

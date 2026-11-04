@@ -5,6 +5,7 @@ import { requireUser } from '@/lib/session';
 import { supabaseAdmin } from '@/lib/supabase/server';
 import { dollars } from '@/lib/money';
 import { companyReviews, summarize } from '@/lib/reviews';
+import { outsideRatingsFor } from '@/lib/googleRatings';
 import { fmtDate, INSURANCE_KINDS, isCurrent, signedUrls } from '@/lib/companyProfile';
 import { firstNameInitial, listingOpen, listingTitle, requireMarketplace, type Bid, type Listing } from '@/lib/marketplace';
 import RangeBar from '@/components/RangeBar';
@@ -119,6 +120,7 @@ export default async function ListingPage({ params, searchParams }: { params: { 
     }
   }
 
+  const gRatings = owner && visible.length ? await outsideRatingsFor(Array.from(new Set(visible.map((b: any) => b.company_id as string)))) : new Map();
   const onlyInsured = searchParams.insured === '1';
   const shown = onlyInsured ? visible.filter((b) => info.get(b.company_id)?.insured) : visible;
   // A contractor without current verified insurance gets a nudge, since the badge helps them stand out.
@@ -320,6 +322,7 @@ export default async function ListingPage({ params, searchParams }: { params: { 
                 </div>
                 <div className="row small muted">
                   <span>{c && c.count > 0 ? `★ ${c.avg.toFixed(1)} · ${c.count} review${c.count > 1 ? 's' : ''}` : 'No reviews yet'}</span>
+                  {gRatings.get(b.company_id) ? <span className="pill warn" title="Linked by the contractor, as shown on Google Maps">★ {gRatings.get(b.company_id)!.rating.toFixed(1)} · {gRatings.get(b.company_id)!.count} on Google Maps</span> : null}
                 </div>
                 {c?.verified ? <span className="pill ok" style={{ width: 'max-content' }}>✓ Verified by Jobfile</span> : null}
                 <InsuranceBadge state={c?.insured ? 'ok' : c?.pending ? 'wait' : 'none'} name={c?.name ?? 'This contractor'} until={c?.until ?? ''} kinds={c?.kinds ?? []} />

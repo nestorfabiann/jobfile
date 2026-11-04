@@ -153,6 +153,24 @@ export default async function Profile({ params, searchParams }: { params: { id: 
 
       {searchParams.reported ? <div className="box ok">Thanks. An admin will review it.</div> : null}
 
+      {outside.length > 0 && (
+        <div className="rt2">
+          <div className="rt2-jf">
+            <span className="rt2-src">On Jobfile</span>
+            {s.count > 0 ? <><b>{s.avg.toFixed(1)}</b><Stars n={s.avg} /><small>{s.count} finished project{s.count > 1 ? 's' : ''}, every one verified</small></> : <><b>New</b><small>No finished projects here yet</small></>}
+          </div>
+          {outside.map((o) => (
+            <div className="rt2-g" key={o.source}>
+              <span className="rt2-src">Google Maps</span>
+              <b>{o.rating.toFixed(1)}</b><Stars n={o.rating} />
+              <small>{o.count} review{o.count > 1 ? 's' : ''}</small>
+              {o.url && <a href={o.url} target="_blank" rel="noopener noreferrer nofollow">See on Google</a>}
+            </div>
+          ))}
+          <p className="rt2-note"><b>Proven twice.</b> Jobfile scores come from real projects here. The Google rating is linked by the contractor and shown as Google reports it.</p>
+        </div>
+      )}
+
       {s.count === 0 ? (
         <div className="card"><p className="muted">No ratings yet. Ratings appear after a completed project, once both sides have rated.</p></div>
       ) : (
@@ -170,19 +188,6 @@ export default async function Profile({ params, searchParams }: { params: { id: 
             ))}
           </div>
           <p className="muted small">Every review is from a homeowner who completed a project with this contractor on Jobfile.</p>
-        </div>
-      )}
-
-      {outside.length > 0 && (
-        <div className="card">
-          <h2 style={{ margin: 0 }}>Also rated elsewhere</h2>
-          {outside.map((o) => (
-            <div className="row" key={o.source} style={{ justifyContent: 'space-between' }}>
-              <div><b>Google</b> <span className="rvbig" style={{ fontSize: 22 }}>{o.rating.toFixed(1)}</span> <span className="muted small">{o.count} review{o.count > 1 ? 's' : ''}</span></div>
-              {o.url && <a className="small" href={o.url} target="_blank" rel="noopener noreferrer nofollow">See on Google</a>}
-            </div>
-          ))}
-          <p className="muted small">Linked by the contractor and shown as Google reports it. It is not part of the Jobfile score.</p>
         </div>
       )}
 

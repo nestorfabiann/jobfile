@@ -104,3 +104,12 @@ export async function companyOutsideRatings(companyId: string): Promise<OutsideR
     return []; // table not created yet
   }
 }
+
+/** Approved Google ratings for several companies at once, keyed by company id. */
+export async function outsideRatingsFor(companyIds: string[]): Promise<Map<string, OutsideRating>> {
+  const out = new Map<string, OutsideRating>();
+  if (!googleConfigured() || !companyIds.length) return out;
+  const all = await Promise.all(companyIds.map(async (id) => [id, (await companyOutsideRatings(id))[0]] as const));
+  for (const [id, r] of all) if (r) out.set(id, r);
+  return out;
+}

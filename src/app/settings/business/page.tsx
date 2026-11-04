@@ -58,8 +58,8 @@ export default async function Business({ searchParams }: { searchParams: { saved
 
       {googleConfigured() && (
         <section className="card" aria-label="Your ratings elsewhere">
-          <h2 id="bp-ratings" style={{ scrollMarginTop: 80 }}>Your ratings elsewhere</h2>
-          <p className="muted">Link your Google page. Homeowners see it next to your Jobfile score. It is never mixed into the Jobfile score.</p>
+          <h2 id="bp-ratings" style={{ scrollMarginTop: 80 }}>Bring your Google reviews with you</h2>
+          <p className="muted">Homeowners see your Google rating right beside your Jobfile score, on your profile and on your bids. It is never mixed into the Jobfile score.</p>
           {gr ? (
             <div className="stack">
               <div className="row" style={{ justifyContent: 'space-between' }}>
