@@ -26,14 +26,18 @@ export default function LandingPitch({ aiOn, signedIn }: { aiOn: boolean; signed
   const go = signedIn ? '/settings/business' : `/login?next=${encodeURIComponent('/settings/business')}`;
   const post = signedIn ? '/marketplace/new' : `/login?next=${encodeURIComponent('/marketplace/new')}`;
   const seg = (on: boolean) => ({ border: 0, borderRadius: 999, minHeight: 46, font: '600 14.5px inherit', fontFamily: 'inherit', cursor: 'pointer', background: on ? 'var(--surface)' : 'transparent', color: on ? 'var(--ink)' : 'var(--ink-2)', boxShadow: on ? '0 1px 4px rgba(0,0,0,.15)' : 'none' }) as const;
-  const steps = (list: [string, string, boolean?][]) => list.map(([t, d, soon], i) => (
-    <div key={t} className="row" style={{ alignItems: 'flex-start', flexWrap: 'nowrap', gap: 10 }}>
-      <span className="why-num" aria-hidden="true">{i + 1}</span>
-      <span><b>{t}</b>{soon ? <Soon /> : null}<span className="muted small" style={{ display: 'block' }}>{d}</span></span>
+  const steps = (list: [string, string, boolean?][]) => (
+    <div className="why-steps">
+      {list.map(([t, d, soon], i) => (
+        <div key={t} className="row" style={{ alignItems: 'flex-start', flexWrap: 'nowrap', gap: 14 }}>
+          <span className="why-num" aria-hidden="true">{i + 1}</span>
+          <span><b style={{ fontSize: 16.5 }}>{t}</b>{soon ? <Soon /> : null}<span className="muted" style={{ display: 'block', marginTop: 4, fontSize: 14.5, lineHeight: 1.5 }}>{d}</span></span>
+        </div>
+      ))}
     </div>
-  ));
+  );
   return (
-    <section className="stack" aria-label="How Jobfile works">
+    <section className="stack" aria-label="How Jobfile works" style={{ gap: 26 }}>
       <div role="tablist" aria-label="Who is this for" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, background: 'var(--line)', borderRadius: 999, padding: 4 }}>
         <button type="button" role="tab" aria-selected={who === 'c'} onClick={() => setWho('c')} style={seg(who === 'c')}>For contractors</button>
         <button type="button" role="tab" aria-selected={who === 'h'} onClick={() => setWho('h')} style={seg(who === 'h')}>For homeowners</button>
@@ -41,14 +45,16 @@ export default function LandingPitch({ aiOn, signedIn }: { aiOn: boolean; signed
 
       {who === 'c' ? (
         <>
-          <h2 style={{ fontSize: 24 }}>Win the job, then run it without the paperwork</h2>
-          <span className="pill ok" style={{ width: 'max-content' }}>Free for contractors</span>
-          <div className="card" style={{ background: 'var(--ok-bg, #d9f1e6)', borderColor: 'transparent' }}>
+          <div className="stack" style={{ gap: 12 }}>
+            <h2 style={{ fontSize: 26, lineHeight: 1.1 }}>Win the job, then run it without the paperwork</h2>
+            <p className="muted" style={{ margin: 0, fontSize: 16, lineHeight: 1.5 }}>Bid on local jobs, agree on the work in writing, and get paid as you go.</p>
+          </div>
+          <div className="card" style={{ background: 'var(--ok-bg, #d9f1e6)', borderColor: 'transparent', padding: 22, gap: 8 }}>
             <h3 style={{ margin: 0 }}>Free to join. No subscription. No fees at all.</h3>
             <span className="small">No monthly or yearly charge, no fee to bid, and nothing taken from the jobs you win.</span>
           </div>
-          <div className="card">
-            <h3 style={{ margin: 0 }}>How it works for contractors</h3>
+          <div className="card" style={{ padding: '26px 22px', gap: 26 }}>
+            <h3 style={{ margin: 0, fontSize: 21 }}>How it works for contractors</h3>
             {steps([
               ['Set up your business profile', 'Add your trades, service area, logo, work photos and insurance.'],
               ['Bid on jobs near you', 'Browse open projects by trade and ZIP. Get an alert when a new one matches.'],
@@ -92,14 +98,13 @@ export default function LandingPitch({ aiOn, signedIn }: { aiOn: boolean; signed
         </>
       ) : (
         <>
-          <h2 style={{ fontSize: 24 }}>One shared record that protects you both</h2>
-          <span className="pill ok" style={{ width: 'max-content' }}>Free for homeowners</span>
-          <div className="card" style={{ background: 'var(--ok-bg, #d9f1e6)', borderColor: 'transparent' }}>
+          <h2 style={{ fontSize: 26, lineHeight: 1.1 }}>One shared record that protects you both</h2>
+          <div className="card" style={{ background: 'var(--ok-bg, #d9f1e6)', borderColor: 'transparent', padding: 22, gap: 8 }}>
             <h3 style={{ margin: 0 }}>Free to post. No fees at all.</h3>
             <span className="small">It costs nothing to post a project, compare bids or run the job in Jobfile.</span>
           </div>
-          <div className="card">
-            <h3 style={{ margin: 0 }}>How it works for homeowners</h3>
+          <div className="card" style={{ padding: '26px 22px', gap: 26 }}>
+            <h3 style={{ margin: 0, fontSize: 21 }}>How it works for homeowners</h3>
             {steps([
               ['Post your project', 'Tap the work you want done, add photos, set a budget range and location in minutes.'],
               ['Compare bids', 'Local contractors send proposals. Review them side by side.'],

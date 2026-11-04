@@ -198,7 +198,9 @@ body.pub .composer { box-shadow: 0 -10px 24px -14px rgba(27, 26, 24, 0.3); }
   .why-ic { border-color: #5a4426; }
   .why-mini { border-color: #5a4426; background: #33281c; }
 }
-.why-num { flex: none; width: 26px; height: 26px; border-radius: 50%; background: var(--accent); color: #fff; display: grid; place-items: center; font-size: 13px; font-weight: 700; }
+.why-steps { position: relative; display: flex; flex-direction: column; gap: 28px; }
+.why-steps::before { content: ''; position: absolute; left: 14px; top: 16px; bottom: 44px; width: 2px; background: var(--line); }
+.why-num { position: relative; z-index: 1; flex: none; width: 30px; height: 30px; border-radius: 50%; background: var(--accent); color: #fff; display: grid; place-items: center; font-size: 13px; font-weight: 700; }
 
 /* Start a project: button that opens the form in place */
 .startp>summary{list-style:none;cursor:pointer}
