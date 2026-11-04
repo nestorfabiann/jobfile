@@ -31,8 +31,8 @@ export default function WelcomeAlerts() {
         </div>
         {install ? (
           <>
-            <h2 id="wa-t">Never miss a bid or a message</h2>
-            <p>On iPhone, alerts work from the Home Screen. Two quick steps first.</p>
+            <h2 id="wa-t">Get the app, never miss a bid</h2>
+            <p>On iPhone, alerts work from the Home Screen. Two quick steps. No App Store needed.</p>
             <div className="wa-st"><span>1</span><div>Tap <b>Share</b>, then <b>Add to Home Screen</b></div></div>
             <div className="wa-st"><span>2</span><div>Open Jobfile from your Home Screen. We will ask once.</div></div>
             <div className="wa-go">

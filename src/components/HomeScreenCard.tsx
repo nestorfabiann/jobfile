@@ -18,10 +18,10 @@ export default function HomeScreenCard() {
   if (!show) return null;
   const hide = () => { try { localStorage.setItem(KEY, '1'); } catch { /* ignore */ } setShow(false); };
   return (
-    <section className="hsc" aria-label="Add to Home Screen">
+    <section className="hsc" aria-label="Get the app">
       <div className="hsc-top">
         <img src="/icons/icon-192.png" alt="" width={56} height={56} />
-        <div><b>Keep Jobfile on your Home Screen</b><span>Opens full screen. Takes 10 seconds.</span></div>
+        <div><b>Get Jobfile on your phone</b><span>Instant alerts when a contractor bids or replies. Takes 10 seconds.</span></div>
       </div>
       <div className="hsc-row">
         <Link className="hsc-go" href="/app" onClick={hide}>Show me how</Link>

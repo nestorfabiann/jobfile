@@ -29,7 +29,7 @@ export default function AppMenu({ marketplace, contractor, admin, signOutAction 
     ['/settings', 'Settings', 'set'],
     ...(contractor ? ([['/settings/business', 'Business profile', 'biz']] as [string, string, string][]) : []),
     ['/invite', 'Invite friends', 'inv'],
-    ['/app', 'Add to Home Screen', 'app'],
+    ['/app', 'Get the app', 'app'],
     ['/help', 'Help and contact', 'help'],
     ...(admin ? ([['/admin', 'Admin', 'adm']] as [string, string, string][]) : []),
   ];
@@ -47,7 +47,7 @@ export default function AppMenu({ marketplace, contractor, admin, signOutAction 
       {open && (
         <nav id="appmenu-sheet" className="appmenu-sheet" aria-label="Main">
           {items.map(([href, label, icon]) => (
-            <Link key={href} href={href} aria-current={current(href) ? 'page' : undefined}><MenuIcon name={icon} />{label}</Link>
+            <Link key={href} href={href} aria-current={current(href) ? 'page' : undefined}><MenuIcon name={icon} />{href === '/app' ? <span>{label}<small className="mi-sub">Alerts on your phone</small></span> : label}</Link>
           ))}
           <hr />
           <form action={signOutAction}><button type="submit" className="menu-out"><MenuIcon name="out" />Sign out</button></form>

@@ -531,3 +531,8 @@ html { scroll-behavior: smooth; }
 .rt2-note b { font-size: inherit; letter-spacing: 0; font-family: inherit; color: var(--ink); }
 @media (max-width: 360px) { .rt2 { grid-template-columns: 1fr; } }
 .rt2-logo { width: 84px; height: auto; background: #fff; border-radius: 8px; padding: 2px 4px; align-self: flex-start; margin-bottom: 4px; }
+.appmenu-sheet .mi-sub { display: block; font: 400 12.5px 'IBM Plex Sans', system-ui, sans-serif; color: var(--ink-2); margin-top: 1px; }
+.gta { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.gta li { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 12px 14px; display: flex; flex-direction: column; gap: 2px; }
+.gta b { font-size: 16px; }
+.gta span { color: var(--ink-2); font-size: 14.5px; line-height: 1.4; }

@@ -14,7 +14,7 @@ export const TOPICS: [HelpTopic, string][] = [
 export const HELP: HelpItem[] = [
   { topic: 'start', who: 'both', q: 'What is Jobfile?', a: 'A place where homeowners post projects and compare bids from local contractors, then keep the price, photos, schedule and payments for the job in one shared record.' },
   { topic: 'start', who: 'both', q: 'Does it cost anything?', a: 'Jobfile is free to start. There is no subscription, and nothing is taken from jobs you win.' },
-  { topic: 'start', who: 'both', q: 'How do I add Jobfile to my phone?', a: 'Open Jobfile in Safari (iPhone) or Chrome (Android), tap Share or the menu, then Add to Home Screen. The Add to Home Screen page in the menu shows each step.' },
+  { topic: 'start', who: 'both', q: 'How do I get the Jobfile app on my phone?', a: 'Open Jobfile in Safari (iPhone) or Chrome (Android), tap Share or the menu, then Add to Home Screen. The Get the app page in the menu shows each step. No App Store is needed.' },
   { topic: 'start', who: 'both', q: 'How do I get alerts on my phone?', a: 'Turn on phone alerts from the card on Projects or in Settings. On iPhone, add Jobfile to your Home Screen first. You choose which kinds of alerts you get.' },
   { topic: 'start', who: 'both', q: 'Already have a contractor or a customer?', a: 'You do not need the marketplace. Start a project, send an invite by email, and they join with one tap. The person you invite does not need an account first.' },
   { topic: 'start', who: 'h', q: 'How do I get bids?', a: 'Tap Post a project, choose the work, add photos and a budget, and publish. Contractors near you can then send bids, and you compare them side by side.' },
