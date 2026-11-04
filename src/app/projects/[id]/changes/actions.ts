@@ -5,7 +5,17 @@ import { revalidatePath } from 'next/cache';
 import { loadProject } from '@/lib/project';
 import { supabaseAdmin } from '@/lib/supabase/server';
 import { notifyOtherSide } from '@/lib/notify';
-import { parseDollars, signedDollars } from '@/lib/money';
+import { dollars, parseDollars, signedDollars } from '@/lib/money';
+import { creditRoom, spreadCredit, sumItems, type Item, type Milestone } from '@/lib/agreement';
+
+/** The signed price and the payment schedule, for checking and applying credits. */
+async function schedule(admin: ReturnType<typeof supabaseAdmin>, projectId: string) {
+  const [{ data: items }, { data: ms }] = await Promise.all([
+    admin.from('agreement_items').select('price_cents').eq('project_id', projectId),
+    admin.from('agreement_milestones').select('*').eq('project_id', projectId).order('position'),
+  ]);
+  return { base: sumItems((items ?? []) as Item[]), ms: ((ms ?? []) as any[]).map((m) => ({ ...m, pct: Number(m.pct) })) as Milestone[] };
+}
 
 const page = (id: string, q = '') => `/projects/${id}/changes${q}`;
 function fail(id: string, msg: string): never {
@@ -26,6 +36,12 @@ export async function createChangeOrder(formData: FormData) {
   const description = String(formData.get('description') ?? '').trim().slice(0, 2000);
   const cost = parseDollars(String(formData.get('cost') ?? ''));
   const days = Math.max(-365, Math.min(365, parseInt(String(formData.get('days') ?? '0'), 10) || 0));
+
+  if (cost < 0) {
+    const { base, ms } = await schedule(admin, project.id);
+    const room = creditRoom(base, ms);
+    if (-cost > room) fail(project.id, `This credit is too big. Only ${dollars(room)} is left on payments that have not been requested yet. Lower the credit, or agree on a refund outside Jobfile.`);
+  }
 
   const { data: last } = await admin
     .from('change_orders')
@@ -85,12 +101,24 @@ export async function decideChange(formData: FormData) {
   }
 
   const finalStatus = status;
+  if (finalStatus === 'approved' && (co.cost_cents as number) < 0) {
+    const { base, ms } = await schedule(admin, project.id);
+    if (-(co.cost_cents as number) > creditRoom(base, ms)) fail(project.id, 'This credit is now bigger than what is left on unrequested payments. Ask for a smaller credit.');
+  }
   const { error } = await admin
     .from('change_orders')
     .update({ status: finalStatus, decided_by: user.id, decided_at: new Date().toISOString() })
     .eq('id', id)
     .eq('status', 'pending');
   if (error) fail(project.id, 'Could not update the change order. Try again.');
+
+  // An approved credit lowers the last unrequested payments.
+  if (finalStatus === 'approved' && (co.cost_cents as number) < 0) {
+    const { base, ms } = await schedule(admin, project.id);
+    for (const u of spreadCredit(base, ms, -(co.cost_cents as number), `CO-${co.number} credit`)) {
+      await admin.from('agreement_milestones').update({ adjust_cents: u.adjust_cents, adjust_note: u.adjust_note }).eq('id', u.id);
+    }
+  }
 
   await notifyOtherSide({
     projectId: project.id,

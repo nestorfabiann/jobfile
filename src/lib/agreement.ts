@@ -18,7 +18,7 @@ export type AgreementRow = {
   executed_at: string | null;
 };
 export type Item = { id: string; position: number; title: string; description: string; kind: 'work' | 'allowance'; price_cents: number };
-export type Milestone = { id: string; position: number; label: string; pct: number };
+export type Milestone = { id: string; position: number; label: string; pct: number; adjust_cents?: number | null; adjust_note?: string | null; pay_status?: string };
 export type Signature = { role: 'contractor' | 'homeowner'; typed_name: string; revision: number; signed_at: string };
 export type ChangeOrder = {
   id: string;
@@ -66,13 +66,35 @@ export function agreementIssues(a: AgreementRow, items: Item[], ms: Milestone[])
 }
 
 /** Cents due at each milestone. The last one absorbs rounding so the amounts add up exactly. */
-export function milestoneAmounts(baseCents: number, ms: Milestone[]): number[] {
+export function milestoneAmounts(baseCents: number, ms: Milestone[], applyCredits = true): number[] {
   let remaining = baseCents;
   return ms.map((m, i) => {
     const amt = i === ms.length - 1 ? remaining : Math.round((baseCents * Number(m.pct)) / 100);
     remaining -= amt;
-    return amt;
+    return amt - (applyCredits ? Number(m.adjust_cents ?? 0) : 0);
   });
+}
+
+/** How much a new credit can lower: what is still unrequested on the payment schedule. */
+export function creditRoom(baseCents: number, ms: Milestone[]): number {
+  const amts = milestoneAmounts(baseCents, ms);
+  return ms.reduce((s, m, i) => ((m.pay_status ?? 'scheduled') === 'scheduled' ? s + amts[i] : s), 0);
+}
+
+/** Lowers the last unrequested payments first. Returns what to store on each payment. */
+export function spreadCredit(baseCents: number, ms: Milestone[], creditCents: number, note: string): { id: string; adjust_cents: number; adjust_note: string }[] {
+  const amts = milestoneAmounts(baseCents, ms);
+  let left = creditCents;
+  const out: { id: string; adjust_cents: number; adjust_note: string }[] = [];
+  for (let i = ms.length - 1; i >= 0 && left > 0; i--) {
+    if ((ms[i].pay_status ?? 'scheduled') !== 'scheduled') continue;
+    const take = Math.min(left, Math.max(0, amts[i]));
+    if (take <= 0) continue;
+    left -= take;
+    const prev = (ms[i].adjust_note ?? '').trim();
+    out.push({ id: ms[i].id, adjust_cents: Number(ms[i].adjust_cents ?? 0) + take, adjust_note: [prev, `${note} (${(take / 100).toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 2 })})`].filter(Boolean).join('; ') });
+  }
+  return out;
 }
 
 export function agreementText(opts: {

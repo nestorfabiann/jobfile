@@ -21,7 +21,7 @@ export async function moneyFor(db: SupabaseClient, projectIds: string[]): Promis
   if (!projectIds.length) return out;
   const [{ data: items }, { data: ms }, { data: cos }, { data: ex }] = await Promise.all([
     db.from('agreement_items').select('project_id,price_cents').in('project_id', projectIds),
-    db.from('agreement_milestones').select('id,project_id,position,label,pct,pay_status').in('project_id', projectIds).order('position'),
+    db.from('agreement_milestones').select('*').in('project_id', projectIds).order('position'),
     db.from('change_orders').select('*').in('project_id', projectIds),
     db.from('project_expenses').select('project_id,amount_cents,category').in('project_id', projectIds),
   ]);

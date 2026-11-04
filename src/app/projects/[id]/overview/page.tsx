@@ -29,7 +29,7 @@ export default async function Overview({ params, searchParams }: { params: { id:
       sb.from('agreement_items').select('price_cents').eq('project_id', project.id),
       sb.from('agreement_signatures').select('role').eq('project_id', project.id),
       sb.from('change_orders').select('*').eq('project_id', project.id),
-      sb.from('agreement_milestones').select('id,position,label,pct,pay_status').eq('project_id', project.id).order('position'),
+      sb.from('agreement_milestones').select('*').eq('project_id', project.id).order('position'),
       sb.from('photos').select('id,kind,status,path,caption,created_at').eq('project_id', project.id).order('created_at', { ascending: false }).limit(200),
       sb.from('messages').select('sender_role,tag,created_at').eq('project_id', project.id).order('created_at', { ascending: false }).limit(50),
     ]);

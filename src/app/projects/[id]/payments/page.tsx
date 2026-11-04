@@ -31,13 +31,14 @@ export default async function Payments({ params, searchParams }: { params: { id:
   const ms = ((msRows ?? []) as Row[]).map((m) => ({ ...m, pct: Number(m.pct) }));
   const t = totals((itemRows ?? []) as Item[], (coRows ?? []) as ChangeOrder[]);
   const due = milestoneAmounts(t.base, ms);
+  const was = milestoneAmounts(t.base, ms, false);
 
   // Approved change orders that add cost are billed on their own lines. Credits just lower the balance.
   const cos = ((coRows ?? []) as (ChangeOrder & { id: string; number: number; title: string; pay_status?: Row['pay_status']; requested_at?: string | null; paid_at?: string | null; paid_method?: string | null; confirmed_at?: string | null; lien_waiver?: boolean })[])
     .filter((c) => c.status === 'approved' && c.cost_cents > 0)
     .sort((a, b) => a.number - b.number);
   const lines = [
-    ...ms.map((m, i) => ({ kind: 'ms', key: m.id, id: m.id, tag: `Milestone · ${m.pct}%`, title: m.label, amt: due[i], pay_status: m.pay_status, requested_at: m.requested_at, paid_at: m.paid_at, paid_method: m.paid_method, confirmed_at: m.confirmed_at, lien_waiver: m.lien_waiver })),
+    ...ms.map((m, i) => ({ kind: 'ms', key: m.id, id: m.id, tag: `Milestone · ${m.pct}%`, title: m.label, amt: due[i], was: was[ms.indexOf(m)], note: (m as any).adjust_note ?? '', pay_status: m.pay_status, requested_at: m.requested_at, paid_at: m.paid_at, paid_method: m.paid_method, confirmed_at: m.confirmed_at, lien_waiver: m.lien_waiver })),
     ...cos.map((c) => ({ kind: 'co', key: c.id, id: c.id, tag: 'Change order', title: `CO-${c.number} · ${c.title}`, amt: c.cost_cents, pay_status: (c.pay_status ?? 'scheduled') as Row['pay_status'], requested_at: c.requested_at ?? null, paid_at: c.paid_at ?? null, paid_method: c.paid_method ?? null, confirmed_at: c.confirmed_at ?? null, lien_waiver: !!c.lien_waiver })),
   ];
   const sum = (st: string) => lines.reduce((s, l) => (l.pay_status === st ? s + l.amt : s), 0);
@@ -68,8 +69,7 @@ export default async function Payments({ params, searchParams }: { params: { id:
         )}
         {executed && t.chg !== 0 && (
           <p className="muted small">
-            Original agreement {dollars(t.base)} plus approved changes ({signedDollars(t.chg)}). Each approved change that adds cost is billed on its own line below.
-            {t.chg < 0 ? ' Credits lower the balance.' : ''}
+            Original agreement {dollars(t.base)} plus approved changes ({signedDollars(t.chg)}). Each approved change that adds cost is billed on its own line below. Credits lower the last payments that were not yet requested.
           </p>
         )}
       </div>
@@ -93,9 +93,11 @@ export default async function Payments({ params, searchParams }: { params: { id:
                 </div>
                 <div className="stack" style={{ alignItems: 'flex-end', gap: 6 }}>
                   <b className="amt">{dollars(m.amt)}</b>
+                  {(m as any).was != null && (m as any).was !== m.amt ? <span className="muted small" style={{ textDecoration: 'line-through' }}>was {dollars((m as any).was)}</span> : null}
                   <span className={`pill ${pill[1]}`}>{pill[0]}</span>
                 </div>
               </div>
+              {(m as any).note ? <p className="box warn small" style={{ margin: 0 }}>{(m as any).note}</p> : null}
               {parts.length > 0 && <p className="muted small">{parts.join(' ')}</p>}
 
               {role === 'contractor' && m.pay_status === 'scheduled' && (

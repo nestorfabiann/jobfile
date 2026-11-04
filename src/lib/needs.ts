@@ -29,7 +29,7 @@ export async function projectTasks(userId: string, projects: P[], myCompanyIds: 
     db.from('agreements').select('project_id,sent_at,executed_at,updated_at').in('project_id', ids),
     db.from('agreement_signatures').select('project_id,role').in('project_id', ids),
     db.from('change_orders').select('*').in('project_id', ids),
-    db.from('agreement_milestones').select('id,project_id,position,label,pct,pay_status,requested_at,paid_at').in('project_id', ids).order('position'),
+    db.from('agreement_milestones').select('*').in('project_id', ids).order('position'),
     db.from('agreement_items').select('id,project_id,position,title,description,kind,price_cents').in('project_id', ids),
   ]);
   const roleOf = (p: P): 'contractor' | 'homeowner' => {
