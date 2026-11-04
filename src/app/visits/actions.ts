@@ -43,6 +43,30 @@ async function context(formData: FormData) {
 
   requireMarketplace();
   const { user } = await requireUser();
+
+  // Before any bid: a contractor asks to see the job, and the homeowner answers.
+  if (scope === 'listing') {
+    const { data: l } = await db.from('marketplace_listings').select('id,homeowner_id,status,job_type,title').eq('id', String(formData.get('listing_id') ?? '')).maybeSingle();
+    if (!l) go(safeReturn, 'That project was not found.');
+    const role: Role | null = l!.homeowner_id === user.id ? 'homeowner' : null;
+    let asContractor = false;
+    if (!role) {
+      const { data: m } = await db.from('company_members').select('company_id').eq('user_id', user.id).limit(1);
+      asContractor = !!(m ?? [])[0];
+    }
+    if (!role && !asContractor) go(safeReturn, 'You are not part of this project.');
+    const r: Role = role ?? 'contractor';
+    const path = `/marketplace/${l!.id}`;
+    return {
+      scope: 'listing' as const, role: r, user, db, back: safeReturn, key: { listing_id: l!.id as string } as Record<string, string>, listingStatus: l!.status as string, bidStatus: 'waiting',
+      tell: async (title: string, body: string) => {
+        if (r === 'contractor') return notifyUsers({ userIds: [l!.homeowner_id as string], projectId: null, kind: 'visit', path, title, body });
+        const { data: v } = await db.from('visits').select('created_by').eq('id', String(formData.get('id') ?? '')).maybeSingle();
+        if (v?.created_by) await notifyUsers({ userIds: [v.created_by as string], projectId: null, kind: 'visit', path, title, body });
+      },
+    };
+  }
+
   const { data: bid } = await db.from('marketplace_bids').select('id,listing_id,company_id,status').eq('id', String(formData.get('bid_id') ?? '')).maybeSingle();
   if (!bid) go(safeReturn, 'That bid was not found.');
   const { data: l } = await db.from('marketplace_listings').select('id,homeowner_id,status,job_type').eq('id', bid!.listing_id as string).maybeSingle();
@@ -60,9 +84,12 @@ async function context(formData: FormData) {
 type Ctx = Awaited<ReturnType<typeof context>>;
 
 async function loadVisit(c: Ctx, formData: FormData): Promise<Visit> {
-  const col = c.scope === 'project' ? 'project_id' : 'bid_id';
-  const { data } = await c.db.from('visits').select('*').eq('id', String(formData.get('id') ?? '')).eq(col, c.key[col]).maybeSingle();
+  const col = c.scope === 'project' ? 'project_id' : c.scope === 'listing' ? 'listing_id' : 'bid_id';
+  let q = c.db.from('visits').select('*').eq('id', String(formData.get('id') ?? '')).eq(col, c.key[col]);
+  if (c.scope === 'listing') q = q.is('bid_id', null);
+  const { data } = await q.maybeSingle();
   if (!data) go(c.back, 'That visit was not found.');
+  if (c.scope === 'listing' && c.role === 'contractor' && (data as any).created_by !== c.user.id) go(c.back, 'That visit was not found.');
   return { ...(data as any), slots: ((data as any).slots as string[]) ?? [] } as Visit;
 }
 
@@ -70,6 +97,22 @@ function requestNote(f: FormData): string {
   const free = f.getAll('avail').map(String).filter(Boolean).slice(0, 5).join(', ');
   const note = txt(f, 'note', 400);
   return [free ? `Free: ${free}.` : '', note].filter(Boolean).join(' ').slice(0, 500);
+}
+
+/** A contractor asks to see the job before bidding. The homeowner proposes times. */
+export async function askToSeeJob(formData: FormData) {
+  const c = await context(formData);
+  if (c.scope !== 'listing' || c.role !== 'contractor') go(c.back, 'Only a contractor asks this on a post.');
+  if (c.listingStatus !== 'open') go(c.back, 'This project is no longer taking bids.');
+  const { count } = await c.db.from('visits').select('id', { count: 'exact', head: true }).eq('listing_id', c.key.listing_id).eq('created_by', c.user.id).is('bid_id', null).in('status', ['requested', 'proposed', 'confirmed']);
+  if ((count ?? 0) > 0) go(c.back, 'You already asked to see this job.');
+  const since = new Date(Date.now() - 86400000).toISOString();
+  const { count: today } = await c.db.from('visits').select('id', { count: 'exact', head: true }).eq('created_by', c.user.id).is('bid_id', null).gte('created_at', since);
+  if ((today ?? 0) >= 10) go(c.back, 'You have asked to see 10 jobs today. Try again tomorrow.');
+  const { error } = await c.db.from('visits').insert({ ...c.key, title: 'Site visit', note: txt(formData, 'note', 400), status: 'requested', requested_role: 'contractor', last_role: 'contractor', created_by: c.user.id });
+  if (error) go(c.back, 'Could not save the request.');
+  await c.tell('A contractor wants to see your job first', 'Open your project and suggest times that work for you. They can still bid after.');
+  go(c.back);
 }
 
 /** A homeowner asks a bidder to come and see the job. */
@@ -104,6 +147,7 @@ export async function proposeVisit(formData: FormData) {
     title = v.title;
     await c.db.from('visits').update({ status: 'proposed', slots, note, duration_text: duration, last_role: c.role, updated_at: new Date().toISOString() }).eq('id', v.id);
   } else {
+    if (c.scope === 'listing') go(c.back, 'Use Ask to see the job first.');
     if (c.scope === 'bid' && c.role !== 'contractor') go(c.back, 'Request a visit and the contractor will propose times.');
     if (c.scope === 'bid') {
       const { count } = await c.db.from('visits').select('id', { count: 'exact', head: true }).eq('bid_id', c.key.bid_id).in('status', ['requested', 'proposed', 'confirmed']);

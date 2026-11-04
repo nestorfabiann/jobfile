@@ -76,6 +76,16 @@ export default async function ListingPage({ params, searchParams }: { params: { 
   // Site visits on bids: the homeowner sees them for every bid, a contractor only for their own.
   const visitBidIds = owner ? visible.map((b) => b.id) : myBid ? [myBid.id] : [];
   const visitRows = visitBidIds.length ? (((await db.from('visits').select('*').in('bid_id', visitBidIds).neq('status', 'canceled')).data ?? []) as unknown as Visit[]) : [];
+  // Visits asked for before any bid: the homeowner sees them all, a contractor only their own.
+  const preRows = (((await db.from('visits').select('*').eq('listing_id', l.id).is('bid_id', null).neq('status', 'canceled')).data ?? []) as unknown as Visit[]).filter((v) => owner || v.created_by === user.id);
+  const preNames = new Map<string, string>();
+  if (owner && preRows.length) {
+    const ids = Array.from(new Set(preRows.map((v) => v.created_by).filter(Boolean))) as string[];
+    const { data: ms } = await db.from('company_members').select('user_id,company_id').in('user_id', ids);
+    const { data: cos } = ms?.length ? await db.from('companies').select('id,name').in('id', (ms as any[]).map((m) => m.company_id)) : { data: [] };
+    (ms ?? []).forEach((m: any) => preNames.set(m.user_id, ((cos ?? []) as any[]).find((c) => c.id === m.company_id)?.name ?? 'A contractor'));
+  }
+  const preWhere = { scope: 'listing' as const, listingId: l.id, returnPath: `/marketplace/${l.id}` };
   const visitFor = (bidId: string, role: 'homeowner' | 'contractor', bidOpen: boolean) => {
     const mine = visitRows.filter((x) => x.bid_id === bidId);
     const where = { scope: 'bid' as const, bidId, returnPath: `/marketplace/${l.id}?open=${bidId}#bid-${bidId}` };
@@ -241,6 +251,19 @@ export default async function ListingPage({ params, searchParams }: { params: { 
         </div>
       )}
 
+      {owner && preRows.length > 0 && (
+        <div className="card stack">
+          <h2>Visit requests</h2>
+          <p className="muted small">These contractors asked to see the job before bidding. Your address stays private until you hire.</p>
+          {preRows.map((v) => (
+            <div key={v.id} className="stack" style={{ gap: 6 }}>
+              <b>{preNames.get(v.created_by ?? '') ?? 'A contractor'}</b>
+              <VisitCard visit={v} role="homeowner" where={preWhere} />
+            </div>
+          ))}
+        </div>
+      )}
+
       {owner && (
         <>
           <div className="row" style={{ justifyContent: 'space-between' }}>
@@ -324,6 +347,12 @@ export default async function ListingPage({ params, searchParams }: { params: { 
       {!owner && companyId && (
         <div className="card">
           <h2 id="your-bid">{myBid && myBid.status !== 'withdrawn' ? 'Your bid' : 'Place a bid'}</h2>
+          {open && (!myBid || myBid.status === 'withdrawn') && (
+            <>
+              {preRows.map((v) => <VisitCard key={v.id} visit={v} role="contractor" where={preWhere} />)}
+              {!preRows.some((v) => v.status !== 'done') && <NewVisit role="contractor" where={preWhere} />}
+            </>
+          )}
           {myBid && myBid.status === 'won' && l.project_id && <><div className="box ok">You won this job.</div><Link className="btn" href={`/projects/${l.project_id}/overview`}>Open the project</Link></>}
           {myBid && myBid.status === 'not_selected' && <div className="box warn">This project went to another contractor or was closed.</div>}
           {open && needsInsurance && (

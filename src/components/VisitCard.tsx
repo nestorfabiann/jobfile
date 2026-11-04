@@ -1,14 +1,15 @@
 import { calendarUrl, countdown, fmtWhen, visitTodo, type Visit } from '@/lib/visits';
 import { addDays, todayChi } from '@/lib/schedule';
-import { cancelVisit, declineTimes, pickVisitTime, proposeVisit, requestVisit, saveAccess, saveVisitReport, setVisitLive } from '@/app/visits/actions';
+import { askToSeeJob, cancelVisit, declineTimes, pickVisitTime, proposeVisit, requestVisit, saveAccess, saveVisitReport, setVisitLive } from '@/app/visits/actions';
 
 type Role = 'contractor' | 'homeowner';
-type Where = { scope: 'bid' | 'project'; bidId?: string; projectId?: string; returnPath: string; address?: string };
+type Where = { scope: 'bid' | 'project' | 'listing'; listingId?: string; bidId?: string; projectId?: string; returnPath: string; address?: string };
 
 function Hidden({ w, id }: { w: Where; id?: string }) {
   return (
     <>
       <input type="hidden" name="scope" value={w.scope} />
+      {w.listingId ? <input type="hidden" name="listing_id" value={w.listingId} /> : null}
       {w.bidId ? <input type="hidden" name="bid_id" value={w.bidId} /> : null}
       {w.projectId ? <input type="hidden" name="project_id" value={w.projectId} /> : null}
       <input type="hidden" name="return_path" value={w.returnPath} />
@@ -231,6 +232,22 @@ export default function VisitCard({ visit: v, role, where: w }: { visit: Visit; 
 
 /** Start a visit: a homeowner asks a bidder; a contractor proposes times; on a project either side can add one. */
 export function NewVisit({ role, where: w, again }: { role: Role; where: Where; again?: boolean }) {
+  if (w.scope === 'listing') {
+    if (role !== 'contractor') return null;
+    return (
+      <form action={askToSeeJob} className="stack">
+        <Hidden w={w} />
+        <details>
+          <summary className="btn ghost" style={{ display: 'flex', justifyContent: 'center' }}>Ask to see the job first</summary>
+          <div className="stack" style={{ marginTop: 10 }}>
+            <span className="small">Want a firmer price? Ask the homeowner for a visit before you bid. They suggest times, you pick one. Their address stays private until they hire.</span>
+            <label className="fld">Note (optional)<input name="note" placeholder="I want to check the ceiling height." maxLength={400} /></label>
+            <div className="row"><button className="btn accent" type="submit">Send request</button></div>
+          </div>
+        </details>
+      </form>
+    );
+  }
   if (w.scope === 'bid' && role === 'homeowner') {
     return (
       <form action={requestVisit} className="stack">

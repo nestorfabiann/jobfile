@@ -335,6 +335,9 @@ export async function placeBid(formData: FormData) {
     const { error } = await db.from('marketplace_bids').insert({ ...row, listing_id: l.id, company_id: co.companyId, bidder_id: user.id });
     if (error) back(path, 'Could not save your bid. Check that the database step was run.');
   }
+  // A visit asked for before bidding now belongs to the bid.
+  const { data: myBidRow } = await db.from('marketplace_bids').select('id').eq('listing_id', l.id).eq('company_id', co.companyId).maybeSingle();
+  if (myBidRow) await db.from('visits').update({ bid_id: myBidRow.id }).eq('listing_id', l.id).eq('created_by', user.id).is('bid_id', null).neq('status', 'canceled');
   if (!existing || existing.status === 'withdrawn') {
     await notifyUsers({ userIds: [l.homeowner_id], projectId: null, kind: 'bid', path: `/marketplace/${l.id}`, title: `New bid on ${listingTitle(l)}: ${dollars(price)}`, body: `${co.name} bid ${dollars(price)}. Open Marketplace to compare your bids.` });
     // Three waiting bids is the point where comparing becomes useful. Said once, when the third one arrives.
