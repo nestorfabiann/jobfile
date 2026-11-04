@@ -282,3 +282,7 @@ details.conew[open] ~ .conew-hint { display: none; }
 .vstep.now i { border-color: var(--accent, #c4813f); color: var(--accent, #c4813f); }
 .vbar { flex: .5; height: 2px; margin-top: 10px; background: var(--line); }
 .vbar.done { background: var(--ok, #1f7a55); }
+
+/* iPhone date and time fields can be wider than their box and push the whole page sideways. */
+input[type='date'], input[type='time'], input[type='datetime-local'] { min-width: 0; max-width: 100%; width: 100%; box-sizing: border-box; -webkit-appearance: none; appearance: none; }
+.fld, .grid2 > * { min-width: 0; }
