@@ -1,0 +1,89 @@
+<title>Site Visits</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: one phone column. Tabs: On a bid, Pick a time, Schedule, Access notes. Names, dates and times are examples. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#c4813f;--orl:#f9efe4;--orb:#ecd4a8;--gr:#1f7a55;--grl:#d9f1e6;--am:#9a5b00;--aml:#fbeccd;--bl:#1d5fa8;--bll:#e0ecf8;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--gr:#6fd1a3;--grl:#173a2c;--am:#f0b95a;--aml:#3a2e12;--bl:#8fbdf0;--bll:#17283d;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--gr:#6fd1a3;--grl:#173a2c;--am:#f0b95a;--aml:#3a2e12;--bl:#8fbdf0;--bll:#17283d;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:14px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:16px}
+h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;text-wrap:balance}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
+.mut{color:var(--mut);font-size:13px;line-height:1.45;margin:0}
+.sw{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}.sw button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:8px 4px;border-radius:99px;font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:44px}.sw button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.sec{display:flex;flex-direction:column;gap:14px}.sec[hidden]{display:none}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.btn{display:block;text-align:center;background:var(--or);color:#fff;border-radius:99px;padding:12px 16px;font:600 14.5px 'IBM Plex Sans',sans-serif;min-height:44px}.btn.gh{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+.pill{font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:99px;white-space:nowrap;background:var(--orl);color:var(--or);border:1px solid var(--orb)}.pill.g{background:var(--grl);color:var(--gr);border-color:transparent}.pill.a{background:var(--aml);color:var(--am);border-color:transparent}.pill.b{background:var(--bll);color:var(--bl);border-color:transparent}.pill.m{background:transparent;color:var(--mut);border-color:var(--line)}
+.nm{display:flex;gap:10px;align-items:center}.logo{width:38px;height:38px;border-radius:11px;background:var(--orl);color:var(--or);border:1px solid var(--orb);display:grid;place-items:center;font:800 15px 'Bricolage Grotesque',sans-serif;flex:none}
+.slot{display:flex;justify-content:space-between;align-items:center;gap:10px;border:1.5px solid var(--line);border-radius:16px;padding:12px 14px;font-size:14.5px;background:var(--card)}.slot b{display:block;font-size:15px}.slot.on{border-color:var(--or);background:var(--orl)}.slot .rd{width:20px;height:20px;border-radius:50%;border:2px solid var(--line);flex:none}.slot.on .rd{border-color:var(--or);background:radial-gradient(var(--or) 45%,transparent 50%)}
+.row{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--line)}.row:last-child{border-bottom:0}.row b{font-size:14.5px}.who{font-size:12.5px;color:var(--mut)}
+.ok{background:var(--grl);color:var(--gr);border-radius:14px;padding:11px 12px;font-size:13.5px;line-height:1.45}
+.warn{background:var(--aml);color:var(--am);border-radius:14px;padding:11px 12px;font-size:13.5px;line-height:1.45}
+.in{height:44px;border:1px solid var(--line);border-radius:14px;background:var(--bg);display:flex;align-items:center;padding:0 14px;color:var(--mut);font-size:14.5px}.in.v{color:var(--ink)}
+.fld{display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:600}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ico{width:34px;height:34px;border-radius:10px;background:var(--bll);color:var(--bl);display:grid;place-items:center;font-size:16px;flex:none}
+</style>
+<div class="wrap">
+  <div class="note"><b>Mockup.</b> Booking a site visit, from a bid to the project schedule. Names, dates and times are examples.</div>
+  <div class="sw" id="sw"><button data-s="bd" class="on" type="button">On a bid</button><button data-s="pk" type="button">Pick a time</button><button data-s="sc" type="button">On the schedule</button><button data-s="ac" type="button">Access notes</button></div>
+
+  <div id="bd" class="sec">
+    <div class="card">
+      <div class="nm"><span class="logo">N</span><div><b>Nesty's Painting</b><div class="who">✓ Verified · Insured · bid $5,008</div></div></div>
+      <div class="warn"><b>Want a firmer price?</b> Contractors can ask to see the job first.</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap"><span class="pill m">Compare</span><span class="pill m">Message</span></div>
+      <a class="btn">Request a site visit</a>
+    </div>
+    <div class="card">
+      <h3 style="font-size:16px">Contractor's view</h3>
+      <p class="mut">Shows on a bid card for a project that is still open.</p>
+      <a class="btn gh">Propose times for a visit</a>
+      <p class="mut">The contractor taps this, picks 2 or 3 times and adds a note such as "About 30 minutes, I will measure the kitchen."</p>
+    </div>
+  </div>
+
+  <div id="pk" class="sec" hidden>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;gap:10px"><h3 style="font-size:18px">Visit request</h3><span class="pill a">Pick a time</span></div>
+      <p class="mut">From Nesty's Painting · about 30 minutes · at your address</p>
+      <div class="slot on"><div><b>Thu, Nov 13 · 10:00 am</b><span class="who">Works for Nesty's Painting</span></div><span class="rd"></span></div>
+      <div class="slot"><div><b>Fri, Nov 14 · 2:00 pm</b><span class="who">Works for Nesty's Painting</span></div><span class="rd"></span></div>
+      <div class="slot"><div><b>Sat, Nov 15 · 9:00 am</b><span class="who">Works for Nesty's Painting</span></div><span class="rd"></span></div>
+      <a class="btn">Confirm Thu, Nov 13 at 10:00 am</a>
+      <a class="btn gh">None of these work. Suggest another time</a>
+    </div>
+    <div class="ok">After you confirm, both sides get the time on their schedule and a reminder the day before.</div>
+  </div>
+
+  <div id="sc" class="sec" hidden>
+    <div class="card"><div style="display:flex;justify-content:space-between;gap:10px;align-items:center"><h2 style="font-size:20px">Coming up</h2><span class="pill g">On track</span></div>
+      <div class="row"><div style="display:flex;gap:10px"><span class="ico">⌂</span><div><b>Site visit · Thu, Nov 13, 10:00 am</b><div class="who">Nesty's Painting at 727 Plano TX · about 30 minutes</div></div></div><span class="pill g">Confirmed</span></div>
+      <div class="row"><div style="display:flex;gap:10px"><span class="ico">▦</span><div><b>Tile delivery · Thu, Nov 14</b><div class="who">Someone should be home</div></div></div><span class="pill m">Both</span></div>
+      <div class="row"><div style="display:flex;gap:10px"><span class="ico">✓</span><div><b>Final walkthrough · Tue, Nov 26, 3:00 pm</b><div class="who">Punch list review before the last payment</div></div></div><span class="pill a">Proposed</span></div>
+    </div>
+    <a class="btn">Add a visit</a>
+    <div class="note" style="border-style:solid">Visits on the project use the same flow: propose times, the other side picks one. Typical uses are a measure visit before work, an inspection, and the final walkthrough. Either side can reschedule or cancel, and the other side is told right away.</div>
+  </div>
+
+  <div id="ac" class="sec" hidden>
+    <div class="card">
+      <h3 style="font-size:18px">Access notes</h3>
+      <p class="mut">Shown only on the visit, and only to the other person on this project.</p>
+      <div class="fld">Gate or entry<div class="in v">Side gate, code 4821</div></div>
+      <div class="two"><div class="fld">Pets<div class="in v">Dog, friendly</div></div><div class="fld">Parking<div class="in v">Driveway</div></div></div>
+      <div class="fld">Anything else<div class="in">Please text when you arrive</div></div>
+      <a class="btn">Save access notes</a>
+    </div>
+    <div class="note" style="border-style:solid"><b>Privacy:</b> access notes never appear on the marketplace post or to contractors who only bid. They are visible after the visit is confirmed, and can be cleared after the job.</div>
+  </div>
+</div>
+<script>
+var sw=document.getElementById('sw'),ids=['bd','pk','sc','ac'];
+[].forEach.call(sw.children,function(b){b.onclick=function(){
+  [].forEach.call(sw.children,function(x){x.classList.toggle('on',x===b)});
+  ids.forEach(function(id){document.getElementById(id).hidden=id!==b.dataset.s});window.scrollTo(0,0)}});
+</script>
