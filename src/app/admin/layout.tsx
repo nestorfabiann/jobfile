@@ -4,7 +4,7 @@ import AdminNav, { type NavGroup } from '@/components/AdminNav';
 // [link, label, area a team member needs]. Links with no area are Owner only.
 type L = [string, string, Area | null];
 const GROUPS: { key: string; label: string; links: L[] }[] = [
-  { key: 'ov', label: 'Overview', links: [['/admin', 'Overview', null], ['/admin/activity', 'Activity', null], ['/admin/usage', 'Usage', null], ['/admin/health', 'Health', null]] },
+  { key: 'ov', label: 'Overview', links: [['/admin', 'Overview', null], ['/admin/activity', 'Activity', null], ['/admin/usage', 'Usage', null], ['/admin/installs', 'App installs', null], ['/admin/health', 'Health', null]] },
   { key: 'pe', label: 'People', links: [['/admin/users', 'Users', 'view'], ['/admin/projects', 'Projects', 'view'], ['/admin/invites', 'Invites', null]] },
   { key: 'rv', label: 'Review', links: [['/admin/help', 'Help', 'help'], ['/admin/verification', 'Insurance', 'verification'], ['/admin/reviews', 'Reviews', 'reviews'], ['/admin/marketplace', 'Marketplace', 'listings']] },
   { key: 'ms', label: 'Message', links: [['/admin/broadcast', 'Broadcast', null], ['/admin/area', 'By area', null]] },
