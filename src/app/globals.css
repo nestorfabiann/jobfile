@@ -751,3 +751,21 @@ html { scroll-behavior: smooth; }
   .chip.av-booked input:checked + span, body.pub .chip.av-booked input:checked + span { background: #33281c; color: #e0933f; border-color: #5a4426; }
   .chip.av-paused input:checked + span, body.pub .chip.av-paused input:checked + span { background: #2a2723; color: #c9c2b6; border-color: #4a453f; }
 }
+
+/* Projects map */
+.viewtg { display: inline-flex; background: var(--line); border-radius: 99px; padding: 3px; align-self: flex-start; }
+.viewtg a { padding: 7px 18px; border-radius: 99px; font: 700 13.5px system-ui, sans-serif; color: var(--ink-2); text-decoration: none; min-height: 34px; display: inline-flex; align-items: center; }
+.viewtg a[aria-current='true'] { background: var(--surface, #fff); color: var(--ink); box-shadow: 0 1px 3px rgba(27,26,24,.18); }
+.pmap-wrap { position: relative; }
+.pmap { height: 62vh; min-height: 320px; border-radius: 18px; border: 1px solid var(--line); overflow: hidden; z-index: 0; background: #e9e3d3; }
+.pm-ic, .pm-me { background: none; border: 0; }
+.pm-pin { width: 26px; height: 26px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); display: grid; place-items: center; border: 2px solid #fff; box-shadow: 0 2px 5px rgba(27,26,24,.35); }
+.pm-pin i { transform: rotate(45deg); font: 800 11px system-ui, sans-serif; font-style: normal; color: #fff; }
+.pm-cl { width: 34px; height: 34px; border-radius: 50%; background: #1f4d3a; color: #fff; display: grid; place-items: center; font: 800 14px system-ui, sans-serif; border: 3px solid #fff; box-shadow: 0 2px 6px rgba(27,26,24,.35); }
+.pm-me i { display: block; width: 14px; height: 14px; border-radius: 50%; background: #2f5f8a; border: 3px solid #fff; box-shadow: 0 0 0 6px rgba(47,95,138,.2); }
+.pmap-sheet { position: absolute; left: 8px; right: 8px; bottom: 8px; z-index: 500; max-height: 55%; overflow-y: auto; background: var(--surface, #fff); color: var(--ink); border: 1px solid var(--line); border-radius: 16px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 10px 24px -8px rgba(27,26,24,.45); }
+.pmap-x { background: none; border: 0; font-size: 22px; line-height: 1; color: var(--ink-2); cursor: pointer; min-width: 32px; min-height: 32px; }
+.pmap-job { display: flex; flex-direction: column; gap: 2px; text-decoration: none; color: var(--ink); border-top: 1px solid var(--line); padding-top: 8px; }
+.pmap-job .dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 6px; }
+.pmap-go { color: #c4813f; font-weight: 700; font-size: 13.5px; }
+@media (prefers-color-scheme: dark) { .pmap .leaflet-tile-pane { filter: invert(1) hue-rotate(180deg) brightness(.92) contrast(.9); } }

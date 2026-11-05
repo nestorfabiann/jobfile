@@ -1,4 +1,5 @@
 import TradeIcon from '@/components/TradeIcon';
+import ProjectsMap, { type MapGroup } from '@/components/ProjectsMap';
 import Link from 'next/link';
 import { requireUser } from '@/lib/session';
 import { supabaseAdmin } from '@/lib/supabase/server';
@@ -15,7 +16,7 @@ const colorFor = (t: string) => TRADE_COLORS[Array.from(t).reduce((n, c) => n + 
 const budget = (l: Listing) =>
   l.budget_min_cents || l.budget_max_cents ? [l.budget_min_cents, l.budget_max_cents].filter((x) => x != null).map((x) => dollars(x as number)).join(' – ') : '';
 
-export default async function Marketplace({ searchParams }: { searchParams: { type?: string; error?: string; mi?: string; trades?: string } }) {
+export default async function Marketplace({ searchParams }: { searchParams: { type?: string; error?: string; mi?: string; trades?: string; view?: string } }) {
   requireMarketplace();
   const { user } = await requireUser();
   const db = supabaseAdmin();
@@ -39,6 +40,7 @@ export default async function Marketplace({ searchParams }: { searchParams: { ty
   const { data } = await q;
   let listings = (data ?? []) as Listing[];
   const away = new Map<string, number>();
+  let coordMap = new Map<string, [number, number]>();
   let hiddenByTrade = 0;
   if (isPro) {
     if (!allTrades) {
@@ -48,6 +50,7 @@ export default async function Marketplace({ searchParams }: { searchParams: { ty
     }
     if (bizZip) {
       const coords = await zipCoords([bizZip, ...listings.map((l) => l.zip)]);
+      coordMap = coords;
       const me = coords.get(bizZip);
       if (me) {
         listings.forEach((l) => { const at = coords.get(l.zip); if (at) away.set(l.id, miles(me, at)); });
@@ -62,6 +65,7 @@ export default async function Marketplace({ searchParams }: { searchParams: { ty
     if (type) u.set('type', type);
     if (searchParams.mi) u.set('mi', searchParams.mi);
     if (searchParams.trades) u.set('trades', searchParams.trades);
+    if (searchParams.view) u.set('view', searchParams.view);
     Object.entries(p).forEach(([k, v]) => (v ? u.set(k, v) : u.delete(k)));
     const t = u.toString();
     return `/marketplace${t ? `?${t}` : ''}`;
@@ -82,6 +86,23 @@ export default async function Marketplace({ searchParams }: { searchParams: { ty
       if (companyId && b.company_id === companyId && b.status !== 'withdrawn') mine.add(b.listing_id);
     });
   }
+
+  // Map view (contractors with a business ZIP): one pin per ZIP code, never a street address.
+  const meAt = bizZip ? coordMap.get(bizZip) : undefined;
+  const mapView = isPro && searchParams.view === 'map' && !!meAt;
+  const mapGroups: MapGroup[] = [];
+  if (mapView) {
+    const byZip = new Map<string, MapGroup>();
+    listings.forEach((l) => {
+      const at = coordMap.get(l.zip);
+      if (!at) return;
+      const g = byZip.get(l.zip) ?? { zip: l.zip, lat: at[0], lng: at[1], jobs: [] };
+      g.jobs.push({ id: l.id, title: listingTitle(l), trade: l.job_type, color: colorFor(l.job_type), price: budget(l), bids: counts.get(l.id) ?? 0, away: away.get(l.id) ?? null });
+      byZip.set(l.zip, g);
+    });
+    byZip.forEach((g) => mapGroups.push(g));
+  }
+  const pinned = mapGroups.reduce((n, g) => n + g.jobs.length, 0);
 
   // General questions (no project): the contractor's inbox, or the homeowner's own asked questions. Ignored if the 043 change is not there yet.
   let qs2: { id: string; name: string; at: string; theirsLast: boolean }[] = [];
@@ -115,6 +136,12 @@ export default async function Marketplace({ searchParams }: { searchParams: { ty
           <div className="row">
             <Link className="btn ghost" href="/marketplace/bids">My bids</Link>
           </div>
+          {bizZip && (
+            <div className="viewtg" role="group" aria-label="View">
+              <Link href={qs({ view: '' })} aria-current={!mapView ? 'true' : undefined}>List</Link>
+              <Link href={qs({ view: 'map' })} aria-current={mapView ? 'true' : undefined}>Map</Link>
+            </div>
+          )}
           <div className="chips" aria-label="Filter by job type">
             <Link className="chip" href={qs({ type: '' })}><span style={!type ? { background: 'var(--brand)', color: '#fff', borderColor: 'var(--brand)' } : undefined}>All</span></Link>
             {typeChips.map((t) => (
@@ -148,6 +175,13 @@ export default async function Marketplace({ searchParams }: { searchParams: { ty
         </>
       )}
 
+      {mapView && meAt && (
+        <>
+          <ProjectsMap me={{ lat: meAt[0], lng: meAt[1] }} radiusMi={Number.isFinite(limitMi) ? limitMi : null} groups={mapGroups} />
+          <p className="muted small" style={{ margin: 0 }}>{pinned} project{pinned === 1 ? '' : 's'} in your area. Pins show the ZIP code, not the home. Tap a pin to open it.{listings.length > pinned ? ` ${listings.length - pinned} more could not be placed on the map. See them in the list.` : ''}</p>
+        </>
+      )}
+
       {listings.length === 0 && (
         <div className="card"><p className="muted">{isPro ? 'No open projects right now. Check back soon.' : 'You have not posted a project yet.'}</p></div>
       )}
@@ -164,7 +198,7 @@ export default async function Marketplace({ searchParams }: { searchParams: { ty
         </section>
       )}
 
-      {listings.map((l) => {
+      {!mapView && listings.map((l) => {
         const open = listingOpen(l);
         const status = l.status === 'awarded' ? 'Hired' : !open ? 'Closed' : 'Open';
         const n = counts.get(l.id) ?? 0;
