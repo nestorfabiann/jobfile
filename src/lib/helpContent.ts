@@ -55,6 +55,7 @@ export const HELP: HelpItem[] = [
   { topic: 'projects', who: 'both', pages: ['projects'], q: 'What do the sections mean?', a: 'Homeowners see Needs you, Waiting for bids, Hired and ongoing, and Completed. Contractors see Find work, Needs you, Ongoing, Your bids and Completed.' },
   { topic: 'projects', who: 'both', pages: ['projects'], q: 'What does the red number on Projects mean?', a: 'Things waiting on you, such as a payment to confirm or a choice to make.' },
   { topic: 'projects', who: 'h', pages: ['projects'], q: 'How do I delete a draft?', a: 'On a draft card, tap Delete and confirm.' },
+  { topic: 'projects', who: 'h', pages: ['projects'], q: 'What does I already have a contractor do?', a: 'Hired someone on your own? Add them to keep the agreement, photos, payments and messages in one place. They do not need a Jobfile account yet.' },
   { topic: 'bidding', who: 'h', pages: ['marketplace'], q: 'What does \u201cNew bid\u201d mean?', a: 'A bid that arrived since you last opened that project.' },
   { topic: 'bidding', who: 'h', pages: ['marketplace'], q: 'How long does a project stay open?', a: 'About 30 days. In the last 7 days you can tap Extend for 30 more.' },
   { topic: 'bidding', who: 'c', pages: ['marketplace'], q: 'How do I narrow the list?', a: 'Filter by kind of work and distance, and tap My bids to see yours.' },

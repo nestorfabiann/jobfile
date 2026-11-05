@@ -83,7 +83,7 @@ export default function ContractorProjects(p: {
       <AvailabilityBar company={p.availability} />
 
       <div className="startp-row">
-        <Link className="btn" href="/marketplace">Find work</Link>
+        <Link className="btn ghost" href="/marketplace">Find work</Link>
         <StartProjectForm companyId={p.companyId} companyName={p.companyName} open={!!p.error} ghost />
       </div>
 
