@@ -56,7 +56,7 @@ export async function tellTeamPartners(leadBidIds: string[], title: string, body
     if (!ids.length) return;
     const { data: ps } = await db.from('team_partners').select('company_id').in('team_bid_id', ids).eq('status', 'confirmed');
     const users = new Set<string>();
-    for (const cid of Array.from(new Set((ps ?? []).map((p: any) => p.company_id as string)))) (await memberIds(cid)).forEach((u) => users.add(u));
+    for (const cid of Array.from(new Set((ps ?? []).map((p: any) => p.company_id as string))) as string[]) (await memberIds(cid)).forEach((u) => users.add(u));
     await notifyUsers({ userIds: Array.from(users), projectId: null, kind: 'bid', path: '/collaborate', title, body });
   } catch { /* team tables not created yet */ }
 }
