@@ -132,7 +132,7 @@ export default async function Overview({ params, searchParams }: { params: { id:
       )}
 
       <ProjectStepper
-        steps={[{ label: 'Agreement', href: `${base}/agreement` }, { label: 'Active', href: `${base}/schedule` }, { label: 'Closeout', href: `${base}/overview#closeout` }, { label: 'Complete', href: `${base}/rating` }]}
+        steps={[{ label: 'Agreement', href: `${base}/agreement` }, { label: 'Active', href: `${base}/schedule` }, { label: 'Closeout', href: executed ? `${base}/closeout` : `${base}/overview#closeout` }, { label: 'Complete', href: `${base}/rating` }]}
         stage={stage}
         phase={curPhase?.title}
         days={curDays}
@@ -159,6 +159,13 @@ export default async function Overview({ params, searchParams }: { params: { id:
         />
         </div>
       )}
+
+      {executed && !project.completed_at ? (
+        <Link href={`${base}/closeout`} className="card" style={{ color: 'inherit', textDecoration: 'none', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10, padding: '12px 14px' }}>
+          <span><b style={{ display: 'block' }}>Closeout checklist</b><span className="muted small">Confirm scope, extra work and payments before the job is closed.</span></span>
+          <span className="pill ok" style={{ whiteSpace: 'nowrap' }}>Open ›</span>
+        </Link>
+      ) : null}
 
       <NeedsYou items={todo} caughtUp compact />
       {waiting ? <p className="muted small" style={{ margin: 0 }}>{waiting}</p> : null}
