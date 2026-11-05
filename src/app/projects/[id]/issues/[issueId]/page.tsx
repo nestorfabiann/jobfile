@@ -5,7 +5,9 @@ import { supabaseAdmin } from '@/lib/supabase/server';
 import { dollars } from '@/lib/money';
 import { milestoneAmounts, totals, type ChangeOrder, type Item, type Milestone } from '@/lib/agreement';
 import { categoryLabel, describeFix, FIXES, RESPOND_DAYS, type Issue, type IssueEvent } from '@/lib/issues';
-import { acceptFix, askJobfile, proposeFix, withdrawIssue } from '../actions';
+import { acceptFix, askJobfile, deleteIssuePhoto, proposeFix, withdrawIssue } from '../actions';
+import { IssuePhotoAdder } from '@/components/IssuePhotos';
+import { signedUrls } from '@/lib/companyProfile';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { title: 'Problem · Jobfile' };
@@ -21,6 +23,9 @@ export default async function IssuePage({ params, searchParams }: { params: { id
   const issue = iss as Issue;
   const { data: evRows } = await db.from('issue_events').select('*').eq('issue_id', issue.id).order('created_at');
   const events = (evRows ?? []) as IssueEvent[];
+  let iphotos: { id: string; path: string; side: string; uploaded_by: string }[] = [];
+  try { iphotos = ((await db.from('issue_photos').select('id,path,side,uploaded_by').eq('issue_id', issue.id).order('created_at')).data ?? []) as typeof iphotos; } catch { /* table not created yet */ }
+  const purls = iphotos.length ? await signedUrls('project-photos', iphotos.map((p) => p.path)) : new Map<string, string>();
   const other = role === 'homeowner' ? 'contractor' : 'homeowner';
   const nameOf = (s: string) => (s === 'jobfile' ? 'Jobfile' : s === role ? 'You' : s === 'homeowner' ? homeownerName : contractorName);
   const otherName = nameOf(other);
@@ -81,6 +86,26 @@ export default async function IssuePage({ params, searchParams }: { params: { id
         <div className="muted small">{reporterName === 'You' ? 'You say' : `${reporterName} says`}</div>
         <p style={{ margin: 0, whiteSpace: 'pre-wrap' }}>{issue.description}</p>
         {issue.wants ? <span className="muted small">Would like: {FIXES.find((f) => f[0] === issue.wants)?.[1]?.toLowerCase()}</span> : null}
+        {iphotos.length > 0 && (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 6 }}>
+            {iphotos.map((p) => purls.get(p.path) ? (
+              <div key={p.id} style={{ position: 'relative' }}>
+                <a href={purls.get(p.path)} target="_blank" rel="noopener noreferrer">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={purls.get(p.path)} alt={`Photo from ${nameOf(p.side)}`} style={{ width: '100%', aspectRatio: '1', objectFit: 'cover', borderRadius: 10, display: 'block' }} />
+                </a>
+                <span className="muted small" style={{ display: 'block' }}>{nameOf(p.side)}</span>
+                {open && p.uploaded_by === user.id && (
+                  <form action={deleteIssuePhoto} style={{ position: 'absolute', top: 4, right: 4 }}>
+                    <input type="hidden" name="project_id" value={project.id} /><input type="hidden" name="issue_id" value={issue.id} /><input type="hidden" name="photo_id" value={p.id} />
+                    <button aria-label="Remove this photo" style={{ background: 'rgba(27,26,24,.7)', color: '#fff', border: 0, borderRadius: 99, width: 26, height: 26, cursor: 'pointer' }}>×</button>
+                  </form>
+                )}
+              </div>
+            ) : null)}
+          </div>
+        )}
+        {open && <IssuePhotoAdder projectId={project.id} issueId={issue.id} />}
       </section>
 
       <section className="card" aria-label="What is on record">
@@ -90,7 +115,7 @@ export default async function IssuePage({ params, searchParams }: { params: { id
           <li>{agr?.executed_at ? `Agreement signed ${day(agr.executed_at as string)}, total ${dollars(t.total)}` : 'Agreement not signed by both sides yet'}</li>
           <li>{approvedCos} approved change order{approvedCos === 1 ? '' : 's'}</li>
           <li>Payments confirmed: {dollars(confirmed)} of {dollars(t.total)}</li>
-          <li>{(photoRows ?? []).length} photo{(photoRows ?? []).length === 1 ? '' : 's'} on the project (<Link href={`${base}/photos`} style={{ fontWeight: 700 }}>see them</Link>)</li>
+          <li>{iphotos.length} photo{iphotos.length === 1 ? '' : 's'} on this problem, {(photoRows ?? []).length} on the project (<Link href={`${base}/photos`} style={{ fontWeight: 700 }}>see them</Link>)</li>
         </ul>
         <div className="lab" style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '.08em', fontWeight: 600 }}>Timeline</div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6, borderLeft: '2px solid var(--line)', paddingLeft: 12 }}>

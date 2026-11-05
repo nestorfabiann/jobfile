@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { loadProject } from '@/lib/project';
 import { supabaseAdmin } from '@/lib/supabase/server';
 import { categoryLabel, FIXES, ISSUE_CATEGORIES, RESPOND_DAYS, type Issue } from '@/lib/issues';
-import { reportIssue } from './actions';
+import { ReportIssueForm } from '@/components/IssuePhotos';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { title: 'Problems · Jobfile' };
@@ -43,28 +43,7 @@ export default async function Issues({ params, searchParams }: { params: { id: s
 
       <details className="card" open={!!searchParams.new || rows.length === 0 || !!searchParams.error}>
         <summary style={{ cursor: 'pointer', fontWeight: 700, listStyle: 'none' }}>＋ Report a problem</summary>
-        <form action={reportIssue} className="stack" style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 12 }}>
-          <input type="hidden" name="project_id" value={project.id} />
-          <fieldset style={{ border: 0, padding: 0, margin: 0 }}>
-            <legend className="small" style={{ fontWeight: 700, marginBottom: 6 }}>What kind of problem?</legend>
-            <div className="chips">
-              {ISSUE_CATEGORIES.map(([k, l], n) => <label className="chip" key={k}><input type="radio" name="category" value={k} defaultChecked={n === 0} /><span>{l}</span></label>)}
-            </div>
-          </fieldset>
-          <label className="fld">What happened
-            <textarea name="description" rows={4} maxLength={2000} required placeholder="Say what you saw, when, and what you already tried." />
-          </label>
-          <p className="muted small" style={{ margin: 0 }}>Photos help a lot. Add them in the <Link href={`${base}/photos`} style={{ fontWeight: 700 }}>Photos tab</Link> first. They stay on the project record.</p>
-          <fieldset style={{ border: 0, padding: 0, margin: 0 }}>
-            <legend className="small" style={{ fontWeight: 700, marginBottom: 6 }}>What would feel fair? (optional)</legend>
-            <div className="chips">
-              <label className="chip"><input type="radio" name="wants" value="" defaultChecked /><span>Not sure</span></label>
-              {FIXES.filter((f) => f[0] !== 'disagree').map(([k, l]) => <label className="chip" key={k}><input type="radio" name="wants" value={k} /><span>{l}</span></label>)}
-            </div>
-          </fieldset>
-          <button className="btn" type="submit">Send to {otherName}</button>
-          <p className="muted small" style={{ margin: 0 }}>{otherName} has {RESPOND_DAYS} days to answer. Messages, photos and payments stay on the project record.</p>
-        </form>
+        <ReportIssueForm projectId={project.id} otherName={otherName} categories={ISSUE_CATEGORIES.map(([k, l]) => [k, l])} wants={FIXES.filter((f) => f[0] !== 'disagree').map(([k, l]) => [k, l])} respondDays={RESPOND_DAYS} />
       </details>
     </div>
   );

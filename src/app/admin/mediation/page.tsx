@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { requireAdmin } from '@/lib/admin';
 import AdminRecommend from '@/components/AdminRecommend';
+import { signedUrls } from '@/lib/companyProfile';
 import { categoryLabel, describeFix, needsMediator, type Issue, type IssueEvent } from '@/lib/issues';
 import { sendRecommendation } from '../actions';
 
@@ -12,10 +13,18 @@ export default async function Mediation() {
   const { db } = await requireAdmin();
   let rows: (Issue & { projects?: { name: string; homeowner_name: string | null } })[] = [];
   let events: IssueEvent[] = [];
+  let photos: { issue_id: string; path: string }[] = [];
+  let urls = new Map<string, string>();
   try {
     const { data } = await db.from('project_issues').select('*, projects(name,homeowner_name)').eq('status', 'open').order('created_at', { ascending: true });
     rows = ((data ?? []) as any[]).filter((i) => needsMediator(i));
     if (rows.length) events = ((await db.from('issue_events').select('*').in('issue_id', rows.map((r) => r.id)).order('created_at')).data ?? []) as IssueEvent[];
+    if (rows.length) {
+      try {
+        photos = ((await db.from('issue_photos').select('issue_id,path').in('issue_id', rows.map((r) => r.id))).data ?? []) as typeof photos;
+        urls = photos.length ? await signedUrls('project-photos', photos.map((p) => p.path)) : urls;
+      } catch { /* table not created yet */ }
+    }
   } catch { /* table not created yet */ }
   return (
     <>
@@ -33,6 +42,13 @@ export default async function Mediation() {
             </div>
             <p className="muted small" style={{ margin: 0 }}>{categoryLabel(i.category)} · reported by the {i.reporter_role} on {day(i.created_at)}</p>
             <p style={{ margin: 0, whiteSpace: 'pre-wrap' }}>{i.description}</p>
+            {photos.filter((p) => p.issue_id === i.id && urls.get(p.path)).length > 0 && (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6 }}>
+                {photos.filter((p) => p.issue_id === i.id && urls.get(p.path)).map((p) => (
+                  <a key={p.path} href={urls.get(p.path)} target="_blank" rel="noopener noreferrer">{/* eslint-disable-next-line @next/next/no-img-element */}<img src={urls.get(p.path)} alt="Photo on this problem" style={{ width: '100%', aspectRatio: '1', objectFit: 'cover', borderRadius: 8 }} /></a>
+                ))}
+              </div>
+            )}
             <div className="small">
               <b>Where they are</b>
               {props.length === 0 ? <div className="muted">No fixes proposed yet.</div> : props.map((p) => <div key={p.id}>{day(p.created_at)} · {p.side}: {describeFix(p)}{p.body ? ` — "${p.body}"` : ''}</div>)}
