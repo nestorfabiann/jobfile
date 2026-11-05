@@ -736,3 +736,4 @@ html { scroll-behavior: smooth; }
 .credchips { display: flex; flex-wrap: wrap; gap: 5px; }
 .credchips span { border-radius: 99px; padding: 2px 9px; font-size: 12px; font-weight: 600; background: var(--line); color: var(--ink); }
 .credchips span.v { background: #e4f0e8; color: #1f4d3a; }
+.ppv-opt { border-top: 1px solid var(--line); padding: 10px 0 2px; font: 600 11px system-ui, sans-serif; letter-spacing: .08em; text-transform: uppercase; color: var(--muted, #6b655e); }
