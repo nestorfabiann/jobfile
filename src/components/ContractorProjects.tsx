@@ -1,3 +1,4 @@
+import GroupTabs from '@/components/GroupTabs';
 import Link from 'next/link';
 import HomeScreenCard from '@/components/HomeScreenCard';
 import { PushCard } from '@/components/PushAlerts';
@@ -74,50 +75,8 @@ export default function ContractorProjects(p: {
     );
   };
 
-  return (
-    <div className="cpage">
-      <div className="stack" style={{ gap: 8 }}>
-        <h1>{first ? `Welcome${p.firstName ? `, ${p.firstName}` : ''}` : `Hi ${p.firstName || 'there'}`}</h1>
-        <p className="muted">{first ? 'Find jobs near you, bid on them, and run the work without the paperwork. It is free.' : `${p.companyName} · here is your work at a glance.`}</p>
-      </div>
-
-      <AvailabilityBar company={p.availability} />
-
-      <div className="startp-row">
-        <Link className="ptile pri" href="/marketplace">
-          <span className="pti" aria-hidden="true">&#128269;</span>
-          <b>Find work</b>
-          <span>Homeowners near you.</span>
-        </Link>
-        <StartProjectForm companyId={p.companyId} companyName={p.companyName} open={!!p.error} ghost />
-      </div>
-
-      {!first && (
-        <nav className="jumpbar" aria-label="Jump to">
-          {ongoing.length > 0 && <a href="#ongoing">Ongoing <b>{ongoing.length}</b></a>}
-          {p.bids.length > 0 && <a href="#bids">Bids <b>{p.waitingCount}</b></a>}
-          <a href="#done">Completed <b>{done.length}</b></a>
-        </nav>
-      )}
-
-      {!first && <PushCard />}
-      {p.error ? <div className="box bad">{p.error}</div> : null}
-      {p.needsCard}
-      {p.invites}
-
-      {first && (
-        <div className="card">
-          <h2>Get started</h2>
-          <p style={{ margin: 0 }}><b>1.</b> Finish your business profile so homeowners trust your bids.</p>
-          <p style={{ margin: 0 }}><b>2.</b> Look through jobs near you and send a bid.</p>
-          <p style={{ margin: 0 }}><b>3.</b> Got a customer already? Start a project and invite them.</p>
-          <Link className="btn ghost" href="/settings/business">Finish my business profile</Link>
-        </div>
-      )}
-
-      {ongoing.length > 0 && (
+  const ongoingPanel = (
         <section className="stack" id="ongoing" aria-label="Ongoing projects">
-          <div className="row" style={{ justifyContent: 'space-between', flexWrap: 'nowrap' }}><h2>Ongoing projects</h2><span className="muted small">{ongoing.length}</span></div>
           {ongoing.map((x) => {
             const s = p.summaries.get(x.id);
             return (
@@ -148,11 +107,9 @@ export default function ContractorProjects(p: {
             );
           })}
         </section>
-      )}
-
-      {p.bids.length > 0 && (
+  );
+  const bidsPanel = (
         <section className="stack" id="bids" aria-label="Your bids">
-          <div className="row" style={{ justifyContent: 'space-between', flexWrap: 'nowrap' }}><h2>Your bids</h2><span className="muted small">{p.waitingCount} waiting</span></div>
           {p.bids.map((b) => (
             <div key={b.id} className="card">
               <Link href={`/marketplace/${b.listing.id}`} style={{ textDecoration: 'none', color: 'var(--ink)', display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -176,21 +133,9 @@ export default function ContractorProjects(p: {
           ))}
           <Link href="/marketplace/bids" style={{ fontWeight: 700 }}>See all bids ›</Link>
         </section>
-      )}
-
-      {(p.collected > 0 || p.toCollect > 0) && (
-        <section className="stack" aria-label="Money">
-          <div className="grid2" style={{ gridTemplateColumns: 'repeat(2, 1fr)' }}>
-            <div className="card" style={{ gap: 2 }}><b style={{ fontSize: 22 }}>{dollars(p.collected)}</b><span className="muted small">Collected so far</span></div>
-            <div className="card" style={{ gap: 2 }}><b style={{ fontSize: 22 }}>{dollars(p.toCollect)}</b><span className="muted small">Still to collect</span></div>
-          </div>
-          <Link href="/settings/business/money" style={{ fontWeight: 700 }}>Open My money ›</Link>
-        </section>
-      )}
-
-      {!first && (
+  );
+  const donePanel = (
         <section className="stack" id="done" aria-label="Completed projects">
-          <div className="row" style={{ justifyContent: 'space-between', flexWrap: 'nowrap' }}><h2>Completed projects</h2><span className="muted small">{done.length}</span></div>
           {done.length === 0 ? (
             <div className="card" style={{ alignItems: 'center', textAlign: 'center', borderStyle: 'dashed' }}>
               <span aria-hidden="true" style={{ width: 44, height: 44, borderRadius: 14, background: 'var(--ok-bg, #d9f1e6)', color: 'var(--ok, #1f7a55)', display: 'grid', placeItems: 'center' }}>
@@ -216,6 +161,60 @@ export default function ContractorProjects(p: {
             </>
           )}
         </section>
+  );
+
+  return (
+    <div className="cpage">
+      <div className="stack" style={{ gap: 8 }}>
+        <h1>{first ? `Welcome${p.firstName ? `, ${p.firstName}` : ''}` : `Hi ${p.firstName || 'there'}`}</h1>
+        <p className="muted">{first ? 'Find jobs near you, bid on them, and run the work without the paperwork. It is free.' : `${p.companyName} · here is your work at a glance.`}</p>
+      </div>
+
+      <AvailabilityBar company={p.availability} />
+
+      <div className="startp-row">
+        <Link className="ptile pri" href="/marketplace">
+          <span className="pti" aria-hidden="true">&#128269;</span>
+          <b>Find work</b>
+          <span>Homeowners near you.</span>
+        </Link>
+        <StartProjectForm companyId={p.companyId} companyName={p.companyName} open={!!p.error} ghost />
+      </div>
+
+      {!first && <PushCard />}
+      {p.error ? <div className="box bad">{p.error}</div> : null}
+      {p.needsCard}
+      {p.invites}
+
+      {first && (
+        <div className="card">
+          <h2>Get started</h2>
+          <p style={{ margin: 0 }}><b>1.</b> Finish your business profile so homeowners trust your bids.</p>
+          <p style={{ margin: 0 }}><b>2.</b> Look through jobs near you and send a bid.</p>
+          <p style={{ margin: 0 }}><b>3.</b> Got a customer already? Start a project and invite them.</p>
+          <Link className="btn ghost" href="/settings/business">Finish my business profile</Link>
+        </div>
+      )}
+
+      {(p.collected > 0 || p.toCollect > 0) && (
+        <section className="stack" aria-label="Money">
+          <div className="grid2" style={{ gridTemplateColumns: 'repeat(2, 1fr)' }}>
+            <div className="card" style={{ gap: 2 }}><b style={{ fontSize: 22 }}>{dollars(p.collected)}</b><span className="muted small">Collected so far</span></div>
+            <div className="card" style={{ gap: 2 }}><b style={{ fontSize: 22 }}>{dollars(p.toCollect)}</b><span className="muted small">Still to collect</span></div>
+          </div>
+          <Link href="/settings/business/money" style={{ fontWeight: 700 }}>Open My money ›</Link>
+        </section>
+      )}
+
+      {!first && (ongoing.length > 0 || p.bids.length > 0 || done.length > 0) && (
+        <GroupTabs
+          initial={ongoing.length > 0 ? 'ongoing' : p.bids.length > 0 ? 'bids' : 'completed'}
+          tabs={[
+            { key: 'ongoing', label: 'Ongoing', count: ongoing.length, panel: ongoingPanel, empty: 'No hired projects yet. Win a bid and the project shows here.' },
+            { key: 'bids', label: 'Bids', count: p.bids.length, panel: bidsPanel, empty: 'No open bids. Find work near you and send a bid.' },
+            { key: 'completed', label: 'Completed', count: done.length, panel: donePanel, empty: 'Finished jobs show here.' },
+          ]}
+        />
       )}
 
       {!first && (
