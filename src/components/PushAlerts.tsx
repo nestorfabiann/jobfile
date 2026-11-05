@@ -94,6 +94,19 @@ export function usePush() {
 }
 
 /** Settings card: turn phone alerts on or off and choose which kinds. */
+function AlertExample() {
+  return (
+    <div className="pex" aria-label="Example of a phone alert">
+      <span className="pex-lab">Example</span>
+      <div className="pex-n">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/icons/icon-192.png" alt="" width={36} height={36} />
+        <div><div className="pex-h"><b>Jobfile</b><span>now</span></div><b>New bid on Bathroom remodel</b><span>Nesty&rsquo;s Painting bid $4,200. Tap to compare.</span></div>
+      </div>
+    </div>
+  );
+}
+
 export default function PushSettings() {
   const p = usePush();
   if (p.state === 'loading' || p.state === 'hidden') return null;
@@ -103,6 +116,7 @@ export default function PushSettings() {
       {p.state === 'install' && (
         <>
           <p className="muted">Alerts need the Home Screen app on iPhone. Add Jobfile to your Home Screen first, then come back here to turn alerts on. It takes about 10 seconds.</p>
+          <AlertExample />
           <Link className="btn" href="/app">Show me how</Link>
         </>
       )}
@@ -111,6 +125,7 @@ export default function PushSettings() {
       {p.state === 'off' && (
         <>
           <p className="muted">Get new bids, visit times and payment requests on this phone, even when Jobfile is closed.</p>
+          <AlertExample />
           <button type="button" className="btn" disabled={p.busy} onClick={p.enable}>{p.busy ? 'Turning on…' : 'Turn on alerts'}</button>
         </>
       )}
