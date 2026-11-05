@@ -5,7 +5,8 @@ import { revalidatePath } from 'next/cache';
 import { loadProject } from '@/lib/project';
 import { supabaseAdmin } from '@/lib/supabase/server';
 import { notifyOtherSide } from '@/lib/notify';
-import { fmtRange, starterPhases } from '@/lib/schedule';
+import { missingFromAgreement } from '@/lib/phaseSync';
+import { CLEANUP, fmtRange, phasePlan, starterPhases } from '@/lib/schedule';
 
 const page = (id: string, q = '') => `/projects/${id}/schedule${q}`;
 function fail(id: string, msg: string): never {
@@ -54,9 +55,23 @@ export async function makeStarter(formData: FormData) {
   if ((count ?? 0) > 0) fail(project.id, 'This project already has phases.');
   const { data: agr } = await admin.from('agreements').select('start_date,end_date').eq('project_id', project.id).maybeSingle();
   if (!agr?.start_date || !agr?.end_date) fail(project.id, 'Set the start and completion dates in the agreement first, or add phases yourself.');
-  const rows = starterPhases(agr.start_date as string, agr.end_date as string).map((p, position) => ({ ...p, position, project_id: project.id }));
+  const { data: items } = await admin.from('agreement_items').select('title').eq('project_id', project.id).eq('kind', 'work').order('position');
+  const plan = phasePlan(((items ?? []) as { title: string }[]).map((i) => i.title), project.name as string);
+  const rows = starterPhases(agr.start_date as string, agr.end_date as string, plan.names).map((p, position) => ({ ...p, position, project_id: project.id, note: plan.label && p.title !== CLEANUP ? plan.label : '' }));
   const { error } = await admin.from('project_phases').insert(rows);
   if (error) fail(project.id, 'Could not create the schedule. Check that the database step was run.');
+  done(project.id);
+}
+
+/** Adds a phase for each work item or approved change order that has none yet. Existing phases keep their dates and status. */
+export async function addFromAgreement(formData: FormData) {
+  const { project, admin } = await ctx(formData);
+  const missing = await missingFromAgreement(admin, project.id);
+  if (!missing.length) fail(project.id, 'The schedule already matches the agreement.');
+  const { data: last } = await admin.from('project_phases').select('position').eq('project_id', project.id).order('position', { ascending: false }).limit(1).maybeSingle();
+  let pos = ((last?.position as number | undefined) ?? -1) + 1;
+  const { error } = await admin.from('project_phases').insert(missing.map((m) => ({ project_id: project.id, title: m.title, note: m.note, position: pos++ })));
+  if (error) fail(project.id, 'Could not add the phases.');
   done(project.id);
 }
 

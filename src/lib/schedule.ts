@@ -27,9 +27,53 @@ export function scheduleState(phases: Phase[], today = todayChi()): { label: str
   return { label: 'On track', tone: 'ok' };
 }
 
+export const GENERIC_PHASES = ['Demo and prep', 'Main work', 'Finish and paint', 'Cleanup and walkthrough'];
+export const CLEANUP = 'Cleanup and walkthrough';
+const hasCleanup = (n: string) => /clean|walk-?through|punch/i.test(n);
+
+/** Short starter lists by trade, used when the agreement has only one work item (marketplace jobs start that way). */
+const TRADE_PHASES: [RegExp, string, string[]][] = [
+  [/roof/i, 'Roofing', ['Tear-off', 'Decking and underlayment', 'Shingles', CLEANUP]],
+  [/paint/i, 'Painting', ['Prep and masking', 'Priming and first coat', 'Finish coat and trim', CLEANUP]],
+  [/bath/i, 'Bathroom', ['Demo', 'Plumbing and rough-in', 'Tile and fixtures', CLEANUP]],
+  [/kitchen/i, 'Kitchen', ['Demo', 'Cabinets and counters', 'Backsplash and fixtures', CLEANUP]],
+  [/floor/i, 'Flooring', ['Remove old flooring', 'Subfloor prep', 'Install flooring', CLEANUP]],
+  [/fenc/i, 'Fencing', ['Layout and post holes', 'Posts and rails', 'Pickets and gates', CLEANUP]],
+  [/deck|patio/i, 'Decks and patios', ['Layout and footings', 'Framing', 'Decking and rails', CLEANUP]],
+  [/concrete|driveway/i, 'Concrete', ['Demo and grading', 'Forms and rebar', 'Pour and finish', CLEANUP]],
+  [/electric/i, 'Electrical', ['Planning and permits', 'Rough-in wiring', 'Fixtures and devices', CLEANUP]],
+  [/plumb/i, 'Plumbing', ['Shut-off and demo', 'Rough-in', 'Fixtures and testing', CLEANUP]],
+  [/hvac|heating|cooling|\bac\b/i, 'HVAC', ['Removal', 'Equipment and ductwork', 'Startup and testing', CLEANUP]],
+  [/window|door/i, 'Windows and doors', ['Measure and remove', 'Install', 'Trim and seal', CLEANUP]],
+  [/siding|exterior/i, 'Siding', ['Remove old siding', 'Wrap and flashing', 'Install siding', CLEANUP]],
+  [/landscap|lawn|yard/i, 'Landscaping', ['Clear and grade', 'Planting and sod', 'Mulch and edging', CLEANUP]],
+  [/drywall|carpent/i, 'Drywall and carpentry', ['Framing', 'Hang drywall', 'Tape, mud and sand', CLEANUP]],
+  [/garage/i, 'Garage', ['Clear and prep', 'Main work', 'Finish', CLEANUP]],
+];
+export function tradePhases(...texts: string[]): string[] | null {
+  const t = texts.join(' ');
+  const hit = TRADE_PHASES.find(([re]) => re.test(t));
+  return hit ? hit[2] : null;
+}
+
+/**
+ * Phase names for a new schedule. Two or more work items in the agreement: each becomes a phase, in order.
+ * One or none: a short list for the trade, then the generic list. Cleanup and walkthrough always ends the list.
+ */
+export function phasePlan(workTitles: string[], projectName: string): { names: string[]; fromAgreement: boolean; label: string } {
+  const titles = workTitles.map((x) => x.trim().slice(0, 120)).filter(Boolean);
+  if (titles.length >= 2) {
+    const names = titles.slice(0, hasCleanup(titles.join(' ')) ? 8 : 7);
+    if (!names.some(hasCleanup)) names.push(CLEANUP);
+    return { names, fromAgreement: true, label: 'From the agreement' };
+  }
+  const trade = tradePhases(titles.join(' '), projectName);
+  if (trade) return { names: trade, fromAgreement: false, label: 'Starter for this kind of job' };
+  return { names: GENERIC_PHASES, fromAgreement: false, label: '' };
+}
+
 /** A starter schedule spread evenly between the agreement's dates. */
-export function starterPhases(start: string, end: string): { title: string; starts_on: string; ends_on: string }[] {
-  const names = ['Demo and prep', 'Main work', 'Finish and paint', 'Cleanup and walkthrough'];
+export function starterPhases(start: string, end: string, names: string[] = GENERIC_PHASES): { title: string; starts_on: string; ends_on: string }[] {
   const total = Math.max(names.length, daysBetween(start, end) + 1);
   const per = Math.floor(total / names.length);
   return names.map((title, i) => {

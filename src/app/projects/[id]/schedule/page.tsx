@@ -3,7 +3,8 @@ import { supabaseAdmin } from '@/lib/supabase/server';
 import { addDays, fmtDay, fmtRange, scheduleState, todayChi, type Phase } from '@/lib/schedule';
 import VisitCard, { NewVisit } from '@/components/VisitCard';
 import { chiDay, fmtWhen, type Visit } from '@/lib/visits';
-import { addPhase, changePhaseDates, deletePhase, makeStarter, setPhaseStatus } from './actions';
+import { addFromAgreement, addPhase, changePhaseDates, deletePhase, makeStarter, setPhaseStatus } from './actions';
+import { missingFromAgreement } from '@/lib/phaseSync';
 
 const stamp = (iso: string) => new Date(iso).toLocaleDateString('en-US', { timeZone: 'America/Chicago', month: 'short', day: 'numeric' });
 
@@ -20,6 +21,7 @@ export default async function Schedule({ params, searchParams }: { params: { id:
   const phases = (phaseRows ?? []) as Phase[];
   const changes = (chgRows ?? []) as any[];
   const state = scheduleState(phases, today);
+  const missing = role === 'contractor' && phases.length > 0 ? await missingFromAgreement(supabaseAdmin(), project.id) : [];
   const visits = (visitData ?? []) as unknown as Visit[];
 
   // The homeowner has now seen the date changes.
@@ -61,13 +63,25 @@ export default async function Schedule({ params, searchParams }: { params: { id:
         </p>
       </div>
 
+      {missing.length > 0 && (
+        <div className="card" style={{ background: 'var(--warn-bg, #f9efe4)', borderColor: 'var(--warn-line, #ecd4a8)' }}>
+          <b>The agreement has {missing.length} thing{missing.length > 1 ? 's' : ''} not on the schedule</b>
+          <span className="small">{missing.map((m) => m.title).join(', ')}</span>
+          <form action={addFromAgreement}>
+            <input type="hidden" name="project_id" value={project.id} />
+            <button className="btn" type="submit">Add {missing.length} new phase{missing.length > 1 ? 's' : ''}</button>
+          </form>
+          <span className="muted small">Phases you already have keep their dates and status.</span>
+        </div>
+      )}
+
       {phases.length === 0 ? (
         <div className="card">
           <p className="muted">{role === 'contractor' ? 'No phases yet. Add the steps of the job with dates so your customer knows what is coming.' : 'Your contractor has not added a schedule yet.'}</p>
           {role === 'contractor' && (
             <form action={makeStarter} className="row">
               <input type="hidden" name="project_id" value={project.id} />
-              <button className="btn accent" type="submit">Start from the agreement dates</button>
+              <button className="btn accent" type="submit">Start from the agreement</button>
             </form>
           )}
         </div>
