@@ -42,6 +42,7 @@ export default function AppTabs({ contractor, marketplace, waiting, admin, invit
     { icon: 'menu', label: 'Menu', on: open },
   ];
   const links: [string, string, string][] = [
+    ['/projects', 'Projects', 'proj'],
     ...(marketplace ? ([['/marketplace', 'Marketplace', 'mkt']] as [string, string, string][]) : []),
     ...(marketplace ? ([['/community', 'Community', 'comm']] as [string, string, string][]) : []),
     ...(marketplace && contractor ? ([['/collaborate', 'Collaborate', 'collab']] as [string, string, string][]) : []),
