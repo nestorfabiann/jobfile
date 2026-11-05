@@ -61,42 +61,63 @@ h2{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;
 .lock{display:flex;gap:6px;align-items:flex-start;background:#e4f0e8;color:#1f4d3a;border-radius:10px;padding:7px 9px;font-size:10.5px;line-height:1.35}
 .badge{display:inline-flex;gap:4px;align-items:center;background:#e4f0e8;color:#1f4d3a;border-radius:99px;padding:3px 9px;font-size:10.5px;font-weight:600}
 .chk2{display:flex;flex-direction:column;gap:5px;font-size:11px}.chk2 div{display:flex;gap:6px;align-items:center}.chk2 i{width:14px;height:14px;border:2px solid #c4813f;border-radius:4px;flex:none}
+.rd{display:flex;flex-direction:column;gap:5px;border:1px solid #e4dfd6;border-radius:12px;padding:8px 10px;background:#fff;font-size:11px}
+.rd .r{display:flex;justify-content:space-between;gap:8px;align-items:center}.rd .r span:first-child{color:#6b655e}
+.ok2{color:#1f4d3a;font-weight:600}.warn2{color:#a8692c;font-weight:600}.bad2{color:#a2503a;font-weight:600}
+.fl{background:#f9efe4;border:1px solid #ecd4a8;border-radius:10px;padding:7px 9px;font-size:10.5px;line-height:1.35;color:#8a5a1a}
+.spin{display:flex;gap:8px;align-items:center;font-size:11px;color:#6b655e}.spin i{width:14px;height:14px;border:2px solid #e4dfd6;border-top-color:#c4813f;border-radius:50%}
 </style>
 <div class="wrap">
   <div class="note"><b>Mockup.</b> Optional ID check for contractors. Homeowners see a badge, never the ID. Names are examples.</div>
   <h2>Identity, without the paperwork showing</h2>
-  <p class="mut">Upload once, an admin checks it, the photo is deleted, and a badge stays.</p>
+  <p class="mut">Upload once, we read it for you, an admin makes the call, the photo is deleted, and a badge stays.</p>
   <div class="sw" role="group" aria-label="Screen" style="grid-template-columns:1fr 1fr">
     <button type="button" data-s="a" aria-pressed="true">1 &middot; Contractor</button>
     <button type="button" data-s="b" aria-pressed="false">2 &middot; Homeowner view</button>
     <button type="button" data-s="d" aria-pressed="false">3 &middot; Admin review</button>
     <button type="button" data-s="c" aria-pressed="false">4 &middot; What changes</button>
   </div>
-<div class="sec" id="a"><div class="stage"><div class="ph"><div class="url">Business profile</div><div class="body"><div class="lab">Business profile</div><b style="font-size:15px;font-family:Bricolage Grotesque,sans-serif">Verify your identity</b>
+<div class="sec" id="a"><div class="stage"><div class="ph"><div class="url">Business profile</div><div class="body">
+<div class="lab">Business profile</div><b style="font-size:15px;font-family:Bricolage Grotesque,sans-serif">Verify your identity</b>
 <span style="color:#6b655e">Optional. Homeowners see a badge, never your ID.</span>
 <div class="lock"><span>&#128274;</span><span>Only Jobfile admins can open your photo. It is deleted as soon as it is checked. We keep only the date it was verified.</span></div>
-<div class="idc"><div class="lab">1 &middot; Photo of your driver license or state ID</div><div class="shot">Front of your ID</div><span class="bt g" style="padding:7px">Take or choose a photo</span></div>
-<div class="idc"><div class="lab">2 &middot; Selfie holding it (optional, speeds review)</div><div class="shot" style="height:50px">Selfie</div></div>
-<div class="fld"><label>Name on the ID</label><div class="inp">Nestor Rodriguez</div></div>
+<div class="idc"><div class="lab">Photo of your driver license or state ID</div><div class="shot">Front of your ID</div></div>
+<div class="spin"><i></i>Reading your ID&hellip;</div>
+<div class="rd"><div class="lab">We read this. Fix anything that is wrong.</div>
+<div class="r"><span>Name</span><span class="ok2">Nestor Rodriguez &#10003;</span></div>
+<div class="r"><span>Expires</span><span class="ok2">Aug 14, 2029 &#10003;</span></div>
+<div class="r"><span>Matches your account name</span><span class="ok2">Yes</span></div></div>
 <span class="bt s">Send for checking</span>
-<span style="font-size:10px;color:#6b655e;line-height:1.4">We check that the name matches the business owner and the ID is not expired. It does not prove you are licensed or insured.</span></div><div class="tabs"><span>Home</span><span>Projects</span><span>Find work</span><span style="color:#c4813f">Menu</span></div></div></div></div><div class="sec" id="b" hidden><div class="stage"><div class="ph"><div class="url">Nesty&rsquo;s Painting</div><div class="body"><div class="hd"><small>Plano TX &middot; 25 mi</small><b>Nesty&rsquo;s Painting</b><span>&#9733; 4.9 &middot; 7 reviews &middot; 5 years</span></div>
+<span style="font-size:10px;color:#6b655e;line-height:1.4">To read your ID, the photo is processed by an AI service. It is not used to train anything, and it is deleted after review. Only admins can open it.</span>
+</div><div class="tabs"><span>Home</span><span>Projects</span><span>Find work</span><span style="color:#c4813f">Menu</span></div></div></div></div>
+
+<div class="sec" id="b" hidden><div class="stage"><div class="ph"><div class="url">Nesty&rsquo;s Painting</div><div class="body"><div class="hd"><small>Plano TX &middot; 25 mi</small><b>Nesty&rsquo;s Painting</b><span>&#9733; 4.9 &middot; 7 reviews &middot; 5 years</span></div>
 <div class="row" style="flex-wrap:wrap;gap:6px;justify-content:flex-start"><span class="badge">&#10003; Verified by Jobfile</span><span class="badge">&#10003; ID verified</span><span class="badge">&#10003; Insured</span></div>
 <div class="cd"><div class="lab">Identity</div><div class="row"><b style="font-size:12.5px">&#10003; ID verified by Jobfile</b><span style="color:#6b655e;font-size:10.5px">Nov 2026</span></div>
 <span style="font-size:10.5px;color:#6b655e;line-height:1.4">A Jobfile admin checked a government photo ID for the owner of this business and the name matches. Jobfile does not keep the ID or share it. This does not show a license or insurance.</span></div>
-<div class="cd"><div class="lab">Bids list view</div><div class="bid" style="border:0;padding:0"><div class="row"><b style="font-size:13px">Nesty&rsquo;s Painting</b><span class="amt">$5,008</span></div><div class="mini"><span class="v">&#10003; ID verified</span><span class="v">&#10003; BBB</span><span>Insured</span></div></div></div></div><div class="tabs"><span>Home</span><span>Projects</span><span>Find work</span><span style="color:#c4813f">Menu</span></div></div></div></div><div class="sec" id="d" hidden><div class="stage"><div class="ph"><div class="url">Admin</div><div class="body"><div class="lab">Admin &middot; ID checks (1)</div>
-<div class="cd"><div class="row"><b style="font-size:13px">Nesty&rsquo;s Painting</b><span class="pill wt">To check</span></div>
+<div class="cd"><div class="lab">Bids list view</div><div class="bid" style="border:0;padding:0"><div class="row"><b style="font-size:13px">Nesty&rsquo;s Painting</b><span class="amt">$5,008</span></div><div class="mini"><span class="v">&#10003; ID verified</span><span class="v">&#10003; BBB</span><span>Insured</span></div></div></div></div><div class="tabs"><span>Home</span><span>Projects</span><span>Find work</span><span style="color:#c4813f">Menu</span></div></div></div></div><div class="sec" id="d" hidden><div class="stage"><div class="ph"><div class="url">Admin</div><div class="body">
+<div class="lab">Admin &middot; ID checks (2)</div>
+<div class="cd"><div class="row"><b style="font-size:13px">Nesty&rsquo;s Painting</b><span class="pill ok">Looks good</span></div>
 <span style="color:#6b655e;font-size:10.5px">Owner: Nestor Rodriguez &middot; sent today</span>
-<div class="shot" style="height:90px">ID photo (opens in a new tab, logged)</div>
-<div class="chk2"><div><i></i>Name matches the business owner</div><div><i></i>ID is not expired</div><div><i></i>Photo looks real and the same person</div></div>
-<div class="fld"><label>Note to contractor (if rejecting)</label><div class="inp ph">Optional</div></div>
-<div class="row"><span class="bt s" style="flex:1">Verified, delete photo</span><span class="bt g" style="flex:1">Reject</span></div>
-<span style="font-size:10px;color:#6b655e">Approving deletes the photo and selfie right away. The audit log keeps who checked it and when.</span></div></div><div class="tabs"><span>Home</span><span>Projects</span><span>Find work</span><span style="color:#c4813f">Menu</span></div></div></div></div>
+<div class="rd"><div class="r"><span>Name read</span><span class="ok2">Nestor Rodriguez &#10003;</span></div><div class="r"><span>Account owner</span><span class="ok2">Matches</span></div><div class="r"><span>Expires</span><span class="ok2">Aug 2029 &#10003;</span></div><div class="r"><span>Photo quality</span><span class="ok2">Clear</span></div></div>
+<div class="shot" style="height:48px">View photo (logged)</div>
+<div class="row"><span class="bt s" style="flex:1">Approve, delete photo</span><span class="bt g" style="flex:1">Reject</span></div></div>
+<div class="cd"><div class="row"><b style="font-size:13px">Lone Star Finishes</b><span class="pill wt">Needs a look</span></div>
+<span style="color:#6b655e;font-size:10.5px">Owner: Dana Whitfield &middot; sent today</span>
+<div class="fl"><b>Why it was flagged</b><br>&bull; Name read: &ldquo;Dana M Whitfeld&rdquo; (close, not exact)<br>&bull; Photo is blurry in one corner<br>&bull; Looks like a photo of a screen</div>
+<div class="shot" style="height:48px">View photo (logged)</div>
+<div class="row"><span class="bt s" style="flex:1">Approve, delete photo</span><span class="bt g" style="flex:1">Reject</span></div></div>
+<span style="font-size:10px;color:#6b655e;line-height:1.4">The system never approves on its own. It reads the ID and tells you what to look at. You decide, and the photo is deleted either way.</span>
+</div><div class="tabs"><span>Home</span><span>Projects</span><span>Find work</span><span style="color:#c4813f">Menu</span></div></div></div></div>
+
   <div class="sec" id="c" hidden>
     <div class="why"><b>What changes</b><ul>
-      <li><b>Optional "Verify your identity" step</b> in the business profile. Photo of a driver license or state ID, an optional selfie, and the name on it.</li>
+      <li><b>Optional "Verify your identity" step</b> in the business profile. The contractor uploads one photo of a driver license or state ID.</li>
+      <li><b>We read it automatically.</b> An AI service reads the name and expiry date, checks them against the owner name on the account, and shows the contractor what it read so they can fix mistakes. The upload screen says plainly that an AI service processes the photo.</li>
       <li><b>Homeowners only see a badge:</b> &ldquo;ID verified by Jobfile&rdquo; with the month, on the profile and in the bid list. Never the ID, number, birth date or address.</li>
-      <li><b>Private and short-lived.</b> The photo goes to private storage that only admins can open. Each open is written to the audit log. Approving or rejecting <b>deletes the photo and selfie</b>, so Jobfile keeps no ID images.</li>
-      <li><b>What you check:</b> the name matches the business owner, the ID is not expired, and the photo looks genuine. A short checklist on the admin screen.</li>
+      <li><b>Private and short-lived.</b> The photo goes to private storage that only admins can open. Each open is written to the audit log. Approving or rejecting <b>deletes the photo</b>, so Jobfile keeps no ID images.</li>
+      <li><b>Pre-filled review for you.</b> Your screen shows what was read, whether it matches, and a green "Looks good" or an orange "Needs a look" with the reasons (close but not exact name, blurry, looks like a photo of a screen). You approve or reject in one tap.</li>
+      <li><b>No auto-approval.</b> A fake ID can read perfectly, so a person always decides. If we later move to a service that checks documents for tampering, that step can become automatic.</li>
       <li><b>Careful wording.</b> &ldquo;ID verified&rdquo; confirms a real person, not a license or insurance, and the badge says so.</li>
       <li><b>Ready to switch later.</b> If volume grows, we can swap the manual check for a service like Stripe Identity without changing what homeowners see.</li>
       <li><b>Not required</b> for now. It is an extra badge, separate from &ldquo;Verified by Jobfile&rdquo;.</li>
