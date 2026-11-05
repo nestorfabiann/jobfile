@@ -33,6 +33,18 @@ export default async function ProjectLayout({
   const { data: vrows } = await supabaseAdmin().from('visits').select('*').eq('project_id', project.id).in('status', ['requested', 'proposed']);
   if (((vrows ?? []) as unknown as Visit[]).some((v) => visitTodo(v, role as 'homeowner' | 'contractor')) && !dots.includes('Schedule')) dots.push('Schedule');
 
+  // Problems tab: shows once the agreement is signed. Counts open problems and those the other side reported.
+  let problems: { open: number; mine: number } | null = null;
+  const { data: agrRow } = await sb.from('agreements').select('executed_at').eq('project_id', project.id).maybeSingle();
+  if (agrRow?.executed_at) {
+    problems = { open: 0, mine: 0 };
+    try {
+      const { data: iss } = await supabaseAdmin().from('project_issues').select('reporter_role').eq('project_id', project.id).eq('status', 'open');
+      const rows = (iss ?? []) as { reporter_role: string }[];
+      problems = { open: rows.length, mine: rows.filter((r) => r.reporter_role !== role).length };
+    } catch { /* table not created yet */ }
+  }
+
   return (
     <>
       <ScrollTop />
@@ -47,7 +59,7 @@ export default async function ProjectLayout({
         </div>
       </div>
 
-      <ProjectTabs id={project.id} priceCheck={role === 'homeowner' && priceCheckEnabled()} rating={!!project.completed_at} money={role === 'contractor'} team={role === 'contractor'} dots={dots} />
+      <ProjectTabs id={project.id} priceCheck={role === 'homeowner' && priceCheckEnabled()} rating={!!project.completed_at} money={role === 'contractor'} team={role === 'contractor'} dots={dots} problems={problems} />
 
       {role === 'contractor' && !homeownerJoined && (
         <div className="box warn">

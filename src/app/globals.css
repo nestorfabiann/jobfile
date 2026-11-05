@@ -265,6 +265,8 @@ details.conew[open] > summary::before { content: "\2013"; }
 details.conew[open] ~ .conew-hint { display: none; }
 
 .ptabs a { position: relative; }
+.ptabs a.ptab-wide { grid-column: 1 / -1; flex-direction: row; gap: 8px; min-height: 44px; }
+.ptab-wide .pill { font-size: 11px; }
 .ptab-dot { position: absolute; top: 7px; right: calc(50% - 22px); width: 9px; height: 9px; border-radius: 50%; background: var(--bad); }
 
 /* Site visits: tap-to-pick days, times and options. The input is hidden; the label is the button. */

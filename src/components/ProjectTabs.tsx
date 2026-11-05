@@ -16,10 +16,11 @@ const ICONS: Record<string, JSX.Element> = {
   'My money': <path d="M12 3v18M16 7.5c0-1.7-1.8-3-4-3s-4 1.3-4 3 1.8 2.6 4 3 4 1.3 4 3-1.8 3-4 3-4-1.3-4-3" />,
   Team: <><circle cx="9" cy="8" r="3" /><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6" /><circle cx="17" cy="9" r="2.3" /><path d="M17 14c2.5 0 4 2 4 5" /></>,
   Ratings: <path d="M12 3l2.6 5.6 6 .7-4.4 4.1 1.2 6-5.4-3-5.4 3 1.2-6L3.4 9.3l6-.7z" />,
+  Problems: <><path d="M5 21V4" /><path d="M5 4h12l-2 4 2 4H5" /></>,
   'Price check': <><circle cx="11" cy="11" r="6" /><path d="M20 20l-4-4" /></>,
 };
 
-export default function ProjectTabs({ id, priceCheck = false, rating = false, money = false, team = false, dots = [] }: { id: string; priceCheck?: boolean; rating?: boolean; money?: boolean; team?: boolean; dots?: string[] }) {
+export default function ProjectTabs({ id, priceCheck = false, rating = false, money = false, team = false, dots = [], problems = null }: { id: string; priceCheck?: boolean; rating?: boolean; money?: boolean; team?: boolean; dots?: string[]; problems?: { open: number; mine: number } | null }) {
   const path = usePathname();
   const base = `/projects/${id}`;
   const tabs = [
@@ -49,6 +50,18 @@ export default function ProjectTabs({ id, priceCheck = false, rating = false, mo
           </Link>
         );
       })}
+      {problems ? (() => {
+        const href = `${base}/issues`;
+        const active = path === href || path.startsWith(`${href}/`);
+        return (
+          <Link href={href} className="ptab-wide" aria-current={active ? 'page' : undefined}>
+            <svg viewBox="0 0 24 24" width={20} height={20} fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{ICONS.Problems}</svg>
+            <span>Problems</span>
+            <span className={`pill ${problems.open === 0 ? 'ok' : 'wt'}`}>{problems.open === 0 ? 'None open' : problems.mine > 0 ? `${problems.open} open · waiting on you` : `${problems.open} open`}</span>
+            {problems.mine > 0 ? <span className="ptab-dot" style={{ right: 12, top: 'calc(50% - 4px)' }} aria-label="Needs you" /> : null}
+          </Link>
+        );
+      })() : null}
     </nav>
   );
 }
