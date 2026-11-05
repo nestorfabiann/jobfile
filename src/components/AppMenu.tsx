@@ -55,10 +55,10 @@ export default function AppMenu({ marketplace, contractor, admin, invites = 0, s
       {open && (
         <nav id="appmenu-sheet" className="appmenu-sheet" aria-label="Main">
           {items.filter(([href]) => !(href === '/app' && installed)).map(([href, label, icon]) => (
-            <Link key={href} href={href} className={(href === '/app' && getApp) || (href === '/collaborate' && collab.highlight) ? 'mi-new' : undefined} aria-current={current(href) ? 'page' : undefined}><MenuIcon name={icon} />{href === '/app' ? <span>{label}<small className="mi-sub">Alerts on your phone</small></span> : href === '/collaborate' ? <span>{label}<small className="mi-sub">Team up on bids</small></span> : label}{href === '/app' && getApp ? <span className="mi-tag">New</span> : null}{href === '/collaborate' && collab.tag ? <span className="mi-tag">{collab.tag}</span> : null}{href === '/community' && commNew ? <span className="mi-tag">New</span> : null}</Link>
+            <Link key={href} href={href} className={(href === '/app' && getApp) || (href === '/collaborate' && collab.highlight) ? 'mi-new' : undefined} aria-current={current(href) ? 'page' : undefined}><MenuIcon name={icon} tile />{href === '/app' ? <span>{label}<small className="mi-sub">Alerts on your phone</small></span> : href === '/collaborate' ? <span>{label}<small className="mi-sub">Team up on bids</small></span> : label}{href === '/app' && getApp ? <span className="mi-tag">New</span> : null}{href === '/collaborate' && collab.tag ? <span className="mi-tag">{collab.tag}</span> : null}{href === '/community' && commNew ? <span className="mi-tag">New</span> : null}</Link>
           ))}
           <hr />
-          <form action={signOutAction}><button type="submit" className="menu-out"><MenuIcon name="out" />Sign out</button></form>
+          <form action={signOutAction}><button type="submit" className="menu-out"><MenuIcon name="out" tile />Sign out</button></form>
         </nav>
       )}
     </div>

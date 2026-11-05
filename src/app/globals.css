@@ -609,3 +609,27 @@ html { scroll-behavior: smooth; }
 .cmscroll { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
 .cmscroll::-webkit-scrollbar { display: none; }
 .cmscroll .chip { flex: none; }
+
+/* Menu icons on soft tinted tiles. --c is the icon color, --b the tile. */
+.mic { width: 32px; height: 32px; border-radius: 10px; display: grid; place-items: center; flex: none; color: var(--c, var(--ink)); background: var(--b, var(--surface-2)); }
+.mic-home, .mic-inv { --c: #c4813f; --b: #f9efe4; }
+.mic-proj, .mic-help, .mic-find { --c: #2f5f8a; --b: #e6eef6; }
+.mic-mkt { --c: #a2503a; --b: #f7e9e4; }
+.mic-comm { --c: #7a4a6b; --b: #f1e8ef; }
+.mic-collab { --c: #1d6f73; --b: #e2f1f1; }
+.mic-set, .mic-adm { --c: #4a5568; --b: #eceef2; }
+.mic-biz { --c: #6b7a2a; --b: #eef1dd; }
+.mic-app { --c: #1f4d3a; --b: #d2e6d9; }
+.mic-out { --c: #b3412f; --b: #fbeae6; }
+@media (prefers-color-scheme: dark) {
+  .mic-home, .mic-inv { --c: #e0933f; --b: #33281c; }
+  .mic-proj, .mic-help, .mic-find { --c: #7fb2e0; --b: #1c2b3a; }
+  .mic-mkt { --c: #e39a86; --b: #3a2420; }
+  .mic-comm { --c: #d6a3c6; --b: #33222f; }
+  .mic-collab { --c: #6cc5c9; --b: #17302f; }
+  .mic-set, .mic-adm { --c: #aab4c4; --b: #272b33; }
+  .mic-biz { --c: #b5c46a; --b: #2a2f17; }
+  .mic-app { --c: #8fd0ab; --b: #173a2c; }
+  .mic-out { --c: #f08a78; --b: #3a1f1a; }
+}
+.appmenu-sheet a[aria-current='page'] .mic { --b: #fff; }

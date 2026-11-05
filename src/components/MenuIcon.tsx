@@ -14,7 +14,8 @@ const PATHS: Record<string, string> = {
   out: '<path d="M10 4H5v16h5"/><path d="M15 8l4 4-4 4"/><path d="M19 12H9"/>',
 };
 
-/** Thin outline icon for the menus. Takes the text color of its row. */
-export default function MenuIcon({ name }: { name: string }) {
-  return <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ flex: 'none' }} dangerouslySetInnerHTML={{ __html: PATHS[name] ?? '' }} />;
+/** Thin outline icon for the menus. Takes the text color of its row. With `tile`, it sits on a soft tinted tile in the item's own color. */
+export default function MenuIcon({ name, tile = false }: { name: string; tile?: boolean }) {
+  const svg = <svg viewBox="0 0 24 24" width={tile ? 20 : 22} height={tile ? 20 : 22} fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ flex: 'none' }} dangerouslySetInnerHTML={{ __html: PATHS[name] ?? '' }} />;
+  return tile ? <span className={`mic mic-${name}`} aria-hidden="true">{svg}</span> : svg;
 }
