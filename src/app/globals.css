@@ -244,7 +244,7 @@ details.card > summary::-webkit-details-marker { display: none; }
 details.startp[open] + .startp-hint { display: none; }
 .startp-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-items: start; }
 .startp-row > details.startp[open] { grid-column: 1 / -1; order: 2; }
-.startp-row > .btn, .startp-row > details.startp > summary.btn { min-height: 52px; text-align: center; }
+.startp-row > details.startp > summary.ptile { cursor: pointer; }
 .startp-row > .startp-hint { margin: 0; text-align: center; }
 .startp-row .btn { width: 100%; }
 .startp-row > details.startp > summary.btn { width: 100%; }

@@ -10,7 +10,15 @@ export default function StartProjectForm({ companyId, companyName, open, heading
           <span className="pill-add">+ Start a project</span>
         </summary>
       ) : (
-        <summary className={ghost ? 'btn ghost' : 'btn'}>Start a project</summary>
+        ghost ? (
+        <summary className="ptile alt">
+          <span className="pti" aria-hidden="true">+</span>
+          <b>Start a project</b>
+          <span>For a customer you already have.</span>
+        </summary>
+      ) : (
+        <summary className="btn">Start a project</summary>
+      )
       )}
       <form action={createProject} className="stack" style={{ marginTop: 12 }}>
         {companyName ? <p className="muted small">{companyName}</p> : null}
@@ -49,13 +57,5 @@ export default function StartProjectForm({ companyId, companyName, open, heading
       </form>
     </details>
   );
-  if (!ghost) return form;
-  return (
-    <>
-      {form}
-      <p className="muted small startp-hint">
-        Got a customer already? Start a project and invite them. They do not need a Jobfile account yet.
-      </p>
-    </>
-  );
+  return form;
 }
