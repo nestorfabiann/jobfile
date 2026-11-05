@@ -25,7 +25,7 @@ export default function GroupTabs({ tabs, initial }: { tabs: Tab[]; initial: str
       <div className="gtabs" role="tablist" aria-label="Your projects">
         {tabs.map((t) => (
           <button key={t.key} type="button" role="tab" id={`gt-${t.key}`} aria-selected={t.key === active.key} aria-controls="gt-panel" onClick={() => setCur(t.key)}>
-            {t.label}<em>{t.count}</em>
+            <em>{t.count}</em><span>{t.label}</span>
             {t.badge ? <span className="gtabs-dot" aria-label={`${t.badge} new`}>{t.badge}</span> : null}
           </button>
         ))}

@@ -773,9 +773,12 @@ html { scroll-behavior: smooth; }
 @media (prefers-color-scheme: dark) { .pmap .leaflet-tile-pane { filter: invert(1) hue-rotate(180deg) brightness(.92) contrast(.9); } }
 
 .gtabs-wrap { display: flex; flex-direction: column; gap: 14px; }
-.gtabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; background: var(--surface-2, #efeae0); border-radius: 999px; padding: 4px; }
-.gtabs button { position: relative; border: 0; background: transparent; border-radius: 999px; padding: 10px 4px; font: 700 14px inherit; font-family: inherit; color: var(--ink-2); cursor: pointer; white-space: nowrap; min-height: 44px; }
-.gtabs button em { font-style: normal; font-weight: 600; color: var(--accent); margin-left: 5px; }
-.gtabs button[aria-selected='true'] { background: var(--surface); color: var(--ink); box-shadow: 0 1px 3px rgba(27, 26, 24, 0.15); }
+.gtabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; background: var(--surface); border: 1.5px solid var(--line); border-radius: 20px; padding: 6px; box-shadow: 0 2px 8px rgba(27, 26, 24, 0.06); }
+.gtabs button { position: relative; border: 0; background: transparent; border-radius: 15px; padding: 8px 2px; font: 700 15px inherit; font-family: inherit; color: var(--ink-2); cursor: pointer; white-space: nowrap; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; transition: background 0.18s ease, color 0.18s ease, transform 0.12s ease; }
+.gtabs button em { font-style: normal; font-weight: 800; font-size: 20px; line-height: 1.1; color: var(--accent); transition: color 0.18s ease; }
+.gtabs button:active { transform: scale(0.97); }
+.gtabs button[aria-selected='true'] { background: var(--accent); color: #fff; box-shadow: 0 4px 10px -3px rgba(196, 129, 63, 0.55); }
+.gtabs button[aria-selected='true'] em { color: #fff; }
 .gtabs button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
-.gtabs-dot { position: absolute; top: 2px; right: 6px; min-width: 18px; height: 18px; border-radius: 99px; background: var(--bad); color: #fff; font-size: 11px; font-weight: 700; display: grid; place-items: center; padding: 0 5px; }
+.gtabs-dot { position: absolute; top: 4px; right: 8px; min-width: 18px; height: 18px; border-radius: 99px; background: var(--bad); color: #fff; font-size: 11px; font-weight: 700; display: grid; place-items: center; padding: 0 5px; }
+@media (prefers-reduced-motion: reduce) { .gtabs button { transition: none; } }
