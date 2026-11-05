@@ -12,6 +12,8 @@ import AvailabilityForm from '@/components/AvailabilityForm';
 import { JOB_TYPES, marketplaceEnabled } from '@/lib/marketplace';
 import { CRED_KINDS, credIcon, credShort, type Credential } from '@/lib/credentials';
 import { addCredential, removeCredential } from './credActions';
+import IdCheckUploader from '@/components/IdCheckUploader';
+import { cancelIdCheck } from './idActions';
 
 export const dynamic = 'force-dynamic';
 
@@ -30,6 +32,8 @@ export default async function Business({ searchParams }: { searchParams: { saved
   const urls = await signedUrls('company-photos', [...(photos ?? []).map((p) => p.path as string), ...(c?.logo_path ? [c.logo_path as string] : [])]);
   let creds: Credential[] = [];
   try { creds = ((await db.from('company_credentials').select('*').eq('company_id', me.companyId).order('created_at')).data ?? []) as Credential[]; } catch { /* table not created yet */ }
+  let idc: any = null;
+  try { idc = (await db.from('company_id_checks').select('status,verified_at,review_note,created_at').eq('company_id', me.companyId).maybeSingle()).data; } catch { /* table not created yet */ }
   const insBy = new Map((ins ?? []).map((i: any) => [i.kind as string, i]));
   const has = (arr: string[] | null | undefined, v: string) => (arr ?? []).includes(v);
 
@@ -226,6 +230,24 @@ export default async function Business({ searchParams }: { searchParams: { saved
           <button className="btn" type="submit">Add credential</button>
           <p className="muted small" style={{ margin: 0 }}>It shows right away as &ldquo;Stated by contractor.&rdquo; After a Jobfile admin checks your link or proof, it shows &ldquo;Checked by Jobfile.&rdquo;</p>
         </form>
+      </div>
+
+      <div className="card">
+        <h2 id="bp-id" style={{ scrollMarginTop: 80 }}>Verify your identity</h2>
+        <p className="muted small">Optional. Homeowners see an &ldquo;ID verified&rdquo; badge, never your ID. It confirms a real person owns this business. It does not show a license or insurance.</p>
+        {idc?.status === 'verified' ? (
+          <div className="box ok">✓ ID verified{idc.verified_at ? ` · ${new Date(idc.verified_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` : ''}. We do not keep your photo.</div>
+        ) : idc?.status === 'pending' ? (
+          <>
+            <div className="box">Waiting for a Jobfile admin to check it. We will tell you when it is done.</div>
+            <form action={cancelIdCheck}><button className="btn ghost">Withdraw and delete my photo</button></form>
+          </>
+        ) : (
+          <>
+            {idc?.status === 'rejected' && <div className="box bad">Jobfile could not verify it{idc.review_note ? `: ${idc.review_note}` : '.'} Your photo was deleted. You can try again.</div>}
+            <IdCheckUploader />
+          </>
+        )}
       </div>
     </>
   );

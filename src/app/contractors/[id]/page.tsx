@@ -9,6 +9,7 @@ import { isAdminEmail } from '@/lib/admin';
 import { companyOutsideRatings } from '@/lib/googleRatings';
 import { companyOf } from '@/lib/team';
 import { inviteCandidates } from '@/lib/bidInvites';
+import { idVerifiedMap } from '@/lib/idCheck';
 import { publicCredentials, credIcon, credShort } from '@/lib/credentials';
 import { marketplaceEnabled } from '@/lib/marketplace';
 import { fmtDate, INSURANCE_KINDS, isCurrent, signedUrls, type InsuranceKind } from '@/lib/companyProfile';
@@ -79,6 +80,7 @@ export default async function Profile({ params, searchParams }: { params: { id: 
     ['Accepts', (c.payments ?? []).join(', ')],
     ['License or registration', c.license_note ? `${c.license_note} (stated by the contractor)` : ''],
   ].filter(([, v]) => !!v) as [string, string][];
+  const idAt = (await idVerifiedMap([c.id as string])).get(c.id as string) ?? '';
   const creds = (await publicCredentials([c.id as string])).get(c.id as string) ?? [];
   const reviews = await companyReviews(c.id);
   const outside = await companyOutsideRatings(c.id);
@@ -124,6 +126,7 @@ export default async function Profile({ params, searchParams }: { params: { id: 
         {(c.verified_at || verified.length > 0) && (
           <div className="row" style={{ gap: 8 }}>
             {c.verified_at ? <span className="pill ok">✓ Verified by Jobfile</span> : null}
+            {idAt ? <span className="pill ok">✓ ID verified</span> : null}
             {(c as any).open_to_partner ? <span className="pill warn">Open to partnering</span> : null}
             {verified.length > 0 && <span className="pill ok">✓ Insured until {fmtDate(verified.map((v) => v.expires_on).sort()[0])}</span>}
           </div>
@@ -177,6 +180,14 @@ export default async function Profile({ params, searchParams }: { params: { id: 
               </figure>
             ) : null)}
           </div>
+        </div>
+      )}
+
+      {idAt && (
+        <div className="card">
+          <h2>Identity</h2>
+          <div className="row" style={{ justifyContent: 'space-between' }}><b>✓ ID verified by Jobfile</b><span className="muted small">{new Date(idAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</span></div>
+          <p className="muted small">A Jobfile admin checked a government photo ID for the owner of this business and the name matched. Jobfile does not keep or share the ID. This does not show a license or insurance.</p>
         </div>
       )}
 

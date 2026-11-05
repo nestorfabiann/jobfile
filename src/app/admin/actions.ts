@@ -207,6 +207,36 @@ export async function reviewCredential(_: Result | null, f: FormData): Promise<R
   return { ok: true, message: decision === 'checked' ? 'Marked as checked.' : 'Hidden. The contractor was told why.' };
 }
 
+/** Owner approves or rejects an ID check. The photo is deleted either way. The contractor is told. */
+export async function reviewIdCheck(_: Result | null, f: FormData): Promise<Result> {
+  const { user: me, db } = await requireAdmin();
+  const id = str(f, 'id');
+  const decision = str(f, 'decision');
+  const note = str(f, 'note').slice(0, 300);
+  if (!id || (decision !== 'verified' && decision !== 'rejected')) return { ok: false, error: 'Nothing to review.' };
+  if (decision === 'rejected' && !note) return { ok: false, error: 'Tell the contractor why. They will see this note.' };
+  const { data: r } = await db.from('company_id_checks').select('id,company_id,photo_path,status').eq('id', id).maybeSingle<any>();
+  if (!r) return { ok: false, error: 'Check not found.' };
+  if (r.status !== 'pending') return { ok: false, error: 'This one was already reviewed.' };
+  const now = new Date().toISOString();
+  const { error } = await db.from('company_id_checks').update({ status: decision, review_note: decision === 'rejected' ? note : '', reviewed_by: me.id, reviewed_at: now, verified_at: decision === 'verified' ? now : null, photo_path: null }).eq('id', id);
+  if (error) return { ok: false, error: `Could not save: ${error.message}` };
+  if (r.photo_path) await db.storage.from('company-docs').remove([r.photo_path as string]);
+  await audit(me, decision === 'verified' ? 'id_verify' : 'id_reject', { type: 'company', id: r.company_id as string }, { note });
+  const { data: owners } = await db.from('company_members').select('user_id').eq('company_id', r.company_id as string).eq('role', 'owner');
+  await notifyUsers({
+    userIds: (owners ?? []).map((o) => o.user_id as string),
+    projectId: null,
+    kind: 'admin',
+    path: '/settings/business#bp-id',
+    title: decision === 'verified' ? 'Your ID was verified' : 'Your ID could not be verified',
+    body: decision === 'verified' ? 'The ID verified badge now shows on your public profile. Your photo was deleted.' : `Reason: ${note}. Your photo was deleted. You can try again in Settings.`,
+    force: true,
+  });
+  revalidatePath('/admin/id-checks');
+  return { ok: true, message: decision === 'verified' ? 'Verified. The photo was deleted.' : 'Rejected. The photo was deleted and the contractor was told why.' };
+}
+
 /** Admin closes a marketplace listing (rule violation). Waiting bidders are told it closed. */
 export async function adminCloseListing(formData: FormData) {
   const { user: me, db } = await requireAdmin('listings');

@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { supabaseAdmin } from '@/lib/supabase/server';
 import { companyReviews, summarize } from '@/lib/reviews';
+import { idVerifiedMap } from '@/lib/idCheck';
 import { isCurrent, signedUrls } from '@/lib/companyProfile';
 
 /** Mini version of the public profile for the contractor's Settings page, built from what is saved. */
@@ -16,6 +17,7 @@ export default async function ProfilePreview({ companyId }: { companyId: string 
   const urls = await signedUrls('company-photos', [...all.slice(0, 3), ...(c.logo_path ? [c.logo_path as string] : [])]);
   let nCreds = 0;
   try { nCreds = (await db.from('company_credentials').select('id', { count: 'exact', head: true }).eq('company_id', companyId).neq('status', 'rejected')).count ?? 0; } catch { /* table not created yet */ }
+  const idOk = (await idVerifiedMap([companyId])).has(companyId);
   const s = summarize(await companyReviews(companyId));
   const services: string[] = Array.isArray(c.services) ? c.services : [];
   const insured = (ins ?? []).some((i: any) => isCurrent(i));
@@ -26,6 +28,7 @@ export default async function ProfilePreview({ companyId }: { companyId: string 
     { ok: hasAbout, label: 'Description', href: '/settings/business#bp-about' },
     { ok: services.length > 0, label: 'Trades you do', href: '/settings/business#bp-about' },
     { ok: insured, label: 'Insurance proof', href: '/settings/business#bp-ins' },
+    { ok: idOk, label: 'ID verified', href: '/settings/business#bp-id' },
     { ok: nCreds > 0, label: 'Credentials (BBB, chamber)', href: '/settings/business#bp-cred' },
   ];
   const done = items.filter((i) => i.ok).length;

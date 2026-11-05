@@ -164,6 +164,7 @@ export default async function ListingPage({ params, searchParams }: { params: { 
   } catch { /* team tables not created yet */ }
 
   // For the homeowner: who each bidder is, their rating and whether their insurance is verified.
+  let idBy = new Map<string, string>();
   let credBy = new Map<string, import('@/lib/credentials').Credential[]>();
   const info = new Map<string, { name: string; avg: number; count: number; insured: boolean; pending: boolean; kinds: string[]; until: string; logo: string; verified: boolean }>();
   if (owner && visible.length) {
@@ -174,6 +175,7 @@ export default async function ListingPage({ params, searchParams }: { params: { 
     ]);
     const logoUrls = await signedUrls('company-photos', (cos ?? []).map((c: any) => c.logo_path as string).filter(Boolean));
     credBy = await (await import('@/lib/credentials')).publicCredentials(cids);
+    idBy = await (await import('@/lib/idCheck')).idVerifiedMap(cids);
     for (const c of cos ?? []) {
       const s = summarize(await companyReviews(c.id as string));
       const good = (ins ?? []).filter((i: any) => i.company_id === c.id && isCurrent(i)).map((i: any) => i.expires_on as string).sort();
@@ -430,6 +432,7 @@ export default async function ListingPage({ params, searchParams }: { params: { 
                   {gRatings.get(b.company_id) ? <span className="pill warn" title="Linked by the contractor, as shown on Google Maps">★ {gRatings.get(b.company_id)!.rating.toFixed(1)} · {gRatings.get(b.company_id)!.count} on Google Maps</span> : null}
                 </div>
                 {c?.verified ? <span className="pill ok" style={{ width: 'max-content' }}>✓ Verified by Jobfile</span> : null}
+                {idBy.has(b.company_id) ? <span className="pill ok" style={{ width: 'max-content' }}>✓ ID verified</span> : null}
                 <InsuranceBadge state={c?.insured ? 'ok' : c?.pending ? 'wait' : 'none'} name={c?.name ?? 'This contractor'} until={c?.until ?? ''} kinds={c?.kinds ?? []} />
                 {(credBy.get(b.company_id) ?? []).length > 0 && (
                   <div className="credchips" aria-label="Credentials">

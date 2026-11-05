@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { uploadBusinessPhoto, uploadInsurance } from '@/app/settings/business/actions';
 
 /** Shrinks a phone photo to about 1600 px so it uploads fast and stays under request limits. */
-async function shrink(file: File, max = 1600): Promise<Blob> {
+export async function shrink(file: File, max = 1600): Promise<Blob> {
   const bmp = await createImageBitmap(file, { imageOrientation: 'from-image' });
   const scale = Math.min(1, max / Math.max(bmp.width, bmp.height));
   const canvas = document.createElement('canvas');
