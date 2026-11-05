@@ -665,3 +665,27 @@ html { scroll-behavior: smooth; }
 .pcb2 i { display: block; height: 100%; border-radius: 99px; background: #1f4d3a; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .pcact.g { background: #173a2c; color: #8fd0ab; } :root:not([data-theme="light"]) .pcact.o { background: #33281c; color: #ecd4a8; } }
 :root[data-theme="dark"] .pcact.g { background: #173a2c; color: #8fd0ab; } :root[data-theme="dark"] .pcact.o { background: #33281c; color: #ecd4a8; }
+
+/* Project progress stepper */
+.pstep { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 16px 12px 14px; display: flex; flex-direction: column; gap: 12px; box-shadow: var(--shadow); }
+.pst { list-style: none; margin: 0; padding: 0; display: flex; }
+.pst li { flex: 1; position: relative; }
+.pst li a { display: flex; flex-direction: column; align-items: center; gap: 6px; text-decoration: none; color: var(--ink-2); font-size: 12px; font-weight: 600; text-align: center; position: relative; }
+.pst li::before { content: ''; position: absolute; top: 14px; left: -50%; right: 50%; height: 3px; background: var(--line); }
+.pst li:first-child::before { display: none; }
+.pst li.done::before, .pst li.now::before { background: #1f4d3a; }
+.pst i { position: relative; z-index: 1; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font: 800 13px system-ui, sans-serif; font-style: normal; background: var(--surface); border: 2px solid var(--line); color: var(--ink-2); }
+.pst li.done i { background: #1f4d3a; border-color: #1f4d3a; color: #fff; }
+.pst li.done a { color: #1f4d3a; }
+.pst li.now i { background: #c4813f; border-color: #c4813f; color: #fff; width: 36px; height: 36px; margin: -3px 0; animation: pstpulse 2.2s infinite; }
+.pst li.now a { color: var(--ink); }
+@keyframes pstpulse { 0% { box-shadow: 0 0 0 0 rgba(196,129,63,.45); } 70% { box-shadow: 0 0 0 10px rgba(196,129,63,0); } 100% { box-shadow: 0 0 0 0 rgba(196,129,63,0); } }
+@media (prefers-reduced-motion: reduce) { .pst li.now i { animation: none; } }
+.pwhere { border-top: 1px solid var(--line); padding-top: 12px; display: flex; flex-direction: column; gap: 8px; }
+.pwhere .p1 { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.pwhere .p1 b { font: 800 17px 'Bricolage Grotesque', system-ui, sans-serif; letter-spacing: -.02em; }
+.pwhere .p1 span { font-size: 13px; color: var(--ink-2); }
+.pbar { height: 8px; border-radius: 99px; background: var(--line); overflow: hidden; }
+.pbar i { display: block; height: 100%; border-radius: 99px; background: linear-gradient(90deg, #e0b985, #c4813f); }
+.pmn { display: flex; justify-content: space-between; gap: 8px; font-size: 13px; color: var(--ink-2); }
+.pmn b { color: var(--ink); }

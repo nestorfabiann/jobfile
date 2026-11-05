@@ -10,6 +10,8 @@ import FinishCard from '@/components/FinishCard';
 import NeedsYou from '@/components/NeedsYou';
 import ProjectPartners from '@/components/ProjectPartners';
 import { projectTasks, type NeedItem } from '@/lib/needs';
+import ProjectStepper from '@/components/ProjectStepper';
+import { daysBetween, fmtDay, todayChi } from '@/lib/schedule';
 
 const TZ = 'America/Chicago';
 const day = (d: string) => new Date(`${d.slice(0, 10)}T12:00:00`).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
@@ -19,7 +21,6 @@ const addDays = (d: string, n: number) => {
   return x.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 };
 
-const STAGES = ['Agreement', 'Active', 'Closeout', 'Complete'];
 
 export default async function Overview({ params, searchParams }: { params: { id: string }; searchParams: { hired?: string; partner?: string } }) {
   const { sb, user, project, role, contractorName, homeownerName } = await loadProject(params.id);
@@ -36,6 +37,8 @@ export default async function Overview({ params, searchParams }: { params: { id:
       sb.from('photos').select('id,kind,status,path,caption,created_at').eq('project_id', project.id).order('created_at', { ascending: false }).limit(200),
       sb.from('messages').select('sender_role,tag,created_at').eq('project_id', project.id).order('created_at', { ascending: false }).limit(50),
     ]);
+  let phaseRows: { title: string; starts_on: string | null; ends_on: string | null; status: string; position: number }[] = [];
+  try { const { data: pr } = await sb.from('project_phases').select('title,starts_on,ends_on,status,position').eq('project_id', project.id).order('position'); phaseRows = (pr ?? []) as typeof phaseRows; } catch { /* schedule tables missing */ }
 
   const items = (itemRows ?? []) as Item[];
   const cos = (coRows ?? []) as ChangeOrder[];
@@ -93,6 +96,12 @@ export default async function Overview({ params, searchParams }: { params: { id:
     const { count } = await supabaseAdmin().from('notifications').select('id', { count: 'exact', head: true }).eq('project_id', project.id).eq('kind', 'finish_request').gt('created_at', new Date(Date.now() - 86400000).toISOString());
     asked = (count ?? 0) > 0;
   }
+  // Where the job is now, from the schedule (left out when there is no schedule).
+  const today = todayChi();
+  const curPhase = phaseRows.find((p) => p.status === 'in_progress') ?? phaseRows.find((p) => p.status !== 'done' && p.starts_on && p.starts_on <= today) ?? null;
+  const curDays = curPhase && curPhase.starts_on && curPhase.ends_on ? `Day ${Math.min(Math.max(daysBetween(curPhase.starts_on, today) + 1, 1), daysBetween(curPhase.starts_on, curPhase.ends_on) + 1)} of ${daysBetween(curPhase.starts_on, curPhase.ends_on) + 1}` : '';
+  const nextPhase = phaseRows.find((p) => p.status === 'upcoming' && p.starts_on && p.starts_on > today);
+  const curNext = curPhase?.ends_on ? `Phase ends ${fmtDay(curPhase.ends_on)}` : nextPhase?.starts_on ? `Next: ${nextPhase.title} ${fmtDay(nextPhase.starts_on)}` : undefined;
   const pct = t.total > 0 ? Math.min(100, Math.round((confirmed / t.total) * 100)) : 0;
   const finish = agr?.end_date ? (t.days ? addDays(agr.end_date as string, t.days) : day(agr.end_date as string)) : null;
 
@@ -125,14 +134,17 @@ export default async function Overview({ params, searchParams }: { params: { id:
         </section>
       )}
 
-      <ol className="stages" aria-label="Project stage">
-        {STAGES.map((s, i) => (
-          <li key={s} className={i < stage ? 'done' : i === stage ? 'now' : ''} aria-current={i === stage ? 'step' : undefined}>
-            <span />
-            {s}
-          </li>
-        ))}
-      </ol>
+      <ProjectStepper
+        steps={[{ label: 'Agreement', href: `${base}/agreement` }, { label: 'Active', href: `${base}/schedule` }, { label: 'Closeout', href: base }, { label: 'Complete', href: `${base}/rating` }]}
+        stage={stage}
+        phase={curPhase?.title}
+        days={curDays}
+        paid={String(confirmed)}
+        total={String(t.total)}
+        paidLabel={executed ? `${dollars(confirmed)} of ${dollars(t.total)} ${role === 'contractor' ? 'received' : 'paid'}` : ''}
+        next={curNext}
+        check={{ done: checks.filter((c) => c.ok).length, of: checks.length }}
+      />
 
       {executed && (
         <FinishCard
