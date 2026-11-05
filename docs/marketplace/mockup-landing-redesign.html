@@ -55,9 +55,33 @@ p{margin:0}.mut{color:var(--mut);font-size:15px;line-height:1.5}
 .quote p{font:600 19px/1.25 'Bricolage Grotesque',sans-serif;letter-spacing:-.02em}.quote small{opacity:.85;font-size:13px}
 .cta{border-radius:24px;padding:22px 16px;background:var(--or);color:#fff;display:flex;flex-direction:column;gap:12px;text-align:center}
 .cta h2{color:#fff}.cta .btn{background:#fff;color:#1b1a18;border-radius:99px;padding:13px;font-weight:700}.cta .ghost{color:#fff;font-size:14px;font-weight:600}
+
+.rate{background:var(--fg);color:#f1f7f3;border-radius:26px;padding:18px 16px;display:flex;flex-direction:column;gap:12px}
+:root[data-theme="dark"] .rate,:root:not([data-theme="light"]) .rate{}
+.rate h2{color:#fff}.rate p{color:#bfe0cd;font-size:15px;line-height:1.5}
+.only{align-self:flex-start;background:var(--or);color:#fff;border-radius:99px;padding:4px 11px;font-size:12px;font-weight:700;letter-spacing:.02em}
+.rg{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.rg>div{background:#fff;color:#1b1a18;border-radius:18px;padding:12px;display:flex;flex-direction:column;gap:6px}
+.rg small{font-size:10.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#6b655e}
+.rg .st{color:#c4813f;letter-spacing:2px;font-size:15px}
+.rg .l{display:flex;justify-content:space-between;font-size:13px;color:#6b655e}.rg .l b{font:800 17px 'Bricolage Grotesque',sans-serif;color:#1b1a18}
+.third{border:1.5px dashed var(--orb);background:var(--orl);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.third .row2{display:flex;gap:10px;align-items:center}.third .ic{background:#fff}
+.third .two{display:grid;grid-template-columns:1fr 1fr;gap:8px}.third .two span{border-radius:99px;padding:11px;text-align:center;font-weight:700;font-size:14px}
+.third .two .f{background:var(--or);color:#fff}.third .two .o{background:#fff;border:1px solid var(--orb);color:var(--ink)}
+.jc{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:13px;display:flex;flex-direction:column;gap:8px}
+.jc .t{font:800 16px/1.15 'Bricolage Grotesque',sans-serif;letter-spacing:-.02em}
+.chips{display:flex;flex-wrap:wrap;gap:6px}.chip{border-radius:99px;padding:3px 10px;font-size:12px;font-weight:600}
+.chip.ai{background:#efe9fb;color:#5b3fa0}.chip.in{background:var(--fgl);color:var(--fg)}.chip.tr{background:var(--orl);color:#8a5a1a}
+.rb{height:7px;border-radius:99px;background:var(--line);position:relative;overflow:hidden}.rb i{position:absolute;top:0;bottom:0;border-radius:99px;background:linear-gradient(90deg,#e0b985,#c4813f)}
+.rr{display:flex;justify-content:space-between;font:800 14px 'Bricolage Grotesque',sans-serif}
+.jc .m{font-size:12.5px;color:var(--mut)}
+.jc .nudge{background:var(--orl);border-radius:11px;padding:8px 10px;font-size:13px;font-weight:600;color:#6e4712;display:flex;justify-content:space-between;align-items:center}
+.jc .nudge u{background:var(--or);color:#fff;text-decoration:none;border-radius:99px;padding:4px 10px;font-size:12px}
+.vtag{background:var(--fg);color:#fff;border-radius:99px;padding:2px 10px;font-size:11px;font-weight:700;align-self:flex-start}
 </style>
 <div class="wrap">
-  <div class="note"><b>Mockup.</b> A redesigned landing page. Quote, numbers and names are examples; the real page would use your real projects and numbers only.</div>
+  <div class="note"><b>Mockup, version 2.</b> Adds the homeowner-rating card up top, an AI price check chip and insurance chips on job cards, and a third door for bringing your own customer. Quote, numbers and names are examples; the real page would use your real projects and numbers only.</div>
 
   <div class="nav"><span class="logo">Job<span>file</span></span><span class="sign">Sign in</span></div>
 
@@ -69,8 +93,26 @@ p{margin:0}.mut{color:var(--mut);font-size:15px;line-height:1.5}
       <div class="door h"><b>I need work done</b><span>Post it free. Compare real bids. Your address stays private.</span><span class="go">Post a project</span></div>
       <div class="door c"><b>I'm a contractor</b><span>Local jobs come to you. No fees. Nothing taken from jobs you win.</span><span class="go">Create my profile</span></div>
     </div>
-    <div class="trust"><span>✓ Insurance verified</span><span>★ Ratings from real jobs</span><span>🔒 Private address</span></div>
+    <div class="trust"><span>✓ Insurance verified on every bid</span><span>★ Ratings from real jobs</span><span>🔒 Private address</span></div>
   </section>
+
+  <section class="rate" aria-label="Rate your homeowners too">
+    <span class="only">Only on Jobfile</span>
+    <h2>Stop working for homeowners who don't pay</h2>
+    <p>Homeowners rate you. You rate them. See who pays on time, decides fast and gives access before you take the job.</p>
+    <div class="rg">
+      <div><small>You get rated</small><span class="st">★★★★★</span><div class="l"><span>Quality</span><b>5.0</b></div><div class="l"><span>On time</span><b>4.8</b></div></div>
+      <div><small>You rate them</small><span class="st">★★★★☆</span><div class="l"><span>Paid on time</span><b>5.0</b></div><div class="l"><span>Quick decisions</span><b>4.0</b></div></div>
+    </div>
+  </section>
+
+  <section class="third" aria-label="Bring your own customer">
+    <div class="row2"><span class="ic">✉️</span><div><h3>Already have a contractor or a customer?</h3></div></div>
+    <p class="mut">Bring them onto Jobfile for free. They join with one tap, no account needed first.</p>
+    <div class="two"><span class="f">I'm a homeowner</span><span class="o">I'm a contractor</span></div>
+    <div class="mut" style="font-size:13px"><b style="color:var(--ink)">1</b> Start it &nbsp;·&nbsp; <b style="color:var(--ink)">2</b> Send invite &nbsp;·&nbsp; <b style="color:var(--ink)">3</b> Run it</div>
+  </section>
+
 
   <section class="sec">
     <h2>See one job, start to finish</h2>
@@ -105,6 +147,32 @@ p{margin:0}.mut{color:var(--mut);font-size:15px;line-height:1.5}
       <div class="no"><h3>Texts and cash</h3><ul><li>"What did we agree on?"</li><li>Extra charges at the end</li><li>No proof of insurance</li><li>Photos lost in a thread</li></ul></div>
       <div class="yes"><h3>Jobfile</h3><ul><li>One agreement, always there</li><li>Extras approved with a price first</li><li>Insurance shown on every bid</li><li>Photos and payments in one record</li></ul></div>
     </div>
+  </section>
+
+  <section class="sec">
+    <h2>Open near you</h2>
+    <p class="mut">Real projects from homeowners. Anyone can browse. Sign in to bid or post.</p>
+    <div class="jc">
+      <div class="chips"><span class="chip tr">Bathroom</span><span class="chip ai">✦ AI price check</span></div>
+      <div class="t">Replace the tub, new tile floor +1 more</div>
+      <div class="rr"><span>$5,500</span><span>$12,500</span></div>
+      <div class="rb"><i style="left:12%;right:20%"></i></div>
+      <div class="m">ZIP 75074 · 60 sq ft · 1 bid · Nov 3</div>
+    </div>
+    <div class="jc">
+      <div class="chips"><span class="chip tr">Kitchen remodel</span></div>
+      <div class="t">Keep current layout, new semi-custom cabinets +2 more</div>
+      <div class="nudge"><span>Add details for a price check</span><u>Add</u></div>
+      <div class="m">ZIP 75074 · 200 sq ft · 0 bids · Nov 3</div>
+    </div>
+    <div class="jc">
+      <div class="chips"><span class="chip tr">Roofing</span><span class="chip ai">✦ AI price check</span></div>
+      <div class="t">Asphalt shingles, fix leaks</div>
+      <div class="rr"><span>$11,000</span><span>$19,500</span></div>
+      <div class="rb"><i style="left:18%;right:10%"></i></div>
+      <div class="m">ZIP 75079 · 2,000 sq ft · 1 bid · Nov 3</div>
+    </div>
+    <p class="mut" style="font-size:13px"><b style="color:var(--ink)">✦ AI price check</b> gives a fair range for the job before anyone bids, so homeowners are not guessing and contractors price fairly. It is a reference, not a quote.</p>
   </section>
 
   <section class="sec">
