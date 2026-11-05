@@ -641,3 +641,27 @@ html { scroll-behavior: smooth; }
 .appmenu-sheet { max-height: calc(100dvh - 200px); overflow-y: auto; overscroll-behavior: contain; }
 .appmenu-sheet a, .appmenu-sheet button { padding-top: 8px; padding-bottom: 8px; }
 .apptabs-sheet { max-height: 88dvh; overflow-y: auto; overscroll-behavior: contain; }
+
+/* Homeowner marketplace project cards */
+.pcsum { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.pcsum > div { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 10px 8px; text-align: center; }
+.pcsum b { display: block; font: 800 22px 'Bricolage Grotesque', sans-serif; }
+.pcsum span { font-size: 12px; color: var(--ink-2); }
+.pcsum > div.hot { background: #1f4d3a; border-color: #1f4d3a; color: #fff; }
+.pcsum > div.hot span { color: #cfe6d8; }
+.pcard { position: relative; overflow: hidden; padding-left: 22px; }
+.pcard::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 5px; background: var(--pc, #c4813f); }
+.pctile { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; flex: none; }
+.pcbar { height: 7px; border-radius: 99px; background: var(--line); position: relative; overflow: hidden; }
+.pcbar i { position: absolute; left: 10%; right: 12%; top: 0; bottom: 0; border-radius: 99px; opacity: .85; }
+.pcact { border-radius: 12px; padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; }
+.pcact.g { background: #e4f0e8; color: #1f4d3a; }
+.pcact.o { background: #f9efe4; color: #6e4712; }
+.pcact.n { background: var(--line); color: var(--ink); }
+.pcgo { background: #1f4d3a; color: #fff; border-radius: 99px; padding: 6px 12px; font-size: 13px; white-space: nowrap; }
+.pcact.o .pcgo { background: #c4813f; }
+.pcdet { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--ink-2); }
+.pcb2 { flex: 1; height: 5px; border-radius: 99px; background: var(--line); overflow: hidden; }
+.pcb2 i { display: block; height: 100%; border-radius: 99px; background: #1f4d3a; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .pcact.g { background: #173a2c; color: #8fd0ab; } :root:not([data-theme="light"]) .pcact.o { background: #33281c; color: #ecd4a8; } }
+:root[data-theme="dark"] .pcact.g { background: #173a2c; color: #8fd0ab; } :root[data-theme="dark"] .pcact.o { background: #33281c; color: #ecd4a8; }

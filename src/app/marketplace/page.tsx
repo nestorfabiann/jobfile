@@ -4,11 +4,14 @@ import { requireUser } from '@/lib/session';
 import { supabaseAdmin } from '@/lib/supabase/server';
 import { dollars } from '@/lib/money';
 import { DEFAULT_RADIUS, miles, zipCoords } from '@/lib/matching';
+import { detailPercent } from '@/lib/scopeQuestions';
 import { firstNameInitial, JOB_TYPES, listingOpen, listingTitle, requireMarketplace, type Listing } from '@/lib/marketplace';
 
 export const dynamic = 'force-dynamic';
 
 const when = (iso: string) => new Date(iso).toLocaleDateString('en-US', { timeZone: 'America/Chicago', month: 'short', day: 'numeric' });
+const TRADE_COLORS = ['#c4813f', '#1f4d3a', '#2f5f8a', '#7a4a6b', '#1d6f73', '#a2503a', '#6b7a2a', '#4a5568'];
+const colorFor = (t: string) => TRADE_COLORS[Array.from(t).reduce((n, c) => n + c.charCodeAt(0), 0) % TRADE_COLORS.length];
 const budget = (l: Listing) =>
   l.budget_min_cents || l.budget_max_cents ? [l.budget_min_cents, l.budget_max_cents].filter((x) => x != null).map((x) => dollars(x as number)).join(' – ') : '';
 
@@ -69,13 +72,20 @@ export default async function Marketplace({ searchParams }: { searchParams: { ty
   const ids = listings.map((l) => l.id);
   const counts = new Map<string, number>();
   const mine = new Set<string>();
+  const fresh = new Map<string, number>();
+  const seenAt = new Map<string, number>(listings.map((l) => [l.id, (l as any).bids_seen_at ? new Date((l as any).bids_seen_at).getTime() : 0]));
   if (ids.length) {
-    const { data: bids } = await db.from('marketplace_bids').select('listing_id,company_id,status').in('listing_id', ids);
+    const { data: bids } = await db.from('marketplace_bids').select('listing_id,company_id,status,created_at').in('listing_id', ids);
     (bids ?? []).forEach((b: any) => {
       if (b.status !== 'withdrawn') counts.set(b.listing_id, (counts.get(b.listing_id) ?? 0) + 1);
+      if (!isPro && b.status === 'waiting' && new Date(b.created_at).getTime() > (seenAt.get(b.listing_id) ?? 0)) fresh.set(b.listing_id, (fresh.get(b.listing_id) ?? 0) + 1);
       if (companyId && b.company_id === companyId && b.status !== 'withdrawn') mine.add(b.listing_id);
     });
   }
+
+  const openN = listings.filter((l) => listingOpen(l)).length;
+  const hiredN = listings.filter((l) => l.status === 'awarded').length;
+  const newN = Array.from(fresh.values()).reduce((a, b) => a + b, 0);
 
   return (
     <>
@@ -108,7 +118,19 @@ export default async function Marketplace({ searchParams }: { searchParams: { ty
           )}
         </>
       ) : (
-        <div className="row"><Link className="btn" href="/marketplace/new">Post a project</Link></div>
+        <>
+          {listings.length > 0 && (
+            <div className="pcsum">
+              <div className={newN > 0 ? 'hot' : ''}><b>{newN}</b><span>New bid{newN === 1 ? '' : 's'}</span></div>
+              <div><b>{openN}</b><span>Open</span></div>
+              <div><b>{hiredN}</b><span>Hired</span></div>
+            </div>
+          )}
+          <div className="stack" style={{ gap: 6 }}>
+            <Link className="btn" href="/marketplace/new">＋ Post a project</Link>
+            <span className="muted small" style={{ textAlign: 'center' }}>Takes about 3 minutes</span>
+          </div>
+        </>
       )}
 
       {listings.length === 0 && (
@@ -118,6 +140,45 @@ export default async function Marketplace({ searchParams }: { searchParams: { ty
       {listings.map((l) => {
         const open = listingOpen(l);
         const status = l.status === 'awarded' ? 'Hired' : !open ? 'Closed' : 'Open';
+        const n = counts.get(l.id) ?? 0;
+        if (!isPro) {
+          const col = colorFor(l.job_type);
+          const f = fresh.get(l.id) ?? 0;
+          const days = Math.max(0, Math.ceil((new Date(l.expires_at).getTime() - Date.now()) / 86400000));
+          const lo = l.budget_min_cents ?? null, hi = l.budget_max_cents ?? null;
+          let pct = 0;
+          try { pct = detailPercent(l.job_type, (l as any).answers); } catch { pct = 0; }
+          const action = l.status === 'awarded'
+            ? { tone: 'g', text: 'You hired a contractor', go: 'Open' }
+            : !open ? { tone: 'n', text: 'This project is closed', go: 'View' }
+            : f > 0 ? { tone: 'g', text: `${f} new bid${f === 1 ? '' : 's'}`, go: 'Compare bids' }
+            : n > 0 ? { tone: 'g', text: `${n} bid${n === 1 ? '' : 's'} so far`, go: n > 1 ? 'Compare bids' : 'View bid' }
+            : days <= 7 ? { tone: 'o', text: `No bids yet. ${days} day${days === 1 ? '' : 's'} left`, go: 'Extend' }
+            : { tone: 'o', text: 'No bids yet. Photos help contractors price it', go: 'Add photos' };
+          return (
+            <Link key={l.id} href={`/marketplace/${l.id}`} className="card pcard" style={{ color: 'inherit', textDecoration: 'none', ['--pc' as any]: col }}>
+              <div className="row" style={{ justifyContent: 'space-between' }}>
+                <span className="row" style={{ gap: 8, flexWrap: 'nowrap' }}>
+                  <span className="pctile" style={{ color: col, background: `${col}1f` }}><TradeIcon trade={l.job_type} size={18} /></span>
+                  <span className="pill">{l.job_type}</span>
+                </span>
+                <span className={`pill ${open ? 'ok' : ''}`}>{open ? `Open · ${days} day${days === 1 ? '' : 's'} left` : status}</span>
+              </div>
+              <h3>{listingTitle(l)}</h3>
+              <p className="muted small">{[l.city, `ZIP ${l.zip}`, l.size_sqft ? `${l.size_sqft.toLocaleString('en-US')} sq ft` : ''].filter(Boolean).join(' · ')}</p>
+              {lo != null || hi != null ? (
+                <div className="stack" style={{ gap: 6 }}>
+                  <div className="row" style={{ justifyContent: 'space-between' }}><b>{lo != null ? dollars(lo) : ''}</b><b>{hi != null ? dollars(hi) : ''}</b></div>
+                  <div className="pcbar"><i style={{ background: col }} /></div>
+                </div>
+              ) : <b>Budget not shared</b>}
+              <div className={`pcact ${action.tone}`}><span>{action.text}</span><span className="pcgo">{action.go}</span></div>
+              {open && n === 0 && pct > 0 ? (
+                <div className="pcdet"><span>Detail level</span><span className="pcb2"><i style={{ width: `${pct}%` }} /></span><span>{pct}%</span></div>
+              ) : null}
+            </Link>
+          );
+        }
         return (
           <Link key={l.id} href={`/marketplace/${l.id}`} className="card" style={{ color: 'inherit', textDecoration: 'none' }}>
             <div className="row" style={{ justifyContent: 'space-between' }}>
@@ -129,8 +190,8 @@ export default async function Marketplace({ searchParams }: { searchParams: { ty
             <div className="row" style={{ justifyContent: 'space-between' }}>
               <b>{budget(l) || 'Budget not shared'}</b>
               <span className="muted small">
-                {counts.get(l.id) ?? 0} bid{(counts.get(l.id) ?? 0) === 1 ? '' : 's'}
-                {isPro ? ` · by ${firstNameInitial(l.homeowner_name)}` : ''} · {when(l.created_at)}
+                {n} bid{n === 1 ? '' : 's'}
+                {` · by ${firstNameInitial(l.homeowner_name)}`} · {when(l.created_at)}
                 {mine.has(l.id) ? ' · You bid' : ''}
               </span>
             </div>
