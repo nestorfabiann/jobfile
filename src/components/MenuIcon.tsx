@@ -9,6 +9,7 @@ const PATHS: Record<string, string> = {
   biz: '<rect x="3" y="8" width="18" height="12" rx="2"/><path d="M9 8V5h6v3"/><path d="M3 13h18"/>',
   adm: '<path d="M12 3l8 3v6c0 4.5-3.2 7.8-8 9-4.8-1.2-8-4.5-8-9V6z"/>',
   collab: '<circle cx="8" cy="9" r="3.2"/><circle cx="16.5" cy="9.5" r="2.7"/><path d="M2.5 19c0-3 2.6-5 5.5-5s5.5 2 5.5 5"/><path d="M14.5 14.3c.7-.2 1.3-.3 2-.3 2.6 0 5 1.6 5 4.6"/>',
+  comm: '<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-8 8"/>',
   app: '<rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M12 8v6M9 11h6"/>',
   out: '<path d="M10 4H5v16h5"/><path d="M15 8l4 4-4 4"/><path d="M19 12H9"/>',
 };

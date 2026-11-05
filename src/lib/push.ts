@@ -10,7 +10,8 @@ export const pushConfigured = () => !!(process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY 
 /** Which settings switch an alert belongs to. Kinds with no switch (agreements, photos and so on) are always sent. */
 export function pushCategory(kind: string): PushKey | null {
   const k = kind.toLowerCase();
-  if (k === 'bid') return 'bids';
+  if (k === 'bid' || k === 'community') return 'bids';
+  if (k === 'community_note') return 'msg';
   if (k === 'visit' || k === 'schedule') return 'visits';
   if (k === 'payment' || k === 'change' || k === 'co' || k === 'ms') return 'pay';
   if (k === 'message') return 'msg';

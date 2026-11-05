@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import MenuIcon from '@/components/MenuIcon';
 import { useGetApp } from '@/lib/useGetApp';
 import { useCollab } from '@/lib/useCollab';
+import { useIsNew } from '@/lib/useSeen';
 
 const IC: Record<string, string> = {
   home: '<path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/>',
@@ -21,6 +22,7 @@ export default function AppTabs({ contractor, marketplace, waiting, admin, invit
   const [open, setOpen] = useState(false);
   const { installed, nudge: getApp } = useGetApp();
   const collab = useCollab(invites);
+  const commNew = useIsNew('jf-community-seen', '/community');
   useEffect(() => { setOpen(false); }, [path]);
   useEffect(() => {
     if (!open) return;
@@ -41,6 +43,7 @@ export default function AppTabs({ contractor, marketplace, waiting, admin, invit
   ];
   const links: [string, string, string][] = [
     ...(marketplace ? ([['/marketplace', 'Marketplace', 'mkt']] as [string, string, string][]) : []),
+    ...(marketplace ? ([['/community', 'Community', 'comm']] as [string, string, string][]) : []),
     ...(marketplace && contractor ? ([['/collaborate', 'Collaborate', 'collab']] as [string, string, string][]) : []),
     ...(marketplace && !contractor ? ([['/find', 'Find contractors', 'find']] as [string, string, string][]) : []),
     ['/settings', 'Settings', 'set'],
@@ -56,7 +59,7 @@ export default function AppTabs({ contractor, marketplace, waiting, admin, invit
       {open && <div className="apptabs-shade" onClick={() => setOpen(false)} aria-hidden="true" />}
       {open && (
         <nav className="apptabs-sheet" id="apptabs-sheet" aria-label="More">
-          {links.filter(([h]) => !(h === '/app' && installed)).map(([h, l, i]) => h === '/app' ? <Link key={h} href={h} className={getApp ? 'mi-new' : undefined}><MenuIcon name={i} /><span>{l}<small className="mi-sub">Alerts on your phone</small></span>{getApp ? <span className="mi-tag">New</span> : null}</Link> : h === '/collaborate' ? <Link key={h} href={h} className={collab.highlight ? 'mi-new' : undefined}><MenuIcon name={i} /><span>{l}<small className="mi-sub">Team up on bids</small></span>{collab.tag ? <span className="mi-tag">{collab.tag}</span> : null}</Link> : <Link key={h} href={h}><MenuIcon name={i} />{l}</Link>)}
+          {links.filter(([h]) => !(h === '/app' && installed)).map(([h, l, i]) => h === '/app' ? <Link key={h} href={h} className={getApp ? 'mi-new' : undefined}><MenuIcon name={i} /><span>{l}<small className="mi-sub">Alerts on your phone</small></span>{getApp ? <span className="mi-tag">New</span> : null}</Link> : h === '/collaborate' ? <Link key={h} href={h} className={collab.highlight ? 'mi-new' : undefined}><MenuIcon name={i} /><span>{l}<small className="mi-sub">Team up on bids</small></span>{collab.tag ? <span className="mi-tag">{collab.tag}</span> : null}</Link> : <Link key={h} href={h}><MenuIcon name={i} />{l}{h === '/community' && commNew ? <span className="mi-tag">New</span> : null}</Link>)}
           <form action={signOutAction}><button type="submit"><MenuIcon name="out" />Sign out</button></form>
         </nav>
       )}

@@ -6,7 +6,7 @@ type L = [string, string, Area | null];
 const GROUPS: { key: string; label: string; links: L[] }[] = [
   { key: 'ov', label: 'Overview', links: [['/admin', 'Overview', null], ['/admin/activity', 'Activity', null], ['/admin/usage', 'Usage', null], ['/admin/installs', 'App installs', null], ['/admin/health', 'Health', null]] },
   { key: 'pe', label: 'People', links: [['/admin/users', 'Users', 'view'], ['/admin/projects', 'Projects', 'view'], ['/admin/invites', 'Invites', null]] },
-  { key: 'rv', label: 'Review', links: [['/admin/help', 'Help', 'help'], ['/admin/verification', 'Insurance', 'verification'], ['/admin/reviews', 'Reviews', 'reviews'], ['/admin/marketplace', 'Marketplace', 'listings']] },
+  { key: 'rv', label: 'Review', links: [['/admin/help', 'Help', 'help'], ['/admin/verification', 'Insurance', 'verification'], ['/admin/reviews', 'Reviews', 'reviews'], ['/admin/marketplace', 'Marketplace', 'listings'], ['/admin/community', 'Community', 'reviews']] },
   { key: 'ms', label: 'Message', links: [['/admin/broadcast', 'Broadcast', null], ['/admin/area', 'By area', null]] },
   { key: 'ad', label: 'Admin', links: [['/admin/team', 'Team', null], ['/admin/audit', 'Audit log', 'audit']] },
 ];
@@ -23,6 +23,12 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     try {
       const { count } = await who.db.from('help_messages').select('id', { count: 'exact', head: true }).is('done_at', null);
       counts['/admin/help'] = count ?? 0;
+    } catch { /* table not created yet */ }
+  }
+  if (can('reviews')) {
+    try {
+      const { count } = await who.db.from('community_posts').select('id', { count: 'exact', head: true }).in('status', ['pending_review', 'held']);
+      counts['/admin/community'] = count ?? 0;
     } catch { /* table not created yet */ }
   }
   if (can('verification')) {

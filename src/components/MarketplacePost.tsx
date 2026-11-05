@@ -168,7 +168,7 @@ export default function MarketplacePost({ types, aiOn, draft }: { types: Types; 
           <span aria-hidden="true" style={{ width: 8, height: 8, borderRadius: '50%', background: 'currentColor' }} />{saveMsg.text}
         </div>
       ) : null}
-      {draft && !saveMsg ? <div className="box ok">Welcome back. We restored your draft from {new Date(draft.at).toLocaleString('en-US', { timeZone: 'America/Chicago', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}. Photos and videos need to be added again before you publish.</div> : null}
+      {draft?.id && !saveMsg ? <div className="box ok">Welcome back. We restored your draft from {new Date(draft.at).toLocaleString('en-US', { timeZone: 'America/Chicago', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}. Photos and videos need to be added again before you publish.</div> : null}
       <input type="hidden" name="job_type" value={type} />
       {picks.map((p) => <input key={p} type="hidden" name="items" value={p} />)}
       <input type="hidden" name="answers" value={JSON.stringify(answers)} />
