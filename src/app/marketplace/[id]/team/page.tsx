@@ -22,13 +22,22 @@ export default async function BidAsTeam({ params, searchParams }: { params: { id
   const verified = await isVerified(me!.id);
 
   const q = (searchParams.q ?? '').trim().slice(0, 60);
+  let unrelated = false;
+  let tradeNote = '';
   let chosen: { id: string; name: string; miles: number } | null = null;
   let found: { id: string; name: string; open: boolean; miles: number }[] = [];
   let past: { id: string; name: string; miles: number }[] = [];
   try {
     if (searchParams.partner) {
       const [c] = await localPartners(l.zip, me!.id, { ids: [searchParams.partner] });
-      if (c) chosen = { id: c.id, name: c.name, miles: c.miles };
+      if (c) {
+        chosen = { id: c.id, name: c.name, miles: c.miles };
+        // Two companies with different trades have no reason to share a contract.
+        const { data: tr } = await db.from('companies').select('id,trades').in('id', [me!.id, c.id]);
+        const mine = (((tr ?? []) as any[]).find((x) => x.id === me!.id)?.trades ?? []) as string[];
+        const theirs = (((tr ?? []) as any[]).find((x) => x.id === c.id)?.trades ?? []) as string[];
+        if (mine.length && theirs.length && !mine.some((t) => theirs.includes(t))) { unrelated = true; tradeNote = `${mine.join(', ')} and ${theirs.join(', ')} are different trades.`; }
+      }
     }
     if (!chosen) {
       found = await localPartners(l.zip, me!.id, q.length >= 2 ? { q } : { openOnly: true });
@@ -72,6 +81,22 @@ export default async function BidAsTeam({ params, searchParams }: { params: { id
           <input type="hidden" name="listing_id" value={l.id} />
           <input type="hidden" name="partner_id" value={chosen.id} />
           <div className="card row" style={{ justifyContent: 'space-between' }}><span><span className="muted small">Your partner</span><br /><b>{chosen.name}</b> <span className="muted small">· {Math.round(chosen.miles)} mi from the job</span></span><Link href={base} style={{ fontWeight: 700 }}>Change</Link></div>
+          <h2>How will you work together?</h2>
+          <label className="card" style={{ display: 'flex', gap: 10, alignItems: 'flex-start', cursor: 'pointer' }}>
+            <input type="radio" name="structure" value="lead" defaultChecked={!unrelated} style={{ width: 22, height: 22, marginTop: 2 }} />
+            <span><b>Lead and partner</b> <span className="pill">One contract</span><br /><span className="muted small">You hold the contract and pay your partner. You are accountable for the whole job.</span></span>
+          </label>
+          <label className="card" style={{ display: 'flex', gap: 10, alignItems: 'flex-start', cursor: 'pointer', ...(unrelated ? { borderColor: 'var(--brand, #1f4d3a)' } : {}) }}>
+            <input type="radio" name="structure" value="separate" defaultChecked={unrelated} style={{ width: 22, height: 22, marginTop: 2 }} />
+            <span><b>Separate contracts</b> {unrelated ? <span className="pill ok">Suggested</span> : null}<br /><span className="muted small">The homeowner hires and pays each company directly. Each company is accountable only for its own work.</span></span>
+          </label>
+          {unrelated ? <div className="box" style={{ background: 'var(--accent-soft, #f9efe4)' }}><b>{tradeNote}</b> <span className="small">Separate contracts keep each company responsible only for its own work.</span></div> : null}
+          <div className="stack" style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <span className="muted small">If you choose separate contracts, how can the homeowner hire?</span>
+            <label className="row" style={{ gap: 10, flexWrap: 'nowrap', cursor: 'pointer' }}><input type="radio" name="hire_mode" value="either" defaultChecked style={{ width: 22, height: 22 }} /><span><b>Either or both</b> <span className="muted small">Each company can be hired alone, or both together.</span></span></label>
+            <label className="row" style={{ gap: 10, flexWrap: 'nowrap', cursor: 'pointer' }}><input type="radio" name="hire_mode" value="package" style={{ width: 22, height: 22 }} /><span><b>Only as a package</b> <span className="muted small">Both or neither. Use this when your price depends on doing both.</span></span></label>
+          </div>
+          <label className="fld">Schedule note (optional, separate contracts)<input name="schedule_note" maxLength={200} placeholder="Electrical Mon–Tue, then painting Wed–Fri" /></label>
           <h2>Your part</h2>
           <label className="fld">Your price ($)<input name="price" required inputMode="decimal" placeholder="2200" /></label>
           <h2>{chosen.name}’s part</h2>

@@ -50,7 +50,9 @@ export default async function Invite({ params, searchParams }: { params: { id: s
       {l ? <div className="card"><span className="muted small">The job</span><p className="small" style={{ whiteSpace: 'pre-wrap', margin: '4px 0 0' }}>{scopeText(l)}</p></div> : null}
 
       <div className="box" style={{ background: 'var(--accent-soft, #f9efe4)' }}>
-        <b>What you will see:</b> the job scope, your part, the schedule and project photos. <b>What you will not see:</b> the homeowner’s contact details or the other company’s price, unless the lead shares them. One lead is accountable to the homeowner, and Jobfile records payments but does not move money.
+        {tb.structure === 'separate'
+          ? <><b>Separate contracts.</b> If the homeowner hires you, you get your own Jobfile project and agreement with the homeowner, and they pay you directly. You are accountable only for your own work. {tb.hire_mode === 'package' ? 'This is a package: the homeowner hires both companies or neither. ' : 'The homeowner can hire either company or both. '}Jobfile records payments but does not move money.{tb.schedule_note ? ` Schedule note from the lead: ${tb.schedule_note}` : ''}</>
+          : <><b>What you will see:</b> the job scope, your part, the schedule and project photos. <b>What you will not see:</b> the homeowner’s contact details or the other company’s price, unless the lead shares them. One lead is accountable to the homeowner, and Jobfile records payments but does not move money.</>}
       </div>
 
       {answerable ? (

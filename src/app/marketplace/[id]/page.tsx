@@ -10,6 +10,7 @@ import { fmtDate, INSURANCE_KINDS, isCurrent, signedUrls } from '@/lib/companyPr
 import { firstNameInitial, JOB_TYPES, listingOpen, listingTitle, requireMarketplace, type Bid, type Listing } from '@/lib/marketplace';
 import RangeBar from '@/components/RangeBar';
 import AcceptBid from '@/components/AcceptBid';
+import HireTeam from '@/components/HireTeam';
 import ProgressStrip from '@/components/ProgressStrip';
 import BidCompare, { type CompareCol } from '@/components/BidCompare';
 import CompareBar from '@/components/CompareBar';
@@ -19,7 +20,7 @@ import ListingPhotoUploader from '@/components/ListingPhotoUploader';
 import BidViewNotice from '@/components/BidViewNotice';
 import { answerRows, detailPercent } from '@/lib/scopeQuestions';
 import { ackBidView, recordBidViews, recordCompared } from '@/lib/bidViews';
-import { acceptBid, closeListing, deleteListingPhoto, deleteListingVideo, extendListing, placeBid, withdrawBid } from '../actions';
+import { acceptBid, acceptTeamBoth, closeListing, deleteListingPhoto, deleteListingVideo, extendListing, placeBid, withdrawBid } from '../actions';
 import VisitCard, { NewVisit, VisitPrefEditor } from '@/components/VisitCard';
 import type { Visit } from '@/lib/visits';
 import { countMatchingContractors, DEFAULT_RADIUS } from '@/lib/matching';
@@ -103,14 +104,25 @@ export default async function ListingPage({ params, searchParams }: { params: { 
   else if (myBid) await ackBidView(db, myBid as any);
 
   // Team bids: the homeowner sees each part; a lead sees whether theirs is still waiting on a partner.
-  const teamByBid = new Map<string, { lead: number; partners: { company_id: string; scope: string; price: number }[] }>();
+  const teamByBid = new Map<string, { lead: number; partners: { company_id: string; scope: string; price: number; bid_id: string | null }[]; separate: boolean; pkg: boolean; note: string; tbId: string }>();
+  const partnerBidIds = new Set<string>();
   let myPendingTeam: { partnerName: string } | null = null;
+  let myTeamPart: { leadName: string } | null = null;
+  let myTeamLead = false;
   try {
     if (owner && visible.length) {
-      const { data: tbs } = await db.from('team_bids').select('id,bid_id,lead_cents').in('bid_id', visible.map((b) => b.id)).eq('status', 'sent');
+      const { data: tbs } = await db.from('team_bids').select('*').in('bid_id', visible.map((b) => b.id)).eq('status', 'sent');
       const tids = (tbs ?? []).map((t: any) => t.id as string);
-      const { data: tps } = tids.length ? await db.from('team_partners').select('team_bid_id,company_id,scope,price_cents').in('team_bid_id', tids).eq('status', 'confirmed') : { data: [] as any[] };
-      for (const t of (tbs ?? []) as any[]) teamByBid.set(t.bid_id as string, { lead: t.lead_cents as number, partners: ((tps ?? []) as any[]).filter((x) => x.team_bid_id === t.id).map((x) => ({ company_id: x.company_id as string, scope: x.scope as string, price: x.price_cents as number })) });
+      const { data: tps } = tids.length ? await db.from('team_partners').select('team_bid_id,company_id,scope,price_cents,bid_id').in('team_bid_id', tids).eq('status', 'confirmed') : { data: [] as any[] };
+      const liveIds = new Set(visible.map((b) => b.id));
+      for (const t of (tbs ?? []) as any[]) {
+        const separate = t.structure === 'separate';
+        // Separate contracts: a partner who withdrew simply drops out; the lead's bid then stands alone.
+        const partners = ((tps ?? []) as any[]).filter((x) => x.team_bid_id === t.id && (!separate || (x.bid_id && liveIds.has(x.bid_id)))).map((x) => ({ company_id: x.company_id as string, scope: x.scope as string, price: x.price_cents as number, bid_id: (x.bid_id as string | null) ?? null }));
+        if (separate && !partners.length) continue;
+        teamByBid.set(t.bid_id as string, { lead: t.lead_cents as number, partners, separate, pkg: t.hire_mode === 'package', note: (t.schedule_note as string) ?? '', tbId: t.id as string });
+        if (separate) partners.forEach((x) => x.bid_id && partnerBidIds.add(x.bid_id));
+      }
     } else if (!owner && companyId) {
       const { data: pend } = await db.from('team_bids').select('id').eq('listing_id', l.id).eq('lead_company_id', companyId).eq('status', 'pending').maybeSingle();
       if (pend) {
@@ -118,6 +130,16 @@ export default async function ListingPage({ params, searchParams }: { params: { 
         const pid = (pp ?? [])[0]?.company_id as string | undefined;
         const { data: pc } = pid ? await db.from('companies').select('name').eq('id', pid).maybeSingle() : { data: null };
         myPendingTeam = { partnerName: (pc?.name as string | undefined) ?? 'your partner' };
+      }
+      if (myBid && myBid.status !== 'withdrawn') {
+        const { data: lt } = await db.from('team_bids').select('id').eq('bid_id', myBid.id).eq('status', 'sent').maybeSingle();
+        if (lt) myTeamLead = true;
+        const { data: mp } = await db.from('team_partners').select('team_bid_id').eq('bid_id', myBid.id).maybeSingle();
+        if (mp) {
+          const { data: tb } = await db.from('team_bids').select('lead_company_id').eq('id', mp.team_bid_id).maybeSingle();
+          const { data: lc } = tb ? await db.from('companies').select('name').eq('id', tb.lead_company_id).maybeSingle() : { data: null };
+          myTeamPart = { leadName: (lc?.name as string | undefined) ?? 'the lead company' };
+        }
       }
     }
   } catch { /* team tables not created yet */ }
@@ -146,7 +168,7 @@ export default async function ListingPage({ params, searchParams }: { params: { 
   const teamTrades = tradeGroups.length;
   const teamTradeNames = tradeGroups.join(', ');
   const onlyInsured = searchParams.insured === '1';
-  const shown = onlyInsured ? visible.filter((b) => info.get(b.company_id)?.insured) : visible;
+  const shown = (onlyInsured ? visible.filter((b) => info.get(b.company_id)?.insured) : visible).filter((b) => !partnerBidIds.has(b.id));
   // A contractor without current verified insurance gets a nudge, since the badge helps them stand out.
   let needsInsurance = false;
   if (!owner && companyId) {
@@ -322,8 +344,9 @@ export default async function ListingPage({ params, searchParams }: { params: { 
           {visible.length === 0 && <div className="card"><p className="muted">No bids yet. Contractors on Jobfile can see your project and send bids.</p></div>}
           {shown.map((b) => {
             const c = info.get(b.company_id);
-            const low = hasAI && b.price_cents < (l.ai_low_cents as number) * 0.8;
-            const high = hasAI && b.price_cents > (l.ai_high_cents as number) * 1.2;
+            const sep = !!teamByBid.get(b.id)?.separate;
+            const low = !sep && hasAI && b.price_cents < (l.ai_low_cents as number) * 0.8;
+            const high = !sep && hasAI && b.price_cents > (l.ai_high_cents as number) * 1.2;
             return (
               <div className="card" id={`bid-${b.id}`} key={b.id} style={b.status === 'won' ? { borderColor: 'var(--ok)' } : undefined}>
                 <div className="row" style={{ justifyContent: 'space-between' }}>
@@ -341,7 +364,7 @@ export default async function ListingPage({ params, searchParams }: { params: { 
                       <Link href={`/contractors/${b.company_id}`} className="small" style={{ fontWeight: 700 }}>View profile ›</Link>
                     </span>
                   </span>
-                  {shown.length > 1 && b.status === 'waiting' ? <label className="row small" style={{ gap: 8, fontWeight: 700, minHeight: 44, cursor: 'pointer' }}><input type="checkbox" name="compare" form="cmpform" value={b.id} defaultChecked={cmpIds.has(b.id)} style={{ width: 22, height: 22 }} />Compare</label> : null}
+                  {shown.length > 1 && b.status === 'waiting' && !teamByBid.get(b.id)?.separate ? <label className="row small" style={{ gap: 8, fontWeight: 700, minHeight: 44, cursor: 'pointer' }}><input type="checkbox" name="compare" form="cmpform" value={b.id} defaultChecked={cmpIds.has(b.id)} style={{ width: 22, height: 22 }} />Compare</label> : null}
                   {b.status === 'won' ? <span className="pill ok">Hired</span> : b.status === 'not_selected' ? <span className="pill">Not selected</span> : null}
                 </div>
                 <div className="row small muted">
@@ -350,42 +373,52 @@ export default async function ListingPage({ params, searchParams }: { params: { 
                 </div>
                 {c?.verified ? <span className="pill ok" style={{ width: 'max-content' }}>✓ Verified by Jobfile</span> : null}
                 <InsuranceBadge state={c?.insured ? 'ok' : c?.pending ? 'wait' : 'none'} name={c?.name ?? 'This contractor'} until={c?.until ?? ''} kinds={c?.kinds ?? []} />
-                <div style={{ fontSize: 26, fontWeight: 800 }}>{dollars(b.price_cents)}</div>
-                {teamByBid.get(b.id) ? (
-                  <div className="box" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                    <b>Team bid · {1 + teamByBid.get(b.id)!.partners.length} companies</b>
-                    <span className="row small" style={{ justifyContent: 'space-between' }}><span><b>{c?.name ?? 'Contractor'}</b> · Lead</span><b>{dollars(teamByBid.get(b.id)!.lead)}</b></span>
-                    {teamByBid.get(b.id)!.partners.map((tp) => {
-                      const pc = info.get(tp.company_id);
-                      const pg = gRatings.get(tp.company_id);
-                      return (
-                        <span key={tp.company_id} className="stack small" style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                          <span className="row" style={{ justifyContent: 'space-between' }}><span><b>{pc?.name ?? 'Partner'}</b> · Partner</span><b>{dollars(tp.price)}</b></span>
-                          <span className="muted">{tp.scope}</span>
-                          <span className="row" style={{ gap: 6 }}>
-                            <span className="pill">{pc && pc.count > 0 ? `★ ${pc.avg.toFixed(1)} · ${pc.count} review${pc.count > 1 ? 's' : ''}` : 'No reviews yet'}</span>
-                            {pg ? <span className="pill warn">★ {pg.rating.toFixed(1)} on Google Maps</span> : null}
-                            {pc?.insured ? <span className="pill ok">Insured</span> : null}
-                            {pc?.verified ? <span className="pill ok">✓ Verified</span> : null}
-                            <Link href={`/contractors/${tp.company_id}`} style={{ fontWeight: 700 }}>Profile ›</Link>
+                {!teamByBid.get(b.id)?.separate ? <div style={{ fontSize: 26, fontWeight: 800 }}>{dollars(b.price_cents)}</div> : null}
+                {teamByBid.get(b.id) ? (() => {
+                  const tm = teamByBid.get(b.id)!;
+                  const total = tm.lead + tm.partners.reduce((n, x) => n + x.price, 0);
+                  return (
+                    <div className="box" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                      <b>Team bid · {1 + tm.partners.length} companies{tm.separate ? ' · Separate contracts' : ''}</b>
+                      {tm.separate ? <span className="row" style={{ justifyContent: 'space-between' }}><span className="muted small">Combined</span><b style={{ fontSize: 22 }}>{dollars(total)}</b></span> : null}
+                      <span className="row small" style={{ justifyContent: 'space-between' }}><span><b>{c?.name ?? 'Contractor'}</b>{tm.separate ? '' : ' · Lead'}</span><b>{dollars(tm.lead)}</b></span>
+                      {tm.partners.map((tp) => {
+                        const pc = info.get(tp.company_id);
+                        const pg = gRatings.get(tp.company_id);
+                        return (
+                          <span key={tp.company_id} className="stack small" style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                            <span className="row" style={{ justifyContent: 'space-between' }}><span><b>{pc?.name ?? 'Partner'}</b>{tm.separate ? '' : ' · Partner'}</span><b>{dollars(tp.price)}</b></span>
+                            <span className="muted">{tp.scope}</span>
+                            <span className="row" style={{ gap: 6 }}>
+                              <span className="pill">{pc && pc.count > 0 ? `★ ${pc.avg.toFixed(1)} · ${pc.count} review${pc.count > 1 ? 's' : ''}` : 'No reviews yet'}</span>
+                              {pg ? <span className="pill warn">★ {pg.rating.toFixed(1)} on Google Maps</span> : null}
+                              {pc?.insured ? <span className="pill ok">Insured</span> : null}
+                              {pc?.verified ? <span className="pill ok">✓ Verified</span> : null}
+                              <Link href={`/contractors/${tp.company_id}`} style={{ fontWeight: 700 }}>Profile ›</Link>
+                            </span>
+                            {tm.separate && tp.bid_id ? <>{thread(tp.bid_id, pc?.name ?? 'the contractor', tp.bid_id ? allBids.find((x) => x.id === tp.bid_id)?.status === 'waiting' : false)}{visitFor(tp.bid_id, 'homeowner', allBids.find((x) => x.id === tp.bid_id)?.status === 'waiting')}</> : null}
                           </span>
-                        </span>
-                      );
-                    })}
-                    <span className="muted small">One lead is accountable to you. If you hire this team, you hire and rate the lead.</span>
-                  </div>
-                ) : null}
+                        );
+                      })}
+                      {tm.separate && tm.note ? <span className="small"><b>Schedule note:</b> {tm.note}</span> : null}
+                      <span className="muted small">{tm.separate ? 'Two contracts: you hire and pay each company directly.' : 'One lead is accountable to you. If you hire this team, you hire and rate the lead.'}</span>
+                    </div>
+                  );
+                })() : null}
                 <p className="muted small">{[b.weeks ? `${b.weeks} week${b.weeks > 1 ? 's' : ''}` : '', b.start_date ? `starts ${fmtDate(b.start_date)}` : ''].filter(Boolean).join(' · ') || 'Timeline not given'}</p>
-                {hasAI && <RangeBar price={b.price_cents} lo={l.ai_low_cents as number} hi={l.ai_high_cents as number} />}
+                {hasAI && !sep && <RangeBar price={b.price_cents} lo={l.ai_low_cents as number} hi={l.ai_high_cents as number} />}
                 {low && <div className="box warn">This bid is well below the local range. Ask what is not included before you accept.</div>}
                 {high && <div className="box warn">This bid is well above the local range. Ask what makes it higher.</div>}
                 {b.inclusions ? <p className="small"><b>Included:</b> {b.inclusions}</p> : null}
                 {b.note ? <p className="small" style={{ whiteSpace: 'pre-wrap' }}>{b.note}</p> : null}
                 {thread(b.id, c?.name ?? 'the contractor', b.status === 'waiting')}
                 {visitFor(b.id, 'homeowner', b.status === 'waiting')}
-                {open && b.status === 'waiting' && (
+                {open && b.status === 'waiting' && (sep ? (() => {
+                  const tm = teamByBid.get(b.id)!;
+                  return <HireTeam bothAction={acceptTeamBoth} singleAction={acceptBid} teamBidId={tm.tbId} pkg={tm.pkg} total={dollars(tm.lead + tm.partners.reduce((n, x) => n + x.price, 0))} options={[{ bidId: b.id, name: c?.name ?? 'this company', price: dollars(tm.lead) }, ...tm.partners.filter((x) => x.bid_id).map((x) => ({ bidId: x.bid_id as string, name: info.get(x.company_id)?.name ?? 'the partner', price: dollars(x.price) }))]} />;
+                })() : (
                   <AcceptBid action={acceptBid} bidId={b.id} name={c?.name ?? 'this contractor'} price={dollars(b.price_cents)} />
-                )}
+                ))}
               </div>
             );
           })}
@@ -414,7 +447,19 @@ export default async function ListingPage({ params, searchParams }: { params: { 
               <span className="small" style={{ display: 'block' }}>Homeowners see it next to your name. Upload your certificate in <Link href="/settings/business">Settings &gt; Business profile</Link>.</span>
             </div>
           )}
-          {open && (!myBid || myBid.status === 'waiting' || myBid.status === 'withdrawn') ? (
+          {myTeamLead && myBid && myBid.status === 'waiting' ? (
+            <div className="box" style={{ background: 'var(--accent-soft, #f9efe4)' }}>
+              <b>This is your team bid.</b>
+              <span className="small" style={{ display: 'block' }}>To change a price, withdraw it below and start a new team bid in <Link href="/collaborate">Collaborate</Link>.</span>
+            </div>
+          ) : null}
+          {myTeamPart && myBid && myBid.status === 'waiting' ? (
+            <div className="box" style={{ background: 'var(--accent-soft, #f9efe4)' }}>
+              <b>This is your part of a team bid with {myTeamPart.leadName}.</b>
+              <span className="small" style={{ display: 'block' }}>Your price: {dollars(myBid.price_cents)}. If the homeowner hires you, you get your own project and agreement. To leave the team bid, withdraw below.</span>
+            </div>
+          ) : null}
+          {open && !myTeamPart && !myTeamLead && (!myBid || myBid.status === 'waiting' || myBid.status === 'withdrawn') ? (
             <form action={placeBid} className="stack" style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               <input type="hidden" name="listing_id" value={l.id} />
               {hasAI && <p className="muted small">AI reference for this scope: {dollars(l.ai_low_cents as number)} – {dollars(l.ai_high_cents as number)}. Bid what the work really costs you.</p>}

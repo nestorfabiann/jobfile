@@ -4,10 +4,12 @@ import { DEFAULT_RADIUS, miles, zipCoords } from '@/lib/matching';
 export type TeamBid = {
   id: string; listing_id: string; lead_company_id: string; lead_user_id: string; lead_cents: number; weeks: number | null; start_date: string | null;
   inclusions: string; note: string; status: 'pending' | 'sent' | 'canceled'; bid_id: string | null; created_at: string; updated_at: string;
+  structure?: 'lead' | 'separate'; hire_mode?: 'either' | 'package'; schedule_note?: string;
 };
 export type TeamPartner = {
   id: string; team_bid_id: string; company_id: string; scope: string; price_cents: number; counter_cents: number | null;
   status: 'invited' | 'countered' | 'confirmed' | 'declined'; created_at: string; updated_at: string;
+  bid_id?: string | null; answered_by?: string | null;
 };
 export const PARTNER_LABEL: Record<TeamPartner['status'], string> = { invited: 'Invited', countered: 'Proposed a new price', confirmed: 'Confirmed', declined: 'Declined' };
 

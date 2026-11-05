@@ -32,21 +32,47 @@ async function release(teamBidId: string) {
     return;
   }
   const total = tb.lead_cents + partners.reduce((n, p) => n + p.price_cents, 0);
-  const row = { price_cents: total, weeks: tb.weeks, start_date: tb.start_date, inclusions: tb.inclusions, note: tb.note, status: 'waiting', updated_at: new Date().toISOString() };
-  const { data: existing } = await db.from('marketplace_bids').select('id,status').eq('listing_id', l.id).eq('company_id', tb.lead_company_id).maybeSingle();
-  let bidId = existing?.id as string | undefined;
-  if (existing) {
-    if (existing.status !== 'withdrawn') return; // a solo bid already exists; the lead handles it
-    await db.from('marketplace_bids').update({ ...row, bidder_id: tb.lead_user_id }).eq('id', existing.id);
-  } else {
-    const { data: ins, error } = await db.from('marketplace_bids').insert({ ...row, listing_id: l.id, company_id: tb.lead_company_id, bidder_id: tb.lead_user_id }).select('id').single();
-    if (error || !ins) return;
-    bidId = ins.id as string;
-  }
-  await db.from('team_bids').update({ status: 'sent', bid_id: bidId, updated_at: new Date().toISOString() }).eq('id', tb.id);
-  const { data: pcos } = await db.from('companies').select('name').in('id', partners.map((p) => p.company_id));
+  const base = { weeks: tb.weeks, start_date: tb.start_date, note: tb.note, status: 'waiting', updated_at: new Date().toISOString() };
+  const { data: pcos } = await db.from('companies').select('id,name').in('id', partners.map((p) => p.company_id));
   const names = [leadName, ...((pcos ?? []) as any[]).map((c) => c.name as string)].join(' and ');
-  await notifyUsers({ userIds: [l.homeowner_id], projectId: null, kind: 'bid', path: `/marketplace/${l.id}`, title: `New team bid on ${listingTitle(l)}: ${dollars(total)}`, body: `${names} bid together for ${dollars(total)}. Open Marketplace to see each part.` });
+
+  // Puts one company's bid on the listing, reusing a withdrawn one. Null when that company already has a live bid.
+  const putBid = async (companyId: string, bidderId: string, priceCents: number, inclusions: string): Promise<string | null> => {
+    const row = { ...base, price_cents: priceCents, inclusions };
+    const { data: ex } = await db.from('marketplace_bids').select('id,status').eq('listing_id', l.id).eq('company_id', companyId).maybeSingle();
+    if (ex) {
+      if (ex.status !== 'withdrawn') return null;
+      await db.from('marketplace_bids').update({ ...row, bidder_id: bidderId }).eq('id', ex.id);
+      return ex.id as string;
+    }
+    const { data: ins, error } = await db.from('marketplace_bids').insert({ ...row, listing_id: l.id, company_id: companyId, bidder_id: bidderId }).select('id').single();
+    return error || !ins ? null : (ins.id as string);
+  };
+  const fail = async () => {
+    await db.from('team_bids').update({ status: 'canceled', updated_at: new Date().toISOString() }).eq('id', tb.id);
+    await notifyUsers({ userIds: [tb.lead_user_id], projectId: null, kind: 'bid', path: '/collaborate', title: 'Your team bid was not sent', body: 'One of the companies already has its own bid on this project. Withdraw it and start the team bid again.' });
+  };
+
+  if (tb.structure === 'separate') {
+    // Two contracts: each company gets its own bid, and the homeowner sees them together as one team bid.
+    const { data: live } = await db.from('marketplace_bids').select('company_id,status').eq('listing_id', l.id).in('company_id', partners.map((p) => p.company_id));
+    if ((live ?? []).some((x: any) => x.status !== 'withdrawn')) return fail();
+    const leadBid = await putBid(tb.lead_company_id, tb.lead_user_id, tb.lead_cents, tb.inclusions);
+    if (!leadBid) return fail();
+    for (const p of partners) {
+      const members = await memberIds(p.company_id);
+      const id = await putBid(p.company_id, p.answered_by ?? members[0] ?? tb.lead_user_id, p.price_cents, p.scope);
+      if (id) await db.from('team_partners').update({ bid_id: id }).eq('id', p.id);
+    }
+    await db.from('team_bids').update({ status: 'sent', bid_id: leadBid, updated_at: new Date().toISOString() }).eq('id', tb.id);
+  } else {
+    const { data: ex } = await db.from('marketplace_bids').select('id,status').eq('listing_id', l.id).eq('company_id', tb.lead_company_id).maybeSingle();
+    if (ex && ex.status !== 'withdrawn') return;
+    const bidId = await putBid(tb.lead_company_id, tb.lead_user_id, total, tb.inclusions);
+    if (!bidId) return;
+    await db.from('team_bids').update({ status: 'sent', bid_id: bidId, updated_at: new Date().toISOString() }).eq('id', tb.id);
+  }
+  await notifyUsers({ userIds: [l.homeowner_id], projectId: null, kind: 'bid', path: `/marketplace/${l.id}`, title: `New team bid on ${listingTitle(l)}: ${dollars(total)}`, body: `${names} bid together for ${dollars(total)}${tb.structure === 'separate' ? ', as separate contracts' : ''}. Open Marketplace to see each part.` });
   await notifyUsers({ userIds: [tb.lead_user_id], projectId: null, kind: 'bid', path: `/marketplace/${l.id}`, title: `Your team bid was sent: ${dollars(total)}`, body: 'Your partner confirmed. The homeowner can see the team bid now.' });
   revalidatePath(`/marketplace/${l.id}`);
   revalidatePath('/marketplace/bids');
@@ -87,6 +113,12 @@ export async function createTeamBid(formData: FormData) {
   const weeks = Number.isFinite(wk) && wk >= 1 && wk <= 520 ? wk : null;
   const sd = txt(formData, 'start_date', 10);
   const start = /^\d{4}-\d{2}-\d{2}$/.test(sd) && sd >= todayIso() ? sd : null;
+  const structure = String(formData.get('structure') ?? '') === 'separate' ? 'separate' : 'lead';
+  const hireMode = structure === 'separate' && String(formData.get('hire_mode') ?? '') === 'package' ? 'package' : 'either';
+  if (structure === 'separate') {
+    const { data: theirs } = await db.from('marketplace_bids').select('status').eq('listing_id', l.id).eq('company_id', partnerId).maybeSingle();
+    if (theirs && theirs.status !== 'withdrawn') go(path, 'error', 'That company already has its own bid on this project, so it cannot be part of a separate-contracts team bid.');
+  }
 
   const { data: solo } = await db.from('marketplace_bids').select('id,status').eq('listing_id', l.id).eq('company_id', me.id).maybeSingle();
   if (solo && solo.status !== 'withdrawn') go(path, 'error', 'You already have a bid on this project. Withdraw it first to bid as a team.');
@@ -97,7 +129,7 @@ export async function createTeamBid(formData: FormData) {
     if ((count ?? 0) >= MAX_BIDS_PER_DAY) go(path, 'error', 'You have started a lot of team bids today. Try again tomorrow.');
   }
 
-  const fields = { lead_user_id: user.id, lead_cents: lead, weeks, start_date: start, inclusions: txt(formData, 'inclusions', 500), note: txt(formData, 'note', 1000), status: 'pending', bid_id: null, updated_at: new Date().toISOString() };
+  const fields = { structure, hire_mode: hireMode, schedule_note: txt(formData, 'schedule_note', 200), lead_user_id: user.id, lead_cents: lead, weeks, start_date: start, inclusions: txt(formData, 'inclusions', 500), note: txt(formData, 'note', 1000), status: 'pending', bid_id: null, updated_at: new Date().toISOString() };
   let tbId: string;
   if (old) {
     await db.from('team_bids').update(fields).eq('id', old.id);
@@ -111,7 +143,7 @@ export async function createTeamBid(formData: FormData) {
   const { data: pr, error: pe } = await db.from('team_partners').insert({ team_bid_id: tbId, company_id: partnerId, scope, price_cents: part }).select('id').single();
   if (pe || !pr) go(path, 'error', 'Could not invite that company. Try again.');
 
-  await notifyUsers({ userIds: await memberIds(partnerId), projectId: null, kind: 'bid', path: `/collaborate/${pr.id}`, title: `${me.name} invited you to a team bid`, body: `${listingTitle(l)}. Your part: ${scope} for ${dollars(part)}. Open Collaborate to confirm, change your price or decline.`, cta: 'Review the invite' });
+  await notifyUsers({ userIds: await memberIds(partnerId), projectId: null, kind: 'bid', path: `/collaborate/${pr.id}`, title: `${me.name} invited you to a team bid`, body: `${listingTitle(l)}. Your part: ${scope} for ${dollars(part)}.${structure === 'separate' ? ' Separate contracts: the homeowner would hire and pay you directly.' : ''} Open Collaborate to confirm, change your price or decline.`, cta: 'Review the invite' });
   revalidatePath('/collaborate');
   go('/collaborate', 'ok', `Invite sent to ${pco.name}. Your bid goes to the homeowner when they confirm.`);
 }
@@ -160,14 +192,14 @@ async function loadMine(formData: FormData) {
   if (!p || !me || me.id !== p.company_id) redirect('/collaborate');
   const { data: tb } = await db.from('team_bids').select('*').eq('id', p.team_bid_id).maybeSingle<TeamBid>();
   if (!tb || tb.status !== 'pending') go('/collaborate', 'error', 'This invite is closed.');
-  return { db, p, tb, me, path: `/collaborate/${p.id}` };
+  return { db, p, tb, me, user, path: `/collaborate/${p.id}` };
 }
 
 export async function confirmPartner(formData: FormData) {
   requireMarketplace();
-  const { db, p, tb, me, path } = await loadMine(formData);
+  const { db, p, tb, me, user, path } = await loadMine(formData);
   if (p.status !== 'invited') go(path, 'error', 'You already answered this invite.');
-  await db.from('team_partners').update({ status: 'confirmed', updated_at: new Date().toISOString() }).eq('id', p.id);
+  await db.from('team_partners').update({ status: 'confirmed', answered_by: user.id, updated_at: new Date().toISOString() }).eq('id', p.id);
   await notifyUsers({ userIds: [tb.lead_user_id], projectId: null, kind: 'bid', path: '/collaborate', title: `${me!.name} confirmed their part`, body: `Confirmed at ${dollars(p.price_cents)}. Your team bid goes to the homeowner now.` });
   await release(tb.id);
   revalidatePath('/collaborate');
@@ -176,12 +208,12 @@ export async function confirmPartner(formData: FormData) {
 
 export async function counterPartner(formData: FormData) {
   requireMarketplace();
-  const { db, p, tb, me, path } = await loadMine(formData);
+  const { db, p, tb, me, user, path } = await loadMine(formData);
   if (p.status !== 'invited') go(path, 'error', 'You already answered this invite.');
   const price = parseDollars(txt(formData, 'price', 20));
   if (price < 100_00 || price > 10_000_000_00) go(path, 'error', 'Enter your price in dollars (for example 700).');
   if (price === p.price_cents) go(path, 'error', 'That is the same price. Tap Confirm instead.');
-  await db.from('team_partners').update({ status: 'countered', counter_cents: price, updated_at: new Date().toISOString() }).eq('id', p.id);
+  await db.from('team_partners').update({ status: 'countered', counter_cents: price, answered_by: user.id, updated_at: new Date().toISOString() }).eq('id', p.id);
   await notifyUsers({ userIds: [tb.lead_user_id], projectId: null, kind: 'bid', path: '/collaborate', title: `${me!.name} proposed a new price`, body: `${dollars(price)} instead of ${dollars(p.price_cents)}. Open Collaborate to accept it and send the bid.`, cta: 'Review the price' });
   revalidatePath('/collaborate');
   go('/collaborate', 'ok', 'Sent. The lead will accept your new price or reply.');

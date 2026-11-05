@@ -363,6 +363,25 @@ export async function placeBid(formData: FormData) {
   redirect(`${path}?bid=1`);
 }
 
+/** When one company leaves a team bid, the others are told. A package bid goes with it. */
+async function teamWithdrawn(db: Db, bidId: string, who: string) {
+  try {
+    const tm = await teamOfBid(db, bidId);
+    if (!tm) return;
+    const { data: ps } = await db.from('team_partners').select('company_id,bid_id').eq('team_bid_id', tm.id);
+    const others = new Set<string>([tm.lead_company_id, ...((ps ?? []) as any[]).map((p) => p.company_id as string)]);
+    const sibling = [tm.bid_id, ...((ps ?? []) as any[]).map((p) => p.bid_id as string | null)].filter((x): x is string => !!x && x !== bidId);
+    const { data: mine } = await db.from('marketplace_bids').select('company_id').eq('id', bidId).maybeSingle();
+    if (mine) others.delete(mine.company_id as string);
+    const pkg = tm.structure === 'separate' && tm.hire_mode === 'package';
+    if (pkg && sibling.length) await db.from('marketplace_bids').update({ status: 'withdrawn', updated_at: new Date().toISOString() }).in('id', sibling).eq('status', 'waiting');
+    for (const cid of Array.from(others)) {
+      const { data: ms } = await db.from('company_members').select('user_id').eq('company_id', cid);
+      await notifyUsers({ userIds: (ms ?? []).map((m: any) => m.user_id as string), projectId: null, kind: 'bid', path: '/collaborate', title: `${who} withdrew from the team bid`, body: pkg ? 'The bid was a package, so it is withdrawn for everyone.' : 'The rest of the team bid stays with the homeowner.' });
+    }
+  } catch { /* team tables not created yet */ }
+}
+
 export async function withdrawBid(formData: FormData) {
   requireMarketplace();
   const { user } = await requireUser();
@@ -374,6 +393,7 @@ export async function withdrawBid(formData: FormData) {
   }
   const { data: gone } = await supabaseAdmin().from('marketplace_bids').update({ status: 'withdrawn', updated_at: new Date().toISOString() }).eq('listing_id', listingId).eq('company_id', co.companyId).eq('status', 'waiting').select('id');
   if ((gone ?? []).length) {
+    await teamWithdrawn(supabaseAdmin(), (gone as any[])[0].id as string, co.name);
     const l = await loadListing(listingId);
     if (l) {
       const { count: left } = await supabaseAdmin().from('marketplace_bids').select('id', { count: 'exact', head: true }).eq('listing_id', l.id).eq('status', 'waiting');
@@ -386,44 +406,25 @@ export async function withdrawBid(formData: FormData) {
 
 // ---------- Homeowner: accept ----------
 
-export async function acceptBid(formData: FormData) {
-  requireMarketplace();
-  const { user } = await requireUser();
-  const bidId = String(formData.get('bid_id') ?? '');
-  const db = supabaseAdmin();
-  const { data: bid } = await db.from('marketplace_bids').select('*').eq('id', bidId).maybeSingle<Bid>();
-  if (!bid) redirect('/marketplace');
-  const l = await loadListing(bid.listing_id);
-  if (!l || l.homeowner_id !== user.id) redirect('/marketplace');
-  const path = `/marketplace/${l.id}`;
-  if (bid.status !== 'waiting' || !listingOpen(l)) back(path, 'This bid can no longer be accepted.');
+type Db = ReturnType<typeof supabaseAdmin>;
 
-  // Claim the listing first, so two taps cannot award it twice.
-  const { data: claimed } = await db.from('marketplace_listings').update({ status: 'awarded', awarded_bid_id: bid.id }).eq('id', l.id).eq('status', 'open').gt('expires_at', new Date().toISOString()).select('id');
-  if (!(claimed ?? []).length) back(path, 'This project was already awarded or closed.');
-  const undo = async () => {
-    await db.from('marketplace_listings').update({ status: 'open', awarded_bid_id: null }).eq('id', l.id);
-  };
-
-  const { data: hp } = await db.from('profiles').select('email').eq('id', user.id).maybeSingle();
-  const title = l.job_type;
+/** Opens the Jobfile project for one winning bid: members, agreement draft, scope message, visits. Null when it could not be opened. */
+async function openProject(db: Db, l: Listing, bid: Bid, homeownerId: string, homeownerEmail: string, o: { name?: string; scheduleNote?: string } = {}): Promise<string | null> {
+  const title = o.name ?? l.job_type;
   const { data: project, error } = await db.from('projects').insert({
     company_id: bid.company_id,
-    name: title,
+    name: title.slice(0, 120),
     address: l.address || [l.city, `TX ${l.zip}`].filter(Boolean).join(' '),
     homeowner_name: l.homeowner_name,
-    homeowner_email: ((hp?.email as string | undefined) ?? '').toLowerCase(),
+    homeowner_email: homeownerEmail,
     is_homestead: l.is_homestead,
     created_by: bid.bidder_id,
   }).select('id').single();
-  if (error || !project) {
-    await undo();
-    back(path, 'Could not open the project. Try again.');
-  }
+  if (error || !project) return null;
 
   await db.from('project_members').insert([
     { project_id: project.id, user_id: bid.bidder_id, role: 'contractor' },
-    { project_id: project.id, user_id: user.id, role: 'homeowner' },
+    { project_id: project.id, user_id: homeownerId, role: 'homeowner' },
   ]);
 
   // Prefill the agreement draft: scope and price from the post and the bid. The contractor reviews and sends it.
@@ -436,30 +437,119 @@ export async function acceptBid(formData: FormData) {
   await db.from('agreement_milestones').insert(
     [['Deposit at signing', 20], ['Midpoint, materials on site', 40], ['Substantial completion', 30], ['Final walkthrough and lien waiver', 10]].map(([label, pct], position) => ({ project_id: project.id, position, label, pct })),
   );
-  await db.from('messages').insert({ project_id: project.id, sender_id: user.id, sender_role: 'homeowner', tag: null, body: `What I posted on the marketplace:\n\n${scope}`.slice(0, 4000) });
+  await db.from('messages').insert({ project_id: project.id, sender_id: homeownerId, sender_role: 'homeowner', tag: null, body: `What I posted on the marketplace:\n\n${scope}`.slice(0, 4000) });
   if (bid.note) await db.from('messages').insert({ project_id: project.id, sender_id: bid.bidder_id, sender_role: 'contractor', tag: null, body: `My bid note:\n\n${bid.note}`.slice(0, 4000) });
+  if (o.scheduleNote) await db.from('messages').insert({ project_id: project.id, sender_id: bid.bidder_id, sender_role: 'contractor', tag: null, body: `Schedule note from the team:\n\n${o.scheduleNote}`.slice(0, 4000) });
 
-  await db.from('marketplace_listings').update({ project_id: project.id }).eq('id', l.id);
   // Visits already arranged with the winner carry over to the new project's schedule.
   await db.from('visits').update({ project_id: project.id }).eq('bid_id', bid.id).neq('status', 'canceled');
   await db.from('marketplace_bids').update({ status: 'won', updated_at: new Date().toISOString() }).eq('id', bid.id);
-  // A team bid: tell the partner company it won, so the lead and partner can start planning.
+  await notifyUsers({ userIds: [bid.bidder_id], projectId: project.id, kind: 'bid', title: `You won ${title}: ${dollars(bid.price_cents)}`, body: 'The homeowner accepted your bid. The project is open with the scope and price filled in. Review the Agreement tab and send it for approval.' });
+  return project.id as string;
+}
+
+/** Everyone still waiting is told the project went elsewhere. */
+async function closeOthers(db: Db, l: Listing) {
+  const { data: lost } = await db.from('marketplace_bids').update({ status: 'not_selected', updated_at: new Date().toISOString() }).eq('listing_id', l.id).eq('status', 'waiting').select('bidder_id');
+  await notifyUsers({ userIds: Array.from(new Set((lost ?? []).map((b) => b.bidder_id as string))), projectId: null, kind: 'bid', path: '/marketplace/bids', title: `${listingTitle(l)} went to another contractor`, body: 'Thanks for bidding. The homeowner chose a different bid.' });
+}
+
+/** The team a bid belongs to, if any (as the lead's bid or as a partner's bid). Null when there is none or the team tables are missing. */
+async function teamOfBid(db: Db, bidId: string): Promise<{ id: string; structure: string; hire_mode: string; schedule_note: string; lead_company_id: string; bid_id: string | null } | null> {
   try {
-    const { data: tb } = await db.from('team_bids').select('id').eq('bid_id', bid.id).maybeSingle();
-    if (tb) {
-      const { data: tps } = await db.from('team_partners').select('company_id').eq('team_bid_id', tb.id).eq('status', 'confirmed');
+    const { data: lead } = await db.from('team_bids').select('id,structure,hire_mode,schedule_note,lead_company_id,bid_id').eq('bid_id', bidId).maybeSingle<any>();
+    if (lead) return lead;
+    const { data: part } = await db.from('team_partners').select('team_bid_id').eq('bid_id', bidId).maybeSingle<any>();
+    if (!part) return null;
+    const { data: tb } = await db.from('team_bids').select('id,structure,hire_mode,schedule_note,lead_company_id,bid_id').eq('id', part.team_bid_id).maybeSingle<any>();
+    return tb ?? null;
+  } catch { return null; }
+}
+
+export async function acceptBid(formData: FormData) {
+  requireMarketplace();
+  const { user } = await requireUser();
+  const bidId = String(formData.get('bid_id') ?? '');
+  const db = supabaseAdmin();
+  const { data: bid } = await db.from('marketplace_bids').select('*').eq('id', bidId).maybeSingle<Bid>();
+  if (!bid) redirect('/marketplace');
+  const l = await loadListing(bid.listing_id);
+  if (!l || l.homeowner_id !== user.id) redirect('/marketplace');
+  const path = `/marketplace/${l.id}`;
+  if (bid.status !== 'waiting' || !listingOpen(l)) back(path, 'This bid can no longer be accepted.');
+  const team = await teamOfBid(db, bid.id);
+  if (team && team.structure === 'separate' && team.hire_mode === 'package') back(path, 'This team bid is a package. Hire both companies together.');
+
+  // Claim the listing first, so two taps cannot award it twice.
+  const { data: claimed } = await db.from('marketplace_listings').update({ status: 'awarded', awarded_bid_id: bid.id }).eq('id', l.id).eq('status', 'open').gt('expires_at', new Date().toISOString()).select('id');
+  if (!(claimed ?? []).length) back(path, 'This project was already awarded or closed.');
+  const undo = async () => {
+    await db.from('marketplace_listings').update({ status: 'open', awarded_bid_id: null }).eq('id', l.id);
+  };
+
+  const { data: hp } = await db.from('profiles').select('email').eq('id', user.id).maybeSingle();
+  const projectId = await openProject(db, l, bid, user.id, ((hp?.email as string | undefined) ?? '').toLowerCase());
+  if (!projectId) {
+    await undo();
+    back(path, 'Could not open the project. Try again.');
+  }
+  await db.from('marketplace_listings').update({ project_id: projectId }).eq('id', l.id);
+
+  // A one-contract team bid: tell the partner company it won, so the lead and partner can start planning.
+  if (team && team.structure !== 'separate') {
+    try {
+      const { data: tps } = await db.from('team_partners').select('company_id').eq('team_bid_id', team.id).eq('status', 'confirmed');
       for (const tp of (tps ?? []) as any[]) {
         const { data: ms } = await db.from('company_members').select('user_id').eq('company_id', tp.company_id);
-        await notifyUsers({ userIds: (ms ?? []).map((m: any) => m.user_id as string), projectId: null, kind: 'bid', path: '/collaborate', title: `Your team won ${title}`, body: 'The homeowner hired the team. The lead will contact you to plan the schedule.' });
+        await notifyUsers({ userIds: (ms ?? []).map((m: any) => m.user_id as string), projectId: null, kind: 'bid', path: '/collaborate', title: `Your team won ${l.job_type}`, body: 'The homeowner hired the team. The lead will contact you to plan the schedule.' });
       }
-    }
-  } catch { /* team tables not created yet */ }
-  const { data: lost } = await db.from('marketplace_bids').update({ status: 'not_selected', updated_at: new Date().toISOString() }).eq('listing_id', l.id).eq('status', 'waiting').select('bidder_id');
-
-  await notifyUsers({ userIds: [bid.bidder_id], projectId: project.id, kind: 'bid', title: `You won ${title}: ${dollars(bid.price_cents)}`, body: 'The homeowner accepted your bid. The project is open with the scope and price filled in. Review the Agreement tab and send it for approval.' });
-  await notifyUsers({ userIds: Array.from(new Set((lost ?? []).map((b) => b.bidder_id as string))), projectId: null, kind: 'bid', path: '/marketplace/bids', title: `${listingTitle(l)} went to another contractor`, body: 'Thanks for bidding. The homeowner chose a different bid.' });
+    } catch { /* team tables not created yet */ }
+  }
+  await closeOthers(db, l);
   revalidatePath('/marketplace');
-  redirect(`/projects/${project.id}/overview?hired=1`);
+  redirect(`/projects/${projectId}/overview?hired=1`);
+}
+
+/** Separate-contracts team bid: hire both companies at once. Each gets its own project. */
+export async function acceptTeamBoth(formData: FormData) {
+  requireMarketplace();
+  const { user } = await requireUser();
+  const db = supabaseAdmin();
+  const { data: tb } = await db.from('team_bids').select('*').eq('id', String(formData.get('team_bid_id') ?? '')).maybeSingle<any>();
+  if (!tb || tb.status !== 'sent' || tb.structure !== 'separate' || !tb.bid_id) redirect('/marketplace');
+  const l = await loadListing(tb.listing_id);
+  if (!l || l.homeowner_id !== user.id) redirect('/marketplace');
+  const path = `/marketplace/${l.id}`;
+  if (!listingOpen(l)) back(path, 'This project is no longer taking bids.');
+  const { data: ps } = await db.from('team_partners').select('company_id,scope,bid_id').eq('team_bid_id', tb.id).eq('status', 'confirmed').not('bid_id', 'is', null);
+  const parts = (ps ?? []) as { company_id: string; scope: string; bid_id: string }[];
+  const ids = [tb.bid_id as string, ...parts.map((p) => p.bid_id)];
+  const { data: bs } = await db.from('marketplace_bids').select('*').in('id', ids);
+  const bids = (bs ?? []) as Bid[];
+  if (!parts.length || bids.length !== ids.length || bids.some((b) => b.status !== 'waiting')) back(path, 'This team bid can no longer be accepted. One of the companies may have withdrawn.');
+
+  const { data: claimed } = await db.from('marketplace_listings').update({ status: 'awarded', awarded_bid_id: tb.bid_id }).eq('id', l.id).eq('status', 'open').gt('expires_at', new Date().toISOString()).select('id');
+  if (!(claimed ?? []).length) back(path, 'This project was already awarded or closed.');
+  const { data: hp } = await db.from('profiles').select('email').eq('id', user.id).maybeSingle();
+  const email = ((hp?.email as string | undefined) ?? '').toLowerCase();
+  const note = String(tb.schedule_note ?? '');
+  const leadBid = bids.find((b) => b.id === tb.bid_id)!;
+  const first = await openProject(db, l, leadBid, user.id, email, { scheduleNote: note });
+  if (!first) {
+    await db.from('marketplace_listings').update({ status: 'open', awarded_bid_id: null }).eq('id', l.id);
+    back(path, 'Could not open the project. Try again.');
+  }
+  await db.from('marketplace_listings').update({ project_id: first }).eq('id', l.id);
+  let failed = false;
+  for (const part of parts) {
+    const b = bids.find((x) => x.id === part.bid_id)!;
+    const pid = await openProject(db, l, b, user.id, email, { name: `${l.job_type}: ${part.scope}`, scheduleNote: note });
+    if (!pid) failed = true;
+  }
+  await closeOthers(db, l);
+  revalidatePath('/marketplace');
+  revalidatePath('/projects');
+  redirect(failed ? '/projects?error=' + encodeURIComponent('One of the two projects could not be opened. Contact Jobfile.') : '/projects?hired=2');
 }
 
 
