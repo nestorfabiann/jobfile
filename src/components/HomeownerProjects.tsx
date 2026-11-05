@@ -6,6 +6,7 @@ import KitchenArt from '@/components/KitchenArt';
 import InviteCard from '@/components/InviteCard';
 import { createCompany } from '@/app/projects/actions';
 import DraftDelete from '@/components/DraftDelete';
+import GroupTabs from '@/components/GroupTabs';
 import { listingOpen, listingTitle, type Listing } from '@/lib/marketplace';
 import type { Summary } from '@/lib/homeSummary';
 
@@ -61,45 +62,9 @@ export default function HomeownerProjects(p: {
       <KitchenArt />
     );
 
-  return (
-    <div className="cpage">
-      <div className="stack">
-        <h1>{first ? `Welcome${p.firstName ? `, ${p.firstName}` : ''}` : `Hi ${p.firstName || 'there'}`}</h1>
-        <p className="muted">{first ? 'Tell us about your project and local contractors will send bids. It is free.' : 'Here is where your projects stand.'}</p>
-        {p.needsName && <Link href="/settings" className="small" style={{ fontWeight: 700 }}>Add your name in Settings</Link>}
-      </div>
-
-      <div className="ptiles">
-        <Link className="ptile pri" href="/marketplace/new">
-          <span className="pti" aria-hidden="true">+</span>
-          <b>{first ? 'Post your first project' : 'Post a project'}</b>
-          <span>Get bids. About 3 minutes.</span>
-        </Link>
-        <Link className="ptile alt" href="/invites/new" title="Hired someone on your own? Add them to keep the agreement, photos, payments and messages in one place. They do not need a Jobfile account yet.">
-          <span className="pti" aria-hidden="true">&#9993;</span>
-          <b>I already have a contractor</b>
-          <span>Invite them, free.</span>
-        </Link>
-      </div>
-
-      {!first && <PushCard />}
-      {p.error ? <div className="box bad">{p.error}</div> : null}
-      {p.needsCard}
-      {p.zipCard}
-      {p.invites}
-
-      {first && (
-        <div className="card">
-          <h2>How it works</h2>
-          <p style={{ margin: 0 }}><b>1.</b> Tell us what you want done and add photos.</p>
-          <p style={{ margin: 0 }}><b>2.</b> Local contractors send bids.</p>
-          <p style={{ margin: 0 }}><b>3.</b> Pick one, sign the agreement, and track the work in one place.</p>
-        </div>
-      )}
-
-      {ongoing.length > 0 && (
+  const newBids = waiting.reduce((n, l) => n + (p.stats.get(l.id)?.fresh ?? 0), 0);
+  const ongoingPanel = (
         <section className="stack" aria-label="Hired and ongoing">
-          <div className="row" style={{ justifyContent: 'space-between', flexWrap: 'nowrap' }}><h2>Hired and ongoing</h2><span className="muted small">{ongoing.length}</span></div>
           {ongoing.map((x) => {
             const s = p.summaries.get(x.id);
             return (
@@ -135,11 +100,9 @@ export default function HomeownerProjects(p: {
             );
           })}
         </section>
-      )}
-
-      {(waiting.length > 0 || p.drafts.length > 0) && (
+  );
+  const bidsPanel = (
         <section className="stack" aria-label="Waiting for bids">
-          <div className="row" style={{ justifyContent: 'space-between', flexWrap: 'nowrap' }}><h2>Waiting for bids</h2><span className="muted small">{waiting.length}</span></div>
           {p.drafts.map((d) => {
             const col = colorFor(d.data.type);
             const g = draftProgress(d.data);
@@ -190,21 +153,11 @@ export default function HomeownerProjects(p: {
           })}
           <Link href="/projects?tab=posted" className="muted small">See all your posted jobs</Link>
         </section>
-      )}
-
-      {done.length > 0 && (
-        <details className="card" aria-label="Completed" style={{ display: 'block', padding: '14px 16px' }}>
-          <summary style={{ fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10, listStyle: 'none', minHeight: 32 }}>
-            <span aria-hidden="true" style={{ flex: 'none', width: 28, height: 28, borderRadius: '50%', background: 'var(--ok-bg, #d9f1e6)', color: 'var(--ok, #1f7a55)', display: 'grid', placeItems: 'center' }}>
-              <svg viewBox="0 0 24 24" width={16} height={16} fill="none" stroke="currentColor" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>
-            </span>
-            <span style={{ flex: 1 }}>Completed</span>
-            <span className="pill ok">{done.length}</span>
-            <span aria-hidden="true" className="muted">›</span>
-          </summary>
-          <div className="stack" style={{ marginTop: 12 }}>
+  );
+  const donePanel = (
+        <section className="stack" aria-label="Completed">
             {done.map((x) => (
-              <div key={x.id} className="stack" style={{ gap: 8 }}>
+              <div key={x.id} className="card" style={{ gap: 8 }}>
                 <Link href={`/projects/${x.id}/overview`} className="row" style={{ flexWrap: 'nowrap', textDecoration: 'none', color: 'var(--ink)' }}>
                   <Thumb id={x.id} />
                   <div style={{ minWidth: 0, flex: 1 }}>
@@ -218,8 +171,54 @@ export default function HomeownerProjects(p: {
                 )}
               </div>
             ))}
-          </div>
-        </details>
+        </section>
+  );
+
+  return (
+    <div className="cpage">
+      <div className="stack">
+        <h1>{first ? `Welcome${p.firstName ? `, ${p.firstName}` : ''}` : `Hi ${p.firstName || 'there'}`}</h1>
+        <p className="muted">{first ? 'Tell us about your project and local contractors will send bids. It is free.' : 'Here is where your projects stand.'}</p>
+        {p.needsName && <Link href="/settings" className="small" style={{ fontWeight: 700 }}>Add your name in Settings</Link>}
+      </div>
+
+      <div className="ptiles">
+        <Link className="ptile pri" href="/marketplace/new">
+          <span className="pti" aria-hidden="true">+</span>
+          <b>{first ? 'Post your first project' : 'Post a project'}</b>
+          <span>Get bids. About 3 minutes.</span>
+        </Link>
+        <Link className="ptile alt" href="/invites/new" title="Hired someone on your own? Add them to keep the agreement, photos, payments and messages in one place. They do not need a Jobfile account yet.">
+          <span className="pti" aria-hidden="true">&#9993;</span>
+          <b>I already have a contractor</b>
+          <span>Invite them, free.</span>
+        </Link>
+      </div>
+
+      {!first && <PushCard />}
+      {p.error ? <div className="box bad">{p.error}</div> : null}
+      {p.needsCard}
+      {p.zipCard}
+      {p.invites}
+
+      {first && (
+        <div className="card">
+          <h2>How it works</h2>
+          <p style={{ margin: 0 }}><b>1.</b> Tell us what you want done and add photos.</p>
+          <p style={{ margin: 0 }}><b>2.</b> Local contractors send bids.</p>
+          <p style={{ margin: 0 }}><b>3.</b> Pick one, sign the agreement, and track the work in one place.</p>
+        </div>
+      )}
+
+      {!first && (ongoing.length > 0 || waiting.length > 0 || p.drafts.length > 0 || done.length > 0) && (
+        <GroupTabs
+          initial={ongoing.length > 0 ? 'ongoing' : waiting.length + p.drafts.length > 0 ? 'bids' : 'completed'}
+          tabs={[
+            { key: 'ongoing', label: 'Ongoing', count: ongoing.length, panel: ongoingPanel, empty: 'No hired projects yet. When you hire a contractor, the project shows here.' },
+            { key: 'bids', label: 'Bids', count: waiting.length + p.drafts.length, badge: newBids, panel: bidsPanel, empty: 'Nothing waiting for bids. Post a project to get bids.' },
+            { key: 'completed', label: 'Completed', count: done.length, panel: donePanel, empty: 'Finished projects show here.' },
+          ]}
+        />
       )}
 
       {!first && (
