@@ -135,7 +135,7 @@ export default async function Overview({ params, searchParams }: { params: { id:
       )}
 
       <ProjectStepper
-        steps={[{ label: 'Agreement', href: `${base}/agreement` }, { label: 'Active', href: `${base}/schedule` }, { label: 'Closeout', href: base }, { label: 'Complete', href: `${base}/rating` }]}
+        steps={[{ label: 'Agreement', href: `${base}/agreement` }, { label: 'Active', href: `${base}/schedule` }, { label: 'Closeout', href: `${base}/overview#closeout` }, { label: 'Complete', href: `${base}/rating` }]}
         stage={stage}
         phase={curPhase?.title}
         days={curDays}
@@ -147,6 +147,7 @@ export default async function Overview({ params, searchParams }: { params: { id:
       />
 
       {executed && (
+        <div id="closeout" style={{ scrollMarginTop: 12 }}>
         <FinishCard
           role={role}
           projectId={project.id}
@@ -158,6 +159,7 @@ export default async function Overview({ params, searchParams }: { params: { id:
           setStage={setStage}
           requestFinish={requestFinish}
         />
+        </div>
       )}
 
       <NeedsYou items={todo} caughtUp compact />
