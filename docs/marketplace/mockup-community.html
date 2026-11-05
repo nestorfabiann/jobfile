@@ -1,0 +1,267 @@
+<title>Jobfile Community</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: one phone column with four switchable screens (feed, project page, share, ask for ideas), then the rules behind them.
+   Color: cream ground, forest green for trust, orange for action. Type: Bricolage Grotesque display, IBM Plex Sans body. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#c4813f;--orl:#f9efe4;--orb:#ecd4a8;--fg:#1f4d3a;--fgl:#e4f0e8;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--fgl:#173a2c;--fg:#8fd0ab;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--fgl:#173a2c;--fg:#8fd0ab;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:14px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px}
+h2{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;font-size:28px;line-height:1.05;text-wrap:balance}
+h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;font-size:18px}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
+.mut{color:var(--mut);font-size:14.5px;line-height:1.5;margin:0}
+.sw{display:grid;grid-template-columns:1fr 1fr;gap:6px}.sw button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:6px 4px;border-radius:99px;font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:44px}.sw button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.sec{display:flex;flex-direction:column;gap:14px}.sec[hidden]{display:none}
+.stage{display:flex;justify-content:center;padding:22px 0 8px;border-radius:30px;background:radial-gradient(120% 80% at 50% 0%,var(--orl),transparent 70%)}
+.ph{width:min(318px,92%);height:640px;background:#faf8f4;color:#1b1a18;border:7px solid #1b1a18;border-radius:36px;position:relative;overflow:hidden;box-shadow:0 22px 44px -18px rgba(27,26,24,.45);display:flex;flex-direction:column}
+.url{height:40px;background:#f3f1ec;display:flex;align-items:center;justify-content:center;font-size:11px;color:#6b655e;padding-top:8px;flex:none}
+.body{flex:1;overflow-y:auto;overflow-x:hidden;padding:12px;display:flex;flex-direction:column;gap:10px;font-size:12px;line-height:1.4;scrollbar-width:thin}
+.body h4{font:800 20px/1.05 'Bricolage Grotesque',sans-serif;letter-spacing:-.03em;margin:0}
+.body p{margin:0;color:#5c564f}
+.lab{font-size:10px;text-transform:uppercase;letter-spacing:.08em;font-weight:600;color:#6b655e}
+.r{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.pill{display:inline-block;border-radius:99px;padding:2px 8px;font-size:10px;font-weight:600;white-space:nowrap}
+.ok{background:#e4f0e8;color:#1f4d3a}.wt{background:#f9efe4;color:#8a5a1a}.gr{background:#eef0f4;color:#4a4f5c}
+.av{width:28px;height:28px;border-radius:9px;color:#fff;font:800 12px 'Bricolage Grotesque',sans-serif;display:grid;place-items:center;flex:none;background:#1f4d3a}.av.o{background:#c4813f}.av.k{background:#4a4f5c}
+.chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;flex:none;scrollbar-width:none}.chips::-webkit-scrollbar{display:none}
+.chip{border:1px solid #e4dfd6;background:#fff;color:#1b1a18;border-radius:99px;padding:0 12px;min-height:34px;font:500 11.5px 'IBM Plex Sans',sans-serif;white-space:nowrap;cursor:pointer}.chip[aria-pressed="true"]{background:#1f4d3a;color:#fff;border-color:#1f4d3a}
+.post{background:#fff;border:1px solid #e4dfd6;border-radius:16px;overflow:hidden;display:flex;flex-direction:column;flex:none}.post[hidden]{display:none}
+.pb{padding:10px 11px 11px;display:flex;flex-direction:column;gap:7px}
+.pb b.t{font:800 15px/1.1 'Bricolage Grotesque',sans-serif;letter-spacing:-.02em}
+.acts{display:flex;gap:6px;align-items:center}
+.ib{border:1px solid #e4dfd6;background:#fff;color:#1b1a18;border-radius:99px;min-height:36px;padding:0 11px;display:inline-flex;align-items:center;gap:6px;font:600 11.5px 'IBM Plex Sans',sans-serif;cursor:pointer}
+.ib svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.ib[aria-pressed="true"]{border-color:#c4813f;color:#a3621f;background:#f9efe4}.ib[aria-pressed="true"] svg{fill:currentColor}
+.ib.pop svg{animation:pop .35s}@keyframes pop{40%{transform:scale(1.35)}}
+.btn{border:0;border-radius:12px;padding:11px;min-height:44px;font:600 12.5px 'IBM Plex Sans',sans-serif;text-align:center;background:#1f4d3a;color:#fff;cursor:pointer;width:100%}.btn.gh{background:transparent;color:#1b1a18;border:1px solid #d6d0c6}.btn.or{background:#c4813f}
+/* before and after slider, drawn with CSS so the mockup needs no photos */
+.ba{position:relative;aspect-ratio:4/3;max-width:100%;overflow:hidden;background:#ccc;--p:50%;touch-action:pan-y}
+.ba .aft{position:absolute;inset:0;clip-path:inset(0 0 0 var(--p))}
+.ba .bar{position:absolute;top:0;bottom:0;left:var(--p);width:2px;background:#fff;box-shadow:0 0 0 1px rgba(0,0,0,.15);pointer-events:none}
+.ba .bar::after{content:"";position:absolute;top:50%;left:50%;width:30px;height:30px;margin:-15px;border-radius:50%;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.3);background-image:linear-gradient(90deg,transparent 7px,#1b1a18 7px 9px,transparent 9px 21px,#1b1a18 21px 23px,transparent 23px)}
+.ba input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:ew-resize;margin:0}
+.ba .tag{position:absolute;top:8px;font-size:9.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:rgba(27,26,24,.72);color:#fff;border-radius:99px;padding:3px 8px;pointer-events:none}.ba .tag.l{left:8px}.ba .tag.r{right:8px}
+.scene{position:absolute;inset:0;background:linear-gradient(var(--wall) 0 64%,var(--floor) 64% 100%)}
+.scene i{position:absolute;display:block}
+.k .up{left:5%;top:10%;width:46%;height:24%;background:var(--cab);border-radius:3px}
+.k .win{left:60%;top:10%;width:30%;height:26%;background:var(--glass);border:3px solid var(--trim);border-radius:4px}
+.k .counter{left:2%;top:39%;width:74%;height:4%;background:var(--ctr)}
+.k .base{left:4%;top:43%;width:70%;height:21%;background:var(--cab);border-radius:0 0 3px 3px;box-shadow:inset -1px 0 0 rgba(0,0,0,.18),inset -48px 0 0 -47px rgba(0,0,0,.18)}
+.h{background:linear-gradient(var(--sky) 0 66%,var(--grass) 66% 100%)}
+.h .roof{left:12%;top:14%;width:76%;height:26%;background:var(--roof);clip-path:polygon(50% 0,100% 100%,0 100%)}
+.h .bdy{left:18%;top:40%;width:64%;height:34%;background:var(--wall)}
+.h .door{left:44%;top:52%;width:12%;height:22%;background:var(--door)}
+.h .w1{left:24%;top:48%;width:14%;height:12%;background:var(--glass);border:2px solid var(--trim)}
+.h .w2{left:62%;top:48%;width:14%;height:12%;background:var(--glass);border:2px solid var(--trim)}
+.b{background:linear-gradient(var(--wall),var(--wall)),var(--wall)}
+.b::before{content:"";position:absolute;inset:0 0 36% 0;background:repeating-linear-gradient(90deg,transparent 0 26px,rgba(0,0,0,.09) 26px 27px),repeating-linear-gradient(0deg,transparent 0 26px,rgba(0,0,0,.09) 26px 27px)}
+.b .tub{left:8%;top:48%;width:60%;height:26%;background:var(--cab);border-radius:8px 8px 16px 16px}
+.b .mir{left:72%;top:14%;width:18%;height:34%;background:var(--glass);border:3px solid var(--trim);border-radius:40px}
+.b .fl{left:0;top:74%;width:100%;height:26%;background:var(--floor)}
+.tkb{--wall:#cfc7b8;--cab:#9b8f7a;--floor:#8a7f6c;--ctr:#b5ab99;--glass:#dfe6ea;--trim:#b8b0a0}
+.tka{--wall:#f1ebdf;--cab:#1f4d3a;--floor:#b98a5a;--ctr:#efe9df;--glass:#cfe6f2;--trim:#fff}
+.thb{--sky:#d9dde0;--grass:#8d9a7b;--wall:#b9ae9c;--roof:#6b645a;--door:#7a6f5f;--glass:#aeb7bb;--trim:#9c9488}
+.tha{--sky:#cfe6f2;--grass:#5f8d57;--wall:#e7d9bf;--roof:#3b3f46;--door:#a8432e;--glass:#f6fbff;--trim:#fff}
+.tbb{--wall:#d8d2c6;--cab:#bdb6a8;--floor:#9a9488;--glass:#c9d0d3;--trim:#aaa398}
+.tba{--wall:#e9efe9;--cab:#ffffff;--floor:#2f3a36;--glass:#dcecf3;--trim:#c4813f}
+.mini{position:relative;aspect-ratio:4/3;border-radius:8px;overflow:hidden;flex:1;min-width:0}
+.cm{display:flex;gap:8px;align-items:flex-start}.cm .bub{background:#f3f1ec;border-radius:12px;padding:7px 9px;flex:1;min-width:0}.cm b{font-size:11.5px}
+.inp{border:1px solid #d6d0c6;border-radius:12px;padding:9px 11px;font-size:11.5px;color:#8a8379;background:#fff}
+.facts{display:grid;grid-template-columns:1fr 1fr;gap:6px}.facts div{background:#fff;border:1px solid #e4dfd6;border-radius:10px;padding:7px 9px}.facts small{display:block;font-size:9.5px;color:#6b655e;text-transform:uppercase;letter-spacing:.06em}.facts b{font-size:12.5px}
+.pick{display:flex;gap:9px;align-items:center;background:#fff;border:1.5px solid #e4dfd6;border-radius:14px;padding:9px;cursor:pointer;text-align:left;font:inherit;color:inherit;width:100%;min-height:44px}.pick[aria-pressed="true"]{border-color:#1f4d3a;background:#e4f0e8}
+.pick .ck{width:20px;height:20px;border-radius:50%;border:2px solid #cfc8bc;flex:none;display:grid;place-items:center;font-size:11px;color:transparent}.pick[aria-pressed="true"] .ck{background:#1f4d3a;border-color:#1f4d3a;color:#fff}
+.tg{display:flex;justify-content:space-between;align-items:center;gap:10px;background:#fff;border:1px solid #e4dfd6;border-radius:12px;padding:8px 10px}
+.sx{width:40px;height:24px;border-radius:99px;border:0;background:#cfc8bc;position:relative;cursor:pointer;flex:none}.sx::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:transform .2s}.sx[aria-checked="true"]{background:#1f4d3a}.sx[aria-checked="true"]::after{transform:translateX(16px)}.sx[disabled]{opacity:.55;cursor:default}
+.opt{position:relative;overflow:hidden;border:1.5px solid #e4dfd6;background:#fff;border-radius:12px;min-height:46px;padding:8px 10px;display:flex;align-items:center;gap:9px;cursor:pointer;font:inherit;color:inherit;width:100%;text-align:left}
+.opt .fill{position:absolute;inset:0 auto 0 0;width:0;background:#e4f0e8;transition:width .5s;z-index:0}.opt>*{position:relative;z-index:1}
+.opt .sw2{width:22px;height:22px;border-radius:7px;flex:none;border:1px solid rgba(0,0,0,.15)}.opt .pc{margin-left:auto;font-weight:700;opacity:0}
+.voted .opt .pc{opacity:1}.opt[aria-pressed="true"]{border-color:#1f4d3a}
+.rules{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:9px}
+.rules ul{margin:0;padding-left:18px;color:var(--mut);font-size:14px;line-height:1.5;display:flex;flex-direction:column;gap:6px}.rules li b{color:var(--ink)}
+.toast{font-size:11px;background:#e4f0e8;color:#1f4d3a;border-radius:10px;padding:8px 10px;font-weight:600}
+:focus-visible{outline:2px solid #c4813f;outline-offset:2px}
+@media (prefers-reduced-motion:reduce){.ib.pop svg{animation:none}.opt .fill,.sx::after{transition:none}}
+</style>
+<div class="wrap">
+  <div class="note"><b>Mockup.</b> A place for people to share finished projects and ask for ideas. Tap, drag the slider, vote and toggle things. Names, places and prices are examples.</div>
+  <h2>Community</h2>
+  <p class="mut">Real projects from real Texas homes, shared by the people who did them. Every showcase comes from a project finished on Jobfile.</p>
+  <div class="sw" role="group" aria-label="Screen">
+    <button type="button" data-s="a" aria-pressed="true">1 · Feed</button>
+    <button type="button" data-s="b" aria-pressed="false">2 · A project</button>
+    <button type="button" data-s="c" aria-pressed="false">3 · Share yours</button>
+    <button type="button" data-s="d" aria-pressed="false">4 · Ask for ideas</button>
+  </div>
+
+  <div class="sec" id="a"><div class="stage"><div class="ph"><div class="url">Community</div>
+    <div class="body">
+      <h4>Community</h4>
+      <div class="chips" role="group" aria-label="Filter">
+        <button class="chip" type="button" data-f="all" aria-pressed="true">All</button>
+        <button class="chip" type="button" data-f="kit" aria-pressed="false">Kitchens</button>
+        <button class="chip" type="button" data-f="paint" aria-pressed="false">Painting</button>
+        <button class="chip" type="button" data-f="bath" aria-pressed="false">Bathrooms</button>
+        <button class="chip" type="button" data-f="ext" aria-pressed="false">Exterior</button>
+      </div>
+      <article class="post" data-tag="kit paint">
+        <div class="ba" data-kind="k" data-b="tkb" data-a="tka"></div>
+        <div class="pb">
+          <b class="t">Dated oak to deep green</b>
+          <div class="r"><span class="r" style="gap:7px;justify-content:flex-start"><span class="av">N</span><span><b>Nesty's Painting</b><br><span style="color:#6b655e">Plano, TX · 4 days</span></span></span><span class="pill ok">✓ Finished on Jobfile</span></div>
+          <div class="acts">
+            <button class="ib like" type="button" aria-pressed="false" data-n="128"><svg viewBox="0 0 24 24"><path d="M12 20s-7-4.4-9-9a5 5 0 019-3 5 5 0 019 3c-2 4.6-9 9-9 9z"/></svg><span>128</span></button>
+            <button class="ib save" type="button" aria-pressed="false"><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></svg><span>Save</span></button>
+            <button class="ib" type="button"><svg viewBox="0 0 24 24"><path d="M4 12v7h16v-7M12 4v11M8 8l4-4 4 4"/></svg><span>Share</span></button>
+          </div>
+          <button class="btn or" type="button">Start a project like this</button>
+        </div>
+      </article>
+      <article class="post" data-tag="ext paint">
+        <div class="ba" data-kind="h" data-b="thb" data-a="tha"></div>
+        <div class="pb">
+          <b class="t">Faded beige to fresh curb appeal</b>
+          <div class="r"><span class="r" style="gap:7px;justify-content:flex-start"><span class="av o">L</span><span><b>Lone Star Painting</b><br><span style="color:#6b655e">Frisco, TX · 6 days</span></span></span><span class="pill ok">✓ Finished on Jobfile</span></div>
+          <div class="acts">
+            <button class="ib like" type="button" aria-pressed="false" data-n="94"><svg viewBox="0 0 24 24"><path d="M12 20s-7-4.4-9-9a5 5 0 019-3 5 5 0 019 3c-2 4.6-9 9-9 9z"/></svg><span>94</span></button>
+            <button class="ib save" type="button" aria-pressed="false"><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></svg><span>Save</span></button>
+            <button class="ib" type="button"><svg viewBox="0 0 24 24"><path d="M4 12v7h16v-7M12 4v11M8 8l4-4 4 4"/></svg><span>Share</span></button>
+          </div>
+          <button class="btn or" type="button">Start a project like this</button>
+        </div>
+      </article>
+      <article class="post" data-tag="bath">
+        <div class="ba" data-kind="b" data-b="tbb" data-a="tba"></div>
+        <div class="pb">
+          <b class="t">Tired tub surround, now a bright spa corner</b>
+          <div class="r"><span class="r" style="gap:7px;justify-content:flex-start"><span class="av k">G</span><span><b>Garcia Home Pros</b><br><span style="color:#6b655e">Garland, TX · 9 days</span></span></span><span class="pill ok">✓ Finished on Jobfile</span></div>
+          <div class="acts">
+            <button class="ib like" type="button" aria-pressed="false" data-n="61"><svg viewBox="0 0 24 24"><path d="M12 20s-7-4.4-9-9a5 5 0 019-3 5 5 0 019 3c-2 4.6-9 9-9 9z"/></svg><span>61</span></button>
+            <button class="ib save" type="button" aria-pressed="false"><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></svg><span>Save</span></button>
+            <button class="ib" type="button"><svg viewBox="0 0 24 24"><path d="M4 12v7h16v-7M12 4v11M8 8l4-4 4 4"/></svg><span>Share</span></button>
+          </div>
+          <button class="btn or" type="button">Start a project like this</button>
+        </div>
+      </article>
+    </div></div></div>
+    <p class="mut">The feed is built around the before and after. Drag the slider on any photo. Filter by the kind of work. Like and save with one tap, and "Start a project like this" opens a marketplace post with the scope filled in.</p></div>
+
+  <div class="sec" id="b" hidden><div class="stage"><div class="ph"><div class="url">Dated oak to deep green</div>
+    <div class="body">
+      <div class="ba" data-kind="k" data-b="tkb" data-a="tka" style="border-radius:14px"></div>
+      <h4>Dated oak to deep green</h4>
+      <div class="r"><span class="r" style="gap:7px;justify-content:flex-start"><span class="av">N</span><span><b>Nesty's Painting</b><br><span style="color:#6b655e">★ 4.9 Jobfile · ★ 4.8 Google</span></span></span><span class="pill ok">✓ Verified</span></div>
+      <div class="facts"><div><small>Where</small><b>Plano, TX</b></div><div><small>Time</small><b>4 days</b></div><div><small>Size</small><b>220 sq ft</b></div><div><small>Cost range</small><b>$2.8k – $3.4k</b></div></div>
+      <p>We kept the layout and refinished the cabinets in a deep green, with new hardware and a warm wall color. The homeowner picked the color from a sample board in the first visit.</p>
+      <div class="toast">Finished on Jobfile. The homeowner confirmed the project and agreed to share it.</div>
+      <div class="acts">
+        <button class="ib like" type="button" aria-pressed="false" data-n="128"><svg viewBox="0 0 24 24"><path d="M12 20s-7-4.4-9-9a5 5 0 019-3 5 5 0 019 3c-2 4.6-9 9-9 9z"/></svg><span>128</span></button>
+        <button class="ib save" type="button" aria-pressed="false"><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></svg><span>Save</span></button>
+      </div>
+      <button class="btn or" type="button">Start a project like this</button>
+      <button class="btn gh" type="button">Ask Nesty's Painting for a bid</button>
+      <span class="lab">Comments (2)</span>
+      <div class="cm"><span class="av k">M</span><div class="bub"><b>Maria</b><br>That green is gorgeous. Did you keep the original hardware?</div></div>
+      <div class="cm"><span class="av">N</span><div class="bub"><b>Nesty's Painting</b> <span class="pill ok">Pro</span><br>We swapped it for brushed brass. It made the biggest difference.</div></div>
+      <div class="inp">Add a comment. No phone numbers or links.</div>
+    </div></div></div>
+    <p class="mut">The project page tells the story: the work, the time, the size and a cost range both sides agreed to share. The trust line shows that it came from a finished Jobfile project. Comments are for questions, and contact details are blocked.</p></div>
+
+  <div class="sec" id="c" hidden><div class="stage"><div class="ph"><div class="url">Share a project</div>
+    <div class="body">
+      <h4>Share a finished project</h4>
+      <p>Pick one of your finished projects. We fill in the photos and details for you.</p>
+      <button class="pick" type="button" aria-pressed="true"><span class="ck">✓</span><span><b>Dated oak to deep green</b><br><span style="color:#6b655e">Finished Oct 28 · Plano</span></span></button>
+      <button class="pick" type="button" aria-pressed="false"><span class="ck">✓</span><span><b>Fence stain and repair</b><br><span style="color:#6b655e">Finished Oct 12 · Plano</span></span></button>
+      <span class="lab">Photos we picked</span>
+      <div class="r" style="gap:6px;align-items:stretch"><div class="mini k tkb"><div class="scene"><i class="up"></i><i class="counter"></i><i class="base"></i><i class="win"></i></div></div><div class="mini k tka"><div class="scene"><i class="up"></i><i class="counter"></i><i class="base"></i><i class="win"></i></div></div></div>
+      <div class="inp">Say a little about it (optional)</div>
+      <div class="tg"><span><b>Address and names</b><br><span style="color:#6b655e">Never shown. City only.</span></span><button class="sx" role="switch" aria-checked="true" aria-label="Address and names stay private" disabled></button></div>
+      <div class="tg"><span><b>Show the cost range</b><br><span style="color:#6b655e">Helps people plan. Optional.</span></span><button class="sx" role="switch" aria-checked="true" aria-label="Show the cost range"></button></div>
+      <div class="tg"><span><b>The homeowner approves it</b><br><span style="color:#6b655e">They get a request before it goes live.</span></span><button class="sx" role="switch" aria-checked="true" aria-label="Homeowner approves" disabled></button></div>
+      <button class="btn" type="button" id="submit">Send for review</button>
+      <div class="toast" id="sent" hidden>Sent. The homeowner is asked first, then Jobfile checks it. You will get an alert when it is live.</div>
+    </div></div></div>
+    <p class="mut">Sharing takes a few taps because the photos and facts come from the finished project. Address and names are never shown. The homeowner must approve, then Jobfile reviews it before it appears.</p></div>
+
+  <div class="sec" id="d" hidden><div class="stage"><div class="ph"><div class="url">Ideas</div>
+    <div class="body">
+      <h4>Ask for ideas</h4>
+      <div class="r" style="gap:8px;justify-content:flex-start;align-items:flex-start"><span class="av k">J</span><div><b>Jerry · Plano, TX</b><br><b style="font-size:13.5px;font-family:'Bricolage Grotesque',sans-serif">Which color for my 1990s oak kitchen cabinets?</b></div></div>
+      <div class="ba" data-kind="k" data-b="tkb" data-a="tkb" style="border-radius:12px"></div>
+      <div id="poll" class="sec" style="gap:6px">
+        <button class="opt" type="button" aria-pressed="false" data-v="0"><span class="fill"></span><span class="sw2" style="background:#1f4d3a"></span><b>Deep green</b><span class="pc">46%</span></button>
+        <button class="opt" type="button" aria-pressed="false" data-v="1"><span class="fill"></span><span class="sw2" style="background:#e9e3d6"></span><b>Warm white</b><span class="pc">31%</span></button>
+        <button class="opt" type="button" aria-pressed="false" data-v="2"><span class="fill"></span><span class="sw2" style="background:#2c3a4d"></span><b>Navy</b><span class="pc">23%</span></button>
+      </div>
+      <span class="lab" id="votes">Tap to vote · 87 votes</span>
+      <span class="lab">Replies from pros (2)</span>
+      <div class="cm"><span class="av">N</span><div class="bub"><b>Nesty's Painting</b> <span class="pill ok">Pro</span><br>Green hides wear best on oak. Go satin, not matte.</div></div>
+      <div class="cm"><span class="av o">L</span><div class="bub"><b>Lone Star Painting</b> <span class="pill ok">Pro</span><br>Warm white brightens a small kitchen. Happy to bid it.</div></div>
+      <button class="btn or" type="button">Get bids for this kitchen</button>
+    </div></div></div>
+    <p class="mut">Homeowners ask for ideas and the community votes. Pros reply with a Pro badge, which is a natural way to meet customers. "Get bids" turns the question into a marketplace post in one tap.</p></div>
+
+  <div class="rules"><h3>How it stays safe</h3><ul>
+    <li><b>Showcase posts come only from finished Jobfile projects.</b> That is the trust badge, and no one can fake it.</li>
+    <li><b>The homeowner approves every post</b> about their home, then Jobfile reviews it before it appears.</li>
+    <li><b>No addresses, last names, phone numbers, emails or links.</b> The same filter we use on bids, applied to captions and comments.</li>
+    <li><b>Report and hide:</b> any post or comment can be reported. Admin can remove it and suspend repeat offenders.</li>
+  </ul></div>
+  <div class="rules"><h3>Why it helps</h3><ul>
+    <li><b>Homeowners get ideas and confidence</b> before they post a project.</li>
+    <li><b>Contractors get free, credible marketing</b> from work they already did, with the badge to prove it.</li>
+    <li><b>It feeds the marketplace.</b> "Start a project like this" and "Get bids" bring new posts.</li>
+  </ul></div>
+  <div class="rules"><h3>Suggested order</h3><ul>
+    <li><b>First:</b> the feed, project pages, likes, saves, and "Start a project like this".</li>
+    <li><b>Then:</b> share from a finished project, with homeowner approval and admin review.</li>
+    <li><b>Later:</b> comments and "Ask for ideas" polls, since these need the most moderation.</li>
+  </ul></div>
+</div>
+<script>
+(function(){
+  var K='<i class="up"></i><i class="counter"></i><i class="base"></i><i class="win"></i>',
+      H='<i class="roof"></i><i class="bdy"></i><i class="door"></i><i class="w1"></i><i class="w2"></i>',
+      B='<i class="fl"></i><i class="tub"></i><i class="mir"></i>';
+  function parts(k){return k==='k'?K:k==='h'?H:B}
+  document.querySelectorAll('.ba').forEach(function(el){
+    var k=el.dataset.kind,pic=parts(k);
+    el.innerHTML='<div class="scene '+k+' '+el.dataset.b+'">'+pic+'</div><div class="aft"><div class="scene '+k+' '+el.dataset.a+'">'+pic+'</div></div><span class="tag l">Before</span><span class="tag r">After</span><span class="bar"></span><input type="range" min="0" max="100" value="50" aria-label="Drag to compare before and after">';
+    el.querySelector('input').addEventListener('input',function(e){el.style.setProperty('--p',e.target.value+'%')});
+  });
+  document.querySelectorAll('.sw button').forEach(function(b){b.addEventListener('click',function(){
+    document.querySelectorAll('.sw button').forEach(function(x){x.setAttribute('aria-pressed',x===b)});
+    ['a','b','c','d'].forEach(function(id){document.getElementById(id).hidden=id!==b.dataset.s});
+  })});
+  document.querySelectorAll('.like').forEach(function(b){b.addEventListener('click',function(){
+    var on=b.getAttribute('aria-pressed')!=='true',n=+b.dataset.n+(on?1:0);
+    b.setAttribute('aria-pressed',on);b.querySelector('span').textContent=n;b.classList.remove('pop');void b.offsetWidth;if(on)b.classList.add('pop');
+  })});
+  document.querySelectorAll('.save').forEach(function(b){b.addEventListener('click',function(){
+    var on=b.getAttribute('aria-pressed')!=='true';b.setAttribute('aria-pressed',on);b.querySelector('span').textContent=on?'Saved':'Save';
+  })});
+  document.querySelectorAll('.chip').forEach(function(c){c.addEventListener('click',function(){
+    document.querySelectorAll('.chip').forEach(function(x){x.setAttribute('aria-pressed',x===c)});
+    document.querySelectorAll('#a .post').forEach(function(p){p.hidden=!(c.dataset.f==='all'||p.dataset.tag.split(' ').indexOf(c.dataset.f)>-1)});
+  })});
+  document.querySelectorAll('.pick').forEach(function(p){p.addEventListener('click',function(){
+    document.querySelectorAll('.pick').forEach(function(x){x.setAttribute('aria-pressed',x===p)});
+  })});
+  document.querySelectorAll('.sx:not([disabled])').forEach(function(s){s.addEventListener('click',function(){s.setAttribute('aria-checked',s.getAttribute('aria-checked')!=='true')})});
+  document.getElementById('submit').addEventListener('click',function(){document.getElementById('sent').hidden=false;this.textContent='Sent for review';this.disabled=true});
+  var base=[40,27,20],total=87,done=false,opts=document.querySelectorAll('#poll .opt');
+  function paint(vote){
+    var counts=base.slice();counts[vote]+=1;var t=total+1;
+    opts.forEach(function(o,i){var pc=Math.round(counts[i]/t*100);o.querySelector('.pc').textContent=pc+'%';o.querySelector('.fill').style.width=pc+'%'});
+    document.getElementById('poll').classList.add('voted');document.getElementById('votes').textContent='Thanks for voting · '+t+' votes';
+  }
+  opts.forEach(function(o,i){o.addEventListener('click',function(){
+    if(done)return;done=true;o.setAttribute('aria-pressed','true');paint(i);
+  })});
+  opts.forEach(function(o,i){o.querySelector('.fill').style.width=[46,31,23][i]+'%'});
+})();
+</script>
