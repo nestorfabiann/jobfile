@@ -1,0 +1,75 @@
+<title>Team Tab</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: one phone column. Three screens: the empty Team tab, the Team tab with partners, and today for comparison. Names, prices and trades are examples. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#c4813f;--orl:#f9efe4;--orb:#ecd4a8;--fg:#1f4d3a;--fgl:#e4f0e8;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--fgl:#173a2c;--fg:#8fd0ab;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--fgl:#173a2c;--fg:#8fd0ab;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:14px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px}
+h2{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;font-size:28px;line-height:1.05;text-wrap:balance}
+h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;font-size:18px}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
+.mut{color:var(--mut);font-size:14.5px;line-height:1.5;margin:0}
+.sw{display:grid;grid-template-columns:1fr 1fr;gap:6px}.sw button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:6px 4px;border-radius:99px;font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:44px}.sw button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.sec{display:flex;flex-direction:column;gap:14px}.sec[hidden]{display:none}
+.stage{display:flex;justify-content:center;padding:22px 0 8px;border-radius:30px;background:radial-gradient(120% 80% at 50% 0%,var(--orl),transparent 70%)}
+.ph{width:min(300px,84%);height:620px;background:#faf8f4;color:#1b1a18;border:7px solid #1b1a18;border-radius:36px;position:relative;overflow:hidden;box-shadow:0 22px 44px -18px rgba(27,26,24,.45);display:flex;flex-direction:column}
+.url{height:44px;background:#f3f1ec;display:flex;align-items:center;justify-content:center;font-size:11px;color:#6b655e;padding-top:10px;flex:none}
+.body{flex:1;padding:13px;display:flex;flex-direction:column;gap:8px;font-size:12px;line-height:1.4;overflow:hidden}
+.body h4{font:800 18px/1.05 'Bricolage Grotesque',sans-serif;letter-spacing:-.03em;margin:0}
+.body p{margin:0;color:#5c564f}
+.lab{font-size:10px;text-transform:uppercase;letter-spacing:.08em;font-weight:600;color:#6b655e;margin-top:2px}
+.cd{background:#fff;border:1px solid #e4dfd6;border-radius:12px;padding:9px 10px;display:flex;flex-direction:column;gap:5px}
+.r{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.r b{font-size:12.5px}.av{width:30px;height:30px;border-radius:9px;color:#fff;font:800 13px 'Bricolage Grotesque',sans-serif;display:grid;place-items:center;flex:none}
+.a1{background:#1f4d3a}.a2{background:#c4813f}
+.pill{display:inline-block;border-radius:99px;padding:2px 8px;font-size:10px;font-weight:600;white-space:nowrap}
+.ok{background:#e4f0e8;color:#1f4d3a}.wt{background:#f9efe4;color:#8a5a1a}.gr{background:#eef0f4;color:#4a4f5c}
+.amt{font:800 15px 'Bricolage Grotesque',sans-serif;font-variant-numeric:tabular-nums}
+.tot{background:#1f4d3a;color:#fff;border-radius:13px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center}.tot b{font:800 21px 'Bricolage Grotesque',sans-serif}.tot small{opacity:.85;font-size:10.5px}
+.inp{border:1px solid #d6d0c6;border-radius:9px;padding:7px 9px;font-size:11px;color:#8a8379;background:#faf8f4}
+.btn{border:0;border-radius:12px;padding:10px;font:600 12.5px 'IBM Plex Sans',sans-serif;text-align:center;background:#1f4d3a;color:#fff}.btn.gh{background:transparent;color:#6b655e;border:1px solid #e4dfd6}
+.tabs{height:48px;background:#fff;border-top:1px solid #e4dfd6;display:flex;justify-content:space-around;align-items:center;font-size:9.5px;color:#6b655e;flex:none}
+.rules{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:9px}
+.rules ul{margin:0;padding-left:18px;color:var(--mut);font-size:14px;line-height:1.5;display:flex;flex-direction:column;gap:6px}.rules li b{color:var(--ink)}
+</style>
+<div class="wrap"><style>
+.tm{background:#fff;border:1px solid #e4dfd6;border-radius:15px;padding:12px;display:flex;flex-direction:column;gap:10px}
+.pair{display:flex;align-items:center;gap:10px;justify-content:center;padding:4px 0}
+.circ{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;font:800 18px 'Bricolage Grotesque',sans-serif;color:#fff;position:relative}
+.circ.dash{background:#faf8f4;border:2px dashed #c4813f;color:#c4813f;font-size:22px}
+.link{width:22px;height:2px;background:repeating-linear-gradient(90deg,#c4813f 0 4px,transparent 4px 7px)}
+.big{border-radius:12px;padding:11px;text-align:center;font:600 13px 'IBM Plex Sans',sans-serif;color:#fff;background:#c4813f;box-shadow:0 6px 14px -6px rgba(196,129,63,.7)}
+.fact{display:flex;gap:8px;align-items:flex-start;font-size:11px;line-height:1.35}
+.fact i{flex:none;width:20px;height:20px;border-radius:7px;display:grid;place-items:center;font-style:normal;font-size:11px}
+.y{background:#e4f0e8;color:#1f4d3a}.n{background:#f9efe4;color:#8a5a1a}
+.dot{position:absolute;right:-1px;bottom:-1px;width:13px;height:13px;border-radius:50%;border:2px solid #fff}
+.pr{display:flex;gap:9px;align-items:center;padding:6px 0;border-top:1px solid #eee9df}
+</style>
+<div class="note"><b>Mockup.</b> A livelier Team tab. Names are examples.</div>
+<h2>Team tab, with some life</h2>
+<p class="mut">A picture of you plus a partner, what they can and cannot see, and a solid button. Once partners are added they show as colored initials with a status dot.</p>
+<div class="sw" role="group" aria-label="Screen" style="grid-template-columns:1fr 1fr 1fr"><button type="button" data-s="a" aria-pressed="true">No partners</button><button type="button" data-s="b" aria-pressed="false">With partners</button><button type="button" data-s="c" aria-pressed="false">Today</button></div>
+<div class="sec" id="a"><div class="stage"><div class="ph"><div class="url">Team</div><div class="body">
+<div class="tm"><div class="pair"><span class="circ" style="background:#1f4d3a">N</span><span class="link"></span><span class="circ dash">+</span></div>
+<h4 style="font-size:16px;text-align:center">Bring in a partner</h4>
+<p style="text-align:center;font-size:11.5px">Add a contractor you work with. They only see their part.</p>
+<div class="fact"><i class="y">✓</i><span>They see their scope, price and dates</span></div><div class="fact"><i class="n">✕</i><span>They do not see the homeowner's phone or email</span></div><div class="fact"><i class="y">✓</i><span>You stay the contact and record payouts</span></div>
+<div class="big">Add a partner</div></div></div></div></div><p class="mut">The three rows answer the first question a contractor has, what the partner can see. The orange button matches the app's main actions.</p></div>
+<div class="sec" id="b" hidden><div class="stage"><div class="ph"><div class="url">Team</div><div class="body">
+<div class="tm"><div style="display:flex;justify-content:space-between;align-items:center"><h4 style="font-size:15px">Team · 2 partners</h4><span class="pill ok">+ Add</span></div>
+<div class="pair" style="justify-content:flex-start"><span class="circ" style="background:#1f4d3a">N</span><span class="circ" style="background:#c4813f">B<i class="dot" style="background:#2f9e60"></i></span><span class="circ" style="background:#2f5f8a">L<i class="dot" style="background:#e0a030"></i></span><span class="circ dash" style="width:40px;height:40px">+</span></div>
+<div class="pr"><span class="av a2">B</span><div style="flex:1;min-width:0"><b style="font-size:12px">Bright Electric</b><div style="font-size:10.5px;color:#6b655e">Deck lighting · Thu–Fri</div></div><span class="pill ok">On the job</span></div>
+<div class="pr"><span class="av" style="background:#2f5f8a">L</span><div style="flex:1;min-width:0"><b style="font-size:12px">Lone Star Concrete</b><div style="font-size:10.5px;color:#6b655e">Footings · Mon</div></div><span class="pill wt">Invited</span></div>
+<div style="display:flex;gap:4px;flex-wrap:wrap"><span class="pill gr">Not verified yet</span><span class="pill ok">Insured</span></div></div></div></div></div><p class="mut">Each partner is a colored circle. The dot shows status: green on the job, amber waiting. The list below names each part and keeps the Verified and Insured tags. Tapping a partner opens their page.</p></div>
+<div class="sec" id="c" hidden><div class="stage"><div class="ph"><div class="url">Team</div><div class="body"><div class="cd"><h4 style="font-size:16px">Team</h4><span style="font-size:11.5px;color:#6b655e">Just your company so far. Bring in a contractor you work with. They only see their part.</span><div class="btn gh" style="color:#1b1a18">+ Add a partner</div></div></div></div></div><p class="mut">Today: plain text and an outlined button.</p></div>
+</div>
+<script>
+document.querySelectorAll('.sw button').forEach(function(b){b.addEventListener('click',function(){
+  document.querySelectorAll('.sw button').forEach(function(x){x.setAttribute('aria-pressed',x===b)});
+  ['a','b','c'].forEach(function(id){document.getElementById(id).hidden=id!==b.dataset.s});
+})});
+</script>
