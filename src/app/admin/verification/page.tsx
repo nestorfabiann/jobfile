@@ -30,6 +30,14 @@ export default async function Verification({ searchParams }: { searchParams: { a
             <span className={`pill ${i.status === 'approved' ? (isCurrent(i) ? 'ok' : 'bad') : i.status === 'rejected' ? 'bad' : 'warn'}`}>{i.status === 'approved' && !isCurrent(i) ? 'expired' : i.status}</span>
           </div>
           <p className="muted small">{[i.carrier, i.coverage && `Coverage ${i.coverage}`, `Expires ${fmtDate(i.expires_on)}`].filter(Boolean).join(' · ')}</p>
+          {i.auto_approved ? <p className="small" style={{ margin: 0 }}><span className="pill ok">auto-approved</span> Read: {i.read_detail?.insured || 'name not read'} · expires {i.read_detail?.expires || 'n/a'}</p> : null}
+          {i.status === 'pending' && i.read_detail ? (
+            <div className="box" style={{ background: 'var(--warn-bg)' }}>
+              <b className="small">{i.read_detail.routine === 'first' ? 'Routine check: first certificate from this company' : i.read_detail.routine === 'spot' ? 'Routine spot check' : 'Why it needs you'}</b>
+              {(i.read_detail.reasons ?? []).map((x: string) => <div className="small" key={x}>• {x}</div>)}
+              {i.read_detail.insured ? <div className="small">Read: {i.read_detail.insured} · {i.read_detail.kind} · expires {i.read_detail.expires || 'not found'}</div> : null}
+            </div>
+          ) : null}
           <div className="row"><a className="btn ghost" href={`/admin/verification/file/${i.id}`} target="_blank" rel="noopener noreferrer">Open certificate</a></div>
           {i.review_note ? <p className="small">Note: {i.review_note}</p> : null}
           <AdminInsuranceActions id={i.id} review={reviewInsurance} />

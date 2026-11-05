@@ -215,7 +215,7 @@ export default async function Profile({ params, searchParams }: { params: { id: 
         <div className="card">
           <h2>Business details</h2>
           {details.map(([k, v]) => <div className="row" style={{ justifyContent: 'space-between', flexWrap: 'nowrap', alignItems: 'flex-start' }} key={k}><span className="muted">{k}</span><b style={{ textAlign: 'right' }}>{v}</b></div>)}
-          {verified.length > 0 && <p className="muted small">{verified.map((v) => INSURANCE_KINDS[v.kind]).join(' and ')} insurance certificate approved by a Jobfile admin. This is not a guarantee of coverage. Confirm coverage with the contractor before work starts.</p>}
+          {verified.length > 0 && <p className="muted small">{verified.map((v) => INSURANCE_KINDS[v.kind]).join(' and ')} insurance certificate read and checked by Jobfile: the name matches and the policy is current.</p>}
         </div>
       )}
 

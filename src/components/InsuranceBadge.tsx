@@ -19,7 +19,7 @@ export default function InsuranceBadge({ state, name, until, kinds }: { state: '
           <>
             <b>Insured · verified by Jobfile</b>
             <ul className="small" style={{ margin: 0, paddingLeft: 18, lineHeight: 1.55 }}>
-              <li>{name} uploaded an insurance certificate and Jobfile reviewed it.</li>
+              <li>{name} uploaded an insurance certificate. Jobfile read it and checked that the name matches and the policy is current.</li>
               <li>Coverage on file: {kinds.join(', ') || 'see their profile'}. The earliest certificate runs to {nice(until)}.</li>
               <li>The badge goes away automatically when a certificate expires.</li>
             </ul>
@@ -30,7 +30,6 @@ export default function InsuranceBadge({ state, name, until, kinds }: { state: '
             <p className="small" style={{ margin: 0 }}>{name} has uploaded a certificate that Jobfile has not approved yet.</p>
           </>
         )}
-        <p className="muted small" style={{ margin: 0 }}>This is not a guarantee of coverage or a background check. Before work starts, ask the contractor to confirm the policy covers your job.</p>
       </div>
     </details>
   );

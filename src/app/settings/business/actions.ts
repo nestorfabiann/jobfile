@@ -5,13 +5,14 @@ import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 import { supabaseAdmin } from '@/lib/supabase/server';
 import { JOB_TYPES, marketplaceEnabled } from '@/lib/marketplace';
+import { judgeInsurance, readInsurance } from '@/lib/insuranceRead';
 import { findPlace, googleConfigured, sameBusiness, searchPhrase } from '@/lib/googleRatings';
 import { cleanUrl, instagramUrl, intOrNull, INSURANCE_KINDS, LANGUAGES, myOwnedCompany, PAYMENTS, pickFrom, SERVICES, type InsuranceKind } from '@/lib/companyProfile';
 
 const IMG: Record<string, string> = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' };
 const MAX_PHOTOS = 24;
 const MAX_BYTES = 3_800_000;
-export type UploadResult = { ok: true } | { ok: false; error: string };
+export type UploadResult = { ok: true; message?: string; approved?: boolean } | { ok: false; error: string };
 
 async function owner() {
   const c = await myOwnedCompany();
@@ -109,7 +110,8 @@ export async function deleteBusinessPhoto(formData: FormData) {
 /** Upload or replace an insurance certificate. It goes back to "pending" for admin review. */
 export async function uploadInsurance(formData: FormData): Promise<UploadResult> {
   try {
-    const { companyId } = await owner();
+    const ownerCo = await owner();
+    const { companyId } = ownerCo;
     const kind = String(formData.get('kind') ?? '') as InsuranceKind;
     if (!(kind in INSURANCE_KINDS)) return { ok: false, error: 'Unknown insurance type.' };
     const file = formData.get('file');
@@ -117,30 +119,53 @@ export async function uploadInsurance(formData: FormData): Promise<UploadResult>
     const ext = file.type === 'application/pdf' ? 'pdf' : IMG[file.type];
     if (!ext) return { ok: false, error: 'The certificate must be a PDF or a photo (JPEG, PNG, WebP).' };
     if (file.size > MAX_BYTES) return { ok: false, error: 'That file is over 3.8 MB. Take a photo of the page instead, or save a smaller PDF.' };
-    const expires = String(formData.get('expires_on') ?? '');
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(expires) || Number.isNaN(Date.parse(expires))) return { ok: false, error: 'Enter the date the policy expires.' };
-    if (expires < new Date().toISOString().slice(0, 10)) return { ok: false, error: 'That policy has already expired.' };
+    const typed = String(formData.get('expires_on') ?? '');
+    const today = new Date().toISOString().slice(0, 10);
+    if (typed && (!/^\d{4}-\d{2}-\d{2}$/.test(typed) || Number.isNaN(Date.parse(typed)))) return { ok: false, error: 'Check the expiry date.' };
 
     const db = supabaseAdmin();
+    const buf = Buffer.from(await file.arrayBuffer());
+    const read = await readInsurance(buf, file.type);
+    const { data: prof } = await db.from('profiles').select('full_name').eq('id', ownerCo.user.id).maybeSingle<any>();
+    const verdict = judgeInsurance(read, { kind: kind as 'liability' | 'workers_comp', businessName: ownerCo.name, ownerName: String(prof?.full_name ?? '') });
+    const expires = read.ok && read.expires ? read.expires : typed;
+    if (!expires) return { ok: false, error: 'We could not find the expiration date on this certificate. Enter it below and send it again.' };
+    if (expires < today && !verdict.auto && !typed) return { ok: false, error: 'That policy looks expired. Upload the current certificate.' };
+    if (typed && typed < today && !read.expires) return { ok: false, error: 'That policy has already expired.' };
+
+    // Auto-approve only when everything checks out. A company's first certificate and a random 1 in 10 still go to an admin.
+    let auto = verdict.auto;
+    const reasons = [...verdict.reasons];
+    let routine = '';
+    if (auto) {
+      const { count: approvedBefore } = await db.from('company_insurance').select('id', { count: 'exact', head: true }).eq('company_id', companyId).eq('status', 'approved');
+      if ((approvedBefore ?? 0) === 0) { auto = false; routine = 'first'; }
+      else if (Math.random() < 0.1) { auto = false; routine = 'spot'; }
+    }
+
     const path = `${companyId}/${randomUUID()}.${ext}`;
-    const up = await db.storage.from('company-docs').upload(path, Buffer.from(await file.arrayBuffer()), { contentType: file.type, upsert: false });
+    const up = await db.storage.from('company-docs').upload(path, buf, { contentType: file.type, upsert: false });
     if (up.error) return { ok: false, error: 'Could not store the file. Check that the database step was run.' };
     const { data: old } = await db.from('company_insurance').select('path').eq('company_id', companyId).eq('kind', kind).maybeSingle();
-    const { error } = await db.from('company_insurance').upsert(
-      {
-        company_id: companyId, kind, path,
-        carrier: txt(formData, 'carrier', 120), coverage: txt(formData, 'coverage', 60), expires_on: expires,
-        status: 'pending', review_note: '', reviewed_by: null, reviewed_at: null, uploaded_at: new Date().toISOString(),
-      },
-      { onConflict: 'company_id,kind' },
-    );
+    const now = new Date().toISOString();
+    const base = {
+      company_id: companyId, kind, path,
+      carrier: txt(formData, 'carrier', 120), coverage: txt(formData, 'coverage', 60), expires_on: expires,
+      status: auto ? 'approved' : 'pending', review_note: '', reviewed_by: null, reviewed_at: auto ? now : null, uploaded_at: now,
+    };
+    const detail = { insured: read.insured, kind: read.kind, expires: read.expires, read_ok: read.ok, reasons, routine };
+    let { error } = await db.from('company_insurance').upsert({ ...base, auto_approved: auto, read_detail: detail }, { onConflict: 'company_id,kind' });
+    if (error) ({ error } = await db.from('company_insurance').upsert(base, { onConflict: 'company_id,kind' })); // the 046 columns are not there yet
     if (error) {
       await db.storage.from('company-docs').remove([path]);
       return { ok: false, error: 'Could not save the insurance record.' };
     }
     if (old?.path) await db.storage.from('company-docs').remove([old.path as string]);
     revalidatePath('/settings/business');
-    return { ok: true };
+    revalidatePath('/projects');
+    if (auto) return { ok: true, approved: true, message: `Approved. Your insurance badge is live until ${expires}.` };
+    if (routine) return { ok: true, message: 'Looks good. An admin does a quick check on certificates like this, usually within a day. We will tell you.' };
+    return { ok: true, message: `Sent to an admin to check. ${reasons.join(' ')}`.trim() };
   } catch {
     return { ok: false, error: 'Something went wrong saving that certificate.' };
   }

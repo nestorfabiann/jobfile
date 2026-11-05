@@ -96,7 +96,7 @@ export function InsuranceUploader({ kind, defaults }: { kind: 'liability' | 'wor
       fd.set('file', new File([blob], f.type === 'application/pdf' ? 'certificate.pdf' : 'certificate.jpg', { type: f.type === 'application/pdf' ? 'application/pdf' : 'image/jpeg' }));
       const r = await uploadInsurance(fd);
       if (r.ok) {
-        setMsg({ tone: 'ok', text: 'Sent for review.' });
+        setMsg({ tone: 'ok', text: r.message ?? 'Sent for review.' });
         if (ref.current) ref.current.value = '';
         router.refresh();
       } else setMsg({ tone: 'bad', text: r.error });
@@ -115,10 +115,10 @@ export function InsuranceUploader({ kind, defaults }: { kind: 'liability' | 'wor
       <div className="grid2">
         <label className="fld">Insurance company<input name="carrier" maxLength={120} defaultValue={defaults?.carrier ?? ''} /></label>
         <label className="fld">Coverage amount<input name="coverage" maxLength={60} defaultValue={defaults?.coverage ?? ''} placeholder="$1,000,000" /></label>
-        <label className="fld">Policy expires<input name="expires_on" type="date" required defaultValue={defaults?.expires_on ?? ''} /></label>
+        <label className="fld">Policy expires (we read it; fill in only if asked)<input name="expires_on" type="date" defaultValue={defaults?.expires_on ?? ''} /></label>
       </div>
       <div className="row">
-        <button className="btn" disabled={busy}>{busy ? 'Uploading…' : defaults ? 'Replace and resubmit' : 'Submit for review'}</button>
+        <button className="btn" disabled={busy}>{busy ? 'Reading your certificate…' : defaults ? 'Replace and resubmit' : 'Upload certificate'}</button>
         {msg && <span role="status" className="small" style={{ color: msg.tone === 'ok' ? 'var(--ok)' : 'var(--bad)' }}>{msg.text}</span>}
       </div>
     </form>
