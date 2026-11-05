@@ -149,6 +149,13 @@ export default async function Overview({ params, searchParams }: { params: { id:
         check={{ done: checks.filter((c) => c.ok).length, of: checks.length }}
       />
 
+      {executed && !project.completed_at ? (
+        <Link href={`${base}/closeout`} className="card" style={{ color: 'inherit', textDecoration: 'none', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10, padding: '12px 14px' }}>
+          <span><b style={{ display: 'block' }}>Closeout checklist</b><span className="muted small">Confirm scope, extra work and payments before the job is closed.</span></span>
+          <span className="pill ok" style={{ whiteSpace: 'nowrap' }}>Open ›</span>
+        </Link>
+      ) : null}
+
       {executed && (
         <div id="closeout" style={{ scrollMarginTop: 12 }}>
         <FinishCard
@@ -165,13 +172,6 @@ export default async function Overview({ params, searchParams }: { params: { id:
         />
         </div>
       )}
-
-      {executed && !project.completed_at ? (
-        <Link href={`${base}/closeout`} className="card" style={{ color: 'inherit', textDecoration: 'none', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10, padding: '12px 14px' }}>
-          <span><b style={{ display: 'block' }}>Closeout checklist</b><span className="muted small">Confirm scope, extra work and payments before the job is closed.</span></span>
-          <span className="pill ok" style={{ whiteSpace: 'nowrap' }}>Open ›</span>
-        </Link>
-      ) : null}
 
       {openIssues.length > 0 ? (
         <Link href={`${base}/issues/${openIssues[0].id}`} className="card" style={{ color: 'inherit', textDecoration: 'none', background: 'var(--warn-bg, #fbeccd)', gap: 4 }}>
