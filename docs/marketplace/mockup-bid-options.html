@@ -1,0 +1,63 @@
+<title>Bid Options</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: one phone column. Three screens: today, bid alone, bid as a team. Names, prices and trades are examples. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#c4813f;--orl:#f9efe4;--orb:#ecd4a8;--fg:#1f4d3a;--fgl:#e4f0e8;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--fgl:#173a2c;--fg:#8fd0ab;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--fgl:#173a2c;--fg:#8fd0ab;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:14px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px}
+h2{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;font-size:28px;line-height:1.05;text-wrap:balance}
+h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;font-size:18px}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
+.mut{color:var(--mut);font-size:14.5px;line-height:1.5;margin:0}
+.sw{display:grid;grid-template-columns:1fr 1fr;gap:6px}.sw button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:6px 4px;border-radius:99px;font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:44px}.sw button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.sec{display:flex;flex-direction:column;gap:14px}.sec[hidden]{display:none}
+.stage{display:flex;justify-content:center;padding:22px 0 8px;border-radius:30px;background:radial-gradient(120% 80% at 50% 0%,var(--orl),transparent 70%)}
+.ph{width:min(300px,84%);height:620px;background:#faf8f4;color:#1b1a18;border:7px solid #1b1a18;border-radius:36px;position:relative;overflow:hidden;box-shadow:0 22px 44px -18px rgba(27,26,24,.45);display:flex;flex-direction:column}
+.url{height:44px;background:#f3f1ec;display:flex;align-items:center;justify-content:center;font-size:11px;color:#6b655e;padding-top:10px;flex:none}
+.body{flex:1;padding:13px;display:flex;flex-direction:column;gap:8px;font-size:12px;line-height:1.4;overflow:hidden}
+.body h4{font:800 18px/1.05 'Bricolage Grotesque',sans-serif;letter-spacing:-.03em;margin:0}
+.body p{margin:0;color:#5c564f}
+.lab{font-size:10px;text-transform:uppercase;letter-spacing:.08em;font-weight:600;color:#6b655e;margin-top:2px}
+.cd{background:#fff;border:1px solid #e4dfd6;border-radius:12px;padding:9px 10px;display:flex;flex-direction:column;gap:5px}
+.r{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.r b{font-size:12.5px}.av{width:30px;height:30px;border-radius:9px;color:#fff;font:800 13px 'Bricolage Grotesque',sans-serif;display:grid;place-items:center;flex:none}
+.a1{background:#1f4d3a}.a2{background:#c4813f}
+.pill{display:inline-block;border-radius:99px;padding:2px 8px;font-size:10px;font-weight:600;white-space:nowrap}
+.ok{background:#e4f0e8;color:#1f4d3a}.wt{background:#f9efe4;color:#8a5a1a}.gr{background:#eef0f4;color:#4a4f5c}
+.amt{font:800 15px 'Bricolage Grotesque',sans-serif;font-variant-numeric:tabular-nums}
+.tot{background:#1f4d3a;color:#fff;border-radius:13px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center}.tot b{font:800 21px 'Bricolage Grotesque',sans-serif}.tot small{opacity:.85;font-size:10.5px}
+.inp{border:1px solid #d6d0c6;border-radius:9px;padding:7px 9px;font-size:11px;color:#8a8379;background:#faf8f4}
+.btn{border:0;border-radius:12px;padding:10px;font:600 12.5px 'IBM Plex Sans',sans-serif;text-align:center;background:#1f4d3a;color:#fff}.btn.gh{background:transparent;color:#6b655e;border:1px solid #e4dfd6}
+.tabs{height:48px;background:#fff;border-top:1px solid #e4dfd6;display:flex;justify-content:space-around;align-items:center;font-size:9.5px;color:#6b655e;flex:none}
+.rules{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:9px}
+.rules ul{margin:0;padding-left:18px;color:var(--mut);font-size:14px;line-height:1.5;display:flex;flex-direction:column;gap:6px}.rules li b{color:var(--ink)}
+</style>
+<div class="wrap"><style>
+.seg{display:grid;grid-template-columns:1fr 1fr;background:#eee9df;border-radius:13px;padding:3px;gap:3px}
+.seg span{text-align:center;padding:8px 4px;border-radius:10px;font:600 11.5px 'IBM Plex Sans',sans-serif;color:#6b655e}
+.seg span.on{background:#fff;color:#1b1a18;box-shadow:0 1px 4px rgba(0,0,0,.12)}
+.trd{display:flex;gap:4px;flex-wrap:wrap}.trd span{background:#fff;border:1px solid #ecd4a8;border-radius:99px;padding:1px 7px;font-size:10px}
+.tc{border-radius:15px;background:linear-gradient(135deg,#1f4d3a,#2c6a50);color:#fff;padding:12px;display:flex;flex-direction:column;gap:8px}
+.av2{display:flex}.av2 span{width:30px;height:30px;border-radius:50%;border:2px solid #1f4d3a;display:grid;place-items:center;font:800 13px 'Bricolage Grotesque',sans-serif;color:#fff}.av2 span+span{margin-left:-9px}
+.tbtn{background:#fff;color:#1f4d3a;border-radius:11px;padding:9px;text-align:center;font:700 12.5px 'IBM Plex Sans',sans-serif}
+.frm{display:flex;flex-direction:column;gap:6px}.fl{font-size:10px;color:#6b655e;text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+.step{display:flex;gap:8px;align-items:flex-start;font-size:11px}.step i{width:18px;height:18px;border-radius:50%;background:#e4f0e8;color:#1f4d3a;display:grid;place-items:center;font-style:normal;font-weight:700;font-size:10px;flex:none}
+</style>
+<div class="note"><b>Mockup.</b> Bid options on a marketplace job. Prices and names are examples.</div>
+<h2>Two ways to answer one job</h2>
+<p class="mut">Bidding alone and bidding as a team become one choice at the top, with the trades hint above it.</p>
+<div class="sw" role="group" aria-label="Screen" style="grid-template-columns:1fr 1fr 1fr"><button type="button" data-s="a" aria-pressed="true">Bid alone</button><button type="button" data-s="b" aria-pressed="false">Bid as a team</button><button type="button" data-s="c" aria-pressed="false">Today</button></div>
+<div class="sec" id="a"><div class="stage"><div class="ph"><div class="url">Kitchen remodel · bid</div><div class="body"><div class="cd" style="background:#f9efe4;border-color:#ecd4a8"><b style="font-size:11.5px">This job needs 4 trades</b><div class="trd"><span>Layout</span><span>Cabinets</span><span>Countertops</span><span>Backsplash</span></div><span style="font-size:10.5px;color:#6b655e">Teaming up lets you bid on all of it.</span></div><div class="seg"><span class="on">Bid alone</span><span class="">Bid as a team <b style="color:#c4813f;font-size:9.5px">New</b></span></div><div class="frm"><span class="fl">Your price</span><div class="inp">$ 8,200</div><span class="fl">Earliest start</span><div class="inp">Nov 25</div><span class="fl">What is included</span><div class="inp" style="height:38px">Permits, materials, haul-away</div><span class="fl">Note to the homeowner</span><div class="inp" style="height:38px">No phone numbers or emails</div></div><div class="btn" style="background:#c4813f;margin-top:auto">Send bid</div></div></div></div><p class="mut">The hint comes first because it helps you decide. The switch sits right above the form, and Send bid is now full width. On single-trade jobs the hint is hidden.</p></div>
+<div class="sec" id="b" hidden><div class="stage"><div class="ph"><div class="url">Kitchen remodel · bid</div><div class="body"><div class="cd" style="background:#f9efe4;border-color:#ecd4a8"><b style="font-size:11.5px">This job needs 4 trades</b><div class="trd"><span>Layout</span><span>Cabinets</span><span>Countertops</span><span>Backsplash</span></div><span style="font-size:10.5px;color:#6b655e">Teaming up lets you bid on all of it.</span></div><div class="seg"><span class="">Bid alone</span><span class="on">Bid as a team <b style="color:#c4813f;font-size:9.5px">New</b></span></div><div class="tc"><div style="display:flex;align-items:center;gap:10px"><div class="av2"><span style="background:#c4813f">N</span><span style="background:#2f5f8a">?</span></div><div><b style="font-size:13px">Pair up with a local pro</b><div style="font-size:10.5px;opacity:.85">Bid on all four trades together</div></div></div><div class="step"><i>1</i><span>Pick a partner within 50 miles</span></div><div class="step"><i>2</i><span>Set each part and price</span></div><div class="step"><i>3</i><span>They confirm, then the bid goes out</span></div><div class="tbtn">Choose a partner</div></div><span style="font-size:10.5px;color:#6b655e;text-align:center">5 companies nearby are open to partnering. You stay the lead.</span></div></div></div><p class="mut">The team side is a green card with the three steps and one button. The count of nearby companies open to partnering only shows when it is above zero.</p></div>
+<div class="sec" id="c" hidden><div class="stage"><div class="ph"><div class="url">Kitchen remodel · bid</div><div class="body"><div class="frm"><span class="fl">Earliest start</span><div class="inp">Nov 25</div><span class="fl">What is included</span><div class="inp" style="height:34px"></div><span class="fl">Note to the homeowner</span><div class="inp" style="height:34px"></div></div><div class="btn" style="background:#c4813f;width:90px;border-radius:99px">Send bid</div><div class="cd" style="background:#f9efe4;border-color:#ecd4a8"><span style="font-size:11px"><b>This job needs 4 trades.</b> Layout, Cabinets, Countertops, Backsplash. Team up with another pro to bid on all of it.</span></div><div class="btn" style="background:#fff;color:#c4813f;border:1.5px solid #c4813f">Bid as a team <span class="pill wt">New</span></div><span style="font-size:10.5px;color:#6b655e">You stay the lead. Your partner confirms their price before it is sent.</span></div></div></div><p class="mut">Today: the form, a small Send bid button, then the note and a separate outlined button.</p></div>
+</div>
+<script>
+document.querySelectorAll('.sw button').forEach(function(b){b.addEventListener('click',function(){
+  document.querySelectorAll('.sw button').forEach(function(x){x.setAttribute('aria-pressed',x===b)});
+  ['a','b','c'].forEach(function(id){document.getElementById(id).hidden=id!==b.dataset.s});
+})});
+</script>
