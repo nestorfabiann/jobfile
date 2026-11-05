@@ -2,14 +2,16 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { HELP, TOPICS, topicForPath, type HelpTopic } from '@/lib/helpContent';
+import { HELP, TOPICS, pageKey, topicForPath, type HelpTopic } from '@/lib/helpContent';
 
 type Who = 'h' | 'c' | 'v';
 
 /** Floating Help button with a sheet of ready answers. No AI, no data access. */
 export default function HelpButton({ who }: { who: Who }) {
   const path = usePathname() || '/';
-  const here = topicForPath(path);
+  const pk = pageKey(path);
+  const pageHas = !!pk && HELP.some((x) => x.pages?.includes(pk) && (who === 'v' ? true : x.who === 'both' || x.who === who));
+  const here = pageHas ? ('page' as const) : topicForPath(path);
   const [open, setOpen] = useState(false);
   const [topic, setTopic] = useState<HelpTopic | 'here' | 'all'>('all');
   const [term, setTerm] = useState('');
@@ -38,8 +40,8 @@ export default function HelpButton({ who }: { who: Who }) {
   const items = useMemo(() => {
     const t = term.trim().toLowerCase();
     return HELP.filter((x) => (who === 'v' ? true : x.who === 'both' || x.who === who))
-      .filter((x) => (t ? `${x.q} ${x.a}`.toLowerCase().includes(t) : topic === 'all' ? true : x.topic === (topic === 'here' ? here : topic)));
-  }, [who, term, topic, here]);
+      .filter((x) => (t ? `${x.q} ${x.a}`.toLowerCase().includes(t) : topic === 'all' ? true : topic === 'here' ? (here === 'page' ? !!pk && !!x.pages?.includes(pk) : x.topic === here) : x.topic === topic));
+  }, [who, term, topic, here, pk]);
 
   const show = () => {
     setOpen(true);
