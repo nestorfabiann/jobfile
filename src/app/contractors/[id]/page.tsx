@@ -105,22 +105,18 @@ export default async function Profile({ params, searchParams }: { params: { id: 
         {searchParams.error ? <div className="box bad">{searchParams.error}</div> : null}
         {homeowner && !c.hidden_at && (
           <div className="card" style={{ background: 'var(--accent-soft, #f9efe4)' }}>
-            {cands.length > 0 ? (
-              <>
-                <b>Want {c.name} to bid on your project?</b>
-                <span className="small muted" style={{ display: 'block' }}>They will see the project and can send a bid. Your contact details stay private until you accept a bid.</span>
-                <div className="row" style={{ gap: 10, marginTop: 10 }}>
-                  <Link className="btn" href={`/contractors/${c.id}/invite`}>Invite to bid</Link>
-                  <Link className="btn ghost" href={`/contractors/${c.id}/ask`}>Ask a question</Link>
-                </div>
-              </>
-            ) : (
-              <>
-                <b>Interested in {c.name}?</b>
-                <span className="small muted" style={{ display: 'block' }}>Post your project in a few minutes and invite them to bid. Nothing is shared until you post.</span>
-                <div className="row" style={{ marginTop: 10 }}><Link className="btn" href={`/marketplace/new?invite=${c.id}`}>Start a project and invite them</Link></div>
-              </>
-            )}
+            <b>Work with {c.name}</b>
+            <span className="small muted" style={{ display: 'block' }}>Your contact details stay private until you accept a bid.</span>
+            <div className="stack" style={{ gap: 8, marginTop: 10 }}>
+              {cands.length > 0
+                ? <Link className="btn" href={`/contractors/${c.id}/invite`}>Invite to bid on a project</Link>
+                : <Link className="btn" href={`/marketplace/new?invite=${c.id}`}>Start a project and invite them</Link>}
+              <div className="row" style={{ gap: 8, flexWrap: 'nowrap' }}>
+                <Link className="btn ghost" style={{ flex: 1 }} href={`/contractors/${c.id}/ask`}>Ask a question</Link>
+                {cands.length > 0 ? <Link className="btn ghost" style={{ flex: 1 }} href={`/marketplace/new?invite=${c.id}`}>Start a project</Link> : null}
+              </div>
+              <span className="small muted">{cands.length > 0 ? 'Need a price on something new? Start a project and invite them.' : 'Not ready to post? Ask a question first.'}</span>
+            </div>
           </div>
         )}
         {(c.verified_at || verified.length > 0) && (

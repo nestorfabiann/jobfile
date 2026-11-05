@@ -83,6 +83,21 @@ export default async function Marketplace({ searchParams }: { searchParams: { ty
     });
   }
 
+  // General questions (no project): the contractor's inbox, or the homeowner's own asked questions. Ignored if the 043 change is not there yet.
+  let qs2: { id: string; name: string; at: string; theirsLast: boolean }[] = [];
+  try {
+    const gq = db.from('bid_invites').select('id,company_id,homeowner_id,status,updated_at').is('listing_id', null).neq('status', 'declined').order('updated_at', { ascending: false }).limit(8);
+    const { data: gr } = isPro ? await gq.eq('company_id', companyId as string) : await gq.eq('homeowner_id', user.id);
+    const rows = (gr ?? []) as any[];
+    if (rows.length) {
+      const { data: cn } = await db.from('companies').select('id,name').in('id', rows.map((r) => r.company_id));
+      const nm = new Map(((cn ?? []) as any[]).map((r) => [r.id as string, r.name as string]));
+      const { data: lm } = await db.from('invite_messages').select('invite_id,sender_side,created_at').in('invite_id', rows.map((r) => r.id)).order('created_at', { ascending: false });
+      const last = new Map<string, string>();
+      ((lm ?? []) as any[]).forEach((m) => { if (!last.has(m.invite_id)) last.set(m.invite_id, m.sender_side); });
+      qs2 = rows.map((r) => ({ id: r.id, name: isPro ? 'Homeowner question' : (nm.get(r.company_id) ?? 'Contractor'), at: r.updated_at, theirsLast: last.get(r.id) === (isPro ? 'homeowner' : 'contractor') }));
+    }
+  } catch { /* table or column missing */ }
   const openN = listings.filter((l) => listingOpen(l)).length;
   const hiredN = listings.filter((l) => l.status === 'awarded').length;
   const newN = Array.from(fresh.values()).reduce((a, b) => a + b, 0);
@@ -135,6 +150,18 @@ export default async function Marketplace({ searchParams }: { searchParams: { ty
 
       {listings.length === 0 && (
         <div className="card"><p className="muted">{isPro ? 'No open projects right now. Check back soon.' : 'You have not posted a project yet.'}</p></div>
+      )}
+
+      {qs2.length > 0 && (
+        <section className="card" aria-label="Questions">
+          <h2>{isPro ? 'Questions from homeowners' : 'Your questions'}</h2>
+          {qs2.map((q) => (
+            <Link key={q.id} href={`/marketplace/general/invite/${q.id}`} className="row" style={{ justifyContent: 'space-between', color: 'inherit', textDecoration: 'none', gap: 10 }}>
+              <span><b>{q.name}</b> <span className="muted small">· General question · {when(q.at)}</span></span>
+              {q.theirsLast ? <span className="pill warn">New reply</span> : <span className="muted small">Open ›</span>}
+            </Link>
+          ))}
+        </section>
       )}
 
       {listings.map((l) => {

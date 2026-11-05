@@ -6,8 +6,9 @@ import { notifyUsers } from '@/lib/notify';
 
 export const MAX_INVITES_PER_DAY = 10;
 export const MAX_QUESTIONS_PER_DAY = 5;
+export const MAX_GENERAL_PER_DAY = 3;
 
-export type BidInvite = { id: string; listing_id: string; homeowner_id: string; company_id: string; note: string; status: 'invited' | 'asked' | 'declined'; created_at: string; updated_at: string };
+export type BidInvite = { id: string; listing_id: string | null; homeowner_id: string; company_id: string; note: string; status: 'invited' | 'asked' | 'declined'; created_at: string; updated_at: string };
 export type InviteMsg = { id: string; sender_side: 'homeowner' | 'contractor'; body: string; created_at: string };
 
 /** A company serves a ZIP when its business ZIP is inside its own service distance of that ZIP. No business ZIP means it does not. */
@@ -53,6 +54,14 @@ export async function makeInvite(l: { id: string; homeowner_id: string; job_type
     const { count: mine } = await db.from('marketplace_bids').select('id', { count: 'exact', head: true }).eq('listing_id', l.id).eq('company_id', companyId);
     if ((mine ?? 0) > 0) return { error: 'This contractor already bid on that project.' };
     const { data: ex } = await db.from('bid_invites').select('id,status').eq('listing_id', l.id).eq('company_id', companyId).maybeSingle<any>();
+    if (!ex) {
+      // A general question asked earlier becomes part of this project, so nothing starts over.
+      const { data: gen } = await db.from('bid_invites').select('id,status').is('listing_id', null).eq('homeowner_id', l.homeowner_id).eq('company_id', companyId).maybeSingle<any>();
+      if (gen && gen.status !== 'declined') {
+        await db.from('bid_invites').update({ listing_id: l.id, note, status: status === 'invited' ? 'invited' : gen.status, updated_at: new Date().toISOString() }).eq('id', gen.id);
+        return { id: gen.id as string, created: status === 'invited' };
+      }
+    }
     if (ex) {
       if (ex.status === 'declined') return { error: 'This contractor passed on that project.' };
       if (ex.status === 'invited') return { error: 'You already invited this contractor to that project.' };
@@ -74,3 +83,25 @@ export async function tellCompany(companyId: string, l: { id: string; job_type: 
   } catch { /* never block */ }
 }
 // Invites: tables come from migration 041.
+
+/** Starts (or finds) a general question thread with a company. Returns an error message or the thread id. Never throws. */
+export async function makeGeneral(userId: string, companyId: string): Promise<{ error: string } | { id: string; fresh: boolean }> {
+  try {
+    const db = supabaseAdmin();
+    const { data: pr } = await db.from('profiles').select('*').eq('id', userId).maybeSingle<any>();
+    const zip = (pr?.zip as string | null) ?? '';
+    if (!/^\d{5}$/.test(zip)) return { error: 'Save your ZIP code first so we can check the contractor serves your area. You can add it in Find contractors.' };
+    if (!(await servesZip(companyId, zip))) return { error: 'This contractor does not serve your ZIP code.' };
+    const { data: ex } = await db.from('bid_invites').select('id,status').is('listing_id', null).eq('homeowner_id', userId).eq('company_id', companyId).maybeSingle<any>();
+    if (ex) {
+      if (ex.status === 'declined') return { error: 'This contractor passed on your question.' };
+      return { id: ex.id as string, fresh: false };
+    }
+    const since = new Date(Date.now() - 86400000).toISOString();
+    const { count } = await db.from('bid_invites').select('id', { count: 'exact', head: true }).eq('homeowner_id', userId).is('listing_id', null).gt('created_at', since);
+    if ((count ?? 0) >= MAX_GENERAL_PER_DAY) return { error: `You can start ${MAX_GENERAL_PER_DAY} new general questions a day. Try again tomorrow.` };
+    const { data: row, error } = await db.from('bid_invites').insert({ listing_id: null, homeowner_id: userId, company_id: companyId, note: '', status: 'asked' }).select('id').single<any>();
+    if (error || !row) return { error: 'Could not send. Check that the database step was run.' };
+    return { id: row.id as string, fresh: true };
+  } catch { return { error: 'Could not send. Try again.' }; }
+}
