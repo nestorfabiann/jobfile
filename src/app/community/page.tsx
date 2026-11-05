@@ -6,6 +6,16 @@ import { supabaseAdmin } from '@/lib/supabase/server';
 import { JOB_TYPES, requireMarketplace } from '@/lib/marketplace';
 import { nameMaps, photoUrls, postStats, type Post } from '@/lib/community';
 import CommunityCard from '@/components/CommunityCard';
+import TradeIcon from '@/components/TradeIcon';
+
+const Ico = ({ d }: { d: string }) => <svg viewBox="0 0 24 24" aria-hidden="true"><path d={d} /></svg>;
+const ICON = {
+  cam: 'M3 9a3 3 0 013-3h1.5L9 4h6l1.5 2H18a3 3 0 013 3v8a3 3 0 01-3 3H6a3 3 0 01-3-3zM12 16.5a3.5 3.5 0 100-7 3.5 3.5 0 000 7z',
+  bulb: 'M9 18h6M10 21h4M12 3a6 6 0 00-4 10.5c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A6 6 0 0012 3z',
+  mark: 'M6 3h12v18l-6-4-6 4z',
+  grid: 'M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z',
+  home: 'M3 11l9-8 9 8M5 10v10h14V10',
+};
 
 export const dynamic = 'force-dynamic';
 export const metadata = { title: 'Community · Jobfile' };
@@ -76,24 +86,31 @@ export default async function Community({ searchParams }: { searchParams: { k?: 
   ]);
   const href = (k: string, t = '') => `/community${k !== 'all' || t ? `?${[k !== 'all' ? `k=${k}` : '', t ? `t=${encodeURIComponent(t)}` : ''].filter(Boolean).join('&')}` : ''}`;
 
+  const todayCount = posts.filter((p) => nowMs - new Date(p.created_at).getTime() < 24 * 3600_000).length;
+  const chipOn = { background: 'var(--brand)', color: '#fff', borderColor: 'var(--brand)' } as const;
+  const Chip = ({ to, on, icon, label, n }: { to: string; on: boolean; icon: string; label: string; n?: number }) => (
+    <Link className="chip" href={to}><span className="cmchip" style={on ? chipOn : undefined}><Ico d={icon} />{label}{n ? <em className="cmn">{n}</em> : null}</span></Link>
+  );
+
   return (
     <div className="stack" style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-      <div className="stack" style={{ gap: 4 }}>
+      <section className="cmhero" aria-label="Community">
+        {todayCount > 0 ? <span className="cmlive"><i />{todayCount} new today</span> : null}
         <h1>Community</h1>
-        <p className="muted">Real projects from Texas homes, shared by the people who did them. Get ideas, ask questions, and share your own.</p>
-      </div>
+        <p>Real Texas projects and ideas, shared by the people who did them.</p>
+      </section>
       {searchParams.error ? <div className="box bad" role="alert">{searchParams.error}</div> : null}
       {searchParams.ok ? <div className="box ok" role="status">{searchParams.ok}</div> : null}
       {missing ? <div className="box warn">Community needs one database step. Ask Jobfile support to run it.</div> : null}
-      <div className="row" style={{ gap: 8 }}>
-        <Link className="btn accent" href="/community/share">Share a finished project</Link>
-        <Link className="btn ghost" href="/community/ask">Ask for ideas</Link>
-        <Link className="btn ghost" href="/community/mine">My posts and saved</Link>
+      <div className="cmtiles">
+        <Link className="cmtile main" href="/community/share"><Ico d={ICON.cam} />Share a project</Link>
+        <Link className="cmtile" href="/community/ask"><Ico d={ICON.bulb} />Ask for ideas</Link>
+        <Link className="cmtile" href="/community/mine"><Ico d={ICON.mark} />Mine and saved</Link>
       </div>
       <div className="chips" aria-label="Show">
-        <Link className="chip" href={href('all')}><span style={kind === 'all' ? { background: 'var(--brand)', color: '#fff', borderColor: 'var(--brand)' } : undefined}>All</span></Link>
-        <Link className="chip" href={href('showcase')}><span style={kind === 'showcase' ? { background: 'var(--brand)', color: '#fff', borderColor: 'var(--brand)' } : undefined}>Projects{newShow ? ` · ${newShow} new` : ''}</span></Link>
-        <Link className="chip" href={href('idea')}><span style={kind === 'idea' ? { background: 'var(--brand)', color: '#fff', borderColor: 'var(--brand)' } : undefined}>Ideas{newIdeas ? ` · ${newIdeas} new` : ''}</span></Link>
+        <Chip to={href('all')} on={kind === 'all'} icon={ICON.grid} label="All" />
+        <Chip to={href('showcase')} on={kind === 'showcase'} icon={ICON.home} label="Projects" n={newShow} />
+        <Chip to={href('idea')} on={kind === 'idea'} icon={ICON.bulb} label="Ideas" n={newIdeas} />
       </div>
       {since && (newShow || newIdeas || newMine) ? (
         <div className="box" role="status" style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -104,9 +121,9 @@ export default async function Community({ searchParams }: { searchParams: { k?: 
       ) : null}
       <CommunitySeen since={since} />
       {trades.length > 0 ? (
-        <div className="chips" aria-label="Kind of work">
-          <Link className="chip" href={href(kind)}><span style={!trade ? { background: 'var(--brand)', color: '#fff', borderColor: 'var(--brand)' } : undefined}>All</span></Link>
-          {trades.map((t) => <Link key={t} className="chip" href={href(kind, t)}><span style={trade === t ? { background: 'var(--brand)', color: '#fff', borderColor: 'var(--brand)' } : undefined}>{t}</span></Link>)}
+        <div className="chips cmscroll" aria-label="Kind of work">
+          <Link className="chip" href={href(kind)}><span className="cmchip" style={!trade ? chipOn : undefined}>All trades</span></Link>
+          {trades.map((t) => <Link key={t} className="chip" href={href(kind, t)}><span className="cmchip" style={trade === t ? chipOn : undefined}><TradeIcon trade={t} size={15} />{t}</span></Link>)}
         </div>
       ) : null}
 
