@@ -237,6 +237,28 @@ export async function reviewIdCheck(_: Result | null, f: FormData): Promise<Resu
   return { ok: true, message: decision === 'verified' ? 'Verified. The photo was deleted.' : 'Rejected. The photo was deleted and the contractor was told why.' };
 }
 
+/** Owner sends a non-binding recommendation on a reported problem to both sides. */
+export async function sendRecommendation(_: Result | null, f: FormData): Promise<Result> {
+  const { user: me, db } = await requireAdmin();
+  const id = str(f, 'id');
+  const note = str(f, 'note').slice(0, 1500);
+  if (!id) return { ok: false, error: 'Nothing selected.' };
+  if (note.length < 10) return { ok: false, error: 'Write the recommendation (at least a sentence).' };
+  const { data: i } = await db.from('project_issues').select('id,project_id,status').eq('id', id).maybeSingle<any>();
+  if (!i || i.status !== 'open') return { ok: false, error: 'That problem is no longer open.' };
+  const now = new Date().toISOString();
+  await db.from('issue_events').insert({ issue_id: id, project_id: i.project_id, user_id: me.id, side: 'jobfile', kind: 'recommendation', body: note });
+  await db.from('project_issues').update({ mediator_note: note, mediator_sent_at: now, updated_at: now }).eq('id', id);
+  await audit(me, 'issue_recommendation', { type: 'project', id: i.project_id as string }, { issue: id });
+  const { data: project } = await db.from('projects').select('company_id').eq('id', i.project_id).maybeSingle<any>();
+  const { data: members } = await db.from('project_members').select('user_id').eq('project_id', i.project_id);
+  const { data: staff } = project ? await db.from('company_members').select('user_id').eq('company_id', project.company_id as string) : { data: [] as any[] };
+  const ids = Array.from(new Set([...(members ?? []), ...(staff ?? [])].map((m: any) => m.user_id as string)));
+  await notifyUsers({ userIds: ids, projectId: i.project_id as string, kind: 'issue', title: 'Jobfile sent a recommendation on the problem', body: 'Open it to read the recommendation. It only applies if you both accept it.' });
+  revalidatePath('/admin/mediation');
+  return { ok: true, message: 'Sent to both sides.' };
+}
+
 /** Admin closes a marketplace listing (rule violation). Waiting bidders are told it closed. */
 export async function adminCloseListing(formData: FormData) {
   const { user: me, db } = await requireAdmin('listings');

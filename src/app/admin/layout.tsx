@@ -6,7 +6,7 @@ type L = [string, string, Area | null];
 const GROUPS: { key: string; label: string; links: L[] }[] = [
   { key: 'ov', label: 'Overview', links: [['/admin', 'Overview', null], ['/admin/activity', 'Activity', null], ['/admin/usage', 'Usage', null], ['/admin/installs', 'App installs', null], ['/admin/health', 'Health', null], ['/admin/collaboration', 'Collaboration', null]] },
   { key: 'pe', label: 'People', links: [['/admin/users', 'Users', 'view'], ['/admin/projects', 'Projects', 'view'], ['/admin/invites', 'Invites', null]] },
-  { key: 'rv', label: 'Review', links: [['/admin/help', 'Help', 'help'], ['/admin/verification', 'Insurance', 'verification'], ['/admin/credentials', 'Credentials', 'verification'], ['/admin/id-checks', 'ID checks', null], ['/admin/reviews', 'Reviews', 'reviews'], ['/admin/marketplace', 'Marketplace', 'listings'], ['/admin/community', 'Community', 'reviews']] },
+  { key: 'rv', label: 'Review', links: [['/admin/help', 'Help', 'help'], ['/admin/verification', 'Insurance', 'verification'], ['/admin/credentials', 'Credentials', 'verification'], ['/admin/id-checks', 'ID checks', null], ['/admin/mediation', 'Mediation', null], ['/admin/reviews', 'Reviews', 'reviews'], ['/admin/marketplace', 'Marketplace', 'listings'], ['/admin/community', 'Community', 'reviews']] },
   { key: 'ms', label: 'Message', links: [['/admin/broadcast', 'Broadcast', null], ['/admin/area', 'By area', null]] },
   { key: 'ad', label: 'Admin', links: [['/admin/team', 'Team', null], ['/admin/audit', 'Audit log', 'audit']] },
 ];
@@ -45,6 +45,10 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     try {
       const { count } = await who.db.from('company_id_checks').select('id', { count: 'exact', head: true }).eq('status', 'pending');
       counts['/admin/id-checks'] = count ?? 0;
+    } catch { /* table not created yet */ }
+    try {
+      const { data } = await who.db.from('project_issues').select('status,escalated_at,respond_by').eq('status', 'open');
+      counts['/admin/mediation'] = ((data ?? []) as any[]).filter((i) => i.escalated_at || Date.now() > new Date(i.respond_by).getTime() + 2 * 86400_000).length;
     } catch { /* table not created yet */ }
   }
 

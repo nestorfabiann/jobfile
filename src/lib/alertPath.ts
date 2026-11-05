@@ -9,6 +9,7 @@ const TAB: Record<string, string> = {
   finish_request: '/overview',
   finish_cancel: '/overview',
   closeout: '/closeout',
+  issue: '/issues',
   schedule: '/schedule',
   selection: '/selections',
   document: '/documents',

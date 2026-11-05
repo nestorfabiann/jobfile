@@ -13,6 +13,7 @@ import ProjectPartners from '@/components/ProjectPartners';
 import { projectTasks, type NeedItem } from '@/lib/needs';
 import ProjectStepper from '@/components/ProjectStepper';
 import { daysBetween, fmtDay, todayChi } from '@/lib/schedule';
+import { categoryLabel, type Issue } from '@/lib/issues';
 
 const TZ = 'America/Chicago';
 const day = (d: string) => new Date(`${d.slice(0, 10)}T12:00:00`).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
@@ -41,6 +42,11 @@ export default async function Overview({ params, searchParams }: { params: { id:
   let phaseRows: { title: string; starts_on: string | null; ends_on: string | null; status: string; position: number }[] = [];
   try { const { data: pr } = await sb.from('project_phases').select('title,starts_on,ends_on,status,position').eq('project_id', project.id).order('position'); phaseRows = (pr ?? []) as typeof phaseRows; } catch { /* schedule tables missing */ }
 
+  let openIssues: Issue[] = [];
+  try {
+    const { data: ir } = await supabaseAdmin().from('project_issues').select('*').eq('project_id', project.id).eq('status', 'open').order('created_at', { ascending: false });
+    openIssues = (ir ?? []) as Issue[];
+  } catch { /* table not created yet */ }
   const items = (itemRows ?? []) as Item[];
   const cos = (coRows ?? []) as ChangeOrder[];
   const t = totals(items, cos);
@@ -164,6 +170,29 @@ export default async function Overview({ params, searchParams }: { params: { id:
         <Link href={`${base}/closeout`} className="card" style={{ color: 'inherit', textDecoration: 'none', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10, padding: '12px 14px' }}>
           <span><b style={{ display: 'block' }}>Closeout checklist</b><span className="muted small">Confirm scope, extra work and payments before the job is closed.</span></span>
           <span className="pill ok" style={{ whiteSpace: 'nowrap' }}>Open ›</span>
+        </Link>
+      ) : null}
+
+      {openIssues.length > 0 ? (
+        <Link href={`${base}/issues/${openIssues[0].id}`} className="card" style={{ color: 'inherit', textDecoration: 'none', background: 'var(--warn-bg, #fbeccd)', gap: 4 }}>
+          <b>{openIssues.length === 1 ? 'A problem is open' : `${openIssues.length} problems are open`}: {categoryLabel(openIssues[0].category)}</b>
+          <span className="muted small">{openIssues[0].reporter_role === role ? 'You reported it. Waiting for an answer or a fix.' : 'Open it to see what happened and suggest a fix.'}</span>
+          <span className="pill ok" style={{ width: 'max-content' }}>Open ›</span>
+        </Link>
+      ) : null}
+      {(() => {
+        const old = (cos as any[]).find((c) => c.requested_role === other && c.status !== 'approved' && c.status !== 'declined' && c.status !== 'rejected' && c.status !== 'withdrawn' && c.created_at && Date.now() - new Date(c.created_at).getTime() > 2 * 86400_000);
+        return old ? (
+          <Link href={`${base}/changes`} className="card" style={{ color: 'inherit', textDecoration: 'none', background: '#f9efe4', gap: 4 }}>
+            <b>A change order is waiting for your answer</b>
+            <span className="muted small">Sent {daysBetween(String(old.created_at).slice(0, 10), todayChi())} days ago. Most jobs settle these within 2 days.</span>
+          </Link>
+        ) : null;
+      })()}
+      {executed && !project.completed_at ? (
+        <Link href={`${base}/issues`} className="card" style={{ color: 'inherit', textDecoration: 'none', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
+          <span><b style={{ display: 'block' }}>Something not right?</b><span className="muted small">If you cannot agree, report it. Nobody is blamed.</span></span>
+          <span className="pill" style={{ whiteSpace: 'nowrap' }}>Report ›</span>
         </Link>
       ) : null}
 
