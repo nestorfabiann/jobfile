@@ -421,7 +421,8 @@ export async function withdrawBid(formData: FormData) {
     }
   }
   revalidatePath('/marketplace/bids');
-  redirect('/marketplace/bids');
+  revalidatePath('/projects');
+  redirect(String(formData.get('return_to') ?? '') === '/projects' ? '/projects#bids' : '/marketplace/bids');
 }
 
 // ---------- Homeowner: accept ----------

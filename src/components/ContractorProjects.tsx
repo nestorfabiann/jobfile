@@ -3,6 +3,7 @@ import HomeScreenCard from '@/components/HomeScreenCard';
 import { PushCard } from '@/components/PushAlerts';
 import KitchenArt from '@/components/KitchenArt';
 import StartProjectForm from '@/components/StartProjectForm';
+import { withdrawBid } from '@/app/marketplace/actions';
 import InviteCard from '@/components/InviteCard';
 import { dollars } from '@/lib/money';
 import AvailabilityBar from '@/components/AvailabilityBar';
@@ -153,14 +154,25 @@ export default function ContractorProjects(p: {
         <section className="stack" id="bids" aria-label="Your bids">
           <div className="row" style={{ justifyContent: 'space-between', flexWrap: 'nowrap' }}><h2>Your bids</h2><span className="muted small">{p.waitingCount} waiting</span></div>
           {p.bids.map((b) => (
-            <Link key={b.id} href={`/marketplace/${b.listing.id}`} className="card" style={{ textDecoration: 'none', color: 'var(--ink)' }}>
-              <b style={{ lineHeight: 1.3 }}>{listingTitle(b.listing)}</b>
-              <span className="muted small">ZIP {b.listing.zip} · your bid {dollars(b.price_cents)}</span>
-              <div className="row" style={{ justifyContent: 'space-between' }}>
-                <span className={`pill ${b.view.tone === 'none' ? '' : 'ok'}`}>{b.view.tone === 'none' ? 'Waiting' : b.view.text}</span>
-                <span className="muted small">Sent {short(b.created_at)}</span>
-              </div>
-            </Link>
+            <div key={b.id} className="card">
+              <Link href={`/marketplace/${b.listing.id}`} style={{ textDecoration: 'none', color: 'var(--ink)', display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <b style={{ lineHeight: 1.3 }}>{listingTitle(b.listing)}</b>
+                <span className="muted small">ZIP {b.listing.zip} · your bid {dollars(b.price_cents)}</span>
+                <div className="row" style={{ justifyContent: 'space-between' }}>
+                  <span className={`pill ${b.view.tone === 'none' ? '' : 'ok'}`}>{b.view.tone === 'none' ? 'Waiting' : b.view.text}</span>
+                  <span className="muted small">Sent {short(b.created_at)}</span>
+                </div>
+              </Link>
+              <details className="wd">
+                <summary>Withdraw bid</summary>
+                <form action={withdrawBid} className="stack" style={{ gap: 8 }}>
+                  <input type="hidden" name="listing_id" value={b.listing.id} />
+                  <input type="hidden" name="return_to" value="/projects" />
+                  <p className="muted small" style={{ margin: 0 }}>The homeowner is told you withdrew. You can bid again while the job is still open.</p>
+                  <div className="row"><button className="btn ghost" type="submit">Yes, withdraw my bid</button></div>
+                </form>
+              </details>
+            </div>
           ))}
           <Link href="/marketplace/bids" style={{ fontWeight: 700 }}>See all bids ›</Link>
         </section>

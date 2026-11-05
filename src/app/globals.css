@@ -737,3 +737,7 @@ html { scroll-behavior: smooth; }
 .credchips span { border-radius: 99px; padding: 2px 9px; font-size: 12px; font-weight: 600; background: var(--line); color: var(--ink); }
 .credchips span.v { background: #e4f0e8; color: #1f4d3a; }
 .ppv-opt { border-top: 1px solid var(--line); padding: 10px 0 2px; font: 600 11px system-ui, sans-serif; letter-spacing: .08em; text-transform: uppercase; color: var(--muted, #6b655e); }
+
+.wd > summary { list-style: none; cursor: pointer; font-size: 13.5px; font-weight: 600; color: var(--ink-2); text-decoration: underline; padding: 6px 0; min-height: 32px; width: max-content; }
+.wd > summary::-webkit-details-marker { display: none; }
+.wd[open] > summary { text-decoration: none; }
