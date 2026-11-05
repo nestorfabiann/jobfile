@@ -1,0 +1,137 @@
+<title>Landing Redesign</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: one mobile column, scrolling like the real page: hero, live demo, texts vs Jobfile, two doors, proof, final call. Names, prices and counts are examples. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#c4813f;--orl:#f9efe4;--orb:#ecd4a8;--fg:#1f4d3a;--fgl:#e4f0e8;--page:#e9e5dc;--bad:#a2503a;--badl:#f7e6e0}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--fgl:#173a2c;--fg:#8fd0ab;--page:#0d0c0b;--badl:#3a2320;--bad:#e0917a;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--fgl:#173a2c;--fg:#8fd0ab;--page:#0d0c0b;--badl:#3a2320;--bad:#e0917a;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:14px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:26px}
+h1,h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.035em;margin:0;text-wrap:balance}
+h1{font-size:40px;line-height:1}h2{font-size:27px;line-height:1.05}h3{font-size:17px}
+p{margin:0}.mut{color:var(--mut);font-size:15px;line-height:1.5}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
+.nav{display:flex;justify-content:space-between;align-items:center}.logo{font:800 24px 'Bricolage Grotesque',sans-serif;letter-spacing:-.04em}.logo span{color:var(--or)}
+.sign{border:1px solid var(--line);background:var(--card);border-radius:99px;padding:8px 14px;font-weight:600;font-size:14px}
+.hero{display:flex;flex-direction:column;gap:14px;padding:22px 16px;border-radius:26px;background:radial-gradient(120% 90% at 100% 0%,var(--orl),transparent 70%),var(--card);border:1px solid var(--line)}
+.hero h1 em{font-style:normal;color:var(--or)}
+.kick{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--fg)}
+.doors{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.door{border-radius:18px;padding:14px 12px;display:flex;flex-direction:column;gap:6px;font-size:13px;line-height:1.35}
+.door b{font:800 17px 'Bricolage Grotesque',sans-serif;letter-spacing:-.03em}
+.door.h{background:var(--or);color:#fff}.door.c{background:var(--fg);color:#fff}
+.door .go{margin-top:4px;background:rgba(255,255,255,.2);border-radius:99px;padding:7px 10px;font-weight:600;text-align:center}
+.trust{display:flex;flex-wrap:wrap;gap:8px}.trust span{background:var(--card);border:1px solid var(--line);border-radius:99px;padding:6px 11px;font-size:12.5px;font-weight:500}
+.sec{display:flex;flex-direction:column;gap:12px}
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.tabs button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:9px 4px;border-radius:99px;font:600 13px 'IBM Plex Sans',sans-serif;cursor:pointer}.tabs button[aria-pressed=true]{background:var(--fg);color:#fff;border-color:var(--fg)}
+.demo{display:flex;justify-content:center;padding:18px 0 6px;border-radius:26px;background:radial-gradient(120% 80% at 50% 0%,var(--orl),transparent 70%)}
+.ph{width:min(290px,86%);height:470px;background:#faf8f4;color:#1b1a18;border:7px solid #1b1a18;border-radius:34px;overflow:hidden;box-shadow:0 22px 44px -18px rgba(27,26,24,.45);display:flex;flex-direction:column}
+.ph .u{height:34px;background:#f3f1ec;display:flex;align-items:center;justify-content:center;font-size:10.5px;color:#6b655e;flex:none}
+.ph .b{flex:1;padding:12px;display:flex;flex-direction:column;gap:8px;font-size:12px;line-height:1.4}
+.ph .b[hidden]{display:none}
+.ph h4{font:800 17px/1.05 'Bricolage Grotesque',sans-serif;letter-spacing:-.03em;margin:0}
+.cd{background:#fff;border:1px solid #e4dfd6;border-radius:12px;padding:9px 10px;display:flex;flex-direction:column;gap:4px}
+.r{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.pill{display:inline-block;border-radius:99px;padding:2px 8px;font-size:10px;font-weight:600;white-space:nowrap}
+.ok{background:#e4f0e8;color:#1f4d3a}.wt{background:#f9efe4;color:#8a5a1a}
+.amt{font:800 15px 'Bricolage Grotesque',sans-serif}
+.bt{border-radius:11px;padding:9px;text-align:center;font-weight:600;font-size:12px;background:#1f4d3a;color:#fff}.bt.gh{background:#fff;color:#6b655e;border:1px solid #e4dfd6}
+.cap{font-size:14px;color:var(--mut);line-height:1.5;text-align:center}.cap b{color:var(--ink)}
+.vs{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.vs>div{border-radius:18px;padding:14px 12px;display:flex;flex-direction:column;gap:8px;font-size:13.5px;line-height:1.35}
+.vs .no{background:var(--badl)}.vs .yes{background:var(--fgl)}
+.vs h3{font-size:15px}.vs .no h3{color:var(--bad)}.vs .yes h3{color:var(--fg)}
+.vs ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px}
+.big{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.big div{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 6px;text-align:center}
+.big b{display:block;font:800 22px 'Bricolage Grotesque',sans-serif;color:var(--fg)}.big span{font-size:11.5px;color:var(--mut)}
+.feat{display:flex;flex-direction:column;gap:10px}
+.f{display:flex;gap:12px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px}
+.ic{width:36px;height:36px;border-radius:11px;display:grid;place-items:center;flex:none;font-size:17px}
+.f b{display:block;font-size:15px}.f span{font-size:13.5px;color:var(--mut);line-height:1.4}
+.quote{background:var(--fg);color:#fff;border-radius:22px;padding:18px;display:flex;flex-direction:column;gap:10px}
+.quote p{font:600 19px/1.25 'Bricolage Grotesque',sans-serif;letter-spacing:-.02em}.quote small{opacity:.85;font-size:13px}
+.cta{border-radius:24px;padding:22px 16px;background:var(--or);color:#fff;display:flex;flex-direction:column;gap:12px;text-align:center}
+.cta h2{color:#fff}.cta .btn{background:#fff;color:#1b1a18;border-radius:99px;padding:13px;font-weight:700}.cta .ghost{color:#fff;font-size:14px;font-weight:600}
+</style>
+<div class="wrap">
+  <div class="note"><b>Mockup.</b> A redesigned landing page. Quote, numbers and names are examples; the real page would use your real projects and numbers only.</div>
+
+  <div class="nav"><span class="logo">Job<span>file</span></span><span class="sign">Sign in</span></div>
+
+  <section class="hero">
+    <span class="kick">For homeowners and local contractors</span>
+    <h1>No more lost texts. No surprise charges. <em>No ghosted jobs.</em></h1>
+    <p class="mut">Jobfile is where a home project is priced, agreed, tracked and paid for, in one record both sides can see.</p>
+    <div class="doors">
+      <div class="door h"><b>I need work done</b><span>Post it free. Compare real bids. Your address stays private.</span><span class="go">Post a project</span></div>
+      <div class="door c"><b>I'm a contractor</b><span>Local jobs come to you. No fees. Nothing taken from jobs you win.</span><span class="go">Create my profile</span></div>
+    </div>
+    <div class="trust"><span>✓ Insurance verified</span><span>★ Ratings from real jobs</span><span>🔒 Private address</span></div>
+  </section>
+
+  <section class="sec">
+    <h2>See one job, start to finish</h2>
+    <p class="mut">This is the shared record. The homeowner and the contractor both see exactly this.</p>
+    <div class="tabs" role="group" aria-label="Demo step">
+      <button type="button" data-s="1" aria-pressed="true">1 · Bid</button>
+      <button type="button" data-s="2" aria-pressed="false">2 · Change</button>
+      <button type="button" data-s="3" aria-pressed="false">3 · Payment</button>
+    </div>
+    <div class="demo"><div class="ph"><div class="u">Kitchen repaint · Plano, TX</div>
+      <div class="b" id="s1"><h4>Compare bids</h4>
+        <div class="cd"><div class="r"><b>Nesty's Painting</b><span class="amt">$5,008</span></div><div class="r"><span class="pill ok">✓ Insured to Mar 2027</span><span style="font-size:10.5px">★ 4.9</span></div></div>
+        <div class="cd"><div class="r"><b>Lone Star Coatings</b><span class="amt">$5,600</span></div><div class="r"><span class="pill wt">Insurance pending</span><span style="font-size:10.5px">★ 4.6</span></div></div>
+        <div class="cd" style="background:#f9efe4;border-color:#ecd4a8"><span style="font-size:11px"><b>Typical for this job:</b> $4,200 to $6,100</span></div>
+        <div class="bt" style="margin-top:auto">Hire Nesty's Painting</div></div>
+      <div class="b" id="s2" hidden><h4>Change order</h4>
+        <div class="cd"><div class="r"><b>Add pantry wall</b><span class="amt">+$380</span></div><span style="font-size:11px;color:#6b655e">Price is shown before any work starts.</span></div>
+        <div class="cd"><div class="r"><span class="pill wt">Waiting for you</span><span style="font-size:10.5px">Today 9:14 AM</span></div></div>
+        <div class="bt" style="margin-top:auto">Approve +$380</div><div class="bt gh">Ask a question</div></div>
+      <div class="b" id="s3" hidden><h4>Payments</h4>
+        <div class="cd"><div class="r"><b>Deposit</b><span class="pill ok">Paid</span></div><span class="amt">$1,500</span></div>
+        <div class="cd"><div class="r"><b>Walls done</b><span class="pill wt">Requested</span></div><span class="amt">$2,000</span></div>
+        <div class="cd"><div class="r"><b>Final</b><span class="pill">Upcoming</span></div><span class="amt">$1,888</span></div>
+        <div style="font-size:10.5px;color:#6b655e;margin-top:auto">Jobfile records payments. It never holds or moves your money.</div></div>
+    </div></div>
+    <p class="cap" id="cap"><b>Compare bids side by side</b> with insurance, ratings and a fair-price range.</p>
+  </section>
+
+  <section class="sec">
+    <h2>Why people switch</h2>
+    <div class="vs">
+      <div class="no"><h3>Texts and cash</h3><ul><li>"What did we agree on?"</li><li>Extra charges at the end</li><li>No proof of insurance</li><li>Photos lost in a thread</li></ul></div>
+      <div class="yes"><h3>Jobfile</h3><ul><li>One agreement, always there</li><li>Extras approved with a price first</li><li>Insurance shown on every bid</li><li>Photos and payments in one record</li></ul></div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <h2>Built to be fair to both sides</h2>
+    <div class="feat">
+      <div class="f"><span class="ic" style="background:#f9efe4">🏠</span><div><b>Homeowners</b><span>Compare real bids, see a fair-price range, meet before you hire. Your address stays private until you do.</span></div></div>
+      <div class="f"><span class="ic" style="background:#e4f0e8">🛠</span><div><b>Contractors</b><span>Local jobs in your trade. Rate the homeowner too, so you know who pays on time. No fees.</span></div></div>
+      <div class="f"><span class="ic" style="background:#e8edf5">🤝</span><div><b>Teams</b><span>Bid with another local pro on one big job, painter plus electrician, with a clear split.</span></div></div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="big"><div><b>0%</b><span>Fee on jobs you win</span></div><div><b>50 mi</b><span>Local pros only</span></div><div><b>1</b><span>Shared record</span></div></div>
+    <div class="quote"><p>"I used to chase people for texts and photos. Now the price, changes and payments are all in one place."</p><small>A real contractor quote goes here, with permission · Plano, TX</small></div>
+  </section>
+
+  <section class="cta">
+    <h2>Start your project, or find your next job</h2>
+    <div class="btn">Post a project, it's free</div>
+    <span class="ghost">I'm a contractor →</span>
+  </section>
+</div>
+<script>
+const cap={1:'<b>Compare bids side by side</b> with insurance, ratings and a fair-price range.',2:'<b>Extra work needs a yes.</b> The price is attached before anyone starts.',3:'<b>Every payment is on record.</b> Both sides see what is paid and what is next.'};
+document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('.tabs button').forEach(x=>x.setAttribute('aria-pressed',x===b));
+  ['1','2','3'].forEach(n=>document.getElementById('s'+n).hidden=n!==b.dataset.s);
+  document.getElementById('cap').innerHTML=cap[b.dataset.s];
+}));
+</script>
