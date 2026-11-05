@@ -106,17 +106,44 @@ export default async function Overview({ params, searchParams }: { params: { id:
   const nextPhase = phaseRows.find((p) => p.status === 'upcoming' && p.starts_on && p.starts_on > today);
   const curNext = stage !== 1 ? undefined : curPhase?.ends_on ? `Phase ends ${fmtDay(curPhase.ends_on)}` : nextPhase?.starts_on ? `Next: ${nextPhase.title} ${fmtDay(nextPhase.starts_on)}` : undefined;
   const pct = t.total > 0 ? Math.min(100, Math.round((confirmed / t.total) * 100)) : 0;
+  const endISO = agr?.end_date ? (t.days ? addDays(agr.end_date as string, t.days) : (agr.end_date as string).slice(0, 10)) : null;
+  const startISO = agr?.start_date ? (agr.start_date as string).slice(0, 10) : null;
+  const jobDays = startISO && endISO ? daysBetween(startISO, endISO) + 1 : 0;
+  const headStatus = project.completed_at
+    ? 'Complete'
+    : project.closeout_started_at
+      ? 'Closeout'
+      : !executed
+        ? 'Waiting for the agreement'
+        : jobDays > 0 && todayChi() >= (startISO as string)
+          ? `Active · day ${Math.min(Math.max(daysBetween(startISO as string, todayChi()) + 1, 1), jobDays)} of ${jobDays}`
+          : 'Active';
   const finish = agr?.end_date ? (t.days ? addDays(agr.end_date as string, t.days) : day(agr.end_date as string)) : null;
 
   return (
     <>
       <AutoRefresh seconds={30} />
 
-      <section className="hero" aria-label="Project summary">
-        <KitchenArt size={56} />
-        <span className="lbl" style={{ color: 'rgba(255,255,255,.8)' }}>{project.address || 'No address yet'}</span>
-        <h2 style={{ fontSize: 26 }}>{project.name}</h2>
-        <p>{role === 'homeowner' ? <Link href={`/contractors/${project.company_id}`} style={{ color: 'inherit' }}>{contractorName}</Link> : contractorName} · {homeownerName}</p>
+      <section className="phead" aria-label="Project summary">
+        <div className="phead-top">
+          <KitchenArt size={46} />
+          <div style={{ minWidth: 0 }}>
+            <b className="phead-name">{project.name}</b>
+            <span className="phead-sub">{headStatus}</span>
+          </div>
+        </div>
+        <div className="phead-bar" role="img" aria-label={`${pct} percent paid`}><i style={{ width: `${pct}%` }} /></div>
+        <div className="phead-facts">
+          <div><b>{dollars(t.total)}</b><span>Contract</span></div>
+          <div><b>{role === 'contractor' ? dollars(Math.max(0, t.total - confirmed)) : dollars(confirmed)}</b><span>{role === 'contractor' ? 'To collect' : 'Paid'}</span></div>
+          <div><b>{agr?.start_date ? fmtDay(agr.start_date as string) : '–'}</b><span>Started</span></div>
+          <div><b>{endISO ? fmtDay(endISO) : '–'}</b><span>Finish</span></div>
+        </div>
+        <div className="phead-acts">
+          <Link href={base}>Message</Link>
+          <Link href={`${base}/photos`}>Photos</Link>
+          {role === 'contractor' ? <Link href={`${base}/payments`}>Bill</Link> : <Link href={`${base}/schedule`}>Schedule</Link>}
+        </div>
       </section>
 
       <ProjectPartners variant="top" projectId={project.id} role={role} notice={searchParams.partner === 'sent' ? 'Invite sent. They will see it as soon as they sign in.' : undefined} />
