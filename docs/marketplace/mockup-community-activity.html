@@ -1,0 +1,62 @@
+<title>Community Activity</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: one phone column. Two screens: the new default feed that mixes projects and ideas with recent activity on top, and the filtered view. Names, prices and trades are examples. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#c4813f;--orl:#f9efe4;--orb:#ecd4a8;--fg:#1f4d3a;--fgl:#e4f0e8;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--fgl:#173a2c;--fg:#8fd0ab;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--fgl:#173a2c;--fg:#8fd0ab;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:14px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px}
+h2{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;font-size:28px;line-height:1.05;text-wrap:balance}
+h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;font-size:18px}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
+.mut{color:var(--mut);font-size:14.5px;line-height:1.5;margin:0}
+.sw{display:grid;grid-template-columns:1fr 1fr;gap:6px}.sw button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:6px 4px;border-radius:99px;font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:44px}.sw button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.sec{display:flex;flex-direction:column;gap:14px}.sec[hidden]{display:none}
+.stage{display:flex;justify-content:center;padding:22px 0 8px;border-radius:30px;background:radial-gradient(120% 80% at 50% 0%,var(--orl),transparent 70%)}
+.ph{width:min(300px,84%);height:620px;background:#faf8f4;color:#1b1a18;border:7px solid #1b1a18;border-radius:36px;position:relative;overflow:hidden;box-shadow:0 22px 44px -18px rgba(27,26,24,.45);display:flex;flex-direction:column}
+.url{height:44px;background:#f3f1ec;display:flex;align-items:center;justify-content:center;font-size:11px;color:#6b655e;padding-top:10px;flex:none}
+.body{flex:1;padding:13px;display:flex;flex-direction:column;gap:8px;font-size:12px;line-height:1.4;overflow:hidden}
+.body h4{font:800 18px/1.05 'Bricolage Grotesque',sans-serif;letter-spacing:-.03em;margin:0}
+.body p{margin:0;color:#5c564f}
+.lab{font-size:10px;text-transform:uppercase;letter-spacing:.08em;font-weight:600;color:#6b655e;margin-top:2px}
+.cd{background:#fff;border:1px solid #e4dfd6;border-radius:12px;padding:9px 10px;display:flex;flex-direction:column;gap:5px}
+.r{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.r b{font-size:12.5px}.av{width:30px;height:30px;border-radius:9px;color:#fff;font:800 13px 'Bricolage Grotesque',sans-serif;display:grid;place-items:center;flex:none}
+.a1{background:#1f4d3a}.a2{background:#c4813f}
+.pill{display:inline-block;border-radius:99px;padding:2px 8px;font-size:10px;font-weight:600;white-space:nowrap}
+.ok{background:#e4f0e8;color:#1f4d3a}.wt{background:#f9efe4;color:#8a5a1a}.gr{background:#eef0f4;color:#4a4f5c}
+.amt{font:800 15px 'Bricolage Grotesque',sans-serif;font-variant-numeric:tabular-nums}
+.tot{background:#1f4d3a;color:#fff;border-radius:13px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center}.tot b{font:800 21px 'Bricolage Grotesque',sans-serif}.tot small{opacity:.85;font-size:10.5px}
+.inp{border:1px solid #d6d0c6;border-radius:9px;padding:7px 9px;font-size:11px;color:#8a8379;background:#faf8f4}
+.btn{border:0;border-radius:12px;padding:10px;font:600 12.5px 'IBM Plex Sans',sans-serif;text-align:center;background:#1f4d3a;color:#fff}.btn.gh{background:transparent;color:#6b655e;border:1px solid #e4dfd6}
+.tabs{height:48px;background:#fff;border-top:1px solid #e4dfd6;display:flex;justify-content:space-around;align-items:center;font-size:9.5px;color:#6b655e;flex:none}
+.rules{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:9px}
+.rules ul{margin:0;padding-left:18px;color:var(--mut);font-size:14px;line-height:1.5;display:flex;flex-direction:column;gap:6px}.rules li b{color:var(--ink)}
+</style>
+<div class="wrap"><style>.pill.new{background:#c4813f;color:#fff}.pill.hot{background:#1f4d3a;color:#fff}.pill.dk{background:#1b1a18;color:#fff;padding:4px 10px;font-size:11px}.pill.gr{padding:4px 10px;font-size:11px}</style>
+<div class="note"><b>Mockup.</b> Community opens on everything, newest first. Names and numbers are examples.</div>
+<h2>Recent activity up front</h2>
+<p class="mut">Today the feed opens on Projects only, so ideas sit behind a tab. This opens on All, so new ideas and projects show together.</p>
+<div class="sw" role="group" aria-label="Screen"><button type="button" data-s="a" aria-pressed="true">1 · New default</button><button type="button" data-s="b" aria-pressed="false">2 · Ideas tab</button></div>
+<div class="sec" id="a"><div class="stage"><div class="ph"><div class="url">Community</div><div class="body">
+<h4 style="font-size:16px">Community</h4>
+<div style="display:flex;gap:5px"><span class="pill dk">All</span><span class="pill gr">Projects</span><span class="pill gr">Ideas · 3 new</span></div>
+<div class="cd" style="background:#f9efe4;border-color:#ecd4a8"><b style="font-size:11.5px">Since your last visit</b><span style="font-size:11px">2 new projects · 3 new ideas</span><span style="font-size:11px">💬 4 new replies on your posts</span></div>
+<div class="cd"><div class="r"><b>Which gray for an open living room?</b><span class="pill new">New</span></div><span style="font-size:10.5px;color:#6b655e">Idea · 6 votes · 3 replies · 40m ago</span></div><div class="cd" style="padding:0;overflow:hidden"><div style="display:flex;height:70px"><div style="flex:1;background:#b9b2a6"></div><div style="flex:1;background:#d9c9a8"></div></div><div style="padding:8px 10px;display:flex;flex-direction:column;gap:3px"><div class="r"><b>Kitchen repaint, Plano</b><span class="pill new">New</span></div><span style="font-size:10.5px;color:#6b655e">Nesty's Painting · 3 days · 2h ago</span></div></div>
+<div class="cd"><div class="r"><b>Best patio cover for Texas sun?</b></div><span style="font-size:10.5px;color:#6b655e">Idea · 12 votes · 9 replies · yesterday</span></div></div><div class="tabs"><span>Home</span><span style="color:#1f4d3a;font-weight:700">Community</span><span>Post</span><span>Menu</span></div></div></div><p class="mut">The feed opens on All, newest first. A "Since your last visit" box counts what is new, including replies on your own posts. New posts get an orange New tag until you open Community again. The Ideas chip shows how many are new.</p></div>
+<div class="sec" id="b" hidden><div class="stage"><div class="ph"><div class="url">Community · Ideas</div><div class="body">
+<h4 style="font-size:16px">Community</h4>
+<div style="display:flex;gap:5px"><span class="pill gr">All</span><span class="pill gr">Projects</span><span class="pill dk">Ideas</span></div>
+<div class="cd"><div class="r"><b>Which gray for an open living room?</b><span class="pill new">New</span></div><span style="font-size:10.5px;color:#6b655e">Idea · 6 votes · 3 replies · 40m ago</span></div>
+<div class="cd"><div class="r"><b>Best patio cover for Texas sun?</b><span class="pill hot">Active now</span></div><span style="font-size:10.5px;color:#6b655e">Idea · 12 votes · 9 replies · 2 new replies</span></div>
+<div class="cd"><div class="r"><b>Cabinet colors that hide wear</b></div><span style="font-size:10.5px;color:#6b655e">Idea · 4 votes · 1 reply · 2 days ago</span></div></div><div class="tabs"><span>Home</span><span style="color:#1f4d3a;font-weight:700">Community</span><span>Post</span><span>Menu</span></div></div></div><p class="mut">Ideas with fresh replies show "Active now" and move up the list, so a lively question is not buried under newer, quiet ones.</p></div>
+</div>
+<script>
+document.querySelectorAll('.sw button').forEach(function(b){b.addEventListener('click',function(){
+  document.querySelectorAll('.sw button').forEach(function(x){x.setAttribute('aria-pressed',x===b)});
+  ['a','b'].forEach(function(id){document.getElementById(id).hidden=id!==b.dataset.s});
+})});
+</script>
