@@ -19,6 +19,14 @@ export const metadata: Metadata = {
   title: 'Jobfile',
   description: 'A shared record for home improvement projects.',
   applicationName: 'Jobfile',
+  metadataBase: new URL(process.env.APP_URL || 'https://jobfile-rosy.vercel.app'),
+  openGraph: {
+    type: 'website',
+    siteName: 'Jobfile',
+    title: 'Jobfile: free for contractors and homeowners',
+    description: 'Homeowners get bids from local contractors. Contractors bid on local jobs and run projects without the paperwork.',
+  },
+  twitter: { card: 'summary_large_image', title: 'Jobfile', description: 'Bid on local jobs and run projects without the paperwork.' },
   icons: { icon: '/icons/icon-192.png', apple: '/icons/apple-touch-icon.png' },
   appleWebApp: { capable: true, title: 'Jobfile', statusBarStyle: 'default' },
 };

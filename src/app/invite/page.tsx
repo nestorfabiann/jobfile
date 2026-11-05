@@ -7,8 +7,16 @@ import InviteShare from '@/components/InviteShare';
 export const dynamic = 'force-dynamic';
 
 const MSG = {
-  h: 'Hey, I use Jobfile to get free bids from local contractors and keep everything about my project in one place. It is free to use. Take a look:',
-  c: 'Hey, Jobfile is free for contractors: no subscription, no fees at all. You can bid on local jobs and run projects without the paperwork. Take a look:',
+  h: {
+    short: 'Hey, I use Jobfile to get free bids from local contractors and keep everything about my project in one place. It is free to use. Take a look:',
+    post: 'Planning a home project? I use Jobfile to get bids from local contractors and keep the agreement, photos, payments and messages in one place. It is free to use. If you are fixing something up, check it out:',
+    es: 'Hola, uso Jobfile para recibir cotizaciones gratis de contratistas locales y tener todo mi proyecto en un solo lugar. Es gratis. Échale un vistazo:',
+  },
+  c: {
+    short: 'Hey, Jobfile is free for contractors: no subscription, no fees at all. You can bid on local jobs and run projects without the paperwork. Take a look:',
+    post: 'Contractors: I use Jobfile to find local jobs and run projects without the paperwork. Bids, agreements, photos, change orders and payments all in one place. It is free for contractors: no subscription, no fees at all. Take a look:',
+    es: 'Hola, Jobfile es gratis para contratistas: sin suscripción y sin comisiones. Puedes cotizar trabajos locales y llevar tus proyectos sin tanto papeleo. Échale un vistazo:',
+  },
 };
 
 export default async function Invite() {
