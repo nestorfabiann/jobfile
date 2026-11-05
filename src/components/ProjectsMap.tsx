@@ -32,7 +32,7 @@ function loadLeaflet(): Promise<any> {
 export default function ProjectsMap({ me, radiusMi, groups }: { me: { lat: number; lng: number }; radiusMi: number | null; groups: MapGroup[] }) {
   const el = useRef<HTMLDivElement>(null);
   const [sel, setSel] = useState<MapGroup | null>(null);
-  const [failed, setFailed] = useState(false);
+  const [failed, setFailed] = useState('');
 
   useEffect(() => {
     let map: any;
@@ -51,16 +51,18 @@ export default function ProjectsMap({ me, radiusMi, groups }: { me: { lat: numbe
         L.marker([g.lat, g.lng], { icon, title: many ? `${g.jobs.length} projects in ${g.zip}` : g.jobs[0].title }).addTo(map).on('click', () => setSel(g));
         pts.push([g.lat, g.lng]);
       });
-      if (radiusMi) {
-        const c = L.circle([me.lat, me.lng], { radius: radiusMi * 1609.34 });
-        map.fitBounds(c.getBounds().extend(pts), { padding: [16, 16], maxZoom: 12 });
-      } else if (pts.length > 1) map.fitBounds(pts, { padding: [30, 30], maxZoom: 12 });
+      // Fit the view to the service area and the pins. Bounds are computed by hand: an unadded circle cannot give its own bounds.
+      const dLat = radiusMi ? radiusMi / 69 : 0;
+      const dLng = radiusMi ? radiusMi / (69 * Math.max(0.2, Math.cos((me.lat * Math.PI) / 180))) : 0;
+      const bounds = L.latLngBounds([[me.lat - dLat, me.lng - dLng], [me.lat + dLat, me.lng + dLng]]);
+      pts.forEach((pt) => bounds.extend(pt));
+      map.fitBounds(bounds, { padding: [16, 16], maxZoom: 12 });
       map.on('click', () => setSel(null));
-    }).catch(() => setFailed(true));
+    }).catch((e) => { console.error('map', e); setFailed(String(e?.message ?? e ?? 'unknown')); });
     return () => { dead = true; if (map) map.remove(); };
   }, [me.lat, me.lng, radiusMi, groups]);
 
-  if (failed) return <div className="box warn">The map could not load. Check your connection and try again, or use the list.</div>;
+  if (failed) return <div className="box warn">The map could not load. Check your connection and try again, or use the list.<div className="small muted">{failed}</div></div>;
   return (
     <div className="pmap-wrap">
       <div ref={el} className="pmap" role="application" aria-label="Map of open projects near you" />
