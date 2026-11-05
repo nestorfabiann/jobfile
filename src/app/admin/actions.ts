@@ -5,6 +5,7 @@ import { audit, isTeamAdmin, requireAdmin } from '@/lib/admin';
 import { notifyUsers } from '@/lib/notify';
 import { supabaseAdmin } from '@/lib/supabase/server';
 import { miles, zipCoords } from '@/lib/matching';
+import { tellTeamPartners } from '@/lib/team';
 
 export type Result = { ok: true; message: string } | { ok: false; error: string };
 const MAX_RECIPIENTS = 200;
@@ -186,10 +187,11 @@ export async function adminCloseListing(formData: FormData) {
   const reason = String(formData.get('reason') ?? '').trim().slice(0, 300) || 'Closed by admin';
   const { data: l } = await db.from('marketplace_listings').update({ status: 'closed' }).eq('id', id).eq('status', 'open').select('id,homeowner_id,job_type');
   if ((l ?? []).length) {
-    const { data: bids } = await db.from('marketplace_bids').update({ status: 'not_selected', updated_at: new Date().toISOString() }).eq('listing_id', id).eq('status', 'waiting').select('bidder_id');
+    const { data: bids } = await db.from('marketplace_bids').update({ status: 'not_selected', updated_at: new Date().toISOString() }).eq('listing_id', id).eq('status', 'waiting').select('id,bidder_id');
     await audit(me, 'close_listing', { type: 'listing', id }, { reason });
     await notifyUsers({ userIds: [(l ?? [])[0].homeowner_id as string], projectId: null, kind: 'admin', path: '/marketplace', title: 'Your marketplace project was closed', body: `Jobfile closed this project. Reason: ${reason}`, force: true });
     await notifyUsers({ userIds: Array.from(new Set((bids ?? []).map((b) => b.bidder_id as string))), projectId: null, kind: 'bid', path: '/marketplace/bids', title: 'A project you bid on was closed', body: 'It is no longer taking bids.' });
+    await tellTeamPartners((bids ?? []).map((b) => b.id as string), 'A project you bid on was closed', 'It is no longer taking bids.');
   }
   revalidatePath('/admin/marketplace');
   revalidatePath('/marketplace');

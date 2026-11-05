@@ -1,5 +1,6 @@
 import { supabaseAdmin } from '@/lib/supabase/server';
 import { DEFAULT_RADIUS, miles, zipCoords } from '@/lib/matching';
+import { notifyUsers } from '@/lib/notify';
 
 export type TeamBid = {
   id: string; listing_id: string; lead_company_id: string; lead_user_id: string; lead_cents: number; weeks: number | null; start_date: string | null;
@@ -29,17 +30,35 @@ export async function memberIds(companyId: string): Promise<string[]> {
   return (data ?? []).map((m: any) => m.user_id as string);
 }
 
-/** Invites waiting for a company's answer. Zero when the team tables do not exist yet. */
+/** Things waiting on a company: invites to answer, plus new prices a partner proposed on its own team bids. Zero when the team tables do not exist yet. */
 export async function inviteCount(userId: string): Promise<number> {
   try {
     const co = await companyOf(userId);
     if (!co) return 0;
-    const { data: ps } = await supabaseAdmin().from('team_partners').select('team_bid_id').eq('company_id', co.id).eq('status', 'invited');
+    const db = supabaseAdmin();
+    const { data: ps } = await db.from('team_partners').select('team_bid_id').eq('company_id', co.id).eq('status', 'invited');
     const ids = (ps ?? []).map((p: any) => p.team_bid_id as string);
-    if (!ids.length) return 0;
-    const { count } = await supabaseAdmin().from('team_bids').select('id', { count: 'exact', head: true }).in('id', ids).eq('status', 'pending');
-    return count ?? 0;
+    const { count: invites } = ids.length ? await db.from('team_bids').select('id', { count: 'exact', head: true }).in('id', ids).eq('status', 'pending') : { count: 0 };
+    const { data: mine } = await db.from('team_bids').select('id').eq('lead_company_id', co.id).eq('status', 'pending');
+    const mineIds = (mine ?? []).map((t: any) => t.id as string);
+    const { count: prices } = mineIds.length ? await db.from('team_partners').select('id', { count: 'exact', head: true }).in('team_bid_id', mineIds).eq('status', 'countered') : { count: 0 };
+    return (invites ?? 0) + (prices ?? 0);
   } catch { return 0; }
+}
+
+/** One-contract team bids: the partner company hears what happened to the lead's bid (not selected, project closed). Never throws. */
+export async function tellTeamPartners(leadBidIds: string[], title: string, body: string) {
+  try {
+    if (!leadBidIds.length) return;
+    const db = supabaseAdmin();
+    const { data: tbs } = await db.from('team_bids').select('id,structure').in('bid_id', leadBidIds);
+    const ids = ((tbs ?? []) as any[]).filter((t) => t.structure !== 'separate').map((t) => t.id as string);
+    if (!ids.length) return;
+    const { data: ps } = await db.from('team_partners').select('company_id').in('team_bid_id', ids).eq('status', 'confirmed');
+    const users = new Set<string>();
+    for (const cid of Array.from(new Set((ps ?? []).map((p: any) => p.company_id as string)))) (await memberIds(cid)).forEach((u) => users.add(u));
+    await notifyUsers({ userIds: Array.from(users), projectId: null, kind: 'bid', path: '/collaborate', title, body });
+  } catch { /* team tables not created yet */ }
 }
 
 /** Both companies must be verified by Jobfile and not hidden. */

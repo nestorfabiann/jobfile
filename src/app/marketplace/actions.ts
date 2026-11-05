@@ -15,6 +15,7 @@ import {
 import { aiConfigured, makeReference, makePostReview, type Reference } from '@/lib/marketplaceAI';
 import { cleanAnswers, questionsFor } from '@/lib/scopeQuestions';
 import { cleanDraft } from '@/lib/drafts';
+import { tellTeamPartners } from '@/lib/team';
 import { hasContactInfo } from '@/lib/contactInfo';
 import { MAX_VIDEOS, MAX_VIDEO_BYTES, VIDEO_TYPES } from '@/lib/mediaLimits';
 
@@ -276,8 +277,9 @@ export async function closeListing(formData: FormData) {
   const db = supabaseAdmin();
   const { data: done } = await db.from('marketplace_listings').update({ status: 'closed' }).eq('id', l.id).eq('status', 'open').select('id');
   if ((done ?? []).length) {
-    const { data: bids } = await db.from('marketplace_bids').update({ status: 'not_selected', updated_at: new Date().toISOString() }).eq('listing_id', l.id).eq('status', 'waiting').select('bidder_id');
+    const { data: bids } = await db.from('marketplace_bids').update({ status: 'not_selected', updated_at: new Date().toISOString() }).eq('listing_id', l.id).eq('status', 'waiting').select('id,bidder_id');
     await notifyUsers({ userIds: Array.from(new Set((bids ?? []).map((b) => b.bidder_id as string))), projectId: null, kind: 'bid', path: '/marketplace/bids', title: `${listingTitle(l)} was closed`, body: 'The homeowner closed this project, so it is no longer taking bids.' });
+    await tellTeamPartners((bids ?? []).map((b) => b.id as string), `${listingTitle(l)} was closed`, 'The homeowner closed this project, so your team bid is closed.');
   }
   revalidatePath('/marketplace');
   redirect('/marketplace');
@@ -450,8 +452,9 @@ async function openProject(db: Db, l: Listing, bid: Bid, homeownerId: string, ho
 
 /** Everyone still waiting is told the project went elsewhere. */
 async function closeOthers(db: Db, l: Listing) {
-  const { data: lost } = await db.from('marketplace_bids').update({ status: 'not_selected', updated_at: new Date().toISOString() }).eq('listing_id', l.id).eq('status', 'waiting').select('bidder_id');
+  const { data: lost } = await db.from('marketplace_bids').update({ status: 'not_selected', updated_at: new Date().toISOString() }).eq('listing_id', l.id).eq('status', 'waiting').select('id,bidder_id');
   await notifyUsers({ userIds: Array.from(new Set((lost ?? []).map((b) => b.bidder_id as string))), projectId: null, kind: 'bid', path: '/marketplace/bids', title: `${listingTitle(l)} went to another contractor`, body: 'Thanks for bidding. The homeowner chose a different bid.' });
+  await tellTeamPartners((lost ?? []).map((b) => b.id as string), `${listingTitle(l)} went to another contractor`, 'The homeowner chose a different bid, so your team bid was not selected.');
 }
 
 /** The team a bid belongs to, if any (as the lead's bid or as a partner's bid). Null when there is none or the team tables are missing. */
