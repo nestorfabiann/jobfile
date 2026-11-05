@@ -95,7 +95,6 @@ export default function ContractorProjects(p: {
         </nav>
       )}
 
-      {!first && <HomeScreenCard />}
       {!first && <PushCard />}
       {p.error ? <div className="box bad">{p.error}</div> : null}
       {p.needsCard}
@@ -208,6 +207,8 @@ export default function ContractorProjects(p: {
       )}
 
       {p.alerts}
+
+      {!first && <HomeScreenCard />}
     </div>
   );
 }
