@@ -1,0 +1,100 @@
+<title>Page Help</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: one phone column. Four examples of the same help sheet, each opening on "On this page" for the page behind it, plus a short notes tab. Questions and answers are the proposed wording. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#c4813f;--orl:#f9efe4;--orb:#ecd4a8;--fg:#1f4d3a;--fgl:#e4f0e8;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--fgl:#173a2c;--fg:#8fd0ab;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--fgl:#173a2c;--fg:#8fd0ab;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:14px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px}
+h2{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;font-size:28px;line-height:1.05;text-wrap:balance}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
+.mut{color:var(--mut);font-size:14.5px;line-height:1.5;margin:0}
+.sw{display:grid;grid-template-columns:1fr 1fr;gap:6px}.sw button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:8px 4px;border-radius:99px;font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer}.sw button[aria-pressed=true]{background:var(--fg);color:#fff;border-color:var(--fg)}
+.sec{display:flex;flex-direction:column;gap:14px}.sec[hidden]{display:none}
+.stage{display:flex;justify-content:center;padding:22px 0 8px;border-radius:30px;background:radial-gradient(120% 80% at 50% 0%,var(--orl),transparent 70%)}
+.ph{width:min(330px,92%);height:700px;background:#faf8f4;color:#1b1a18;border:7px solid #1b1a18;border-radius:36px;overflow:hidden;box-shadow:0 22px 44px -18px rgba(27,26,24,.45);display:flex;flex-direction:column;position:relative}
+.url{height:40px;background:#f3f1ec;display:flex;align-items:center;justify-content:center;font-size:11px;color:#6b655e;padding-top:8px;flex:none}
+.dim{flex:1;position:relative;background:#faf8f4;display:flex;flex-direction:column;overflow:hidden}
+.bg{padding:14px;display:flex;flex-direction:column;gap:10px;filter:blur(1px)}.blur{height:70px;border-radius:14px;background:#efeae0}.blur.s{height:46px}
+.dim::after{content:'';position:absolute;inset:0;background:rgba(27,26,24,.42)}
+.sheet{position:absolute;left:0;right:0;bottom:0;top:62px;background:#fff;border-radius:22px 22px 0 0;z-index:2;padding:8px 14px 14px;display:flex;flex-direction:column;gap:8px;font-size:12px;line-height:1.4;overflow:hidden}
+.grab{width:40px;height:4px;border-radius:99px;background:#e4dfd6;align-self:center;margin-bottom:2px}
+.row{display:flex;justify-content:space-between;align-items:center}.sheet h4{font:800 19px 'Bricolage Grotesque',sans-serif;letter-spacing:-.03em;margin:0}
+.x{width:26px;height:26px;border-radius:50%;background:#f3f1ec;display:grid;place-items:center;font-size:11px}
+.srch{border:1px solid #e4dfd6;border-radius:99px;padding:8px 12px;color:#9b948a;background:#faf8f4}
+.chips{display:flex;gap:6px;overflow:hidden;white-space:nowrap}.ch{border:1px solid #e4dfd6;border-radius:99px;padding:5px 10px;font-weight:600;font-size:11px;flex:none}.ch.on{background:#f9efe4;border-color:#c4813f;color:#8a5a1a}
+.lab{font-size:10px;text-transform:uppercase;letter-spacing:.08em;font-weight:600;color:#6b655e;margin-top:2px}
+.q{border-bottom:1px solid #efeae0;padding:8px 0;cursor:pointer}.qh{display:flex;justify-content:space-between;gap:8px;font-weight:600;font-size:12.5px}.qh i{font-style:normal;color:#6b655e;transition:transform .15s}
+.qa{display:none;color:#5c564f;padding-top:5px}.q.open .qa{display:block}.q.open .qh i{transform:rotate(180deg)}
+.more{margin-top:auto;text-align:center;color:#c4813f;font-weight:600;padding:6px}
+.why{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:9px}
+.why ul{margin:0;padding-left:18px;color:var(--mut);font-size:14px;line-height:1.5;display:flex;flex-direction:column;gap:6px}.why li b{color:var(--ink)}
+</style>
+<div class="wrap">
+  <div class="note"><b>Mockup.</b> The "?" help sheet opens on a new <b>On this page</b> chip, with questions about the page you are on. Tap a question to open it. Wording is the proposed text.</div>
+  <h2>Help that knows where you are</h2>
+  <p class="mut">Same sheet, different page behind it. The first chip is highlighted and shows only what matters for that page.</p>
+  <div class="sw" role="group" aria-label="Page">
+    <button type="button" data-s="a" aria-pressed="true">1 · Projects</button>
+    <button type="button" data-s="b" aria-pressed="false">2 · Marketplace</button>
+    <button type="button" data-s="c" aria-pressed="false">3 · Community</button>
+    <button type="button" data-s="d" aria-pressed="false">4 · Settings</button>
+    <button type="button" data-s="e" aria-pressed="false" style="grid-column:1/-1">5 · How it works</button>
+  </div>
+<div class="sec" id="a"><div class="stage"><div class="ph"><div class="url">Your projects</div>
+    <div class="dim"><div class="bg"><b style="font:800 20px 'Bricolage Grotesque',sans-serif">Your projects</b><div class="blur"></div><div class="blur s"></div></div>
+    <div class="sheet"><div class="grab"></div><div class="row"><h4>How can we help?</h4><span class="x">✕</span></div>
+      <div class="srch">Search help</div>
+      <div class="chips"><span class="ch on">On this page</span><span class="ch">All</span><span class="ch">Getting started</span><span class="ch">Bidding</span><span class="ch">Payments</span></div>
+      <div class="lab">About Projects</div>
+      <div class="q"><div class="qh"><span>What do the sections mean?</span><i>⌄</i></div><div class="qa">Homeowners see Needs you, Waiting for bids, Hired and ongoing, and Completed. Contractors see Find work, Needs you, Ongoing, Your bids and Completed.</div></div><div class="q"><div class="qh"><span>What does the red number on Projects mean?</span><i>⌄</i></div><div class="qa">Things waiting on you, such as a payment to confirm or a choice to make.</div></div><div class="q"><div class="qh"><span>How do I delete a draft?</span><i>⌄</i></div><div class="qa">On a draft card, tap Delete and confirm.</div></div>
+      <div class="more">Not here? See all help</div>
+    </div></div></div></div></div><div class="sec" id="b" hidden><div class="stage"><div class="ph"><div class="url">Your marketplace projects</div>
+    <div class="dim"><div class="bg"><b style="font:800 20px 'Bricolage Grotesque',sans-serif">Your marketplace projects</b><div class="blur"></div><div class="blur s"></div></div>
+    <div class="sheet"><div class="grab"></div><div class="row"><h4>How can we help?</h4><span class="x">✕</span></div>
+      <div class="srch">Search help</div>
+      <div class="chips"><span class="ch on">On this page</span><span class="ch">All</span><span class="ch">Getting started</span><span class="ch">Bidding</span><span class="ch">Payments</span></div>
+      <div class="lab">About Marketplace</div>
+      <div class="q"><div class="qh"><span>What does “New bid” mean?</span><i>⌄</i></div><div class="qa">A bid that arrived since you last opened that project.</div></div><div class="q"><div class="qh"><span>How long does a project stay open?</span><i>⌄</i></div><div class="qa">About 30 days. In the last 7 days you can tap Extend for 30 more.</div></div><div class="q"><div class="qh"><span>Does Jobfile hold or move money?</span><i>⌄</i></div><div class="qa">No. Jobfile records payments between you and your contractor.</div></div>
+      <div class="more">Not here? See all help</div>
+    </div></div></div></div></div><div class="sec" id="c" hidden><div class="stage"><div class="ph"><div class="url">Community</div>
+    <div class="dim"><div class="bg"><b style="font:800 20px 'Bricolage Grotesque',sans-serif">Community</b><div class="blur"></div><div class="blur s"></div></div>
+    <div class="sheet"><div class="grab"></div><div class="row"><h4>How can we help?</h4><span class="x">✕</span></div>
+      <div class="srch">Search help</div>
+      <div class="chips"><span class="ch on">On this page</span><span class="ch">All</span><span class="ch">Getting started</span><span class="ch">Bidding</span><span class="ch">Payments</span></div>
+      <div class="lab">About Community</div>
+      <div class="q"><div class="qh"><span>What is Community?</span><i>⌄</i></div><div class="qa">Finished projects people share, plus questions asking for ideas.</div></div><div class="q"><div class="qh"><span>How do I share a finished project?</span><i>⌄</i></div><div class="qa">Pick a finished project and a before and an after photo. The other side approves it, then Jobfile reviews. Only the city is shown.</div></div><div class="q"><div class="qh"><span>How do I ask for ideas?</span><i>⌄</i></div><div class="qa">Tap Ask for ideas, add a photo if you like, and add a poll with 2 to 4 choices.</div></div>
+      <div class="more">Not here? See all help</div>
+    </div></div></div></div></div><div class="sec" id="d" hidden><div class="stage"><div class="ph"><div class="url">Settings</div>
+    <div class="dim"><div class="bg"><b style="font:800 20px 'Bricolage Grotesque',sans-serif">Settings</b><div class="blur"></div><div class="blur s"></div></div>
+    <div class="sheet"><div class="grab"></div><div class="row"><h4>How can we help?</h4><span class="x">✕</span></div>
+      <div class="srch">Search help</div>
+      <div class="chips"><span class="ch on">On this page</span><span class="ch">All</span><span class="ch">Getting started</span><span class="ch">Bidding</span><span class="ch">Payments</span></div>
+      <div class="lab">About Settings</div>
+      <div class="q"><div class="qh"><span>How do I change how I’m alerted?</span><i>⌄</i></div><div class="qa">Choose Email and Text, and turn on phone alerts. Texts never include message content.</div></div><div class="q"><div class="qh"><span>Why is my ZIP code here?</span><i>⌄</i></div><div class="qa">It shows contractors near you. Your street address is never shared.</div></div><div class="q"><div class="qh"><span>Can I read messages in Spanish?</span><i>⌄</i></div><div class="qa">Yes. Pick your language, and new messages can be translated automatically. Translations are made by AI.</div></div>
+      <div class="more">Not here? See all help</div>
+    </div></div></div></div></div>
+  <div class="sec" id="e" hidden>
+    <div class="why">
+      <b>How it works</b>
+      <ul>
+        <li><b>"On this page" chip.</b> New first chip. It is selected when the page has its own questions, and it shows only those. "All" and the other chips work as before.</li>
+        <li><b>Every Menu page gets its own set.</b> Home, Projects, Marketplace, Community, Find contractors, Collaborate (already done), Settings, Business profile, Invite friends and Get the app. Homeowners and contractors each see the questions that apply to them.</li>
+        <li><b>A page with no questions</b> opens on All, as it does today. No empty chip.</li>
+        <li><b>Search still searches everything,</b> so a typed question finds its answer from any page.</li>
+        <li><b>Plain answers.</b> Short, and true to how the app works today. When a feature changes, the answer changes with it.</li>
+        <li><b>No AI.</b> These are written answers, so they are always the same and never invented.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+<script>
+document.querySelectorAll('.sw button').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('.sw button').forEach(x=>x.setAttribute('aria-pressed',x===b));
+  document.querySelectorAll('.sec').forEach(s=>s.hidden=s.id!==b.dataset.s);
+}));
+document.querySelectorAll('.q').forEach(q=>q.addEventListener('click',()=>q.classList.toggle('open')));
+</script>
