@@ -17,7 +17,7 @@ type Types = Record<string, { size: number; sizeLabel: string; groups: [string, 
 const money = (n: number) => '$' + Math.round(n).toLocaleString('en-US');
 const digits = (v: string) => parseInt(v.replace(/\D/g, ''), 10) || 0;
 
-export default function MarketplacePost({ types, aiOn, draft }: { types: Types; aiOn: boolean; draft?: { id: string; at: string; data: DraftData } | null }) {
+export default function MarketplacePost({ types, aiOn, draft, inviteCompany }: { types: Types; aiOn: boolean; inviteCompany?: string; draft?: { id: string; at: string; data: DraftData } | null }) {
   const names = Object.keys(types);
   const d0 = draft?.data;
   const [type, setType] = useState(d0 && types[d0.type] ? d0.type : names[0]);
@@ -116,6 +116,7 @@ export default function MarketplacePost({ types, aiOn, draft }: { types: Types; 
     try {
       const fd = new FormData(formNode);
       if (draftId.current) fd.set('draft_id', draftId.current);
+      if (inviteCompany) fd.set('invite_company', inviteCompany);
       const r = await createListing(fd);
       if (!r.ok) { setPostErr(r.error); setPosting(false); return; }
       if (media.length) {

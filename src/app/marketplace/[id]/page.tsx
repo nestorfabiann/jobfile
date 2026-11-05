@@ -2,6 +2,7 @@ import BidChoice from '@/components/BidChoice';
 import { localPartners } from '@/lib/team';
 import TradeIcon from '@/components/TradeIcon';
 import Link from 'next/link';
+import { declineInvite } from '@/app/invitebid/actions';
 import { notFound } from 'next/navigation';
 import { requireUser } from '@/lib/session';
 import { supabaseAdmin } from '@/lib/supabase/server';
@@ -57,6 +58,19 @@ export default async function ListingPage({ params, searchParams }: { params: { 
   const videoUrls = await signedUrls('listing-videos', (videoRows ?? []).map((v) => v.path as string));
   const allBids = (bidRows ?? []) as Bid[];
   // The homeowner has now seen the bids; the Projects page stops calling them new. Ignored if the 014 column is not there yet.
+  // Invites and questions for this project (ignored if the 041 tables are not there yet).
+  let invRows: any[] = [];
+  let invNames = new Map<string, string>();
+  try {
+    const q = db.from('bid_invites').select('id,company_id,status,note,created_at').eq('listing_id', l.id);
+    const { data: iv } = owner ? await q : companyId ? await q.eq('company_id', companyId) : { data: [] };
+    invRows = (iv ?? []) as any[];
+    if (owner && invRows.length) {
+      const { data: cn } = await db.from('companies').select('id,name').in('id', invRows.map((r) => r.company_id));
+      invNames = new Map(((cn ?? []) as any[]).map((r) => [r.id as string, r.name as string]));
+    }
+  } catch { /* table missing */ }
+  const bidders = new Set(allBids.map((b) => b.company_id as string));
   if (owner) await db.from('marketplace_listings').update({ bids_seen_at: new Date().toISOString() }).eq('id', l.id);
   // Pre-accept messages. Homeowners see every bid's thread; a contractor sees only their own. Opening the page marks the other side's messages read.
   const threadBids = owner ? allBids.filter((b) => b.status !== 'withdrawn').map((b) => b.id) : allBids.filter((b) => b.company_id === companyId).map((b) => b.id);
@@ -239,6 +253,29 @@ export default async function ListingPage({ params, searchParams }: { params: { 
       {searchParams.media === 'partial' ? <div className="box bad">Your project is posted, but some photos or videos did not upload. You can add them again below.</div> : null}
       {searchParams.bid ? <div className="box ok">Your bid was sent.</div> : null}
       {searchParams.error ? <div className="box bad">{searchParams.error}</div> : null}
+      {!owner && invRows[0] && invRows[0].status !== 'declined' && !bidders.has(companyId as string) && (
+        <div className="box" style={{ background: 'var(--accent-soft, #f9efe4)' }}>
+          <b>{invRows[0].status === 'invited' ? 'The homeowner invited you to bid.' : 'The homeowner asked you a question.'}</b>
+          {invRows[0].note ? <span className="small" style={{ display: 'block' }}>&ldquo;{invRows[0].note}&rdquo;</span> : null}
+          <span className="row" style={{ gap: 10, marginTop: 8 }}>
+            <Link className="btn ghost" href={`/marketplace/${l.id}/invite/${invRows[0].id}`}>{invRows[0].status === 'asked' ? 'Read and reply' : 'Ask a question'}</Link>
+            <form action={declineInvite}><input type="hidden" name="id" value={invRows[0].id} /><button className="btn ghost" type="submit">Pass on this one</button></form>
+          </span>
+        </div>
+      )}
+      {owner && invRows.length > 0 && (
+        <div className="card">
+          <h2>Invited contractors</h2>
+          <div className="stack" style={{ gap: 8 }}>
+            {invRows.map((r) => (
+              <div className="row" key={r.id} style={{ justifyContent: 'space-between', gap: 10 }}>
+                <span><Link href={`/contractors/${r.company_id}`}><b>{invNames.get(r.company_id) ?? 'Contractor'}</b></Link> <span className="muted small">· {bidders.has(r.company_id) ? 'Bid sent' : r.status === 'declined' ? 'Passed' : r.status === 'asked' ? 'You asked a question' : 'Invited, no bid yet'}</span></span>
+                {r.status !== 'declined' && <Link className="small" href={`/marketplace/${l.id}/invite/${r.id}`}>Messages</Link>}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="card">
         <h2>Scope of work</h2>

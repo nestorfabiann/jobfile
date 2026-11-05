@@ -7,6 +7,9 @@ import { companyReviews, HOME_CATS, summarize } from '@/lib/reviews';
 import { reportReview } from './actions';
 import { isAdminEmail } from '@/lib/admin';
 import { companyOutsideRatings } from '@/lib/googleRatings';
+import { companyOf } from '@/lib/team';
+import { inviteCandidates } from '@/lib/bidInvites';
+import { marketplaceEnabled } from '@/lib/marketplace';
 import { fmtDate, INSURANCE_KINDS, isCurrent, signedUrls, type InsuranceKind } from '@/lib/companyProfile';
 
 export const dynamic = 'force-dynamic';
@@ -49,7 +52,7 @@ function LinkIcon({ name, size = 18 }: { name: string; size?: number }) {
   return (<svg {...common}><path d="M12 2l3 6.5 7 .9-5.1 4.9 1.3 7-6.2-3.4L5.8 21.3l1.3-7L2 9.4l7-.9z" /></svg>);
 }
 
-export default async function Profile({ params, searchParams }: { params: { id: string }; searchParams: { reported?: string } }) {
+export default async function Profile({ params, searchParams }: { params: { id: string }; searchParams: { reported?: string; ok?: string; error?: string } }) {
   const { user } = await requireUser();
   const db = supabaseAdmin();
   const { data: c } = await db.from('companies').select('*').eq('id', params.id).maybeSingle<any>();
@@ -78,6 +81,9 @@ export default async function Profile({ params, searchParams }: { params: { id: 
   const reviews = await companyReviews(c.id);
   const outside = await companyOutsideRatings(c.id);
   const s = summarize(reviews);
+  // Homeowner actions: only for signed-in homeowners (people with no business of their own) when the marketplace is on.
+  const homeowner = marketplaceEnabled() && !(await companyOf(user.id));
+  const cands = homeowner ? await inviteCandidates(user.id, c.id) : [];
   const years = c.year_started ? new Date().getFullYear() - Number(c.year_started) : 0;
   const g0 = outside[0];
   const factLine = [s.count > 0 ? `★ ${s.avg.toFixed(1)} · ${s.count} review${s.count > 1 ? 's' : ''}${g0 ? ' on Jobfile' : ''}` : '', g0 ? `★ ${g0.rating.toFixed(1)} · ${g0.count} on Google Maps` : '', years >= 1 ? `${years} year${years > 1 ? 's' : ''}` : ''].filter(Boolean).join(' · ');
@@ -95,6 +101,28 @@ export default async function Profile({ params, searchParams }: { params: { id: 
             {factLine ? <div className="muted small" style={{ marginTop: 4, fontSize: 14.5 }}>{factLine}</div> : null}
           </div>
         </div>
+        {searchParams.ok ? <div className="box ok">{searchParams.ok}</div> : null}
+        {searchParams.error ? <div className="box bad">{searchParams.error}</div> : null}
+        {homeowner && !c.hidden_at && (
+          <div className="card" style={{ background: 'var(--accent-soft, #f9efe4)' }}>
+            {cands.length > 0 ? (
+              <>
+                <b>Want {c.name} to bid on your project?</b>
+                <span className="small muted" style={{ display: 'block' }}>They will see the project and can send a bid. Your contact details stay private until you accept a bid.</span>
+                <div className="row" style={{ gap: 10, marginTop: 10 }}>
+                  <Link className="btn" href={`/contractors/${c.id}/invite`}>Invite to bid</Link>
+                  <Link className="btn ghost" href={`/contractors/${c.id}/ask`}>Ask a question</Link>
+                </div>
+              </>
+            ) : (
+              <>
+                <b>Interested in {c.name}?</b>
+                <span className="small muted" style={{ display: 'block' }}>Post your project in a few minutes and invite them to bid. Nothing is shared until you post.</span>
+                <div className="row" style={{ marginTop: 10 }}><Link className="btn" href={`/marketplace/new?invite=${c.id}`}>Start a project and invite them</Link></div>
+              </>
+            )}
+          </div>
+        )}
         {(c.verified_at || verified.length > 0) && (
           <div className="row" style={{ gap: 8 }}>
             {c.verified_at ? <span className="pill ok">✓ Verified by Jobfile</span> : null}

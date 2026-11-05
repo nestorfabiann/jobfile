@@ -145,6 +145,18 @@ async function createListingInner(formData: FormData): Promise<CreateResult> {
   if (error && /answers/i.test(error.message ?? '')) ({ data: l, error } = await db.from('marketplace_listings').insert(row).select(cols).single());
   if (error || !l) return bad('Could not post the project. Check that the database step was run.');
   await alertMatchingContractors(l as any);
+  // "Start a project and invite them" from a contractor profile: invite that one contractor too (best effort).
+  const inviteCo = txt(formData, 'invite_company', 60);
+  if (/^[0-9a-f-]{36}$/i.test(inviteCo)) {
+    try {
+      const { makeInvite, tellCompany } = await import('@/lib/bidInvites');
+      const { data: full } = await db.from('marketplace_listings').select('id,homeowner_id,job_type,items,zip,status,expires_at,homeowner_name').eq('id', l.id).maybeSingle<any>();
+      if (full) {
+        const r = await makeInvite(full, inviteCo, '', 'invited');
+        if (!('error' in r) && r.created) await tellCompany(inviteCo, full, `A homeowner invited you to bid on ${listingTitle(full)}`, `${listingTitle(full)} in ${full.zip}. Open the project to see the details and bid.`);
+      }
+    } catch { /* never block posting */ }
+  }
   const draftId = txt(formData, 'draft_id', 40);
   if (/^[0-9a-f-]{36}$/i.test(draftId)) await db.from('marketplace_drafts').delete().eq('id', draftId).eq('user_id', user.id);
   revalidatePath('/marketplace');

@@ -7,7 +7,7 @@ import { cleanDraft } from '@/lib/drafts';
 import { aiConfigured } from '@/lib/marketplaceAI';
 import MarketplacePost from '@/components/MarketplacePost';
 
-export default async function NewListing({ searchParams }: { searchParams: { error?: string; draft?: string; like?: string } }) {
+export default async function NewListing({ searchParams }: { searchParams: { error?: string; draft?: string; like?: string; invite?: string } }) {
   requireMarketplace();
   const { user } = await requireUser();
   const { data: mem } = await supabaseAdmin().from('company_members').select('company_id').eq('user_id', user.id).limit(1);
@@ -32,7 +32,7 @@ export default async function NewListing({ searchParams }: { searchParams: { err
         <p className="muted">Pick what you want done, and local contractors can send you bids.</p>
       </div>
       {searchParams.error ? <div className="box bad">{searchParams.error}</div> : null}
-      <MarketplacePost types={JOB_TYPES} aiOn={aiConfigured()} draft={draft} />
+      <MarketplacePost types={JOB_TYPES} aiOn={aiConfigured()} draft={draft} inviteCompany={/^[0-9a-f-]{36}$/i.test(searchParams.invite ?? '') ? searchParams.invite : undefined} />
     </>
   );
 }
