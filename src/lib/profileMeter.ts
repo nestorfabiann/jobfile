@@ -1,6 +1,7 @@
 import { supabaseAdmin } from '@/lib/supabase/server';
 import { isCurrent } from '@/lib/companyProfile';
 import { googleConfigured } from '@/lib/googleRatings';
+import { idVerifiedMap } from '@/lib/idCheck';
 
 export type MeterItem = { label: string; ok: boolean; cta: string; href: string };
 
@@ -23,6 +24,10 @@ export async function profileMeter(companyId: string): Promise<{ pct: number; it
     { label: 'Short “About us” text', ok: String(c.about ?? '').trim().length >= 40, cta: 'Write', href: '/settings/business#bp-about' },
     { label: 'Year you started', ok: !!c.year_started, cta: 'Add', href: '/settings/business#bp-where' },
   ];
+  let nCreds = 0;
+  try { nCreds = (await db.from('company_credentials').select('id', { count: 'exact', head: true }).eq('company_id', companyId).neq('status', 'rejected')).count ?? 0; } catch { nCreds = 0; }
+  items.push({ label: 'ID verified', ok: (await idVerifiedMap([companyId])).has(companyId), cta: 'Add', href: '/settings/business#bp-id' });
+  items.push({ label: 'Credentials (BBB, chamber)', ok: nCreds > 0, cta: 'Add', href: '/settings/business#bp-cred' });
   if (googleConfigured()) {
     let linked = false;
     try { linked = !!(await db.from('company_ratings').select('company_id').eq('company_id', companyId).eq('source', 'google').maybeSingle()).data; } catch { linked = false; }
