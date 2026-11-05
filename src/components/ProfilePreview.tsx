@@ -14,6 +14,8 @@ export default async function ProfilePreview({ companyId }: { companyId: string 
   ]);
   const all = (photos ?? []).map((p: any) => p.path as string);
   const urls = await signedUrls('company-photos', [...all.slice(0, 3), ...(c.logo_path ? [c.logo_path as string] : [])]);
+  let nCreds = 0;
+  try { nCreds = (await db.from('company_credentials').select('id', { count: 'exact', head: true }).eq('company_id', companyId).neq('status', 'rejected')).count ?? 0; } catch { /* table not created yet */ }
   const s = summarize(await companyReviews(companyId));
   const services: string[] = Array.isArray(c.services) ? c.services : [];
   const insured = (ins ?? []).some((i: any) => isCurrent(i));
@@ -24,6 +26,7 @@ export default async function ProfilePreview({ companyId }: { companyId: string 
     { ok: hasAbout, label: 'Description', href: '/settings/business#bp-about' },
     { ok: services.length > 0, label: 'Trades you do', href: '/settings/business#bp-about' },
     { ok: insured, label: 'Insurance proof', href: '/settings/business#bp-ins' },
+    { ok: nCreds > 0, label: 'Credentials (BBB, chamber)', href: '/settings/business#bp-cred' },
   ];
   const done = items.filter((i) => i.ok).length;
   const pct = Math.round((done / items.length) * 100);

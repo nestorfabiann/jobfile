@@ -180,6 +180,33 @@ export async function reviewInsurance(_: Result | null, f: FormData): Promise<Re
   return { ok: true, message: decision === 'approved' ? 'Approved. The badge is live.' : 'Rejected. The contractor was told why.' };
 }
 
+/** Approve or reject a contractor credential. The contractor is told either way. */
+export async function reviewCredential(_: Result | null, f: FormData): Promise<Result> {
+  const { user: me, db } = await requireAdmin('verification');
+  const id = str(f, 'id');
+  const decision = str(f, 'decision');
+  const note = str(f, 'note').slice(0, 300);
+  if (!id || (decision !== 'checked' && decision !== 'rejected')) return { ok: false, error: 'Nothing to review.' };
+  if (decision === 'rejected' && !note) return { ok: false, error: 'Tell the contractor why. They will see this note.' };
+  const { data: c } = await db.from('company_credentials').select('id,company_id,name').eq('id', id).maybeSingle<any>();
+  if (!c) return { ok: false, error: 'Credential not found.' };
+  const { error } = await db.from('company_credentials').update({ status: decision, review_note: decision === 'rejected' ? note : '', reviewed_by: me.id, reviewed_at: new Date().toISOString() }).eq('id', id);
+  if (error) return { ok: false, error: `Could not save: ${error.message}` };
+  await audit(me, decision === 'checked' ? 'credential_check' : 'credential_reject', { type: 'company', id: c.company_id as string }, { name: c.name, note });
+  const { data: owners } = await db.from('company_members').select('user_id').eq('company_id', c.company_id as string).eq('role', 'owner');
+  await notifyUsers({
+    userIds: (owners ?? []).map((o) => o.user_id as string),
+    projectId: null,
+    kind: 'admin',
+    path: '/settings/business#bp-cred',
+    title: decision === 'checked' ? `${c.name} was checked` : `${c.name} could not be checked`,
+    body: decision === 'checked' ? 'It now shows "Checked by Jobfile" on your public profile.' : `Reason: ${note}. It is hidden from your profile until you fix it.`,
+    force: true,
+  });
+  revalidatePath('/admin/credentials');
+  return { ok: true, message: decision === 'checked' ? 'Marked as checked.' : 'Hidden. The contractor was told why.' };
+}
+
 /** Admin closes a marketplace listing (rule violation). Waiting bidders are told it closed. */
 export async function adminCloseListing(formData: FormData) {
   const { user: me, db } = await requireAdmin('listings');

@@ -9,6 +9,7 @@ import { isAdminEmail } from '@/lib/admin';
 import { companyOutsideRatings } from '@/lib/googleRatings';
 import { companyOf } from '@/lib/team';
 import { inviteCandidates } from '@/lib/bidInvites';
+import { publicCredentials, credIcon, credShort } from '@/lib/credentials';
 import { marketplaceEnabled } from '@/lib/marketplace';
 import { fmtDate, INSURANCE_KINDS, isCurrent, signedUrls, type InsuranceKind } from '@/lib/companyProfile';
 
@@ -78,6 +79,7 @@ export default async function Profile({ params, searchParams }: { params: { id: 
     ['Accepts', (c.payments ?? []).join(', ')],
     ['License or registration', c.license_note ? `${c.license_note} (stated by the contractor)` : ''],
   ].filter(([, v]) => !!v) as [string, string][];
+  const creds = (await publicCredentials([c.id as string])).get(c.id as string) ?? [];
   const reviews = await companyReviews(c.id);
   const outside = await companyOutsideRatings(c.id);
   const s = summarize(reviews);
@@ -175,6 +177,26 @@ export default async function Profile({ params, searchParams }: { params: { id: 
               </figure>
             ) : null)}
           </div>
+        </div>
+      )}
+
+      {creds.length > 0 && (
+        <div className="card">
+          <h2>Credentials</h2>
+          {creds.map((x) => (
+            <div className="row" key={x.id} style={{ justifyContent: 'space-between', flexWrap: 'nowrap', alignItems: 'flex-start', gap: 10 }}>
+              <div className="row" style={{ flexWrap: 'nowrap', gap: 10, alignItems: 'flex-start', minWidth: 0 }}>
+                <span className="credic" aria-hidden="true">{credIcon(x.kind)}</span>
+                <div style={{ minWidth: 0 }}>
+                  <b>{x.name}</b>
+                  <div className="muted small">{credShort(x.kind)}{x.expires_on ? ` · expires ${fmtDate(x.expires_on)}` : ''}</div>
+                  {x.link ? <a className="small" style={{ fontWeight: 700 }} href={x.link} target="_blank" rel="noopener noreferrer nofollow">View their listing ›</a> : null}
+                </div>
+              </div>
+              {x.status === 'checked' ? <span className="pill ok" style={{ flex: 'none' }}>✓ Checked by Jobfile</span> : <span className="pill" style={{ flex: 'none' }}>Stated by contractor</span>}
+            </div>
+          ))}
+          <p className="muted small">&ldquo;Checked&rdquo; means a Jobfile admin looked at the proof or the official listing. &ldquo;Stated&rdquo; means the contractor says so and Jobfile has not checked it yet. Links open other websites.</p>
         </div>
       )}
 

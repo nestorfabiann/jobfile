@@ -731,3 +731,8 @@ html { scroll-behavior: smooth; }
 .ppv-ck { display: flex; flex-direction: column; padding: 0 12px; }
 .ppv-ck a { display: flex; justify-content: space-between; gap: 8px; padding: 9px 0; border-top: 1px solid var(--line); font-size: 13.5px; color: var(--ink); text-decoration: none; min-height: 40px; align-items: center; }
 .ppv-ck .y { color: #1f4d3a; } .ppv-ck .n { color: #c4813f; }
+
+.credic { width: 30px; height: 30px; border-radius: 9px; background: rgba(196,129,63,.14); color: #c4813f; display: grid; place-items: center; font: 800 11px system-ui, sans-serif; flex: none; }
+.credchips { display: flex; flex-wrap: wrap; gap: 5px; }
+.credchips span { border-radius: 99px; padding: 2px 9px; font-size: 12px; font-weight: 600; background: var(--line); color: var(--ink); }
+.credchips span.v { background: #e4f0e8; color: #1f4d3a; }

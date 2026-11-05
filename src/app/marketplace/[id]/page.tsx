@@ -164,6 +164,7 @@ export default async function ListingPage({ params, searchParams }: { params: { 
   } catch { /* team tables not created yet */ }
 
   // For the homeowner: who each bidder is, their rating and whether their insurance is verified.
+  let credBy = new Map<string, import('@/lib/credentials').Credential[]>();
   const info = new Map<string, { name: string; avg: number; count: number; insured: boolean; pending: boolean; kinds: string[]; until: string; logo: string; verified: boolean }>();
   if (owner && visible.length) {
     const cids = Array.from(new Set([...visible.map((b) => b.company_id), ...Array.from(teamByBid.values()).flatMap((t) => t.partners.map((p) => p.company_id))]));
@@ -172,6 +173,7 @@ export default async function ListingPage({ params, searchParams }: { params: { 
       db.from('company_insurance').select('company_id,status,expires_on,kind').in('company_id', cids),
     ]);
     const logoUrls = await signedUrls('company-photos', (cos ?? []).map((c: any) => c.logo_path as string).filter(Boolean));
+    credBy = await (await import('@/lib/credentials')).publicCredentials(cids);
     for (const c of cos ?? []) {
       const s = summarize(await companyReviews(c.id as string));
       const good = (ins ?? []).filter((i: any) => i.company_id === c.id && isCurrent(i)).map((i: any) => i.expires_on as string).sort();
@@ -429,6 +431,12 @@ export default async function ListingPage({ params, searchParams }: { params: { 
                 </div>
                 {c?.verified ? <span className="pill ok" style={{ width: 'max-content' }}>✓ Verified by Jobfile</span> : null}
                 <InsuranceBadge state={c?.insured ? 'ok' : c?.pending ? 'wait' : 'none'} name={c?.name ?? 'This contractor'} until={c?.until ?? ''} kinds={c?.kinds ?? []} />
+                {(credBy.get(b.company_id) ?? []).length > 0 && (
+                  <div className="credchips" aria-label="Credentials">
+                    {(credBy.get(b.company_id) ?? []).slice(0, 3).map((x) => <span key={x.id} className={x.status === 'checked' ? 'v' : ''}>{x.status === 'checked' ? '✓ ' : ''}{x.kind === 'bbb' ? 'BBB' : x.kind === 'epa' ? 'EPA lead-safe' : x.name.length > 22 ? x.name.slice(0, 21) + '…' : x.name}</span>)}
+                    {(credBy.get(b.company_id) ?? []).length > 3 && <span>+{(credBy.get(b.company_id) ?? []).length - 3}</span>}
+                  </div>
+                )}
                 {!teamByBid.get(b.id)?.separate ? <div style={{ fontSize: 26, fontWeight: 800 }}>{dollars(b.price_cents)}</div> : null}
                 {teamByBid.get(b.id) ? (() => {
                   const tm = teamByBid.get(b.id)!;

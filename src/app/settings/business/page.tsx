@@ -10,6 +10,8 @@ import ProfileMeter from '@/components/ProfileMeter';
 import { profileMeter } from '@/lib/profileMeter';
 import AvailabilityForm from '@/components/AvailabilityForm';
 import { JOB_TYPES, marketplaceEnabled } from '@/lib/marketplace';
+import { CRED_KINDS, credIcon, credShort, type Credential } from '@/lib/credentials';
+import { addCredential, removeCredential } from './credActions';
 
 export const dynamic = 'force-dynamic';
 
@@ -26,6 +28,8 @@ export default async function Business({ searchParams }: { searchParams: { saved
     db.from('company_insurance').select('*').eq('company_id', me.companyId),
   ]);
   const urls = await signedUrls('company-photos', [...(photos ?? []).map((p) => p.path as string), ...(c?.logo_path ? [c.logo_path as string] : [])]);
+  let creds: Credential[] = [];
+  try { creds = ((await db.from('company_credentials').select('*').eq('company_id', me.companyId).order('created_at')).data ?? []) as Credential[]; } catch { /* table not created yet */ }
   const insBy = new Map((ins ?? []).map((i: any) => [i.kind as string, i]));
   const has = (arr: string[] | null | undefined, v: string) => (arr ?? []).includes(v);
 
@@ -184,6 +188,45 @@ export default async function Business({ searchParams }: { searchParams: { saved
           </div>
         );
       })}
+
+      <div className="card">
+        <h2 id="bp-cred" style={{ scrollMarginTop: 80 }}>Credentials</h2>
+        <p className="muted small">Homeowners trust businesses they can check. Add your BBB page, chamber or trade group, manufacturer certifications, EPA lead-safe, or a license. A link to your own listing is the best proof. Names show as text with a link, so please do not upload logos.</p>
+        {creds.map((x) => (
+          <div className="row" key={x.id} style={{ justifyContent: 'space-between', flexWrap: 'nowrap', alignItems: 'flex-start', gap: 10 }}>
+            <div style={{ minWidth: 0 }}>
+              <b>{x.name}</b>
+              <div className="muted small">{credShort(x.kind)}{x.expires_on ? ` · expires ${fmtDate(x.expires_on)}` : ''}{x.link ? ' · link added' : ''}{x.proof_path ? ' · proof uploaded' : ''}</div>
+              {x.status === 'rejected' && <div className="box bad">Jobfile could not check this{x.review_note ? `: ${x.review_note}` : '.'} It is hidden from your profile.</div>}
+            </div>
+            <div style={{ textAlign: 'right', flex: 'none' }}>
+              {x.status === 'checked' ? <span className="pill ok">✓ Checked</span> : x.status === 'rejected' ? <span className="pill bad">Hidden</span> : <span className="pill warn">Stated by you</span>}
+              <form action={removeCredential}><input type="hidden" name="id" value={x.id} /><button className="small" style={{ background: 'none', border: 0, color: 'var(--ink-2)', textDecoration: 'underline', cursor: 'pointer' }}>Remove</button></form>
+            </div>
+          </div>
+        ))}
+        <form action={addCredential} className="stack" style={{ gap: 10 }}>
+          <b className="small">Add a credential</b>
+          <label className="fld">Kind
+            <select name="kind" defaultValue="bbb">{CRED_KINDS.map(([k, , long]) => <option key={k} value={k}>{long}</option>)}</select>
+          </label>
+          <label className="fld">Name
+            <input name="name" required maxLength={100} placeholder="e.g. BBB Accredited Business, Sherwin-Williams Pro" />
+          </label>
+          <label className="fld">Link to your listing (best)
+            <input name="link" inputMode="url" placeholder="https://" />
+          </label>
+          <label className="fld">Or upload proof (PDF or photo)
+            <input name="file" type="file" accept="application/pdf,image/jpeg,image/png,image/webp" />
+            <span className="muted small">Proof files are private. Only you and Jobfile admins can open them.</span>
+          </label>
+          <label className="fld">Expires (if it does)
+            <input name="expires_on" type="date" />
+          </label>
+          <button className="btn" type="submit">Add credential</button>
+          <p className="muted small" style={{ margin: 0 }}>It shows right away as &ldquo;Stated by contractor.&rdquo; After a Jobfile admin checks your link or proof, it shows &ldquo;Checked by Jobfile.&rdquo;</p>
+        </form>
+      </div>
     </>
   );
 }
