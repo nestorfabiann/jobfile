@@ -138,22 +138,22 @@ export default async function Marketplace({ searchParams }: { searchParams: { ty
           </div>
           {bizZip && (
             <div className="viewtg" role="group" aria-label="View">
-              <Link href={qs({ view: '' })} aria-current={!mapView ? 'true' : undefined}>List</Link>
-              <Link href={qs({ view: 'map' })} aria-current={mapView ? 'true' : undefined}>Map</Link>
+              <Link scroll={false} href={qs({ view: '' })} aria-current={!mapView ? 'true' : undefined}>List</Link>
+              <Link scroll={false} href={qs({ view: 'map' })} aria-current={mapView ? 'true' : undefined}>Map</Link>
             </div>
           )}
           <div className="chips" aria-label="Filter by job type">
-            <Link className="chip" href={qs({ type: '' })}><span style={!type ? { background: 'var(--brand)', color: '#fff', borderColor: 'var(--brand)' } : undefined}>All</span></Link>
+            <Link scroll={false} className="chip" href={qs({ type: '' })}><span style={!type ? { background: 'var(--brand)', color: '#fff', borderColor: 'var(--brand)' } : undefined}>All</span></Link>
             {typeChips.map((t) => (
-              <Link className="chip" key={t} href={qs({ type: t })}><span style={type === t ? { background: 'var(--brand)', color: '#fff', borderColor: 'var(--brand)' } : undefined}><TradeIcon trade={t} size={15} />{t}</span></Link>
+              <Link scroll={false} className="chip" key={t} href={qs({ type: t })}><span style={type === t ? { background: 'var(--brand)', color: '#fff', borderColor: 'var(--brand)' } : undefined}><TradeIcon trade={t} size={15} />{t}</span></Link>
             ))}
           </div>
           {bizZip ? (
             <div className="chips" aria-label="Filter by distance">
               {miOptions.map((m) => (
-                <Link className="chip" key={m} href={qs({ mi: m })}><span style={miParam === m ? { background: 'var(--brand)', color: '#fff', borderColor: 'var(--brand)' } : undefined}>{m} mi</span></Link>
+                <Link scroll={false} className="chip" key={m} href={qs({ mi: m })}><span style={miParam === m ? { background: 'var(--brand)', color: '#fff', borderColor: 'var(--brand)' } : undefined}>{m} mi</span></Link>
               ))}
-              <Link className="chip" href={qs({ mi: 'any' })}><span style={miParam === 'any' ? { background: 'var(--brand)', color: '#fff', borderColor: 'var(--brand)' } : undefined}>Any distance</span></Link>
+              <Link scroll={false} className="chip" href={qs({ mi: 'any' })}><span style={miParam === 'any' ? { background: 'var(--brand)', color: '#fff', borderColor: 'var(--brand)' } : undefined}>Any distance</span></Link>
             </div>
           ) : (
             <div className="box warn">Add your business ZIP code to see how far each job is and to get alerts for jobs near you. <Link href="/settings/business">Open business profile</Link></div>
