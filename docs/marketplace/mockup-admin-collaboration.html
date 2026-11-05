@@ -1,0 +1,94 @@
+<title>Admin Collaboration</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: one column admin page. Summary tiles first, then conversion funnels, then who is collaborating, then problems to watch. Numbers are examples. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#c4813f;--orl:#f9efe4;--orb:#ecd4a8;--fg:#1f4d3a;--fgl:#e4f0e8;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--fgl:#173a2c;--fg:#8fd0ab;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--fgl:#173a2c;--fg:#8fd0ab;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:14px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px}
+h2{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;font-size:28px;line-height:1.05;text-wrap:balance}
+h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;font-size:18px}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
+.mut{color:var(--mut);font-size:14.5px;line-height:1.5;margin:0}
+.sw{display:grid;grid-template-columns:1fr 1fr;gap:6px}.sw button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:6px 4px;border-radius:99px;font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:44px}.sw button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.sec{display:flex;flex-direction:column;gap:14px}.sec[hidden]{display:none}
+.stage{display:flex;justify-content:center;padding:22px 0 8px;border-radius:30px;background:radial-gradient(120% 80% at 50% 0%,var(--orl),transparent 70%)}
+.ph{width:min(300px,84%);height:620px;background:#faf8f4;color:#1b1a18;border:7px solid #1b1a18;border-radius:36px;position:relative;overflow:hidden;box-shadow:0 22px 44px -18px rgba(27,26,24,.45);display:flex;flex-direction:column}
+.url{height:44px;background:#f3f1ec;display:flex;align-items:center;justify-content:center;font-size:11px;color:#6b655e;padding-top:10px;flex:none}
+.body{flex:1;padding:13px;display:flex;flex-direction:column;gap:8px;font-size:12px;line-height:1.4;overflow:hidden}
+.body h4{font:800 18px/1.05 'Bricolage Grotesque',sans-serif;letter-spacing:-.03em;margin:0}
+.body p{margin:0;color:#5c564f}
+.lab{font-size:10px;text-transform:uppercase;letter-spacing:.08em;font-weight:600;color:#6b655e;margin-top:2px}
+.cd{background:#fff;border:1px solid #e4dfd6;border-radius:12px;padding:9px 10px;display:flex;flex-direction:column;gap:5px}
+.r{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.r b{font-size:12.5px}.av{width:30px;height:30px;border-radius:9px;color:#fff;font:800 13px 'Bricolage Grotesque',sans-serif;display:grid;place-items:center;flex:none}
+.a1{background:#1f4d3a}.a2{background:#c4813f}
+.pill{display:inline-block;border-radius:99px;padding:2px 8px;font-size:10px;font-weight:600;white-space:nowrap}
+.ok{background:#e4f0e8;color:#1f4d3a}.wt{background:#f9efe4;color:#8a5a1a}.gr{background:#eef0f4;color:#4a4f5c}
+.amt{font:800 15px 'Bricolage Grotesque',sans-serif;font-variant-numeric:tabular-nums}
+.tot{background:#1f4d3a;color:#fff;border-radius:13px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center}.tot b{font:800 21px 'Bricolage Grotesque',sans-serif}.tot small{opacity:.85;font-size:10.5px}
+.inp{border:1px solid #d6d0c6;border-radius:9px;padding:7px 9px;font-size:11px;color:#8a8379;background:#faf8f4}
+.btn{border:0;border-radius:12px;padding:10px;font:600 12.5px 'IBM Plex Sans',sans-serif;text-align:center;background:#1f4d3a;color:#fff}.btn.gh{background:transparent;color:#6b655e;border:1px solid #e4dfd6}
+.tabs{height:48px;background:#fff;border-top:1px solid #e4dfd6;display:flex;justify-content:space-around;align-items:center;font-size:9.5px;color:#6b655e;flex:none}
+.rules{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:9px}
+.rules ul{margin:0;padding-left:18px;color:var(--mut);font-size:14px;line-height:1.5;display:flex;flex-direction:column;gap:6px}.rules li b{color:var(--ink)}
+</style>
+<div class="wrap"><style>
+.rng{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.rng button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:6px 4px;border-radius:99px;font:500 13px 'IBM Plex Sans',sans-serif;min-height:40px;cursor:pointer}.rng button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.tile{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.tile small{font-size:11.5px;color:var(--mut)}.tile b{font:800 26px 'Bricolage Grotesque',sans-serif;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.tile em{font-style:normal;font-size:11.5px;font-weight:600;color:var(--fg)}.tile em.dn{color:#a2503a}
+.box2{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.fn{display:flex;flex-direction:column;gap:3px}.fn .l{display:flex;justify-content:space-between;font-size:13px}.fn .l span:last-child{font-variant-numeric:tabular-nums;color:var(--mut)}
+.fb{height:9px;border-radius:99px;background:var(--line);overflow:hidden}.fb i{display:block;height:100%;border-radius:99px;background:var(--or)}.fb i.g{background:var(--fg)}
+.rw{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-top:1px solid var(--line);font-size:13.5px;align-items:center}.rw:first-of-type{border-top:0}.rw span:last-child{font-variant-numeric:tabular-nums;color:var(--mut);white-space:nowrap}
+.flag{display:flex;gap:10px;align-items:flex-start;padding:9px 10px;border-radius:12px;font-size:13px;line-height:1.4}
+.flag.w{background:var(--orl);border:1px solid var(--orb)}.flag b{display:block}
+.spark{display:flex;align-items:flex-end;gap:4px;height:56px}.spark i{flex:1;background:var(--or);border-radius:4px 4px 0 0;opacity:.85}.spark i:last-child{opacity:1}
+.sub{font-size:12px;color:var(--mut);margin:0}
+</style>
+<div class="note"><b>Mockup.</b> Admin, new page "Collaboration". Numbers are examples.</div>
+<h2>Collaboration</h2>
+<p class="mut">How contractors work together: team bids on the marketplace and partners on their own projects.</p>
+<div class="rng" role="group" aria-label="Range"><button type="button" aria-pressed="false">7 days</button><button type="button" aria-pressed="true">30 days</button><button type="button" aria-pressed="false">All time</button></div>
+<div class="tiles">
+<div class="tile"><small>Team bids sent</small><b>14</b><em>▲ 5 vs last 30 days</em></div>
+<div class="tile"><small>Team bids hired</small><b>5</b><em>36% hire rate</em></div>
+<div class="tile"><small>Partners invited</small><b>22</b><em>▲ 9 vs last 30 days</em></div>
+<div class="tile"><small>Partners on the job</small><b>13</b><em>59% accepted</em></div>
+<div class="tile"><small>Projects with a partner</small><b>9%</b><em>of 118 projects</em></div>
+<div class="tile"><small>Partner work</small><b>$38.4k</b><em>avg $2,950 each</em></div>
+</div>
+<div class="box2"><h3>Activity by week</h3><div class="spark" role="img" aria-label="Invites and team bids per week, rising"><i style="height:20%"></i><i style="height:28%"></i><i style="height:24%"></i><i style="height:40%"></i><i style="height:36%"></i><i style="height:52%"></i><i style="height:48%"></i><i style="height:70%"></i><i style="height:64%"></i><i style="height:88%"></i></div><p class="sub">Team bids plus partner invites, last 10 weeks.</p></div>
+<div class="box2"><h3>Do invites turn into partners?</h3>
+<div class="fn"><div class="l"><span>Invited</span><span>22</span></div><div class="fb"><i class="" style="width:100%"></i></div></div><div class="fn"><div class="l"><span>Answered</span><span>19</span></div><div class="fb"><i class="" style="width:86%"></i></div></div><div class="fn"><div class="l"><span>Accepted</span><span>13</span></div><div class="fb"><i class="g" style="width:59%"></i></div></div><div class="fn"><div class="l"><span>Proposed a new price</span><span>4</span></div><div class="fb"><i class="" style="width:18%"></i></div></div><div class="fn"><div class="l"><span>Declined</span><span>2</span></div><div class="fb"><i class="" style="width:9%"></i></div></div>
+<p class="sub">Average time to answer: 7 hours. 3 invites unanswered over 3 days.</p></div>
+<div class="box2"><h3>Do team bids win?</h3>
+<div class="fn"><div class="l"><span>Team bids sent</span><span>14</span></div><div class="fb"><i class="" style="width:100%"></i></div></div><div class="fn"><div class="l"><span>Hired</span><span>5</span></div><div class="fb"><i class="g" style="width:36%"></i></div></div><div class="fn"><div class="l"><span>Single-company bids hired</span><span>1,204 of 4,310 · 28%</span></div><div class="fb"><i class="" style="width:28%"></i></div></div>
+<p class="sub">Team bids win more often than single bids in this period.</p></div>
+<div class="box2"><h3>How they work together</h3>
+<div class="rw"><span>One contract (lead pays partner)</span><span>11 · 79%</span></div>
+<div class="rw"><span>Separate contracts</span><span>3 · 21%</span></div>
+<div class="rw"><span>Hire either or both</span><span>2 · 67%</span></div>
+<div class="rw"><span>Only as a package</span><span>1 · 33%</span></div></div>
+<div class="box2"><h3>Growth from invites</h3>
+<div class="rw"><span>Partners invited by email, not on Jobfile</span><span>8</span></div>
+<div class="rw"><span>Of those, signed up</span><span>5 · 63%</span></div>
+<div class="rw"><span>Companies open to partnering</span><span>31 of 74 · 42%</span></div></div>
+<div class="box2"><h3>Most active</h3>
+<div class="rw"><span>Nesty's Painting · Bright Electric</span><span>4 jobs</span></div>
+<div class="rw"><span>Lone Star Concrete · Nesty's Painting</span><span>3 jobs</span></div>
+<div class="rw"><span>Texan Roofing · Alamo Gutters</span><span>2 jobs</span></div></div>
+<div class="box2"><h3>Needs a look</h3>
+<div class="flag w"><span>⏳</span><span><b>3 invites waiting over 3 days</b>Bright Electric, Lone Star Concrete, Alamo Gutters</span></div>
+<div class="flag w"><span>🚫</span><span><b>2 partners removed by homeowners</b>9% of partners. Worth watching if it climbs.</span></div>
+<div class="flag w"><span>📍</span><span><b>4 invites blocked by the 50 mile rule</b>If this rises, the distance may be too tight.</span></div>
+<p class="sub">Payments are records only, so partner dollars are what leads recorded, not money confirmed.</p></div>
+</div>
+<script>
+document.querySelectorAll('.rng button').forEach(function(b){b.addEventListener('click',function(){document.querySelectorAll('.rng button').forEach(function(x){x.setAttribute('aria-pressed',x===b)})})});
+</script>
