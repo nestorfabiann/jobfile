@@ -69,7 +69,7 @@ export async function getReference(input: { jobType: string; items: string[]; si
   return { ok: true, id: row.id as string, ref: r.ref };
 }
 
-export type CreateResult = { ok: true; id: string } | { ok: false; error: string };
+export type CreateResult = { ok: true; id: string; invite?: { company: string; ok: boolean; why?: 'zip' | 'closed' | 'other' } } | { ok: false; error: string };
 const bad = (error: string): { ok: false; error: string } => ({ ok: false, error });
 
 /** Creates the listing and tells the matching contractors. The browser then uploads any photos and videos and opens the page. */
@@ -147,20 +147,26 @@ async function createListingInner(formData: FormData): Promise<CreateResult> {
   await alertMatchingContractors(l as any);
   // "Start a project and invite them" from a contractor profile: invite that one contractor too (best effort).
   const inviteCo = txt(formData, 'invite_company', 60);
+  let inviteRes: { company: string; ok: boolean; why?: 'zip' | 'closed' | 'other' } | undefined;
   if (/^[0-9a-f-]{36}$/i.test(inviteCo)) {
+    inviteRes = { company: inviteCo, ok: false, why: 'other' };
     try {
       const { makeInvite, tellCompany } = await import('@/lib/bidInvites');
       const { data: full } = await db.from('marketplace_listings').select('id,homeowner_id,job_type,items,zip,status,expires_at,homeowner_name').eq('id', l.id).maybeSingle<any>();
       if (full) {
         const r = await makeInvite(full, inviteCo, '', 'invited');
-        if (!('error' in r) && r.created) await tellCompany(inviteCo, full, `A homeowner invited you to bid on ${listingTitle(full)}`, `${listingTitle(full)} in ${full.zip}. Open the project to see the details and bid.`);
+        if ('error' in r) inviteRes.why = /does not serve/i.test(r.error) ? 'zip' : /no longer/i.test(r.error) ? 'closed' : 'other';
+        else {
+          inviteRes = { company: inviteCo, ok: true };
+          if (r.created) await tellCompany(inviteCo, full, `A homeowner invited you to bid on ${listingTitle(full)}`, `${listingTitle(full)} in ${full.zip}. Open the project to see the details and bid.`);
+        }
       }
     } catch { /* never block posting */ }
   }
   const draftId = txt(formData, 'draft_id', 40);
   if (/^[0-9a-f-]{36}$/i.test(draftId)) await db.from('marketplace_drafts').delete().eq('id', draftId).eq('user_id', user.id);
   revalidatePath('/marketplace');
-  return { ok: true, id: l.id as string };
+  return { ok: true, id: l.id as string, invite: inviteRes };
 }
 
 export type UploadResult = { ok: true } | { ok: false; error: string };

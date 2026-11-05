@@ -32,7 +32,7 @@ export const dynamic = 'force-dynamic';
 const when = (iso: string) => new Date(iso).toLocaleDateString('en-US', { timeZone: 'America/Chicago', month: 'short', day: 'numeric', year: 'numeric' });
 const range = (a: number | null, b: number | null) => [a, b].filter((x) => x != null).map((x) => dollars(x as number)).join(' – ');
 
-export default async function ListingPage({ params, searchParams }: { params: { id: string }; searchParams: { compare?: string | string[]; insured?: string; open?: string; posted?: string; extended?: string; media?: string; bid?: string; error?: string } }) {
+export default async function ListingPage({ params, searchParams }: { params: { id: string }; searchParams: { compare?: string | string[]; insured?: string; open?: string; posted?: string; extended?: string; media?: string; bid?: string; error?: string; inv?: string; invc?: string } }) {
   requireMarketplace();
   const { user } = await requireUser();
   if (!/^[0-9a-f-]{36}$/i.test(params.id)) notFound();
@@ -70,6 +70,9 @@ export default async function ListingPage({ params, searchParams }: { params: { 
       invNames = new Map(((cn ?? []) as any[]).map((r) => [r.id as string, r.name as string]));
     }
   } catch { /* table missing */ }
+  if (owner && searchParams.invc && /^[0-9a-f-]{36}$/i.test(searchParams.invc) && !invNames.has(searchParams.invc)) {
+    try { const { data: ic } = await db.from('companies').select('id,name').eq('id', searchParams.invc).maybeSingle<any>(); if (ic) invNames.set(ic.id as string, ic.name as string); } catch { /* ignore */ }
+  }
   const bidders = new Set(allBids.map((b) => b.company_id as string));
   if (owner) await db.from('marketplace_listings').update({ bids_seen_at: new Date().toISOString() }).eq('id', l.id);
   // Pre-accept messages. Homeowners see every bid's thread; a contractor sees only their own. Opening the page marks the other side's messages read.
@@ -231,6 +234,12 @@ export default async function ListingPage({ params, searchParams }: { params: { 
       </div>
       {strip && <ProgressStrip {...strip} />}
       {searchParams.posted && told > 0 ? <div className="box ok"><b>Your project is posted.</b> We told {told} contractor{told === 1 ? '' : 's'} within {DEFAULT_RADIUS} miles of {l.zip} who do {l.job_type.toLowerCase()}. Add photos below to help them price it.</div> : null}
+      {owner && searchParams.posted && searchParams.inv ? (() => {
+        const nm = invNames.get(searchParams.invc ?? '') ?? 'The contractor';
+        return searchParams.inv === 'ok'
+          ? <div className="box ok"><b>{nm} was invited to bid.</b> They will see your project and can send a bid.</div>
+          : <div className="box warn"><b>We could not invite {nm}.</b> {searchParams.inv === 'zip' ? 'They do not serve your ZIP code.' : 'They could not be invited right now.'} Your project is still posted for other contractors.</div>;
+      })() : null}
       {searchParams.posted && told === 0 ? (
         <div className="box warn">
           <b>Your project is posted.</b> No contractors on Jobfile near {l.zip} do this kind of work yet, so nobody was alerted. You can still invite someone you know, or look for one yourself.

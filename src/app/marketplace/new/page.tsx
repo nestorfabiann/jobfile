@@ -24,6 +24,13 @@ export default async function NewListing({ searchParams }: { searchParams: { err
       if (lp && lp.status === 'live') draft = { id: '', at: new Date().toISOString(), data: cleanDraft({ type: lp.trade, city: lp.city, details: `I would like something like this: ${lp.title}` }) };
     } catch { /* community tables not created yet */ }
   }
+  // Coming from a contractor's profile: say who will be invited.
+  let inviteId: string | undefined;
+  let inviteName = '';
+  if (/^[0-9a-f-]{36}$/i.test(searchParams.invite ?? '')) {
+    const { data: ic } = await supabaseAdmin().from('companies').select('id,name,hidden_at').eq('id', searchParams.invite as string).maybeSingle<any>();
+    if (ic && !ic.hidden_at) { inviteId = ic.id as string; inviteName = ic.name as string; }
+  }
   return (
     <>
       <div className="stack">
@@ -32,7 +39,13 @@ export default async function NewListing({ searchParams }: { searchParams: { err
         <p className="muted">Pick what you want done, and local contractors can send you bids.</p>
       </div>
       {searchParams.error ? <div className="box bad">{searchParams.error}</div> : null}
-      <MarketplacePost types={JOB_TYPES} aiOn={aiConfigured()} draft={draft} inviteCompany={/^[0-9a-f-]{36}$/i.test(searchParams.invite ?? '') ? searchParams.invite : undefined} />
+      {inviteId ? (
+        <div className="box" style={{ background: 'var(--accent-soft, #f9efe4)' }}>
+          <b>You will invite {inviteName} to bid when you post.</b>
+          <span className="small" style={{ display: 'block' }}>Other local contractors can still bid on your project. {inviteName} must serve your ZIP code to be invited.</span>
+        </div>
+      ) : null}
+      <MarketplacePost types={JOB_TYPES} aiOn={aiConfigured()} draft={draft} inviteCompany={inviteId} inviteName={inviteName} />
     </>
   );
 }

@@ -17,7 +17,7 @@ type Types = Record<string, { size: number; sizeLabel: string; groups: [string, 
 const money = (n: number) => '$' + Math.round(n).toLocaleString('en-US');
 const digits = (v: string) => parseInt(v.replace(/\D/g, ''), 10) || 0;
 
-export default function MarketplacePost({ types, aiOn, draft, inviteCompany }: { types: Types; aiOn: boolean; inviteCompany?: string; draft?: { id: string; at: string; data: DraftData } | null }) {
+export default function MarketplacePost({ types, aiOn, draft, inviteCompany, inviteName }: { types: Types; aiOn: boolean; inviteCompany?: string; inviteName?: string; draft?: { id: string; at: string; data: DraftData } | null }) {
   const names = Object.keys(types);
   const d0 = draft?.data;
   const [type, setType] = useState(d0 && types[d0.type] ? d0.type : names[0]);
@@ -45,6 +45,7 @@ export default function MarketplacePost({ types, aiOn, draft, inviteCompany }: {
   const [status, setStatus] = useState('');
   const [upStates, setUpStates] = useState<Record<string, FileState>>({});
   const [listingId, setListingId] = useState('');
+  const invQ = useRef('');
   const upLive = useRef<Record<string, FileState>>({});
   const [postErr, setPostErr] = useState('');
   const [nudge, setNudge] = useState(false);
@@ -119,12 +120,13 @@ export default function MarketplacePost({ types, aiOn, draft, inviteCompany }: {
       if (inviteCompany) fd.set('invite_company', inviteCompany);
       const r = await createListing(fd);
       if (!r.ok) { setPostErr(r.error); setPosting(false); return; }
+      invQ.current = r.invite ? `&inv=${r.invite.ok ? 'ok' : r.invite.why ?? 'other'}&invc=${encodeURIComponent(r.invite.company)}` : '';
       if (media.length) {
         setListingId(r.id);
         setStatus('Uploading…');
         window.scrollTo({ top: 0, behavior: 'smooth' });
         await runUploads(r.id, media);
-      } else router.push(`/marketplace/${r.id}?posted=1`);
+      } else router.push(`/marketplace/${r.id}?posted=1${invQ.current}`);
     } catch (err: any) {
       setPostErr(`Something went wrong. Check your connection and try again. (${String(err?.message ?? err).slice(0, 160)})`);
       setPosting(false);
@@ -139,9 +141,9 @@ export default function MarketplacePost({ types, aiOn, draft, inviteCompany }: {
   async function runUploads(lid: string, list: MediaItem[]) {
     await uploadMedia(lid, list, note);
     const failed = media.filter((m) => upLive.current[m.id]?.status === 'error').length;
-    if (!failed) router.push(`/marketplace/${lid}?posted=1`);
+    if (!failed) router.push(`/marketplace/${lid}?posted=1${invQ.current}`);
   }
-  const leaveWithFailures = () => router.push(`/marketplace/${listingId}?posted=1&media=partial`);
+  const leaveWithFailures = () => router.push(`/marketplace/${listingId}?posted=1&media=partial${invQ.current}`);
 
   // Compares the homeowner's budget with the AI range, once a reference exists.
   let check: { tone: 'ok' | 'warn'; text: string } | null = null;
