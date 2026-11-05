@@ -4,7 +4,7 @@ import { requireUser } from '@/lib/session';
 import { supabaseAdmin } from '@/lib/supabase/server';
 import { dollars } from '@/lib/money';
 import { listingOpen, listingTitle, requireMarketplace, type Listing } from '@/lib/marketplace';
-import { companyOf, isVerified } from '@/lib/team';
+import { companyOf, isVerified, localPartners } from '@/lib/team';
 import { createTeamBid } from '@/app/collaborate/actions';
 
 export const dynamic = 'force-dynamic';
@@ -22,32 +22,25 @@ export default async function BidAsTeam({ params, searchParams }: { params: { id
   const verified = await isVerified(me!.id);
 
   const q = (searchParams.q ?? '').trim().slice(0, 60);
-  let chosen: { id: string; name: string } | null = null;
-  if (searchParams.partner && searchParams.partner !== me!.id) {
-    const { data: c } = await db.from('companies').select('id,name,verified_at,hidden_at').eq('id', searchParams.partner).maybeSingle<any>();
-    if (c?.verified_at && !c?.hidden_at) chosen = { id: c.id, name: c.name };
-  }
-  let found: { id: string; name: string; open: boolean }[] = [];
-  let past: { id: string; name: string }[] = [];
-  if (!chosen) {
-    try {
-      let query = db.from('companies').select('id,name,open_to_partner').not('verified_at', 'is', null).is('hidden_at', null).neq('id', me!.id).limit(10);
-      if (q.length >= 2) query = query.ilike('name', `%${q.replace(/[%_]/g, '')}%`);
-      else query = query.eq('open_to_partner', true);
-      const { data } = await query;
-      found = ((data ?? []) as any[]).map((c) => ({ id: c.id, name: c.name, open: !!c.open_to_partner }));
+  let chosen: { id: string; name: string; miles: number } | null = null;
+  let found: { id: string; name: string; open: boolean; miles: number }[] = [];
+  let past: { id: string; name: string; miles: number }[] = [];
+  try {
+    if (searchParams.partner) {
+      const [c] = await localPartners(l.zip, me!.id, { ids: [searchParams.partner] });
+      if (c) chosen = { id: c.id, name: c.name, miles: c.miles };
+    }
+    if (!chosen) {
+      found = await localPartners(l.zip, me!.id, q.length >= 2 ? { q } : { openOnly: true });
       const { data: mine } = await db.from('team_bids').select('id').eq('lead_company_id', me!.id).eq('status', 'sent');
       const ids = (mine ?? []).map((x: any) => x.id as string);
       if (ids.length) {
         const { data: ps } = await db.from('team_partners').select('company_id').in('team_bid_id', ids).eq('status', 'confirmed');
         const cids = Array.from(new Set((ps ?? []).map((x: any) => x.company_id as string)));
-        if (cids.length) {
-          const { data: cs } = await db.from('companies').select('id,name').in('id', cids).not('verified_at', 'is', null).is('hidden_at', null);
-          past = ((cs ?? []) as any[]).map((c) => ({ id: c.id, name: c.name }));
-        }
+        past = (await localPartners(l.zip, me!.id, { ids: cids })).map((c) => ({ id: c.id, name: c.name, miles: c.miles }));
       }
-    } catch { /* team tables not created yet */ }
-  }
+    }
+  } catch { /* team tables not created yet */ }
 
   return (
     <div className="stack" style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -66,19 +59,19 @@ export default async function BidAsTeam({ params, searchParams }: { params: { id
             <input name="q" defaultValue={q} placeholder="Search by company name" aria-label="Company name" style={{ flex: 1 }} />
             <button className="btn" type="submit">Search</button>
           </form>
-          {past.length > 0 ? <><span className="muted small">Past partners</span>{past.map((c) => <Link key={c.id} className="card" href={`${base}?partner=${c.id}`} style={{ fontWeight: 700 }}>{c.name} ›</Link>)}</> : null}
-          <span className="muted small">{q.length >= 2 ? 'Verified companies matching your search' : 'Verified companies open to partnering'}</span>
-          {found.length === 0 ? <div className="card"><p className="muted">{q.length >= 2 ? `No verified companies match “${q}”.` : 'No one has turned on “Open to partnering” yet. Search by company name.'}</p></div> : null}
+          {past.length > 0 ? <><span className="muted small">Past partners</span>{past.map((c) => <Link key={c.id} className="card" href={`${base}?partner=${c.id}`} style={{ fontWeight: 700 }}>{c.name} <span className="muted small">· {Math.round(c.miles)} mi from the job</span> ›</Link>)}</> : null}
+          <span className="muted small">{q.length >= 2 ? 'Local verified companies matching your search' : 'Local verified companies open to partnering'}</span>
+          {found.length === 0 ? <div className="card"><p className="muted">{q.length >= 2 ? `No local verified companies match “${q}”.` : 'No local company has turned on “Open to partnering” yet. Search by company name.'}</p></div> : null}
           {found.map((c) => (
-            <Link key={c.id} className="card row" href={`${base}?partner=${c.id}`} style={{ justifyContent: 'space-between' }}><b>{c.name}</b>{c.open ? <span className="pill ok">Open to partnering</span> : <span className="muted small">Verified</span>}</Link>
+            <Link key={c.id} className="card row" href={`${base}?partner=${c.id}`} style={{ justifyContent: 'space-between' }}><span><b>{c.name}</b><br /><span className="muted small">{Math.round(c.miles)} mi from the job</span></span>{c.open ? <span className="pill ok">Open to partnering</span> : <span className="muted small">Verified</span>}</Link>
           ))}
-          <p className="muted small">Only companies verified by Jobfile can join a team bid. Not on the list? Ask them to join Jobfile and get verified.</p>
+          <p className="muted small">Team bids are for local companies: verified by Jobfile, working in this project’s area, and within 50 miles of you. Not on the list? Ask them to join Jobfile and get verified.</p>
         </>
       ) : (
         <form action={createTeamBid} className="stack" style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           <input type="hidden" name="listing_id" value={l.id} />
           <input type="hidden" name="partner_id" value={chosen.id} />
-          <div className="card row" style={{ justifyContent: 'space-between' }}><span><span className="muted small">Your partner</span><br /><b>{chosen.name}</b></span><Link href={base} style={{ fontWeight: 700 }}>Change</Link></div>
+          <div className="card row" style={{ justifyContent: 'space-between' }}><span><span className="muted small">Your partner</span><br /><b>{chosen.name}</b> <span className="muted small">· {Math.round(chosen.miles)} mi from the job</span></span><Link href={base} style={{ fontWeight: 700 }}>Change</Link></div>
           <h2>Your part</h2>
           <label className="fld">Your price ($)<input name="price" required inputMode="decimal" placeholder="2200" /></label>
           <h2>{chosen.name}’s part</h2>

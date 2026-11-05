@@ -4,7 +4,7 @@ import { requireUser } from '@/lib/session';
 import { supabaseAdmin } from '@/lib/supabase/server';
 import { dollars } from '@/lib/money';
 import { listingTitle, requireMarketplace, type Listing } from '@/lib/marketplace';
-import { companyOf, PARTNER_LABEL, type TeamBid, type TeamPartner } from '@/lib/team';
+import { companyOf, localPartners, PARTNER_LABEL, type TeamBid, type TeamPartner } from '@/lib/team';
 import { acceptCounter, cancelTeamBid, setOpenToPartner } from './actions';
 
 export const dynamic = 'force-dynamic';
@@ -69,11 +69,14 @@ export default async function Collaborate({ searchParams }: { searchParams: { er
   }
 
   const q = (searchParams.q ?? '').trim().slice(0, 60);
-  let found: { id: string; name: string; open: boolean }[] = [];
+  let found: { id: string; name: string; open: boolean; miles: number }[] = [];
+  let noZip = false;
   if (q.length >= 2) {
     try {
-      const { data } = await db.from('companies').select('id,name,open_to_partner').ilike('name', `%${q.replace(/[%_]/g, '')}%`).not('verified_at', 'is', null).is('hidden_at', null).neq('id', me!.id).limit(10);
-      found = ((data ?? []) as any[]).map((c) => ({ id: c.id, name: c.name, open: !!c.open_to_partner }));
+      const { data: mine } = await db.from('companies').select('business_zip').eq('id', me!.id).maybeSingle<any>();
+      const zip = (mine?.business_zip as string | undefined) ?? '';
+      if (!/^\d{5}$/.test(zip)) noZip = true;
+      else found = await localPartners(zip, me!.id, { q });
     } catch { /* column missing */ }
   }
 
@@ -90,7 +93,7 @@ export default async function Collaborate({ searchParams }: { searchParams: { er
           <b>Open to partnering</b>
           <span className={`pill${openToPartner ? ' ok' : ''}`}>{openToPartner ? 'On' : 'Off'}</span>
         </div>
-        <p className="muted small">When on, an “Open to partnering” badge shows on your public profile and you appear first when other companies look for a partner.</p>
+        <p className="muted small">When on, an “Open to partnering” badge shows on your public profile and you appear first when nearby companies look for a partner.</p>
         <form action={setOpenToPartner}><input type="hidden" name="on" value={openToPartner ? '0' : '1'} /><button className="btn ghost" type="submit">{openToPartner ? 'Turn off' : 'Turn on'}</button></form>
       </div>
 
@@ -154,9 +157,10 @@ export default async function Collaborate({ searchParams }: { searchParams: { er
         <input name="q" defaultValue={q} placeholder="Company name" aria-label="Company name" style={{ flex: 1 }} />
         <button className="btn" type="submit">Search</button>
       </form>
-      {q && found.length === 0 ? <p className="muted small">No verified companies match “{q}”. Only companies verified by Jobfile can join a team bid.</p> : null}
+      {noZip ? <p className="muted small">Add your business ZIP in <Link href="/settings/business">Business profile</Link> to find partners near you.</p> : null}
+      {q && !noZip && found.length === 0 ? <p className="muted small">No local verified companies match “{q}”. Team bids are for companies verified by Jobfile, near you.</p> : null}
       {found.map((c) => (
-        <div className="card row" key={c.id} style={{ justifyContent: 'space-between' }}><span><b>{c.name}</b>{c.open ? <span className="pill ok" style={{ marginLeft: 8 }}>Open to partnering</span> : null}</span><Link href={`/contractors/${c.id}`} style={{ fontWeight: 700 }}>View profile ›</Link></div>
+        <div className="card row" key={c.id} style={{ justifyContent: 'space-between' }}><span><b>{c.name}</b><span className="muted small"> · {Math.round(c.miles)} mi away</span>{c.open ? <span className="pill ok" style={{ marginLeft: 8 }}>Open to partnering</span> : null}</span><Link href={`/contractors/${c.id}`} style={{ fontWeight: 700 }}>View profile ›</Link></div>
       ))}
     </div>
   );

@@ -7,7 +7,7 @@ import { supabaseAdmin } from '@/lib/supabase/server';
 import { notifyUsers } from '@/lib/notify';
 import { dollars, parseDollars } from '@/lib/money';
 import { listingOpen, listingTitle, MAX_BIDS_PER_DAY, requireMarketplace, type Listing } from '@/lib/marketplace';
-import { companyOf, isVerified, memberIds, type TeamBid, type TeamPartner } from '@/lib/team';
+import { companyOf, isVerified, localPartners, memberIds, type TeamBid, type TeamPartner } from '@/lib/team';
 
 const txt = (f: FormData, k: string, n: number) => String(f.get(k) ?? '').trim().slice(0, n);
 function go(path: string, key: 'error' | 'ok', msg: string): never {
@@ -75,6 +75,7 @@ export async function createTeamBid(formData: FormData) {
   const { data: pco } = await db.from('companies').select('id,name').eq('id', partnerId).maybeSingle();
   if (!pco) go(path, 'error', 'We could not find that company.');
   if (!(await isVerified(partnerId))) go(path, 'error', 'That company is not verified by Jobfile yet, so it cannot join a team bid.');
+  if (!(await localPartners(l.zip, me!.id, { ids: [partnerId] })).length) go(path, 'error', 'Team bids are for local companies. That company is outside the area for this project.');
 
   const lead = parseDollars(txt(formData, 'price', 20));
   const part = parseDollars(txt(formData, 'partner_price', 20));
