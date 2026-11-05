@@ -1,0 +1,118 @@
+<title>Partner Invite</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: one phone column. Five screens of one story: the lead builds a team bid, the partner confirms their part, the homeowner compares, then the hired team shows on the project. Names, prices and trades are examples. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#c4813f;--orl:#f9efe4;--orb:#ecd4a8;--fg:#1f4d3a;--fgl:#e4f0e8;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--fgl:#173a2c;--fg:#8fd0ab;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--fgl:#173a2c;--fg:#8fd0ab;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:14px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px}
+h2{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;font-size:28px;line-height:1.05;text-wrap:balance}
+h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;font-size:18px}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
+.mut{color:var(--mut);font-size:14.5px;line-height:1.5;margin:0}
+.sw{display:grid;grid-template-columns:1fr 1fr;gap:6px}.sw button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:6px 4px;border-radius:99px;font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:44px}.sw button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.sec{display:flex;flex-direction:column;gap:14px}.sec[hidden]{display:none}
+.stage{display:flex;justify-content:center;padding:22px 0 8px;border-radius:30px;background:radial-gradient(120% 80% at 50% 0%,var(--orl),transparent 70%)}
+.ph{width:min(300px,84%);height:620px;background:#faf8f4;color:#1b1a18;border:7px solid #1b1a18;border-radius:36px;position:relative;overflow:hidden;box-shadow:0 22px 44px -18px rgba(27,26,24,.45);display:flex;flex-direction:column}
+.url{height:44px;background:#f3f1ec;display:flex;align-items:center;justify-content:center;font-size:11px;color:#6b655e;padding-top:10px;flex:none}
+.body{flex:1;padding:13px;display:flex;flex-direction:column;gap:8px;font-size:12px;line-height:1.4;overflow:hidden}
+.body h4{font:800 18px/1.05 'Bricolage Grotesque',sans-serif;letter-spacing:-.03em;margin:0}
+.body p{margin:0;color:#5c564f}
+.lab{font-size:10px;text-transform:uppercase;letter-spacing:.08em;font-weight:600;color:#6b655e;margin-top:2px}
+.cd{background:#fff;border:1px solid #e4dfd6;border-radius:12px;padding:9px 10px;display:flex;flex-direction:column;gap:5px}
+.r{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.r b{font-size:12.5px}.av{width:30px;height:30px;border-radius:9px;color:#fff;font:800 13px 'Bricolage Grotesque',sans-serif;display:grid;place-items:center;flex:none}
+.a1{background:#1f4d3a}.a2{background:#c4813f}
+.pill{display:inline-block;border-radius:99px;padding:2px 8px;font-size:10px;font-weight:600;white-space:nowrap}
+.ok{background:#e4f0e8;color:#1f4d3a}.wt{background:#f9efe4;color:#8a5a1a}.gr{background:#eef0f4;color:#4a4f5c}
+.amt{font:800 15px 'Bricolage Grotesque',sans-serif;font-variant-numeric:tabular-nums}
+.tot{background:#1f4d3a;color:#fff;border-radius:13px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center}.tot b{font:800 21px 'Bricolage Grotesque',sans-serif}.tot small{opacity:.85;font-size:10.5px}
+.inp{border:1px solid #d6d0c6;border-radius:9px;padding:7px 9px;font-size:11px;color:#8a8379;background:#faf8f4}
+.btn{border:0;border-radius:12px;padding:10px;font:600 12.5px 'IBM Plex Sans',sans-serif;text-align:center;background:#1f4d3a;color:#fff}.btn.gh{background:transparent;color:#6b655e;border:1px solid #e4dfd6}
+.tabs{height:48px;background:#fff;border-top:1px solid #e4dfd6;display:flex;justify-content:space-around;align-items:center;font-size:9.5px;color:#6b655e;flex:none}
+.rules{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:9px}
+.rules ul{margin:0;padding-left:18px;color:var(--mut);font-size:14px;line-height:1.5;display:flex;flex-direction:column;gap:6px}.rules li b{color:var(--ink)}
+</style>
+<div class="wrap">
+<div class="note"><b>Mockup.</b> Inviting a contractor you work with onto a job that did not come from Jobfile. Names, prices and trades are examples.</div>
+<h2>Add a partner to your own job</h2>
+<p class="mut">Nesty's Painting brings Bright Electric onto a deck rebuild the lead found on their own.</p>
+<div class="sw" role="group" aria-label="Screen" style="grid-template-columns:1fr 1fr 1fr">
+<button type="button" data-s="a" aria-pressed="true">1 · Add</button><button type="button" data-s="b" aria-pressed="false">2 · Invite</button><button type="button" data-s="c" aria-pressed="false">3 · Partner gets</button><button type="button" data-s="d" aria-pressed="false">4 · Partner view</button><button type="button" data-s="e" aria-pressed="false">5 · Homeowner</button><button type="button" data-s="f" aria-pressed="false">Rules</button></div>
+<div class="sec" id="a"><div class="stage"><div class="ph"><div class="url">Your project</div><div class="body">
+<h4 style="font-size:16px">Deck rebuild · Plano</h4>
+<div class="r"><span class="pill ok">In progress</span><span style="font-size:10.5px;color:#6b655e">Homeowner: Jerry S.</span></div>
+<div class="lab">Team</div>
+<div class="cd"><div class="r"><div class="r" style="gap:8px"><span class="av a1">N</span><b>Nesty's Painting</b></div><span class="pill gr">Lead</span></div></div>
+<div class="cd" style="border:1.5px dashed #c4813f;background:#f9efe4;align-items:center;text-align:center"><b style="color:#8a5a1a">+ Add a partner</b><span style="font-size:10.5px;color:#6b655e">Bring in a contractor you work with. Works for jobs that did not come from Jobfile.</span></div>
+<div class="lab">Schedule</div>
+<div class="cd"><span style="font-size:11px">Demo Mon · Build Tue–Thu · Stain Fri</span></div>
+<div class="lab">Also on the Collaborate page</div>
+<div class="cd"><div class="r"><b>Invite someone you work with</b><span style="color:#6b655e">›</span></div></div>
+<div class="note" style="font-size:10.5px;padding:7px 9px;margin-top:auto">Appears on any project you lead, whether it started on Jobfile or not.</div></div><div class="tabs"><span>Home</span><span style="color:#1f4d3a;font-weight:700">Projects</span><span>Post</span><span>Menu</span></div></div></div><p class="mut">The lead taps "Add a partner" on any project they run, or "Invite someone you work with" on the Collaborate page.</p></div>
+<div class="sec" id="b" hidden><div class="stage"><div class="ph"><div class="url">Add a partner</div><div class="body">
+<h4 style="font-size:16px">Add a partner</h4>
+<div class="lab">Who</div>
+<div class="inp">Name · Bright Electric</div>
+<div class="inp">Email or mobile · (214) 555-0142</div>
+<div class="cd" style="background:#e4f0e8;border-color:#bcd8c6"><span style="font-size:11px"><b>On Jobfile already?</b> We match the email or number. If not, they get an invite to join free.</span></div>
+<div class="lab">Their part</div>
+<div class="inp">Scope · Deck lighting, 6 fixtures</div>
+<div class="r"><div class="inp" style="flex:1">Price · $1,400</div><div class="inp" style="flex:1">Dates · Thu–Fri</div></div>
+<div class="lab">How will you work together?</div>
+<div class="cd" style="border:1.5px solid #1f4d3a;background:#e4f0e8"><div class="r"><b>Under my contract</b></div><span style="font-size:10.5px;color:#3d5a4b">You pay them. They only see their part.</span></div>
+<div class="cd"><div class="r"><b>Their own contract</b></div><span style="font-size:10.5px;color:#6b655e">Homeowner pays them directly. Linked project.</span></div>
+<div class="btn" style="margin-top:auto">Send invite</div></div></div></div><p class="mut">Name plus email or mobile. If they are already on Jobfile we match them, otherwise they get an invite to join free. The lead chooses one contract or their own contract, as in team bids.</p></div>
+<div class="sec" id="c" hidden><div class="stage"><div class="ph"><div class="url">Invite from Nesty's Painting</div><div class="body">
+<h4 style="font-size:16px">Nesty's Painting invited you to a job</h4>
+<div class="cd"><div class="r"><b>Deck rebuild · Plano</b><span class="amt">$1,400</span></div><span style="font-size:11px;color:#6b655e">Deck lighting, 6 fixtures · Thu–Fri</span><span class="pill gr" style="width:max-content">11 miles from you</span></div>
+<div class="lab">What you will see</div>
+<div class="cd"><span style="font-size:11px">✓ Your scope, price and dates<br>✓ Photos and notes for your part<br>✓ Messages with Nesty's Painting<br>✓ The job address on the day</span></div>
+<div class="lab">What stays private</div>
+<div class="cd" style="background:#f9efe4;border-color:#ecd4a8"><span style="font-size:11px">✕ Homeowner phone and email<br>✕ Total price and other partners' prices</span></div>
+<div class="btn">Accept</div>
+<div style="display:flex;gap:6px"><div class="btn gh" style="flex:1;padding:8px">Change price</div><div class="btn gh" style="flex:1;padding:8px">Decline</div></div>
+<div class="note" style="font-size:10.5px;padding:7px 9px">New to Jobfile? Accepting creates your free account first.</div></div></div></div><p class="mut">The partner sees exactly what they get and what stays private before accepting. They can change the price or decline.</p></div>
+<div class="sec" id="d" hidden><div class="stage"><div class="ph"><div class="url">Partner view · Team tab</div><div class="body">
+<h4 style="font-size:16px">Deck rebuild</h4>
+<div class="r"><span class="pill ok">Your part</span><span class="pill gr">Partner</span></div>
+<div class="cd"><div class="r"><b>Deck lighting</b><span class="amt">$1,400</span></div><span style="font-size:11px;color:#6b655e">6 fixtures · Thu–Fri</span></div>
+<div class="lab">Lead</div>
+<div class="cd"><div class="r"><div class="r" style="gap:8px"><span class="av a1">N</span><b>Nesty's Painting</b></div><span class="pill ok">Message</span></div></div>
+<div class="lab">Schedule</div>
+<div class="cd"><span style="font-size:11px">Demo Mon · Build Tue–Thu · Stain Fri<br><b>Your days: Thu–Fri</b></span></div>
+<div class="lab">Photos</div>
+<div style="display:flex;gap:6px"><div class="av a2" style="width:60px;height:46px;border-radius:9px"></div><div class="av a1" style="width:60px;height:46px;border-radius:9px"></div></div>
+<div class="lab">Payments</div>
+<div class="cd"><span style="font-size:11px">Recorded by Nesty's Painting. You can confirm when paid.</span></div>
+<div class="note" style="font-size:10.5px;padding:7px 9px;margin-top:auto">Contact details and totals are hidden.</div></div><div class="tabs"><span>Home</span><span style="color:#1f4d3a;font-weight:700">Projects</span><span>Post</span><span>Menu</span></div></div></div><p class="mut">After accepting, the partner gets a limited Team tab on the project. No homeowner contact, no total.</p></div>
+<div class="sec" id="e" hidden><div class="stage"><div class="ph"><div class="url">Your project</div><div class="body">
+<h4 style="font-size:16px">A partner joined your project</h4>
+<div class="cd" style="border:1.5px solid #1f4d3a"><div class="r"><div class="r" style="gap:8px"><span class="av a2">B</span><b>Bright Electric</b></div><span class="pill wt">Not verified yet</span></div>
+<div style="display:flex;gap:4px;flex-wrap:wrap"><span class="pill ok">★ 4.8 Google</span><span class="pill ok">Insured</span><span class="pill gr">11 mi</span></div>
+<span style="font-size:11px;color:#6b655e">Deck lighting · Thu–Fri. Invited by Nesty's Painting.</span></div>
+<div class="cd"><span style="font-size:11px">Nesty's Painting stays your contact for the whole job. Bright Electric works under their contract and does not see your phone or email.</span></div>
+<div class="btn gh">Remove this partner</div>
+<div class="note" style="font-size:10.5px;padding:7px 9px;margin-top:auto">If you remove a partner, Nesty's Painting is told right away.</div></div><div class="tabs"><span>Home</span><span style="color:#1f4d3a;font-weight:700">Projects</span><span>Post</span><span>Menu</span></div></div></div><p class="mut">The homeowner is told and sees the partner. They can remove a partner they do not want. The lead is told if that happens.</p></div>
+<div class="sec" id="f" hidden><div class="rules"><h3>Who can do what</h3><ul>
+<li><b>Lead.</b> Adds partners, sets their part, stays the contact, records payouts.</li>
+<li><b>Partner.</b> Sees only their scope, price, dates, photos and messages with the lead.</li>
+<li><b>Homeowner.</b> Is told, sees the partner's rating and insurance, can remove them.</li></ul></div>
+<div class="rules"><h3>Same as team bids</h3><ul>
+<li><b>Local only.</b> Within 50 miles of the project.</li>
+<li><b>Partner confirms first.</b> Nothing is final until they accept the price.</li>
+<li><b>Payments are records only.</b> Jobfile does not move money.</li></ul></div>
+<div class="rules"><h3>What is new</h3><ul>
+<li><b>Partner role.</b> A limited project role. Hired team-bid partners get the same Team tab.</li>
+<li><b>Not verified yet.</b> Partners new to Jobfile are labeled until verified.</li>
+<li><b>Growth.</b> Every invite brings a contractor onto Jobfile.</li></ul></div></div>
+</div>
+<script>
+document.querySelectorAll('.sw button').forEach(function(b){b.addEventListener('click',function(){
+  document.querySelectorAll('.sw button').forEach(function(x){x.setAttribute('aria-pressed',x===b)});
+  ['a','b','c','d','e','f'].forEach(function(id){document.getElementById(id).hidden=id!==b.dataset.s});
+})});
+</script>
