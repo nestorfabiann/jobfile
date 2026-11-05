@@ -549,7 +549,9 @@ export async function acceptTeamBoth(formData: FormData) {
   await closeOthers(db, l);
   revalidatePath('/marketplace');
   revalidatePath('/projects');
-  redirect(failed ? '/projects?error=' + encodeURIComponent('One of the two projects could not be opened. Contact Jobfile.') : '/projects?hired=2');
+  // Not an ?error here: on /projects that opens the contractor's start-a-project form.
+  if (failed) await notifyUsers({ userIds: [user.id], projectId: null, kind: 'bid', path: '/projects', title: 'One of your two projects could not be opened', body: 'The other project is open. Contact Jobfile and we will fix it.' });
+  redirect('/projects');
 }
 
 

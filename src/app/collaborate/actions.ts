@@ -84,7 +84,7 @@ export async function createTeamBid(formData: FormData) {
   requireMarketplace();
   const { user } = await requireUser();
   const listingId = String(formData.get('listing_id') ?? '');
-  const path = `/marketplace/${listingId}/team`;
+  let path = `/marketplace/${listingId}/team`;
   const db = supabaseAdmin();
   const { data: l } = await db.from('marketplace_listings').select('*').eq('id', listingId).maybeSingle<Listing>();
   if (!l) redirect('/marketplace');
@@ -97,6 +97,7 @@ export async function createTeamBid(formData: FormData) {
   if (!(await isVerified(me.id))) go(path, 'error', 'Your company needs to be verified by Jobfile before it can lead a team bid.');
 
   const partnerId = String(formData.get('partner_id') ?? '');
+  if (partnerId) path = `${path}?partner=${encodeURIComponent(partnerId)}`;
   if (!partnerId || partnerId === me.id) go(path, 'error', 'Pick the company you want to team up with.');
   const { data: pco } = await db.from('companies').select('id,name').eq('id', partnerId).maybeSingle();
   if (!pco) go(path, 'error', 'We could not find that company.');
