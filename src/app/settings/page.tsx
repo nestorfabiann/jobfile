@@ -2,6 +2,7 @@ import { requireUser } from '@/lib/session';
 import Link from 'next/link';
 import { saveSettings } from './actions';
 import { myOwnedCompany } from '@/lib/companyProfile';
+import ProfilePreview from '@/components/ProfilePreview';
 import PushSettings from '@/components/PushAlerts';
 import { asLang, translateEnabled } from '@/lib/translate';
 
@@ -28,7 +29,8 @@ export default async function Settings({ searchParams }: { searchParams: { saved
       {owned && (
         <div className="card">
           <h2>Business profile</h2>
-          <p className="muted small">Add photos of your work, proof of insurance, your website and social links, and a description for homeowners.</p>
+          <p className="muted small">This is what homeowners see. Tap any part to fix it.</p>
+          <ProfilePreview companyId={owned.companyId} />
           <div className="row">
             <Link className="btn" href="/settings/business">Edit business profile</Link>
             <Link className="btn ghost" href={`/contractors/${owned.companyId}`}>View public page</Link>
