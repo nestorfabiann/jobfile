@@ -633,3 +633,11 @@ html { scroll-behavior: smooth; }
   .mic-out { --c: #f08a78; --b: #3a1f1a; }
 }
 .appmenu-sheet a[aria-current='page'] .mic { --b: #fff; }
+
+/* Menu tiles: keep the tile a centered square. The sheets style any direct child span as a text column, which pushed the icon to the corner. */
+.appmenu-sheet a > span.mic, .apptabs-sheet a > span.mic, .appmenu-sheet button > span.mic, .apptabs-sheet button > span.mic { display: grid; place-items: center; flex: none; width: 32px; height: 32px; min-width: 32px; }
+.mic svg { display: block; margin: 0; }
+/* Tall menus scroll inside themselves so Sign out is always reachable on short screens. */
+.appmenu-sheet { max-height: calc(100dvh - 200px); overflow-y: auto; overscroll-behavior: contain; }
+.appmenu-sheet a, .appmenu-sheet button { padding-top: 8px; padding-bottom: 8px; }
+.apptabs-sheet { max-height: 88dvh; overflow-y: auto; overscroll-behavior: contain; }
