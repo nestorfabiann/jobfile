@@ -1,3 +1,5 @@
+import BidChoice from '@/components/BidChoice';
+import { localPartners } from '@/lib/team';
 import TradeIcon from '@/components/TradeIcon';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -166,7 +168,15 @@ export default async function ListingPage({ params, searchParams }: { params: { 
   // How many trades the job lists, from the groups its items belong to.
   const tradeGroups = (JOB_TYPES[l.job_type]?.groups ?? []).filter(([, its]) => its.some((i) => l.items.includes(i))).map(([g]) => g);
   const teamTrades = tradeGroups.length;
-  const teamTradeNames = tradeGroups.join(', ');
+  let myCompanyName = '';
+  let nearbyOpen = 0;
+  if (!owner && companyId && open) {
+    try {
+      const { data: mc } = await db.from('companies').select('name').eq('id', companyId).maybeSingle<any>();
+      myCompanyName = (mc?.name as string | undefined) ?? '';
+      nearbyOpen = (await localPartners(String(l.zip ?? ''), companyId, { openOnly: true })).length;
+    } catch { /* columns missing */ }
+  }
   const onlyInsured = searchParams.insured === '1';
   const shown = (onlyInsured ? visible.filter((b) => info.get(b.company_id)?.insured) : visible).filter((b) => !partnerBidIds.has(b.id));
   // A contractor without current verified insurance gets a nudge, since the badge helps them stand out.
@@ -459,8 +469,16 @@ export default async function ListingPage({ params, searchParams }: { params: { 
               <span className="small" style={{ display: 'block' }}>Your price: {dollars(myBid.price_cents)}. If the homeowner hires you, you get your own project and agreement. To leave the team bid, withdraw below.</span>
             </div>
           ) : null}
-          {open && !myTeamPart && !myTeamLead && (!myBid || myBid.status === 'waiting' || myBid.status === 'withdrawn') ? (
-            <form action={placeBid} className="stack" style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {open && myPendingTeam ? (
+            <div className="box" style={{ background: 'var(--accent-soft, #f9efe4)' }}>
+              <b>Your team bid is waiting on {myPendingTeam.partnerName}.</b>
+              <span className="small" style={{ display: 'block' }}>It goes to the homeowner when they confirm. <Link href="/collaborate">Open Collaborate</Link></span>
+            </div>
+          ) : null}
+          {(() => {
+            const showForm = open && !myTeamPart && !myTeamLead && (!myBid || myBid.status === 'waiting' || myBid.status === 'withdrawn');
+            const showTeam = open && !myPendingTeam && (!myBid || myBid.status === 'withdrawn');
+            const formJsx = (<form action={placeBid} className="stack" style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               <input type="hidden" name="listing_id" value={l.id} />
               {hasAI && <p className="muted small">AI reference for this scope: {dollars(l.ai_low_cents as number)} – {dollars(l.ai_high_cents as number)}. Bid what the work really costs you.</p>}
               <div className="grid2">
@@ -470,22 +488,41 @@ export default async function ListingPage({ params, searchParams }: { params: { 
               </div>
               <label className="fld">What is included (permits, materials…)<textarea name="inclusions" rows={2} maxLength={500} defaultValue={myBid?.inclusions ?? ''} /></label>
               <label className="fld">Note to the homeowner<textarea name="note" rows={3} maxLength={1000} defaultValue={myBid?.note ?? ''} placeholder="No phone numbers or emails. You can talk once the homeowner accepts." /></label>
-              <div className="row"><button className="btn" type="submit">{myBid && myBid.status === 'waiting' ? 'Update my bid' : 'Send bid'}</button></div>
-            </form>
-          ) : null}
-          {open && myPendingTeam ? (
-            <div className="box" style={{ background: 'var(--accent-soft, #f9efe4)' }}>
-              <b>Your team bid is waiting on {myPendingTeam.partnerName}.</b>
-              <span className="small" style={{ display: 'block' }}>It goes to the homeowner when they confirm. <Link href="/collaborate">Open Collaborate</Link></span>
-            </div>
-          ) : null}
-          {open && !myPendingTeam && (!myBid || myBid.status === 'withdrawn') ? (
-            <>
-              {teamTrades > 1 ? <div className="box" style={{ background: 'var(--accent-soft, #f9efe4)' }}><b>This job needs {teamTrades} trades.</b> <span className="small">{teamTradeNames}. Team up with another pro to bid on all of it.</span></div> : null}
-              <Link className="btn ghost" href={`/marketplace/${l.id}/team`} style={{ borderColor: 'var(--brand, #1f4d3a)', color: 'var(--brand, #1f4d3a)', fontWeight: 700 }}>Bid as a team <span className="pill warn" style={{ marginLeft: 6 }}>New</span></Link>
-              <span className="muted small">You stay the lead. Your partner confirms their price before it is sent.</span>
-            </>
-          ) : null}
+              <button className="btn" type="submit" style={{ width: '100%' }}>{myBid && myBid.status === 'waiting' ? 'Update my bid' : 'Send bid'}</button>
+            </form>);
+            const hint = teamTrades > 1 ? (
+              <div className="box" style={{ background: 'var(--accent-soft, #f9efe4)', display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <b>This job needs {teamTrades} trades</b>
+                <span className="row" style={{ gap: 6 }}>{tradeGroups.map((g) => <span key={g} className="pill">{g}</span>)}</span>
+                <span className="small">Teaming up lets you bid on all of it.</span>
+              </div>
+            ) : null;
+            const teamCard = (
+              <div style={{ borderRadius: 18, background: 'linear-gradient(135deg, #1f4d3a, #2c6a50)', color: '#fff', padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <div className="row" style={{ gap: 12, flexWrap: 'nowrap', alignItems: 'center' }}>
+                  <span aria-hidden="true" style={{ display: 'flex' }}>
+                    <span style={{ width: 40, height: 40, borderRadius: '50%', background: '#c4813f', border: '2px solid #1f4d3a', display: 'grid', placeItems: 'center', fontWeight: 800 }}>{(myCompanyName[0] ?? 'Y').toUpperCase()}</span>
+                    <span style={{ width: 40, height: 40, borderRadius: '50%', background: '#2f5f8a', border: '2px solid #1f4d3a', display: 'grid', placeItems: 'center', fontWeight: 800, marginLeft: -12 }}>?</span>
+                  </span>
+                  <span><b style={{ fontSize: 18, display: 'block' }}>Pair up with a local pro</b><span className="small" style={{ opacity: 0.88 }}>{teamTrades > 1 ? `Bid on all ${teamTrades} trades together` : 'Bid on the whole job together'}</span></span>
+                </div>
+                {['Pick a partner within 50 miles', 'Set each part and price', 'They confirm, then the bid goes out'].map((t, i) => (
+                  <div key={t} className="row" style={{ gap: 10, flexWrap: 'nowrap', alignItems: 'center' }}>
+                    <span aria-hidden="true" style={{ width: 22, height: 22, borderRadius: '50%', background: 'rgba(255,255,255,.18)', display: 'grid', placeItems: 'center', fontSize: 12, fontWeight: 700, flex: 'none' }}>{i + 1}</span>
+                    <span className="small">{t}</span>
+                  </div>
+                ))}
+                <Link href={`/marketplace/${l.id}/team`} style={{ background: '#fff', color: '#1f4d3a', borderRadius: 14, padding: '13px 10px', textAlign: 'center', fontWeight: 700, textDecoration: 'none' }}>Choose a partner</Link>
+                <span className="small" style={{ opacity: 0.88, textAlign: 'center' }}>{nearbyOpen > 0 ? `${nearbyOpen} ${nearbyOpen === 1 ? 'company' : 'companies'} nearby ${nearbyOpen === 1 ? 'is' : 'are'} open to partnering. ` : ''}You stay the lead. Your partner confirms their price before it is sent.</span>
+              </div>
+            );
+            return (
+              <>
+                {showTeam ? hint : null}
+                {showForm && showTeam ? <BidChoice alone={formJsx} team={teamCard} /> : showForm ? formJsx : showTeam ? teamCard : null}
+              </>
+            );
+          })()}
           {myBid && myBid.status !== 'withdrawn' && thread(myBid.id, 'the homeowner', myBid.status === 'waiting')}
           {myBid && myBid.status !== 'withdrawn' && visitFor(myBid.id, 'contractor', myBid.status === 'waiting')}
           {open && myBid && myBid.status === 'waiting' && (
