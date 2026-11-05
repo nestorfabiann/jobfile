@@ -5,13 +5,26 @@ import TradeIcon from '@/components/TradeIcon';
 import KitchenArt from '@/components/KitchenArt';
 import InviteCard from '@/components/InviteCard';
 import { createCompany } from '@/app/projects/actions';
-import { deleteDraft } from '@/app/marketplace/actions';
+import DraftDelete from '@/components/DraftDelete';
 import { listingOpen, listingTitle, type Listing } from '@/lib/marketplace';
 import type { Summary } from '@/lib/homeSummary';
 
 type Proj = { id: string; name: string; address: string; created_at: string; completed_at: string | null; closeout_started_at: string | null };
 type Stat = { n: number; lo: number; hi: number; fresh: number };
-type Draft = { id: string; updated_at: string; data: { type: string; picks: string[]; zip?: string } };
+type Draft = { id: string; updated_at: string; data: { type: string; picks: string[]; zip?: string; details?: string; bmin?: string; bmax?: string } };
+
+const TRADE_COLORS = ['#c4813f', '#1f4d3a', '#2f5f8a', '#7a4a6b', '#1d6f73', '#a2503a', '#6b7a2a', '#4a5568'];
+const colorFor = (t: string) => TRADE_COLORS[Array.from(t).reduce((n, c) => n + c.charCodeAt(0), 0) % TRADE_COLORS.length];
+/** How far along a draft is: five steps (kind of work is always done), and what is still missing, named for the person. */
+function draftProgress(d: Draft['data']) {
+  const miss: string[] = [];
+  if (!d.picks.length) miss.push('choices');
+  if (!(d.details ?? '').trim()) miss.push('details');
+  if (!/^\d{5}$/.test(d.zip ?? '')) miss.push('your ZIP');
+  if (!(d.bmin || d.bmax)) miss.push('a budget');
+  const done = 5 - miss.length;
+  return { done, pct: Math.round((done / 5) * 100), missing: miss.length ? `Add ${miss.slice(0, 2).join(' and ')}` : 'Ready to publish' };
+}
 
 const left = (l: Listing) => Math.max(0, Math.ceil((new Date(l.expires_at).getTime() - Date.now()) / 86400000));
 const short = (iso: string) => new Date(iso).toLocaleDateString('en-US', { timeZone: 'America/Chicago', month: 'short', day: 'numeric' });
@@ -121,25 +134,36 @@ export default function HomeownerProjects(p: {
       {(waiting.length > 0 || p.drafts.length > 0) && (
         <section className="stack" aria-label="Waiting for bids">
           <div className="row" style={{ justifyContent: 'space-between', flexWrap: 'nowrap' }}><h2>Waiting for bids</h2><span className="muted small">{waiting.length}</span></div>
-          {p.drafts.map((d) => (
-            <div className="card" key={d.id}>
-              <div className="row" style={{ justifyContent: 'space-between' }}><span className="pill warn">Draft</span><span className="muted small">Saved {short(d.updated_at)}</span></div>
-              <b>{d.data.type}{d.data.picks.length ? ` · ${d.data.picks.length} choice${d.data.picks.length === 1 ? '' : 's'} picked` : ''}</b>
-              <span className="muted small">Not visible to contractors until you publish</span>
-              <Link className="btn ghost" href={`/marketplace/new?draft=${d.id}`}>Continue your post</Link>
-              <details>
-                <summary className="muted small" style={{ cursor: 'pointer', padding: '8px 0' }}>Delete this draft</summary>
-                <div className="stack" style={{ gap: 8 }}>
-                  <p className="muted small" style={{ margin: 0 }}>This removes the draft for good.</p>
-                  <form action={deleteDraft}>
-                    <input type="hidden" name="id" value={d.id} />
-                    <input type="hidden" name="back" value="/projects" />
-                    <button className="btn ghost" type="submit">Yes, delete the draft</button>
-                  </form>
+          {p.drafts.map((d) => {
+            const col = colorFor(d.data.type);
+            const g = draftProgress(d.data);
+            return (
+              <div className="card" key={d.id} style={{ padding: 0, overflow: 'hidden', gap: 0 }}>
+                <div style={{ height: 5, background: col }} />
+                <div style={{ padding: 14, display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  <div className="row" style={{ gap: 12, flexWrap: 'nowrap', alignItems: 'center' }}>
+                    <span aria-hidden="true" style={{ width: 46, height: 46, borderRadius: 13, background: col, color: '#fff', display: 'grid', placeItems: 'center', flex: 'none' }}><TradeIcon trade={d.data.type} size={26} /></span>
+                    <span style={{ flex: 1, minWidth: 0 }}><b style={{ fontSize: 18, display: 'block' }}>{d.data.type}</b><span className="muted small">Saved {short(d.updated_at)}</span></span>
+                    <span className="pill" style={{ background: `${col}22`, color: col, borderColor: 'transparent', fontWeight: 700 }}>Draft</span>
+                  </div>
+                  {d.data.picks.length ? (
+                    <div className="row" style={{ gap: 6 }}>
+                      {d.data.picks.slice(0, 3).map((x) => <span key={x} className="pill" style={{ background: 'var(--surface-2)' }}>{x}</span>)}
+                      {d.data.picks.length > 3 ? <span className="pill" style={{ background: 'var(--surface-2)' }}>+{d.data.picks.length - 3} more</span> : null}
+                    </div>
+                  ) : null}
+                  <div>
+                    <div className="bar" role="img" aria-label={`${g.done} of 5 steps done`}><span style={{ width: `${g.pct}%`, background: col }} /></div>
+                    <div className="row" style={{ justifyContent: 'space-between', marginTop: 4 }}><span className="muted small">{g.done} of 5 steps</span><span className="muted small">{g.missing}</span></div>
+                  </div>
+                  <div className="row" style={{ gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+                    <Link className="btn" href={`/marketplace/new?draft=${d.id}`} style={{ flex: 1, background: col, borderColor: col, color: '#fff', textAlign: 'center' }}>{g.pct >= 80 ? 'Finish your post' : 'Keep going'}</Link>
+                    <DraftDelete id={d.id} back="/projects" />
+                  </div>
                 </div>
-              </details>
-            </div>
-          ))}
+              </div>
+            );
+          })}
           {waiting.map((l) => {
             const st = p.stats.get(l.id);
             return (
