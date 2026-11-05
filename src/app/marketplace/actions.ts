@@ -443,6 +443,17 @@ export async function acceptBid(formData: FormData) {
   // Visits already arranged with the winner carry over to the new project's schedule.
   await db.from('visits').update({ project_id: project.id }).eq('bid_id', bid.id).neq('status', 'canceled');
   await db.from('marketplace_bids').update({ status: 'won', updated_at: new Date().toISOString() }).eq('id', bid.id);
+  // A team bid: tell the partner company it won, so the lead and partner can start planning.
+  try {
+    const { data: tb } = await db.from('team_bids').select('id').eq('bid_id', bid.id).maybeSingle();
+    if (tb) {
+      const { data: tps } = await db.from('team_partners').select('company_id').eq('team_bid_id', tb.id).eq('status', 'confirmed');
+      for (const tp of (tps ?? []) as any[]) {
+        const { data: ms } = await db.from('company_members').select('user_id').eq('company_id', tp.company_id);
+        await notifyUsers({ userIds: (ms ?? []).map((m: any) => m.user_id as string), projectId: null, kind: 'bid', path: '/collaborate', title: `Your team won ${title}`, body: 'The homeowner hired the team. The lead will contact you to plan the schedule.' });
+      }
+    }
+  } catch { /* team tables not created yet */ }
   const { data: lost } = await db.from('marketplace_bids').update({ status: 'not_selected', updated_at: new Date().toISOString() }).eq('listing_id', l.id).eq('status', 'waiting').select('bidder_id');
 
   await notifyUsers({ userIds: [bid.bidder_id], projectId: project.id, kind: 'bid', title: `You won ${title}: ${dollars(bid.price_cents)}`, body: 'The homeowner accepted your bid. The project is open with the scope and price filled in. Review the Agreement tab and send it for approval.' });

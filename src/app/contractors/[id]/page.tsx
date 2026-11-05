@@ -98,6 +98,7 @@ export default async function Profile({ params, searchParams }: { params: { id: 
         {(c.verified_at || verified.length > 0) && (
           <div className="row" style={{ gap: 8 }}>
             {c.verified_at ? <span className="pill ok">✓ Verified by Jobfile</span> : null}
+            {(c as any).open_to_partner ? <span className="pill warn">Open to partnering</span> : null}
             {verified.length > 0 && <span className="pill ok">✓ Insured until {fmtDate(verified.map((v) => v.expires_on).sort()[0])}</span>}
           </div>
         )}

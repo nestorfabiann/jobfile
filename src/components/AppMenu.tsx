@@ -5,13 +5,15 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import MenuIcon from '@/components/MenuIcon';
 import { useGetApp } from '@/lib/useGetApp';
+import { useCollab } from '@/lib/useCollab';
 
 /** Signed-in header menu: Home first, then the usual links. Closes on navigation, outside tap and Escape. */
-export default function AppMenu({ marketplace, contractor, admin, signOutAction }: { marketplace: boolean; contractor?: boolean; admin: boolean; signOutAction: () => void | Promise<void> }) {
+export default function AppMenu({ marketplace, contractor, admin, invites = 0, signOutAction }: { marketplace: boolean; contractor?: boolean; admin: boolean; invites?: number; signOutAction: () => void | Promise<void> }) {
   const [open, setOpen] = useState(false);
   const path = usePathname();
   const box = useRef<HTMLDivElement>(null);
   const { installed, nudge: getApp } = useGetApp();
+  const collab = useCollab(invites);
 
   useEffect(() => { setOpen(false); }, [path]);
   useEffect(() => {
@@ -27,6 +29,7 @@ export default function AppMenu({ marketplace, contractor, admin, signOutAction 
     ['/', 'Home', 'home'],
     ['/projects', 'Projects', 'proj'],
     ...(marketplace ? ([['/marketplace', 'Marketplace', 'mkt']] as [string, string, string][]) : []),
+    ...(marketplace && contractor ? ([['/collaborate', 'Collaborate', 'collab']] as [string, string, string][]) : []),
     ...(marketplace && !contractor ? ([['/find', 'Find contractors', 'find']] as [string, string, string][]) : []),
     ['/settings', 'Settings', 'set'],
     ...(contractor ? ([['/settings/business', 'Business profile', 'biz']] as [string, string, string][]) : []),
@@ -49,7 +52,7 @@ export default function AppMenu({ marketplace, contractor, admin, signOutAction 
       {open && (
         <nav id="appmenu-sheet" className="appmenu-sheet" aria-label="Main">
           {items.filter(([href]) => !(href === '/app' && installed)).map(([href, label, icon]) => (
-            <Link key={href} href={href} className={href === '/app' && getApp ? 'mi-new' : undefined} aria-current={current(href) ? 'page' : undefined}><MenuIcon name={icon} />{href === '/app' ? <span>{label}<small className="mi-sub">Alerts on your phone</small></span> : label}{href === '/app' && getApp ? <span className="mi-tag">New</span> : null}</Link>
+            <Link key={href} href={href} className={(href === '/app' && getApp) || (href === '/collaborate' && collab.highlight) ? 'mi-new' : undefined} aria-current={current(href) ? 'page' : undefined}><MenuIcon name={icon} />{href === '/app' ? <span>{label}<small className="mi-sub">Alerts on your phone</small></span> : href === '/collaborate' ? <span>{label}<small className="mi-sub">Team up on bids</small></span> : label}{href === '/app' && getApp ? <span className="mi-tag">New</span> : null}{href === '/collaborate' && collab.tag ? <span className="mi-tag">{collab.tag}</span> : null}</Link>
           ))}
           <hr />
           <form action={signOutAction}><button type="submit" className="menu-out"><MenuIcon name="out" />Sign out</button></form>

@@ -7,6 +7,7 @@ import { adminRoleOf } from '@/lib/admin';
 import { marketplaceEnabled } from '@/lib/marketplace';
 import PubTabs from '@/components/PubTabs';
 import AppMenu from '@/components/AppMenu';
+import { inviteCount } from '@/lib/team';
 import HelpButton from '@/components/HelpButton';
 import AlertPill from '@/components/AlertPill';
 import WelcomeAlerts from '@/components/WelcomeAlerts';
@@ -34,6 +35,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   // Signed-in tab bar: contractors see Find work, everyone else sees Post. The badge matches the "Needs you" card.
   let contractor = false;
   let waiting = 0;
+  let invites = 0;
   let isAdmin = false;
   if (user) {
     isAdmin = (await adminRoleOf(user.email, !!user.email_confirmed_at)) !== null;
@@ -42,6 +44,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       const m = await db.from('company_members').select('company_id', { count: 'exact', head: true }).eq('user_id', user.id);
       contractor = (m.count ?? 0) > 0;
       waiting = await needsCount(user.id);
+      if (contractor && marketplaceEnabled()) invites = await inviteCount(user.id);
     } catch { /* the bar still shows, without the badge */ }
   }
 
@@ -63,7 +66,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <header className="pubtop app">
             <div className="in pubtop-in">
               <Link href="/" className="publogo">Job<b>file</b></Link>
-              {user && <AppMenu marketplace={marketplaceEnabled()} contractor={contractor} admin={isAdmin} signOutAction={signOut} />}
+              {user && <AppMenu marketplace={marketplaceEnabled()} contractor={contractor} admin={isAdmin} invites={invites} signOutAction={signOut} />}
             </div>
           </header>
         )}
@@ -73,7 +76,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         {user && <UsageBeacon />}
         {user && <AlertPill />}
         {user && <WelcomeAlerts />}
-        {user && <AppTabs contractor={contractor} marketplace={marketplaceEnabled()} waiting={waiting} admin={isAdmin} signOutAction={signOut} />}
+        {user && <AppTabs contractor={contractor} marketplace={marketplaceEnabled()} waiting={waiting} admin={isAdmin} invites={invites} signOutAction={signOut} />}
       </body>
     </html>
   );

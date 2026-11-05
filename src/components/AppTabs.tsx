@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import MenuIcon from '@/components/MenuIcon';
 import { useGetApp } from '@/lib/useGetApp';
+import { useCollab } from '@/lib/useCollab';
 
 const IC: Record<string, string> = {
   home: '<path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/>',
@@ -15,10 +16,11 @@ const IC: Record<string, string> = {
 };
 
 /** Bottom tab bar for signed-in people. Homeowners get Post, contractors get Find work. */
-export default function AppTabs({ contractor, marketplace, waiting, admin, signOutAction }: { contractor: boolean; marketplace: boolean; waiting: number; admin: boolean; signOutAction: () => void | Promise<void> }) {
+export default function AppTabs({ contractor, marketplace, waiting, admin, invites = 0, signOutAction }: { contractor: boolean; marketplace: boolean; waiting: number; admin: boolean; invites?: number; signOutAction: () => void | Promise<void> }) {
   const path = usePathname() || '/';
   const [open, setOpen] = useState(false);
   const { installed, nudge: getApp } = useGetApp();
+  const collab = useCollab(invites);
   useEffect(() => { setOpen(false); }, [path]);
   useEffect(() => {
     if (!open) return;
@@ -39,6 +41,7 @@ export default function AppTabs({ contractor, marketplace, waiting, admin, signO
   ];
   const links: [string, string, string][] = [
     ...(marketplace ? ([['/marketplace', 'Marketplace', 'mkt']] as [string, string, string][]) : []),
+    ...(marketplace && contractor ? ([['/collaborate', 'Collaborate', 'collab']] as [string, string, string][]) : []),
     ...(marketplace && !contractor ? ([['/find', 'Find contractors', 'find']] as [string, string, string][]) : []),
     ['/settings', 'Settings', 'set'],
     ...(contractor ? ([['/settings/business', 'Business profile', 'biz']] as [string, string, string][]) : []),
@@ -53,7 +56,7 @@ export default function AppTabs({ contractor, marketplace, waiting, admin, signO
       {open && <div className="apptabs-shade" onClick={() => setOpen(false)} aria-hidden="true" />}
       {open && (
         <nav className="apptabs-sheet" id="apptabs-sheet" aria-label="More">
-          {links.filter(([h]) => !(h === '/app' && installed)).map(([h, l, i]) => h === '/app' ? <Link key={h} href={h} className={getApp ? 'mi-new' : undefined}><MenuIcon name={i} /><span>{l}<small className="mi-sub">Alerts on your phone</small></span>{getApp ? <span className="mi-tag">New</span> : null}</Link> : <Link key={h} href={h}><MenuIcon name={i} />{l}</Link>)}
+          {links.filter(([h]) => !(h === '/app' && installed)).map(([h, l, i]) => h === '/app' ? <Link key={h} href={h} className={getApp ? 'mi-new' : undefined}><MenuIcon name={i} /><span>{l}<small className="mi-sub">Alerts on your phone</small></span>{getApp ? <span className="mi-tag">New</span> : null}</Link> : h === '/collaborate' ? <Link key={h} href={h} className={collab.highlight ? 'mi-new' : undefined}><MenuIcon name={i} /><span>{l}<small className="mi-sub">Team up on bids</small></span>{collab.tag ? <span className="mi-tag">{collab.tag}</span> : null}</Link> : <Link key={h} href={h}><MenuIcon name={i} />{l}</Link>)}
           <form action={signOutAction}><button type="submit"><MenuIcon name="out" />Sign out</button></form>
         </nav>
       )}
