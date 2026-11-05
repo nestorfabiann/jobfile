@@ -45,6 +45,8 @@ h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;
     <button type="button" data-s="b" aria-pressed="false">2 · Partner confirms</button>
     <button type="button" data-s="c" aria-pressed="false">3 · Homeowner sees</button>
     <button type="button" data-s="d" aria-pressed="false">4 · After hiring</button>
+    <button type="button" data-s="e" aria-pressed="false">5 · Menu</button>
+    <button type="button" data-s="f" aria-pressed="false">6 · Collaborate page</button>
   </div>
 
   <div class="sec" id="a"><div class="stage"><div class="ph"><div class="url">Your bid · Kitchen repaint and drywall repair</div>
@@ -105,6 +107,37 @@ h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;
   </div></div>
     <p class="mut">Once hired, the project gets a Team tab. The partner joins the schedule and photos with limited access, and the lead records what they pay the partner. The homeowner always sees who is on the job.</p></div>
 
+  <div class="sec" id="e" hidden><div class="stage"><div class="ph"><div class="url">Jobfile</div>
+    <div class="body" style="background:#f3f1ec;padding:0;gap:0">
+      <div style="margin:30px 0 0 auto;width:226px;background:#fff;border-radius:14px 0 0 14px;border:1px solid #e4dfd6;padding:8px;display:flex;flex-direction:column;gap:2px;font-size:12.5px;height:100%;border-right:0">
+        <div style="padding:8px 10px">Dashboard</div>
+        <div style="padding:8px 10px">Marketplace</div>
+        <div style="padding:8px 10px">Projects</div>
+        <div style="padding:8px 10px;background:#e4f0e8;border-radius:10px;display:flex;justify-content:space-between;align-items:center"><span><b style="color:#1f4d3a">Collaborate</b><br><span style="font-size:10.5px;color:#4d6b5c">Team up on bids</span></span><span class="pill" style="background:#c4813f;color:#fff">2</span></div>
+        <div style="padding:8px 10px">Messages</div>
+        <div style="padding:8px 10px">Get the app</div>
+        <div style="padding:8px 10px">Invite friends</div>
+        <div style="padding:8px 10px">Settings</div>
+      </div>
+    </div></div></div>
+    <p class="mut">Contractors get a Collaborate item in the menu with a count of invites waiting. Homeowners never see it. It uses the green style to help people find the new feature, and it goes back to normal once they have opened it.</p></div>
+
+  <div class="sec" id="f" hidden><div class="stage"><div class="ph"><div class="url">Collaborate</div>
+    <div class="body">
+      <h4>Collaborate</h4>
+      <div class="cd" style="background:#f9efe4;border-color:#ecd4a8"><div class="r"><b>Open to partnering</b><span class="pill ok">On</span></div><span style="font-size:10.5px;color:#6b655e">Shows an "Open to partnering" badge on your profile.</span></div>
+      <div class="lab">Invites waiting (2)</div>
+      <div class="cd"><div class="r"><b>Lone Star Painting</b><span class="amt">$780</span></div><span style="font-size:11px;color:#6b655e">Fence staining · Plano 75024</span><div style="display:flex;gap:6px"><div class="btn" style="flex:1;padding:7px">Review</div><div class="btn gh" style="flex:1;padding:7px">Decline</div></div></div>
+      <div class="cd"><div class="r"><b>Garcia Home Pros</b><span class="amt">$1,150</span></div><span style="font-size:11px;color:#6b655e">Bathroom tile · Dallas 75201</span><div class="btn" style="padding:7px">Review</div></div>
+      <div class="lab">My team bids</div>
+      <div class="cd"><div class="r"><b>Kitchen repaint, drywall</b><span class="pill wt">Waiting on Reyes</span></div></div>
+      <div class="cd"><div class="r"><b>Deck refinish</b><span class="pill ok">Hired</span></div></div>
+      <div class="lab">Past partners</div>
+      <div class="cd"><div class="r"><div class="r" style="gap:8px"><span class="av a2">R</span><b>Reyes Drywall</b></div><span style="font-size:11px;color:#1f4d3a;font-weight:600">Invite again</span></div></div>
+      <div class="inp">Find a partner by trade or area</div>
+    </div></div></div>
+    <p class="mut">One place for invites you have received, your own team bids, companies you have worked with, and a search for new partners. The switch at the top controls the "Open to partnering" badge on your public profile.</p></div>
+
   <div class="rules"><h3>Rules built in</h3><ul>
     <li><b>One lead is accountable.</b> The homeowner hires and rates the lead. The partner works for the lead.</li>
     <li><b>Both companies must be verified to join a team bid,</b> and insurance for each shows on the bid.</li>
@@ -117,6 +150,6 @@ h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;
 <script>
 document.querySelectorAll('.sw button').forEach(function(b){b.addEventListener('click',function(){
   document.querySelectorAll('.sw button').forEach(function(x){x.setAttribute('aria-pressed',x===b)});
-  ['a','b','c','d'].forEach(function(id){document.getElementById(id).hidden=id!==b.dataset.s});
+  ['a','b','c','d','e','f'].forEach(function(id){document.getElementById(id).hidden=id!==b.dataset.s});
 })});
 </script>
