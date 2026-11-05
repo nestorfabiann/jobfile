@@ -1,0 +1,119 @@
+<title>General Question</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: one phone column, four screens: contractor profile, the ask form, the contractor's view of the thread, and what happens after the homeowner posts a project. Names are examples. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#c4813f;--orl:#f9efe4;--orb:#ecd4a8;--fg:#1f4d3a;--fgl:#e4f0e8;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--fgl:#173a2c;--fg:#8fd0ab;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--fgl:#173a2c;--fg:#8fd0ab;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:14px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px}
+h2{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;font-size:28px;line-height:1.05;text-wrap:balance}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
+.mut{color:var(--mut);font-size:14.5px;line-height:1.5;margin:0}
+.sw{display:grid;grid-template-columns:1fr 1fr;gap:6px}.sw button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:8px 4px;border-radius:99px;font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer}.sw button[aria-pressed=true]{background:var(--fg);color:#fff;border-color:var(--fg)}
+.sec{display:flex;flex-direction:column;gap:14px}.sec[hidden]{display:none}
+.stage{display:flex;justify-content:center;padding:22px 0 8px;border-radius:30px;background:radial-gradient(120% 80% at 50% 0%,var(--orl),transparent 70%)}
+.ph{width:min(330px,92%);height:720px;background:#faf8f4;color:#1b1a18;border:7px solid #1b1a18;border-radius:36px;overflow:hidden;box-shadow:0 22px 44px -18px rgba(27,26,24,.45);display:flex;flex-direction:column}
+.url{height:40px;background:#f3f1ec;display:flex;align-items:center;justify-content:center;font-size:11px;color:#6b655e;padding-top:8px;flex:none}
+.body{flex:1;padding:12px;display:flex;flex-direction:column;gap:9px;font-size:12px;line-height:1.4;overflow:hidden}
+.body h4{font:800 19px/1.05 'Bricolage Grotesque',sans-serif;letter-spacing:-.03em;margin:0}
+.body p{margin:0;color:#5c564f}
+.cd{background:#fff;border:1px solid #e4dfd6;border-radius:14px;padding:10px 12px;display:flex;flex-direction:column;gap:7px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.lab{font-size:10px;text-transform:uppercase;letter-spacing:.08em;font-weight:600;color:#6b655e}
+.logo{width:46px;height:46px;border-radius:13px;background:#1f4d3a;color:#fff;font:800 20px 'Bricolage Grotesque',sans-serif;display:grid;place-items:center;flex:none}
+.pill{display:inline-block;border-radius:99px;padding:2px 8px;font-size:10px;font-weight:600;white-space:nowrap}.ok{background:#e4f0e8;color:#1f4d3a}.wt{background:#f9efe4;color:#8a5a1a}.pu{background:#efe9fb;color:#5b3fa0}
+.act{background:#f9efe4;border:1px solid #ecd4a8;border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:8px}
+.btn{border-radius:99px;padding:10px;text-align:center;font-weight:700;font-size:12.5px;background:#c4813f;color:#fff}.btn.gh{background:#fff;color:#1b1a18;border:1px solid #e4dfd6}.btn.gr{background:#1f4d3a}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.opt{display:flex;gap:9px;align-items:flex-start;border:1.5px solid #e4dfd6;border-radius:12px;padding:9px 10px;background:#fff}
+.opt.on{border-color:#1f4d3a;background:#e4f0e8}.rd{width:16px;height:16px;border-radius:50%;border:2px solid #c9c2b6;flex:none;margin-top:1px}.on .rd{border-color:#1f4d3a;background:radial-gradient(#1f4d3a 45%,transparent 50%)}
+.sub{color:#6b655e;font-size:10.5px}
+.ta{border:1px solid #d6d0c6;border-radius:10px;padding:8px 10px;color:#8a8379;min-height:64px;background:#faf8f4}
+.bub{max-width:86%;border-radius:14px;padding:8px 11px}.me{align-self:flex-end;background:#f9efe4;border:1px solid #ecd4a8}.them{align-self:flex-start;background:#fff;border:1px solid #e4dfd6}
+.nudge{background:#e4f0e8;border-radius:12px;padding:9px 11px;color:#1f4d3a;display:flex;flex-direction:column;gap:6px}
+.tabs{height:50px;background:#fff;border-top:1px solid #e4dfd6;display:flex;justify-content:space-around;align-items:center;font-size:9.5px;color:#6b655e;flex:none}
+.why{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:9px}
+.why ul{margin:0;padding-left:18px;color:var(--mut);font-size:14px;line-height:1.5;display:flex;flex-direction:column;gap:6px}.why li b{color:var(--ink)}
+</style>
+<div class="wrap">
+  <div class="note"><b>Mockup.</b> Homeowners can ask a contractor a general question without a posted project. Invites to bid still need a project. Names are examples.</div>
+  <h2>Ask first, post when you're ready</h2>
+  <p class="mut">A question can be general or about one of your projects. A bid always needs a project.</p>
+  <div class="sw" role="group" aria-label="Screen">
+    <button type="button" data-s="a" aria-pressed="true">1 · Profile</button>
+    <button type="button" data-s="b" aria-pressed="false">2 · Ask</button>
+    <button type="button" data-s="c" aria-pressed="false">3 · Contractor</button>
+    <button type="button" data-s="d" aria-pressed="false">4 · Rules</button>
+  </div>
+
+  <div class="sec" id="a"><div class="stage"><div class="ph"><div class="url">Nesty's Painting</div>
+    <div class="body">
+      <div class="row" style="justify-content:flex-start;gap:10px"><span class="logo">N</span><div><h4>Nesty's Painting</h4><span class="sub">★ 5.0 · 1 review · 8 years</span></div></div>
+      <div class="act">
+        <b style="font-size:13px">Work with Nesty's Painting</b>
+        <span class="sub">Your contact details stay private until you accept a bid.</span>
+        <div class="btn">Invite to bid on a project</div>
+        <div class="two"><div class="btn gh">Ask a question</div><div class="btn gh">Start a project</div></div>
+        <span class="sub">No project yet? Ask a question first, or start one in about 3 minutes.</span>
+      </div>
+      <div class="row" style="justify-content:flex-start;gap:6px"><span class="pill ok">✓ Verified</span><span class="pill wt">Open to partnering</span><span class="pill ok">✓ Insured</span></div>
+      <div class="cd"><span>We are a family-owned business with 10 years of experience.</span></div>
+    </div>
+    <div class="tabs"><span>Home</span><span style="color:#c4813f">Projects</span><span>Post</span><span>Menu</span></div>
+  </div></div></div>
+
+  <div class="sec" id="b" hidden><div class="stage"><div class="ph"><div class="url">Ask Nesty's Painting</div>
+    <div class="body">
+      <h4>Ask Nesty's Painting a question</h4>
+      <div class="lab">What is it about?</div>
+      <div class="opt on"><span class="rd"></span><div><b>A general question</b><br><span class="sub">No project needed. Good for "Do you do this?" or "When are you free?"</span></div></div>
+      <div class="opt"><span class="rd"></span><div><b>Kitchen remodel</b><br><span class="sub">ZIP 75074 · 0 bids</span></div></div>
+      <div class="opt"><span class="rd"></span><div><b>Bathroom: replace the tub +1</b><br><span class="sub">ZIP 75074 · 1 bid</span></div></div>
+      <div class="lab">Your question</div>
+      <div class="ta">Do you refinish kitchen cabinets? Are you booking before Christmas?</div>
+      <span class="sub">Phone numbers, emails and links are blocked until a bid is accepted.</span>
+      <div class="btn">Send question</div>
+      <span class="sub" style="text-align:center">3 new general questions a day · Contractors within 50 miles</span>
+    </div>
+    <div class="tabs"><span>Home</span><span style="color:#c4813f">Projects</span><span>Post</span><span>Menu</span></div>
+  </div></div></div>
+
+  <div class="sec" id="c" hidden><div class="stage"><div class="ph"><div class="url">Question · Jerry S.</div>
+    <div class="body">
+      <div class="row"><h4 style="font-size:17px">Jerry S. asked a question</h4><span class="pill pu">General question</span></div>
+      <span class="sub">Not about a posted project. This is not a bid request.</span>
+      <div class="bub them">Do you refinish kitchen cabinets? Are you booking before Christmas?</div>
+      <div class="bub me">Yes, we do cabinets. We have openings in early December.</div>
+      <div class="nudge"><b>Want a price?</b><span>Ask Jerry to post his project so you can send a bid.</span><div class="btn gr">Suggest he posts a project</div></div>
+      <div class="ta" style="min-height:44px">Write a reply</div>
+      <div class="two"><div class="btn">Send</div><div class="btn gh">Pass on this one</div></div>
+      <span class="sub">Passing does not count against you.</span>
+    </div>
+    <div class="tabs"><span>Home</span><span style="color:#c4813f">Projects</span><span>Find work</span><span>Menu</span></div>
+  </div></div></div>
+
+  <div class="sec" id="d" hidden>
+    <div class="why">
+      <b>How it works</b>
+      <ul>
+        <li><b>Profile.</b> Three actions: Invite to bid (needs a project), Ask a question (general or about a project), Start a project (posts it and invites them).</li>
+        <li><b>Invite to bid stays project-based.</b> A bid needs a scope, a size and a place. With no project, the button becomes "Start a project and invite them".</li>
+        <li><b>General questions.</b> No project needed, clearly labeled, and never a bid request.</li>
+        <li><b>Same privacy.</b> Phone numbers, emails and web links are blocked until a bid is accepted.</li>
+        <li><b>Caps.</b> 3 new general conversations a day per homeowner, and one per contractor until they reply. Contractors within 50 miles only.</li>
+        <li><b>Contractor controls.</b> A "Pass" button that doesn't count against them, and a one-tap nudge to ask the homeowner to post a project.</li>
+        <li><b>Links up later.</b> When the homeowner posts a project, the thread can be attached to it so nothing starts over.</li>
+        <li><b>Hidden and unlisted companies</b> can't be messaged.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+<script>
+document.querySelectorAll('.sw button').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('.sw button').forEach(x=>x.setAttribute('aria-pressed',x===b));
+  document.querySelectorAll('.sec').forEach(s=>s.hidden=s.id!==b.dataset.s);
+}));
+</script>
