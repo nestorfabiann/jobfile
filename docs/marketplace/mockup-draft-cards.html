@@ -1,0 +1,73 @@
+<title>Draft Cards</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: one phone column. Two screens: today's pale draft cards and the proposed livelier ones. Names, prices and trades are examples. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#c4813f;--orl:#f9efe4;--orb:#ecd4a8;--fg:#1f4d3a;--fgl:#e4f0e8;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--fgl:#173a2c;--fg:#8fd0ab;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--fgl:#173a2c;--fg:#8fd0ab;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:14px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px}
+h2{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;font-size:28px;line-height:1.05;text-wrap:balance}
+h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;font-size:18px}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
+.mut{color:var(--mut);font-size:14.5px;line-height:1.5;margin:0}
+.sw{display:grid;grid-template-columns:1fr 1fr;gap:6px}.sw button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:6px 4px;border-radius:99px;font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:44px}.sw button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.sec{display:flex;flex-direction:column;gap:14px}.sec[hidden]{display:none}
+.stage{display:flex;justify-content:center;padding:22px 0 8px;border-radius:30px;background:radial-gradient(120% 80% at 50% 0%,var(--orl),transparent 70%)}
+.ph{width:min(300px,84%);height:620px;background:#faf8f4;color:#1b1a18;border:7px solid #1b1a18;border-radius:36px;position:relative;overflow:hidden;box-shadow:0 22px 44px -18px rgba(27,26,24,.45);display:flex;flex-direction:column}
+.url{height:44px;background:#f3f1ec;display:flex;align-items:center;justify-content:center;font-size:11px;color:#6b655e;padding-top:10px;flex:none}
+.body{flex:1;padding:13px;display:flex;flex-direction:column;gap:8px;font-size:12px;line-height:1.4;overflow:hidden}
+.body h4{font:800 18px/1.05 'Bricolage Grotesque',sans-serif;letter-spacing:-.03em;margin:0}
+.body p{margin:0;color:#5c564f}
+.lab{font-size:10px;text-transform:uppercase;letter-spacing:.08em;font-weight:600;color:#6b655e;margin-top:2px}
+.cd{background:#fff;border:1px solid #e4dfd6;border-radius:12px;padding:9px 10px;display:flex;flex-direction:column;gap:5px}
+.r{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.r b{font-size:12.5px}.av{width:30px;height:30px;border-radius:9px;color:#fff;font:800 13px 'Bricolage Grotesque',sans-serif;display:grid;place-items:center;flex:none}
+.a1{background:#1f4d3a}.a2{background:#c4813f}
+.pill{display:inline-block;border-radius:99px;padding:2px 8px;font-size:10px;font-weight:600;white-space:nowrap}
+.ok{background:#e4f0e8;color:#1f4d3a}.wt{background:#f9efe4;color:#8a5a1a}.gr{background:#eef0f4;color:#4a4f5c}
+.amt{font:800 15px 'Bricolage Grotesque',sans-serif;font-variant-numeric:tabular-nums}
+.tot{background:#1f4d3a;color:#fff;border-radius:13px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center}.tot b{font:800 21px 'Bricolage Grotesque',sans-serif}.tot small{opacity:.85;font-size:10.5px}
+.inp{border:1px solid #d6d0c6;border-radius:9px;padding:7px 9px;font-size:11px;color:#8a8379;background:#faf8f4}
+.btn{border:0;border-radius:12px;padding:10px;font:600 12.5px 'IBM Plex Sans',sans-serif;text-align:center;background:#1f4d3a;color:#fff}.btn.gh{background:transparent;color:#6b655e;border:1px solid #e4dfd6}
+.tabs{height:48px;background:#fff;border-top:1px solid #e4dfd6;display:flex;justify-content:space-around;align-items:center;font-size:9.5px;color:#6b655e;flex:none}
+.rules{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:9px}
+.rules ul{margin:0;padding-left:18px;color:var(--mut);font-size:14px;line-height:1.5;display:flex;flex-direction:column;gap:6px}.rules li b{color:var(--ink)}
+</style>
+<div class="wrap"><style>
+.dc{background:#fff;border:1px solid #e4dfd6;border-radius:14px;padding:9px;display:flex;flex-direction:column;gap:6px}
+.dc.old{gap:4px}
+.nw{position:relative;overflow:hidden;border:1px solid #e4dfd6;border-radius:15px;background:#fff;display:flex;flex-direction:column}
+.nw .top{display:flex;gap:9px;padding:10px 10px 6px;align-items:center}
+.nw .ico{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;flex:none}
+.nw .ico svg{width:21px;height:21px;fill:none;stroke:#fff;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.nw h5{margin:0;font:800 14px/1.1 'Bricolage Grotesque',sans-serif;letter-spacing:-.02em}
+.chips{display:flex;gap:4px;flex-wrap:wrap;padding:0 10px}
+.chips span{background:#f4f1ea;border-radius:99px;padding:2px 7px;font-size:10px;color:#4a453f}
+.pg{padding:7px 10px 0}
+.pg .bar{height:6px;border-radius:99px;background:#eee9df;overflow:hidden}.pg .bar i{display:block;height:100%;border-radius:99px}
+.pg small{display:flex;justify-content:space-between;font-size:9.5px;color:#6b655e;margin-top:3px}
+.nw .act{display:flex;gap:6px;padding:8px 10px 10px;align-items:center}
+.nw .go{flex:1;border-radius:11px;padding:9px;text-align:center;font:600 12px 'IBM Plex Sans',sans-serif;color:#fff}
+.nw .rm{font-size:10.5px;color:#8a8379;padding:6px 4px}
+.tag{font-size:9.5px;font-weight:700;border-radius:99px;padding:2px 7px}
+</style>
+<div class="note"><b>Mockup.</b> Livelier draft cards. Trades, choices and progress are examples.</div>
+<h2>Drafts with some life</h2>
+<p class="mut">Each draft gets its trade's icon and color, chips for the choices made, a progress bar that shows what is left, and a solid button. Delete becomes a quiet link.</p>
+<div class="sw" role="group" aria-label="Screen"><button type="button" data-s="a" aria-pressed="true">Proposed</button><button type="button" data-s="b" aria-pressed="false">Today</button></div>
+<div class="sec" id="a"><div class="stage"><div class="ph"><div class="url">Projects</div><div class="body"><h4 style="font-size:15px">Waiting for bids</h4><div class="nw"><div style="height:4px;background:#c4813f"></div><div class="top"><span class="ico" style="background:#c4813f"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="14" height="6" rx="1"/><path d="M18 7h2v5H11v3"/><rect x="9.5" y="15" width="3" height="6" rx="1"/></svg></span><div style="flex:1;min-width:0"><h5>Painting</h5><span style="font-size:10px;color:#6b655e">Saved Nov 3</span></div><span class="tag" style="background:#c4813f22;color:#c4813f">Draft</span></div>
+<div class="chips"><span>Interior walls</span><span>Trim</span></div><div class="pg"><div class="bar"><i style="width:60%;background:#c4813f"></i></div><small><span>3 of 5 steps</span><span>Add photos and budget</span></small></div>
+<div class="act"><div class="go" style="background:#c4813f">Finish your post</div><span class="rm">Delete</span></div></div><div class="nw"><div style="height:4px;background:#1f4d3a"></div><div class="top"><span class="ico" style="background:#1f4d3a"><svg viewBox="0 0 24 24"><path d="M3 12l9-8 9 8"/><path d="M6 10v10h12V10"/><path d="M10 20v-5h4v5"/></svg></span><div style="flex:1;min-width:0"><h5>Roofing</h5><span style="font-size:10px;color:#6b655e">Saved Nov 2</span></div><span class="tag" style="background:#1f4d3a22;color:#1f4d3a">Draft</span></div>
+<div class="chips"><span>Full replacement</span></div><div class="pg"><div class="bar"><i style="width:30%;background:#1f4d3a"></i></div><small><span>2 of 5 steps</span><span>Add details and ZIP</span></small></div>
+<div class="act"><div class="go" style="background:#1f4d3a">Keep going</div><span class="rm">Delete</span></div></div></div></div></div><p class="mut">Progress counts the steps already filled in: kind of work, choices, details, ZIP, budget. The line under the bar names what is missing, so the person knows what finishing takes. Each trade keeps its own color. Delete still asks to confirm.</p></div>
+<div class="sec" id="b" hidden><div class="stage"><div class="ph"><div class="url">Projects</div><div class="body"><h4 style="font-size:15px">Waiting for bids</h4><div class="dc old"><div class="r"><span class="pill wt">Draft</span><span style="font-size:10px;color:#6b655e">Saved Nov 3</span></div><b style="font-size:12.5px">Painting · 2 choices picked</b><span style="font-size:10.5px;color:#6b655e">Not visible to contractors until you publish</span><div class="btn gh" style="padding:8px;color:#1b1a18">Continue your post</div><span style="font-size:10.5px;color:#6b655e">▸ Delete this draft</span></div><div class="dc old"><div class="r"><span class="pill wt">Draft</span><span style="font-size:10px;color:#6b655e">Saved Nov 2</span></div><b style="font-size:12.5px">Roofing · 1 choice picked</b><span style="font-size:10.5px;color:#6b655e">Not visible to contractors until you publish</span><div class="btn gh" style="padding:8px;color:#1b1a18">Continue your post</div><span style="font-size:10.5px;color:#6b655e">▸ Delete this draft</span></div></div></div></div><p class="mut">Today: pale cards, an outlined button and a long "not visible" line on every draft.</p></div>
+</div>
+<script>
+document.querySelectorAll('.sw button').forEach(function(b){b.addEventListener('click',function(){
+  document.querySelectorAll('.sw button').forEach(function(x){x.setAttribute('aria-pressed',x===b)});
+  ['a','b'].forEach(function(id){document.getElementById(id).hidden=id!==b.dataset.s});
+})});
+</script>
