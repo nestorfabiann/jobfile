@@ -73,3 +73,4 @@ export async function tellCompany(companyId: string, l: { id: string; job_type: 
     await notifyUsers({ userIds: await memberIds(companyId), projectId: null, kind: 'bid', path: path ?? `/marketplace/${l.id}`, title, body, cta: 'Open the project' });
   } catch { /* never block */ }
 }
+// Invites: tables come from migration 041.
