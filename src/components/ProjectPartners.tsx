@@ -9,7 +9,7 @@ const initial = (s: string) => (s.trim()[0] ?? '?').toUpperCase();
 const circle: React.CSSProperties = { width: 46, height: 46, borderRadius: '50%', display: 'grid', placeItems: 'center', color: '#fff', fontWeight: 800, fontSize: 18, position: 'relative', flex: 'none' };
 
 /** Partners brought in by the lead. The lead manages them; the homeowner sees who is on the job and can remove one. Renders nothing when there are none and the viewer is the homeowner. */
-export default async function ProjectPartners({ projectId, role, notice }: { projectId: string; role: 'contractor' | 'homeowner'; notice?: string }) {
+export default async function ProjectPartners({ projectId, role, notice, variant = 'bottom' }: { projectId: string; role: 'contractor' | 'homeowner'; notice?: string; variant?: 'top' | 'bottom' }) {
   const db = supabaseAdmin();
   let rows: ProjectPartner[] = [];
   try {
@@ -39,26 +39,41 @@ export default async function ProjectPartners({ projectId, role, notice }: { pro
   const dotColor = (r: ProjectPartner) => (r.status === 'accepted' ? '#2f9e60' : '#e0a030');
   const Dot = ({ r }: { r: ProjectPartner }) => <i aria-hidden="true" style={{ position: 'absolute', right: -1, bottom: -1, width: 14, height: 14, borderRadius: '50%', border: '2px solid var(--surface, #fff)', background: dotColor(r) }} />;
 
+  // Top of the page: only a slim team strip, and only when there are partners. Everything else sits lower down.
+  if (variant === 'top') {
+    if (rows.length === 0) return null;
+    const allIn = rows.every((r) => r.status === 'accepted');
+    const strip = (
+      <div className="row" style={{ justifyContent: 'space-between', gap: 10, flexWrap: 'nowrap', alignItems: 'center' }}>
+        <span className="row" style={{ gap: 10, flexWrap: 'nowrap', alignItems: 'center', minWidth: 0 }}>
+          <span style={{ display: 'flex' }} aria-hidden="true">
+            {role === 'contractor' ? <span style={{ ...circle, width: 32, height: 32, fontSize: 14, background: '#1f4d3a', border: '2px solid var(--surface, #fff)' }}>{initial(leadName)}</span> : null}
+            {rows.slice(0, 4).map((r, i) => <span key={r.id} style={{ ...circle, width: 32, height: 32, fontSize: 14, background: colorFor(nameOf(r)), border: '2px solid var(--surface, #fff)', marginLeft: role === 'contractor' || i > 0 ? -8 : 0 }}>{initial(nameOf(r))}</span>)}
+          </span>
+          <b style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{rows.length === 1 ? `Team: ${role === 'contractor' ? 'you + ' : ''}${nameOf(rows[0])}` : `Team · ${rows.length} partners`}</b>
+        </span>
+        <span className={`pill${allIn ? ' ok' : ' warn'}`}>{allIn ? 'Confirmed' : 'Waiting'}</span>
+      </div>
+    );
+    return (
+      <section className="card" aria-label="Team" style={{ padding: '12px 14px', gap: 8 }}>
+        {notice ? <div className="box ok" role="status">{notice}</div> : null}
+        {role === 'contractor' ? <Link href={`/projects/${projectId}/partners`} style={{ color: 'inherit', textDecoration: 'none' }}>{strip}</Link> : strip}
+      </section>
+    );
+  }
+
   // Nothing yet: a picture of you plus a partner, and what a partner can and cannot see.
   if (role === 'contractor' && rows.length === 0) {
     return (
-      <section className="card" aria-label="Team" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-        {notice ? <div className="box ok" role="status">{notice}</div> : null}
-        <div className="row" style={{ justifyContent: 'center', alignItems: 'center', gap: 10, flexWrap: 'nowrap' }} aria-hidden="true">
-          <span style={{ ...circle, background: '#1f4d3a' }}>{initial(leadName)}</span>
-          <span style={{ width: 24, height: 2, background: 'repeating-linear-gradient(90deg,#c4813f 0 4px,transparent 4px 7px)' }} />
-          <span style={{ ...circle, background: 'transparent', border: '2px dashed #c4813f', color: '#c4813f', fontSize: 24 }}>+</span>
-        </div>
-        <h2 style={{ textAlign: 'center' }}>Bring in a partner</h2>
-        <p className="muted" style={{ textAlign: 'center', margin: 0 }}>Add a contractor you work with. They only see their part.</p>
-        {([['✓', 'They see their scope, price and dates', true], ['✕', 'They do not see the homeowner’s phone or email', false], ['✓', 'You stay the contact and record payouts', true]] as [string, string, boolean][]).map(([sym, t, yes]) => (
-          <div key={t} className="row" style={{ gap: 10, flexWrap: 'nowrap', alignItems: 'flex-start' }}>
-            <span aria-hidden="true" style={{ width: 22, height: 22, borderRadius: 8, display: 'grid', placeItems: 'center', fontSize: 12, fontWeight: 700, flex: 'none', background: yes ? '#e4f0e8' : '#f9efe4', color: yes ? '#1f4d3a' : '#8a5a1a' }}>{sym}</span>
-            <span className="small">{t}</span>
-          </div>
-        ))}
-        <Link className="btn accent" href={`/projects/${projectId}/partners/new`}>Add a partner</Link>
-      </section>
+      <Link href={`/projects/${projectId}/partners/new`} className="card" aria-label="Bring in a partner" style={{ color: 'inherit', textDecoration: 'none', flexDirection: 'row', alignItems: 'center', gap: 12, padding: '12px 14px', border: '1.5px dashed var(--orb, #d9c9a8)' }}>
+        <span aria-hidden="true" style={{ ...circle, width: 38, height: 38, background: 'transparent', border: '2px dashed #c4813f', color: '#c4813f', fontSize: 22 }}>+</span>
+        <span style={{ minWidth: 0 }}>
+          <b style={{ display: 'block' }}>Bring in a partner</b>
+          <span className="muted small">Share part of the job with another pro. They only see their part.</span>
+        </span>
+        <span className="btn accent" style={{ marginLeft: 'auto', padding: '8px 16px', minHeight: 0, whiteSpace: 'nowrap' }}>Add</span>
+      </Link>
     );
   }
 

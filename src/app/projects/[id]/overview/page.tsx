@@ -113,7 +113,7 @@ export default async function Overview({ params, searchParams }: { params: { id:
         <p>{role === 'homeowner' ? <Link href={`/contractors/${project.company_id}`} style={{ color: 'inherit' }}>{contractorName}</Link> : contractorName} · {homeownerName}</p>
       </section>
 
-      <ProjectPartners projectId={project.id} role={role} notice={searchParams.partner === 'sent' ? 'Invite sent. They will see it as soon as they sign in.' : undefined} />
+      <ProjectPartners variant="top" projectId={project.id} role={role} notice={searchParams.partner === 'sent' ? 'Invite sent. They will see it as soon as they sign in.' : undefined} />
 
       {role === 'homeowner' && searchParams.hired === '1' && (
         <section className="card why" aria-label="What happens next">
@@ -195,6 +195,8 @@ export default async function Overview({ params, searchParams }: { params: { id:
           <p className="muted">Dates are set in the agreement.</p>
         )}
       </section>
+
+      <ProjectPartners projectId={project.id} role={role} />
 
       <section className="card" aria-label="Photos">
         <div className="row" style={{ justifyContent: 'space-between' }}>
