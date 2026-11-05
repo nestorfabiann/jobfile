@@ -5,6 +5,7 @@ import { supabaseAdmin } from '@/lib/supabase/server';
 import { dollars } from '@/lib/money';
 import { listingTitle, requireMarketplace, type Listing } from '@/lib/marketplace';
 import { companyOf, localPartners, PARTNER_LABEL, type TeamBid, type TeamPartner } from '@/lib/team';
+import { myPartnerRows, PSTATUS, type ProjectPartner } from '@/lib/partners';
 import { acceptCounter, cancelTeamBid, setOpenToPartner } from './actions';
 
 export const dynamic = 'force-dynamic';
@@ -68,6 +69,26 @@ export default async function Collaborate({ searchParams }: { searchParams: { er
     ((more ?? []) as any[]).forEach((c) => name.set(c.id, c.name));
   }
 
+  // Partner jobs: jobs other contractors invited this company to, and this company's own active projects (to add a partner).
+  const jobsAsPartner: ProjectPartner[] = await myPartnerRows(user.id, me!.id);
+  const pInfo = new Map<string, { project: string; lead: string }>();
+  let myProjects: { id: string; name: string }[] = [];
+  try {
+    if (jobsAsPartner.length) {
+      const [{ data: pj }, { data: lc }] = await Promise.all([
+        db.from('projects').select('id,name').in('id', jobsAsPartner.map((j) => j.project_id)),
+        db.from('companies').select('id,name').in('id', jobsAsPartner.map((j) => j.lead_company_id)),
+      ]);
+      const pn = new Map(((pj ?? []) as any[]).map((x) => [x.id as string, x.name as string] as [string, string]));
+      const ln = new Map(((lc ?? []) as any[]).map((x) => [x.id as string, x.name as string] as [string, string]));
+      jobsAsPartner.forEach((j) => pInfo.set(j.id, { project: pn.get(j.project_id) ?? 'A job', lead: ln.get(j.lead_company_id) ?? 'A contractor' }));
+    }
+    const { data: mp } = await db.from('projects').select('id,name').eq('company_id', me!.id).is('completed_at', null).order('created_at', { ascending: false }).limit(20);
+    myProjects = (mp ?? []) as any[];
+  } catch { /* partner tables not created yet */ }
+  const partnerInvites = jobsAsPartner.filter((j) => j.status === 'invited');
+  const partnerJobs = jobsAsPartner.filter((j) => j.status !== 'invited');
+
   const q = (searchParams.q ?? '').trim().slice(0, 60);
   let found: { id: string; name: string; open: boolean; miles: number }[] = [];
   let noZip = false;
@@ -81,9 +102,9 @@ export default async function Collaborate({ searchParams }: { searchParams: { er
   }
 
   return (
-    <div className="stack" style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+    <div className="stack" style={{ display: 'flex', flexDirection: 'column', gap: 14, paddingBottom: 90 }}>
       <h1>Collaborate</h1>
-      <p className="muted">Team up with another company on a marketplace bid. You stay accountable for your part, the homeowner sees one team bid.</p>
+      <p className="muted">Team up with another company on a marketplace bid, or bring a contractor you work with onto a job you found yourself.</p>
       {searchParams.error ? <div className="box warn" role="alert">{searchParams.error}</div> : null}
       {searchParams.ok ? <div className="box ok" role="status">{searchParams.ok}</div> : null}
       {setupMissing ? <div className="box warn">Team bids need one database step. Ask Jobfile support to run it.</div> : null}
@@ -97,8 +118,15 @@ export default async function Collaborate({ searchParams }: { searchParams: { er
         <form action={setOpenToPartner}><input type="hidden" name="on" value={openToPartner ? '0' : '1'} /><button className="btn ghost" type="submit">{openToPartner ? 'Turn off' : 'Turn on'}</button></form>
       </div>
 
-      <h2>Invites waiting ({invites.length})</h2>
-      {invites.length === 0 ? <div className="card"><p className="muted">No invites right now. When another company asks you to join a team bid, it shows up here.</p></div> : null}
+      <h2>Invites waiting ({invites.length + partnerInvites.length})</h2>
+      {partnerInvites.map((j) => (
+        <div className="card" key={j.id} style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <div className="row" style={{ justifyContent: 'space-between' }}><b>{pInfo.get(j.id)?.lead ?? 'A contractor'}</b><b>{dollars(j.price_cents)}</b></div>
+          <span className="muted small">{j.scope} · {pInfo.get(j.id)?.project ?? 'A job'} · partner invite</span>
+          <Link className="btn" href={`/partner/${j.id}`}>Review</Link>
+        </div>
+      ))}
+      {invites.length === 0 && partnerInvites.length === 0 ? <div className="card"><p className="muted">No invites right now. When another company asks you to join a team bid, it shows up here.</p></div> : null}
       {invites.map((p) => {
         const tb = inById.get(p.team_bid_id)!;
         const l = listing.get(tb.listing_id);
@@ -145,6 +173,22 @@ export default async function Collaborate({ searchParams }: { searchParams: { er
           </div>
         );
       })}
+
+      <h2>Jobs where I’m a partner</h2>
+      {partnerJobs.length === 0 ? <div className="card"><p className="muted">When a contractor you work with adds you to their job and you accept, it shows up here.</p></div> : null}
+      {partnerJobs.map((j) => (
+        <Link className="card row" key={j.id} href={`/partner/${j.id}`} style={{ justifyContent: 'space-between', gap: 8 }}>
+          <span style={{ minWidth: 0 }}><b>{pInfo.get(j.id)?.project ?? 'A job'}</b><span className="muted small" style={{ display: 'block' }}>{j.scope} · {pInfo.get(j.id)?.lead}</span></span>
+          <span className={`pill${j.status === 'accepted' ? ' ok' : ''}`}>{PSTATUS[j.status]}</span>
+        </Link>
+      ))}
+
+      <h2>Invite someone you work with</h2>
+      <p className="muted small">For a job you found yourself. Pick the project, then add the contractor by email. They only see their part.</p>
+      {myProjects.length === 0 ? <div className="card"><p className="muted">You have no active projects yet.</p></div> : null}
+      {myProjects.map((pr) => (
+        <div className="card row" key={pr.id} style={{ justifyContent: 'space-between', gap: 8 }}><b style={{ minWidth: 0, overflowWrap: 'anywhere' }}>{pr.name}</b><Link href={`/projects/${pr.id}/partners/new`} style={{ fontWeight: 700, whiteSpace: 'nowrap' }}>Add a partner ›</Link></div>
+      ))}
 
       <h2>Past partners</h2>
       {past.size === 0 ? <div className="card"><p className="muted">Companies you win or bid with show up here.</p></div> : null}

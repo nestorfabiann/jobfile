@@ -42,7 +42,9 @@ export async function inviteCount(userId: string): Promise<number> {
     const { data: mine } = await db.from('team_bids').select('id').eq('lead_company_id', co.id).eq('status', 'pending');
     const mineIds = (mine ?? []).map((t: any) => t.id as string);
     const { count: prices } = mineIds.length ? await db.from('team_partners').select('id', { count: 'exact', head: true }).in('team_bid_id', mineIds).eq('status', 'countered') : { count: 0 };
-    return (invites ?? 0) + (prices ?? 0);
+    let partnerInv = 0;
+    try { const { partnerInviteCount } = await import('@/lib/partners'); partnerInv = await partnerInviteCount(userId, co.id); } catch { /* table not created yet */ }
+    return (invites ?? 0) + (prices ?? 0) + partnerInv;
   } catch { return 0; }
 }
 

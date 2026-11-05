@@ -8,6 +8,7 @@ import { milestoneAmounts, totals, type ChangeOrder, type Item, type Milestone }
 import { setStage, requestFinish } from './actions';
 import FinishCard from '@/components/FinishCard';
 import NeedsYou from '@/components/NeedsYou';
+import ProjectPartners from '@/components/ProjectPartners';
 import { projectTasks, type NeedItem } from '@/lib/needs';
 
 const TZ = 'America/Chicago';
@@ -20,7 +21,7 @@ const addDays = (d: string, n: number) => {
 
 const STAGES = ['Agreement', 'Active', 'Closeout', 'Complete'];
 
-export default async function Overview({ params, searchParams }: { params: { id: string }; searchParams: { hired?: string } }) {
+export default async function Overview({ params, searchParams }: { params: { id: string }; searchParams: { hired?: string; partner?: string } }) {
   const { sb, user, project, role, contractorName, homeownerName } = await loadProject(params.id);
   const base = `/projects/${project.id}`;
   const other = role === 'contractor' ? 'homeowner' : 'contractor';
@@ -105,6 +106,8 @@ export default async function Overview({ params, searchParams }: { params: { id:
         <h2 style={{ fontSize: 26 }}>{project.name}</h2>
         <p>{role === 'homeowner' ? <Link href={`/contractors/${project.company_id}`} style={{ color: 'inherit' }}>{contractorName}</Link> : contractorName} · {homeownerName}</p>
       </section>
+
+      <ProjectPartners projectId={project.id} role={role} notice={searchParams.partner === 'sent' ? 'Invite sent. They will see it as soon as they sign in.' : undefined} />
 
       {role === 'homeowner' && searchParams.hired === '1' && (
         <section className="card why" aria-label="What happens next">
