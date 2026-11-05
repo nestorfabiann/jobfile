@@ -1,5 +1,5 @@
 /** Ready answers for the Help button. Plain text only. Keep each answer short and true to how the app works today. */
-export type HelpTopic = 'start' | 'bidding' | 'payments' | 'visits' | 'projects' | 'trust';
+export type HelpTopic = 'start' | 'bidding' | 'payments' | 'visits' | 'projects' | 'trust' | 'team';
 export type HelpItem = { q: string; a: string; topic: HelpTopic; who: 'h' | 'c' | 'both' };
 
 export const TOPICS: [HelpTopic, string][] = [
@@ -9,6 +9,7 @@ export const TOPICS: [HelpTopic, string][] = [
   ['visits', 'Visits'],
   ['projects', 'Projects'],
   ['trust', 'Trust and privacy'],
+  ['team', 'Teaming up'],
 ];
 
 export const HELP: HelpItem[] = [
@@ -38,10 +39,21 @@ export const HELP: HelpItem[] = [
   { topic: 'trust', who: 'c', q: 'Can I rate the homeowner?', a: 'Yes. After you mark a job complete, you can rate the homeowner on communication, quick decisions, paying on time and site access. Ratings stay hidden until both sides rate or 14 days pass.' },
   { topic: 'trust', who: 'h', q: 'Does the contractor rate me too?', a: 'Yes. Ratings go both ways. After a job is complete, the contractor rates you on communication, quick decisions, paying on time and site access. Both ratings stay hidden until you both rate or 14 days pass.' },
   { topic: 'trust', who: 'both', q: 'How do ratings work?', a: 'After a job is complete, the homeowner rates the contractor. Ratings build a public record for the contractor.' },
+  { topic: 'team', who: 'c', q: 'What is Collaborate?', a: 'A way to bid on a job with another local pro, or to bring a partner onto a job you already won. Each company keeps its own business.' },
+  { topic: 'team', who: 'c', q: 'How do I bid as a team?', a: 'On a job page tap Bid as a team, pick a local partner, set each company\u2019s part and price, and send. Your partner confirms their part first.' },
+  { topic: 'team', who: 'c', q: 'Lead and partner, or separate contracts?', a: 'With one contract, the lead holds the contract and pays the partner. With separate contracts, the homeowner hires each company directly, which suits unrelated trades such as painting and electrical.' },
+  { topic: 'team', who: 'c', q: 'How far away can a partner be?', a: 'Within 50 miles of the project. Both companies need a business ZIP code in their profile.' },
+  { topic: 'team', who: 'c', q: 'What does a partner see?', a: 'Only their scope, price, dates and messages with you. They do not see the homeowner\u2019s phone or email. The lead stays the contact.' },
+  { topic: 'team', who: 'c', q: 'What if my partner wants a different price?', a: 'They can propose a new one. You accept it or adjust. Nothing is sent to the homeowner until both of you agree.' },
+  { topic: 'team', who: 'c', q: 'How do payments work with a partner?', a: 'Jobfile only records payments. The lead records payouts to partners. Jobfile does not hold or move money.' },
+  { topic: 'team', who: 'c', q: 'What is Open to partnering?', a: 'A switch in Collaborate. It shows a badge on your profile so other contractors can find you and invite you.' },
+  { topic: 'team', who: 'c', q: 'Can I invite someone who is not on Jobfile?', a: 'Yes. They get an email and join free. They only see their own part of the job.' },
+  { topic: 'team', who: 'h', q: 'Can I remove a partner my contractor brought in?', a: 'Yes. In the project, open the Team section and tap Remove next to the partner. Your contractor stays your contact.' },
 ];
 
 /** Which topic to lead with, by page. */
 export function topicForPath(path: string): HelpTopic | null {
+  if (/^\/(collaborate|partner)/.test(path) || /^\/marketplace\/[^/]+\/team/.test(path) || /^\/projects\/[^/]+\/partners/.test(path)) return 'team';
   if (/^\/marketplace\/new/.test(path)) return 'start';
   if (/^\/(marketplace|jobs)/.test(path)) return 'bidding';
   if (/\/(payments|money)/.test(path)) return 'payments';
