@@ -15,7 +15,7 @@ export default function AvailabilityForm({ company, back }: { company: { availab
       <input type="hidden" name="back" value={back} />
       <div className="chips">
         {opts.map(([v, l]) => (
-          <label className="chip" key={v}><input type="radio" name="mode" value={v} defaultChecked={a.mode === v} /><span>{l}</span></label>
+          <label className={`chip av-${v}`} key={v}><input type="radio" name="mode" value={v} defaultChecked={a.mode === v} /><span>{l}</span></label>
         ))}
       </div>
       <label className="fld">Booked until<input type="date" name="until" min={min} defaultValue={a.until ?? ''} /></label>

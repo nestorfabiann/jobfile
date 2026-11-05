@@ -741,3 +741,13 @@ html { scroll-behavior: smooth; }
 .wd > summary { list-style: none; cursor: pointer; font-size: 13.5px; font-weight: 600; color: var(--ink-2); text-decoration: underline; padding: 6px 0; min-height: 32px; width: max-content; }
 .wd > summary::-webkit-details-marker { display: none; }
 .wd[open] > summary { text-decoration: none; }
+/* Availability: the selected choice is colored by what it means. Green = taking jobs, amber = booked, gray = paused. */
+.chip.av-open input:checked + span, body.pub .chip.av-open input:checked + span { background: #e4f0e8; color: #1f4d3a; border-color: #8cc2a3; }
+.chip.av-open input:checked + span::before { content: ''; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #2f8a5b; margin-right: 7px; vertical-align: 1px; }
+.chip.av-booked input:checked + span, body.pub .chip.av-booked input:checked + span { background: #f9efe4; color: #8a5a1a; border-color: #ecd4a8; }
+.chip.av-paused input:checked + span, body.pub .chip.av-paused input:checked + span { background: #ece8e0; color: #4a453f; border-color: #cfc8bb; }
+@media (prefers-color-scheme: dark) {
+  .chip.av-open input:checked + span, body.pub .chip.av-open input:checked + span { background: #173a2c; color: #8fd0ab; border-color: #2f6b4d; }
+  .chip.av-booked input:checked + span, body.pub .chip.av-booked input:checked + span { background: #33281c; color: #e0933f; border-color: #5a4426; }
+  .chip.av-paused input:checked + span, body.pub .chip.av-paused input:checked + span { background: #2a2723; color: #c9c2b6; border-color: #4a453f; }
+}
