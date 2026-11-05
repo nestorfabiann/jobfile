@@ -1,0 +1,113 @@
+<title>Project Cards</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: one column. Two screens: the new project list, and the same list for a homeowner with one project. Names, prices and counts are examples. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#c4813f;--orl:#f9efe4;--orb:#ecd4a8;--fg:#1f4d3a;--fgl:#e4f0e8;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--fgl:#173a2c;--fg:#8fd0ab;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--fgl:#173a2c;--fg:#8fd0ab;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:14px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px}
+h2{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;font-size:28px;line-height:1.05;text-wrap:balance}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
+.mut{color:var(--mut);font-size:14.5px;line-height:1.5;margin:0}
+.sw{display:grid;grid-template-columns:1fr 1fr;gap:6px}.sw button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:8px 4px;border-radius:99px;font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer}.sw button[aria-pressed=true]{background:var(--fg);color:#fff;border-color:var(--fg)}
+.sec{display:flex;flex-direction:column;gap:14px}.sec[hidden]{display:none}
+.stage{display:flex;justify-content:center;padding:22px 0 8px;border-radius:30px;background:radial-gradient(120% 80% at 50% 0%,var(--orl),transparent 70%)}
+.ph{width:min(330px,92%);height:720px;background:#faf8f4;color:#1b1a18;border:7px solid #1b1a18;border-radius:36px;position:relative;overflow:hidden;box-shadow:0 22px 44px -18px rgba(27,26,24,.45);display:flex;flex-direction:column}
+.url{height:40px;background:#f3f1ec;display:flex;align-items:center;justify-content:center;font-size:11px;color:#6b655e;padding-top:8px;flex:none}
+.body{flex:1;padding:13px;display:flex;flex-direction:column;gap:10px;font-size:12px;line-height:1.4;overflow:hidden}
+.body h4{font:800 22px/1.05 'Bricolage Grotesque',sans-serif;letter-spacing:-.03em;margin:0}
+.body p{margin:0;color:#5c564f}
+.row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.sum{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.sum div{background:#fff;border:1px solid #e4dfd6;border-radius:12px;padding:7px 8px;text-align:center}
+.sum b{display:block;font:800 18px 'Bricolage Grotesque',sans-serif}.sum span{font-size:9.5px;color:#6b655e}
+.sum .hot{background:#1f4d3a;border-color:#1f4d3a;color:#fff}.sum .hot span{color:#cfe6d8}
+.post{background:#c4813f;color:#fff;border-radius:99px;padding:10px 14px;font:700 13px 'IBM Plex Sans',sans-serif;text-align:center;display:flex;justify-content:center;gap:6px;align-items:center}
+.post small{font-weight:400;opacity:.9;font-size:10.5px}
+.card{background:#fff;border:1px solid #e4dfd6;border-radius:16px;overflow:hidden;display:flex;flex-direction:column;position:relative}
+.card .edge{position:absolute;left:0;top:0;bottom:0;width:4px}
+.card .in{padding:10px 11px 10px 14px;display:flex;flex-direction:column;gap:6px}
+.tile{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;flex:none}
+.tile svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.t1{background:#f9efe4;color:#8a5a1a}.t2{background:#e4f0e8;color:#1f4d3a}
+.ttl{font:800 14px/1.15 'Bricolage Grotesque',sans-serif;letter-spacing:-.02em}
+.meta{font-size:10.5px;color:#6b655e}
+.pill{display:inline-block;border-radius:99px;padding:2px 8px;font-size:10px;font-weight:600;white-space:nowrap}
+.ok{background:#e4f0e8;color:#1f4d3a}.wt{background:#f9efe4;color:#8a5a1a}
+.bar{height:6px;border-radius:99px;background:#efeae0;position:relative}.bar i{position:absolute;top:0;bottom:0;border-radius:99px;background:linear-gradient(90deg,#e0b985,#c4813f)}
+.rng{display:flex;justify-content:space-between;font:800 13px 'Bricolage Grotesque',sans-serif;font-variant-numeric:tabular-nums}
+.act{border-radius:11px;padding:8px 10px;display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:11px}
+.act.g{background:#e4f0e8;color:#1f4d3a}.act.o{background:#f9efe4;color:#6e4712}
+.act b{font-weight:600}.go{background:#1f4d3a;color:#fff;border-radius:99px;padding:5px 10px;font-weight:600;font-size:10.5px;white-space:nowrap}.go.o{background:#c4813f}
+.det{display:flex;align-items:center;gap:6px;font-size:10px;color:#6b655e}.det .b2{flex:1;height:4px;border-radius:99px;background:#efeae0}.det .b2 i{display:block;height:100%;border-radius:99px;background:#1f4d3a}
+.tabs{height:50px;background:#fff;border-top:1px solid #e4dfd6;display:flex;justify-content:space-around;align-items:center;font-size:9.5px;color:#6b655e;flex:none}
+.q{position:absolute;right:12px;bottom:62px;width:38px;height:38px;border-radius:50%;background:#c4813f;color:#fff;display:grid;place-items:center;font:800 17px 'Bricolage Grotesque',sans-serif;box-shadow:0 6px 14px -4px rgba(0,0,0,.35)}
+.why{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:9px}
+.why ul{margin:0;padding-left:18px;color:var(--mut);font-size:14px;line-height:1.5;display:flex;flex-direction:column;gap:6px}.why li b{color:var(--ink)}
+</style>
+<div class="wrap">
+  <div class="note"><b>Mockup.</b> A livelier "Your marketplace projects" list. Names, prices and counts are examples.</div>
+  <h2>Cards that tell you what to do next</h2>
+  <p class="mut">Each card now says what is happening and gives one button to act on it.</p>
+  <div class="sw" role="group" aria-label="Screen">
+    <button type="button" data-s="a" aria-pressed="true">1 · New list</button>
+    <button type="button" data-s="b" aria-pressed="false">2 · Why it helps</button>
+  </div>
+
+  <div class="sec" id="a"><div class="stage"><div class="ph"><div class="url">jobfile-rosy.vercel.app</div>
+    <div class="body">
+      <h4>Your marketplace projects</h4>
+      <div class="sum">
+        <div class="hot"><b>1</b><span>New bid</span></div>
+        <div><b>2</b><span>Open</span></div>
+        <div><b>0</b><span>Hired</span></div>
+      </div>
+      <div class="post">＋ Post a project <small>· about 3 minutes</small></div>
+
+      <div class="card"><span class="edge" style="background:#c4813f"></span><div class="in">
+        <div class="row"><div class="row" style="gap:8px"><span class="tile t1"><svg viewBox="0 0 24 24"><path d="M4 12h16v3a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4zM6 12V6a2 2 0 0 1 4 0"/></svg></span><span class="pill wt">Bathroom</span></div><span class="pill ok">Open · 24 days left</span></div>
+        <div class="ttl">Replace the tub, new tile floor +1 more</div>
+        <div class="meta">ZIP 75074 · 60 sq ft</div>
+        <div class="rng"><span>$5,500</span><span>$12,500</span></div>
+        <div class="bar"><i style="left:12%;right:20%"></i></div>
+        <div class="act g"><span><b>1 new bid</b> from a verified contractor</span><span class="go">Compare bids</span></div>
+      </div></div>
+
+      <div class="card"><span class="edge" style="background:#1f4d3a"></span><div class="in">
+        <div class="row"><div class="row" style="gap:8px"><span class="tile t2"><svg viewBox="0 0 24 24"><path d="M4 10h16v10H4zM4 10l2-6h12l2 6M9 14h6"/></svg></span><span class="pill ok">Kitchen remodel</span></div><span class="pill ok">Open · 28 days left</span></div>
+        <div class="ttl">Keep current layout, new semi-custom cabinets +2 more</div>
+        <div class="meta">ZIP 75074 · 200 sq ft</div>
+        <div class="rng"><span>$17,500</span><span>$40,000</span></div>
+        <div class="bar"><i style="left:20%;right:8%"></i></div>
+        <div class="act o"><span><b>No bids yet.</b> 6 contractors were alerted</span><span class="go o">Add photos</span></div>
+        <div class="det"><span>Detail level</span><span class="b2"><i style="width:55%"></i></span><span>55%</span></div>
+      </div></div>
+    </div>
+    <div class="q">?</div>
+    <div class="tabs"><span>Home</span><span>Projects</span><span>Post</span><span>Menu</span></div>
+  </div></div></div>
+
+  <div class="sec" id="b" hidden>
+    <div class="why">
+      <b>What changes</b>
+      <ul>
+        <li><b>Summary strip.</b> Counts for new bids, open and hired projects. The green tile shows when something is waiting.</li>
+        <li><b>Action line on every card.</b> New bids: "Compare bids". No bids: "Add photos" or "Invite a contractor". Closing soon: "Extend".</li>
+        <li><b>Price range bar.</b> Shows the typical range at a glance.</li>
+        <li><b>Colored edge and icon tile.</b> Same look as the draft cards and menu tiles, so cards are easy to tell apart.</li>
+        <li><b>Detail level bar.</b> Shows how complete the post is, so homeowners know adding detail gets more bids.</li>
+        <li><b>Post a project.</b> Keeps its place, with a "+" and a time estimate. It could shrink once there are several projects.</li>
+        <li><b>The "?" button.</b> Sits above the bottom bar and no longer covers a card's bid count.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+<script>
+document.querySelectorAll('.sw button').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('.sw button').forEach(x=>x.setAttribute('aria-pressed',x===b));
+  document.querySelectorAll('.sec').forEach(s=>s.hidden=s.id!==b.dataset.s);
+}));
+</script>
