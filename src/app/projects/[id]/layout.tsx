@@ -45,7 +45,7 @@ export default async function ProjectLayout({
         </div>
       </div>
 
-      <ProjectTabs id={project.id} priceCheck={role === 'homeowner' && priceCheckEnabled()} rating={!!project.completed_at} money={role === 'contractor'} dots={dots} />
+      <ProjectTabs id={project.id} priceCheck={role === 'homeowner' && priceCheckEnabled()} rating={!!project.completed_at} money={role === 'contractor'} team={role === 'contractor'} dots={dots} />
 
       {role === 'contractor' && !homeownerJoined && (
         <div className="box warn">

@@ -14,11 +14,12 @@ const ICONS: Record<string, JSX.Element> = {
   Changes: <path d="M4 8h14l-3-3M20 16H6l3 3" />,
   Payments: <><rect x="3" y="6" width="18" height="12" rx="2" /><circle cx="12" cy="12" r="2.5" /></>,
   'My money': <path d="M12 3v18M16 7.5c0-1.7-1.8-3-4-3s-4 1.3-4 3 1.8 2.6 4 3 4 1.3 4 3-1.8 3-4 3-4-1.3-4-3" />,
+  Team: <><circle cx="9" cy="8" r="3" /><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6" /><circle cx="17" cy="9" r="2.3" /><path d="M17 14c2.5 0 4 2 4 5" /></>,
   Ratings: <path d="M12 3l2.6 5.6 6 .7-4.4 4.1 1.2 6-5.4-3-5.4 3 1.2-6L3.4 9.3l6-.7z" />,
   'Price check': <><circle cx="11" cy="11" r="6" /><path d="M20 20l-4-4" /></>,
 };
 
-export default function ProjectTabs({ id, priceCheck = false, rating = false, money = false, dots = [] }: { id: string; priceCheck?: boolean; rating?: boolean; money?: boolean; dots?: string[] }) {
+export default function ProjectTabs({ id, priceCheck = false, rating = false, money = false, team = false, dots = [] }: { id: string; priceCheck?: boolean; rating?: boolean; money?: boolean; team?: boolean; dots?: string[] }) {
   const path = usePathname();
   const base = `/projects/${id}`;
   const tabs = [
@@ -32,6 +33,7 @@ export default function ProjectTabs({ id, priceCheck = false, rating = false, mo
     [`${base}/changes`, 'Changes'],
     [`${base}/payments`, 'Payments'],
     ...(money ? [[`${base}/money`, 'My money']] : []),
+    ...(team ? [[`${base}/partners`, 'Team']] : []),
     ...(rating ? [[`${base}/rating`, 'Ratings']] : []),
     ...(priceCheck ? [[`${base}/price-check`, 'Price check']] : []),
   ];
