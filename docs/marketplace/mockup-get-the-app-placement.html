@@ -1,0 +1,66 @@
+<title>Get The App Placement</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: one phone column. Three screens: where the install prompt sits today, at the bottom of Home, and as a slim bar. Names, prices and trades are examples. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#c4813f;--orl:#f9efe4;--orb:#ecd4a8;--fg:#1f4d3a;--fgl:#e4f0e8;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--fgl:#173a2c;--fg:#8fd0ab;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--fgl:#173a2c;--fg:#8fd0ab;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:14px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px}
+h2{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;font-size:28px;line-height:1.05;text-wrap:balance}
+h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;font-size:18px}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
+.mut{color:var(--mut);font-size:14.5px;line-height:1.5;margin:0}
+.sw{display:grid;grid-template-columns:1fr 1fr;gap:6px}.sw button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:6px 4px;border-radius:99px;font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:44px}.sw button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.sec{display:flex;flex-direction:column;gap:14px}.sec[hidden]{display:none}
+.stage{display:flex;justify-content:center;padding:22px 0 8px;border-radius:30px;background:radial-gradient(120% 80% at 50% 0%,var(--orl),transparent 70%)}
+.ph{width:min(300px,84%);height:620px;background:#faf8f4;color:#1b1a18;border:7px solid #1b1a18;border-radius:36px;position:relative;overflow:hidden;box-shadow:0 22px 44px -18px rgba(27,26,24,.45);display:flex;flex-direction:column}
+.url{height:44px;background:#f3f1ec;display:flex;align-items:center;justify-content:center;font-size:11px;color:#6b655e;padding-top:10px;flex:none}
+.body{flex:1;padding:13px;display:flex;flex-direction:column;gap:8px;font-size:12px;line-height:1.4;overflow:hidden}
+.body h4{font:800 18px/1.05 'Bricolage Grotesque',sans-serif;letter-spacing:-.03em;margin:0}
+.body p{margin:0;color:#5c564f}
+.lab{font-size:10px;text-transform:uppercase;letter-spacing:.08em;font-weight:600;color:#6b655e;margin-top:2px}
+.cd{background:#fff;border:1px solid #e4dfd6;border-radius:12px;padding:9px 10px;display:flex;flex-direction:column;gap:5px}
+.r{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.r b{font-size:12.5px}.av{width:30px;height:30px;border-radius:9px;color:#fff;font:800 13px 'Bricolage Grotesque',sans-serif;display:grid;place-items:center;flex:none}
+.a1{background:#1f4d3a}.a2{background:#c4813f}
+.pill{display:inline-block;border-radius:99px;padding:2px 8px;font-size:10px;font-weight:600;white-space:nowrap}
+.ok{background:#e4f0e8;color:#1f4d3a}.wt{background:#f9efe4;color:#8a5a1a}.gr{background:#eef0f4;color:#4a4f5c}
+.amt{font:800 15px 'Bricolage Grotesque',sans-serif;font-variant-numeric:tabular-nums}
+.tot{background:#1f4d3a;color:#fff;border-radius:13px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center}.tot b{font:800 21px 'Bricolage Grotesque',sans-serif}.tot small{opacity:.85;font-size:10.5px}
+.inp{border:1px solid #d6d0c6;border-radius:9px;padding:7px 9px;font-size:11px;color:#8a8379;background:#faf8f4}
+.btn{border:0;border-radius:12px;padding:10px;font:600 12.5px 'IBM Plex Sans',sans-serif;text-align:center;background:#1f4d3a;color:#fff}.btn.gh{background:transparent;color:#6b655e;border:1px solid #e4dfd6}
+.tabs{height:48px;background:#fff;border-top:1px solid #e4dfd6;display:flex;justify-content:space-around;align-items:center;font-size:9.5px;color:#6b655e;flex:none}
+.rules{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:9px}
+.rules ul{margin:0;padding-left:18px;color:var(--mut);font-size:14px;line-height:1.5;display:flex;flex-direction:column;gap:6px}.rules li b{color:var(--ink)}
+</style>
+<div class="wrap"><style>
+.pills{display:flex;gap:5px;flex-wrap:wrap}.pills span{border:1px solid #e4dfd6;background:#fff;border-radius:99px;padding:3px 9px;font-size:10.5px}
+.need{background:#f9efe4;border:1px solid #ecd4a8;border-radius:13px;padding:9px 10px;display:flex;flex-direction:column;gap:5px}
+.app{background:#1f4d3a;color:#fff;border-radius:14px;padding:10px;display:flex;flex-direction:column;gap:7px}
+.app .j{width:34px;height:34px;border-radius:9px;background:#c4813f;display:grid;place-items:center;font:800 17px 'Bricolage Grotesque',sans-serif;flex:none}
+.app .b{background:#fff;color:#1f4d3a;border-radius:99px;padding:6px 12px;font-weight:600;font-size:11px}
+.slim{background:#e4f0e8;border:1px solid #bcd8c6;border-radius:12px;padding:7px 9px;display:flex;align-items:center;gap:8px;font-size:11px;color:#1f4d3a}
+.slim .j{width:22px;height:22px;border-radius:6px;background:#c4813f;color:#fff;display:grid;place-items:center;font:800 12px 'Bricolage Grotesque',sans-serif;flex:none}
+.hl{outline:2px dashed #c4813f;outline-offset:2px;border-radius:14px}
+</style>
+<div class="note"><b>Mockup.</b> Where the "Get Jobfile on your phone" prompt sits on Home. The dashed outline marks the prompt.</div>
+<h2>Out of the middle</h2>
+<p class="mut">Today the big green card sits above "Needs you". The proposal moves it below the work, and only shows it when alerts would matter.</p>
+<div class="sw" role="group" aria-label="Screen" style="grid-template-columns:1fr 1fr 1fr"><button type="button" data-s="a" aria-pressed="true">Today</button><button type="button" data-s="b" aria-pressed="false">Bottom</button><button type="button" data-s="c" aria-pressed="false">Slim</button></div>
+<div class="sec" id="a"><div class="stage"><div class="ph"><div class="url">Home</div><div class="body"><h4 style="font-size:17px">Hi Nestor</h4><span style="font-size:11px;color:#6b655e">Nesty's Painting · your work at a glance</span><div class="cd"><div class="r"><b>● Taking new jobs</b><span class="pill wt">Change</span></div></div><div class="btn" style="background:#c4813f">Find work</div><div class="pills"><span>Ongoing 2</span><span>Bids 2</span><span>Completed 1</span></div><div class="app hl"><div style="display:flex;gap:9px;align-items:center"><span class="j">J</span><div><b style="font-size:12.5px">Get Jobfile on your phone</b><div style="font-size:10.5px;opacity:.85">Instant alerts when a contractor bids or replies.</div></div></div><div style="display:flex;justify-content:space-between;align-items:center"><span class="b">Show me how</span><span style="font-size:11px;opacity:.85">Not now</span></div></div><div class="need"><b style="font-size:13px">Needs you · 1</b><span style="font-size:11px">Sign the agreement for Kitchen painting</span><div class="btn" style="padding:7px">Open</div></div><div class="cd"><b>Ongoing</b><span style="font-size:11px;color:#6b655e">Kitchen and walls painting · In progress</span></div></div><div class="tabs"><span style="color:#1f4d3a;font-weight:700">Home</span><span>Projects</span><span>Find work</span><span>Menu</span></div></div></div><p class="mut">The largest, darkest block on the page pushes "Needs you" down.</p></div>
+<div class="sec" id="b" hidden><div class="stage"><div class="ph"><div class="url">Home</div><div class="body"><h4 style="font-size:17px">Hi Nestor</h4><span style="font-size:11px;color:#6b655e">Nesty's Painting · your work at a glance</span><div class="cd"><div class="r"><b>● Taking new jobs</b><span class="pill wt">Change</span></div></div><div class="btn" style="background:#c4813f">Find work</div><div class="pills"><span>Ongoing 2</span><span>Bids 2</span><span>Completed 1</span></div><div class="need"><b style="font-size:13px">Needs you · 1</b><span style="font-size:11px">Sign the agreement for Kitchen painting</span><div class="btn" style="padding:7px">Open</div></div><div class="cd"><b>Ongoing</b><span style="font-size:11px;color:#6b655e">Kitchen and walls painting · In progress</span></div><div class="cd"><b>Bids</b><span style="font-size:11px;color:#6b655e">2 waiting</span></div><div class="app hl"><div style="display:flex;gap:9px;align-items:center"><span class="j">J</span><div><b style="font-size:12.5px">Get Jobfile on your phone</b><div style="font-size:10.5px;opacity:.85">Instant alerts when a contractor bids or replies.</div></div></div><div style="display:flex;justify-content:space-between;align-items:center"><span class="b">Show me how</span><span style="font-size:11px;opacity:.85">Not now</span></div></div></div><div class="tabs"><span style="color:#1f4d3a;font-weight:700">Home</span><span>Projects</span><span>Find work</span><span>Menu</span></div></div></div><p class="mut">Same card, below the work. Needs you and Ongoing come first.</p></div>
+<div class="sec" id="c" hidden><div class="stage"><div class="ph"><div class="url">Home</div><div class="body"><h4 style="font-size:17px">Hi Nestor</h4><span style="font-size:11px;color:#6b655e">Nesty's Painting · your work at a glance</span><div class="cd"><div class="r"><b>● Taking new jobs</b><span class="pill wt">Change</span></div></div><div class="btn" style="background:#c4813f">Find work</div><div class="pills"><span>Ongoing 2</span><span>Bids 2</span><span>Completed 1</span></div><div class="need"><b style="font-size:13px">Needs you · 1</b><span style="font-size:11px">Sign the agreement for Kitchen painting</span><div class="btn" style="padding:7px">Open</div></div><div class="cd"><b>Ongoing</b><span style="font-size:11px;color:#6b655e">Kitchen and walls painting · In progress</span></div><div class="cd"><b>Bids</b><span style="font-size:11px;color:#6b655e">2 waiting</span></div><div class="slim hl"><span class="j">J</span><span style="flex:1"><b>Get alerts on your phone</b></span><span class="pill ok" style="background:#1f4d3a;color:#fff">Show me how</span><span style="opacity:.6">✕</span></div></div><div class="tabs"><span style="color:#1f4d3a;font-weight:700">Home</span><span>Projects</span><span>Find work</span><span>Menu</span></div></div></div><p class="mut">A one-line bar at the bottom, about a quarter of the height. The ✕ hides it.</p></div>
+<div class="rules"><h3>When it shows</h3><ul>
+<li><b>After it matters.</b> Once someone has a bid, a reply or a project in progress, so alerts are useful.</li>
+<li><b>Not on the first visit.</b> A new person sees their own start first.</li>
+<li><b>Never once installed.</b> Same as now. "Not now" hides it for a while.</li></ul></div>
+</div>
+<script>
+document.querySelectorAll('.sw button').forEach(function(b){b.addEventListener('click',function(){
+  document.querySelectorAll('.sw button').forEach(function(x){x.setAttribute('aria-pressed',x===b)});
+  ['a','b','c'].forEach(function(id){document.getElementById(id).hidden=id!==b.dataset.s});
+})});
+</script>
