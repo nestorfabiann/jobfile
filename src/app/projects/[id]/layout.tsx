@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { loadProject } from '@/lib/project';
 import HomesteadNotice from '@/components/HomesteadNotice';
 import ProjectTabs from '@/components/ProjectTabs';
+import ScrollTop from '@/components/ScrollTop';
 import { priceCheckEnabled } from '@/lib/pricecheck';
 import { addDays, todayChi } from '@/lib/schedule';
 
@@ -34,6 +35,7 @@ export default async function ProjectLayout({
 
   return (
     <>
+      <ScrollTop />
       <div className="stack">
         <Link href="/projects" className="small">‹ All projects</Link>
         <h1>{project.name}</h1>
