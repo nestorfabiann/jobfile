@@ -15,6 +15,7 @@ export default function FinishCard(props: {
   asked: boolean;
   setStage: (fd: FormData) => void | Promise<void>;
   requestFinish: (fd: FormData) => void | Promise<void>;
+  cancelFinish?: (fd: FormData) => void | Promise<void>;
 }) {
   const { role, projectId, completed, closeoutStarted, checks, otherName, asked } = props;
   const [confirm, setConfirm] = useState(false);
@@ -37,7 +38,16 @@ export default function FinishCard(props: {
         <h2>Is the work finished?</h2>
         <p className="muted">Tell {otherName} the work is done. They confirm and close the job, then you both rate each other.</p>
         {asked ? (
-          <div className="box ok">Sent. We asked {otherName} to mark the project complete. You will get an alert when they do.</div>
+          <>
+            <div className="box ok">Sent. We asked {otherName} to mark the project complete. You will get an alert when they do.</div>
+            {props.cancelFinish ? (
+              <form action={props.cancelFinish} className="stack" style={{ gap: 4 }}>
+                {hidden}
+                <span className="muted small">Not finished yet? Pressed it by mistake?</span>
+                <button className="btn ghost" type="submit">Take it back</button>
+              </form>
+            ) : null}
+          </>
         ) : (
           <form action={props.requestFinish}>{hidden}<button className="btn" type="submit">The work is finished</button></form>
         )}

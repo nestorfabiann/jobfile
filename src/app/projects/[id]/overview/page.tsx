@@ -5,7 +5,8 @@ import AutoRefresh from '@/components/AutoRefresh';
 import KitchenArt from '@/components/KitchenArt';
 import { dollars, signedDollars, daysText } from '@/lib/money';
 import { milestoneAmounts, totals, type ChangeOrder, type Item, type Milestone } from '@/lib/agreement';
-import { setStage, requestFinish } from './actions';
+import { setStage, requestFinish, cancelFinish } from './actions';
+import { finishAsked } from '@/lib/finishRequest';
 import FinishCard from '@/components/FinishCard';
 import NeedsYou from '@/components/NeedsYou';
 import ProjectPartners from '@/components/ProjectPartners';
@@ -91,17 +92,13 @@ export default async function Overview({ params, searchParams }: { params: { id:
     { ok: allPaid, text: allPaid ? 'Final payment confirmed received' : 'Some payments are not confirmed yet' },
     { ok: openFixes === 0 && awaitingConfirm === 0, text: openFixes === 0 && awaitingConfirm === 0 ? 'No open punch-list items' : `${openFixes + awaitingConfirm} punch-list item${openFixes + awaitingConfirm === 1 ? '' : 's'} still open` },
   ];
-  let asked = false;
-  if (executed && role === 'homeowner' && !project.completed_at) {
-    const { count } = await supabaseAdmin().from('notifications').select('id', { count: 'exact', head: true }).eq('project_id', project.id).eq('kind', 'finish_request').gt('created_at', new Date(Date.now() - 86400000).toISOString());
-    asked = (count ?? 0) > 0;
-  }
+  const asked = executed && role === 'homeowner' && !project.completed_at ? await finishAsked(project.id) : false;
   // Where the job is now, from the schedule (left out when there is no schedule).
   const today = todayChi();
   const curPhase = phaseRows.find((p) => p.status === 'in_progress') ?? phaseRows.find((p) => p.status !== 'done' && p.starts_on && p.starts_on <= today) ?? null;
   const curDays = curPhase && curPhase.starts_on && curPhase.ends_on ? `Day ${Math.min(Math.max(daysBetween(curPhase.starts_on, today) + 1, 1), daysBetween(curPhase.starts_on, curPhase.ends_on) + 1)} of ${daysBetween(curPhase.starts_on, curPhase.ends_on) + 1}` : '';
   const nextPhase = phaseRows.find((p) => p.status === 'upcoming' && p.starts_on && p.starts_on > today);
-  const curNext = curPhase?.ends_on ? `Phase ends ${fmtDay(curPhase.ends_on)}` : nextPhase?.starts_on ? `Next: ${nextPhase.title} ${fmtDay(nextPhase.starts_on)}` : undefined;
+  const curNext = stage !== 1 ? undefined : curPhase?.ends_on ? `Phase ends ${fmtDay(curPhase.ends_on)}` : nextPhase?.starts_on ? `Next: ${nextPhase.title} ${fmtDay(nextPhase.starts_on)}` : undefined;
   const pct = t.total > 0 ? Math.min(100, Math.round((confirmed / t.total) * 100)) : 0;
   const finish = agr?.end_date ? (t.days ? addDays(agr.end_date as string, t.days) : day(agr.end_date as string)) : null;
 
@@ -158,6 +155,7 @@ export default async function Overview({ params, searchParams }: { params: { id:
           asked={asked}
           setStage={setStage}
           requestFinish={requestFinish}
+          cancelFinish={cancelFinish}
         />
         </div>
       )}

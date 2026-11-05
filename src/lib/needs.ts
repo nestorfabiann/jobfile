@@ -45,11 +45,11 @@ export async function projectTasks(userId: string, projects: P[], myCompanyIds: 
   };
 
   // Homeowners asking a contractor to close out a job (kept for 14 days, until the job is complete).
-  const { data: fin } = await db.from('notifications').select('project_id,created_at').eq('user_id', userId).eq('kind', 'finish_request').in('project_id', ids).gt('created_at', new Date(Date.now() - 14 * 86400000).toISOString()).order('created_at', { ascending: false });
+  const { data: fin } = await db.from('notifications').select('project_id,created_at,kind').eq('user_id', userId).in('kind', ['finish_request', 'finish_cancel']).in('project_id', ids).gt('created_at', new Date(Date.now() - 14 * 86400000).toISOString()).order('created_at', { ascending: false });
   const out: NeedItem[] = [];
   for (const p of active) {
     const f = (fin ?? []).find((x: any) => x.project_id === p.id) as any;
-    if (f) out.push({ key: `fin-${p.id}`, icon: 'done', title: 'Homeowner says the work is finished', sub: `${p.name} · Mark it complete to open ratings`, href: alertHref(p.id, 'finish_request'), go: 'Review', at: f.created_at });
+    if (f && f.kind === 'finish_request') out.push({ key: `fin-${p.id}`, icon: 'done', title: 'Homeowner says the work is finished', sub: `${p.name} · Mark it complete to open ratings`, href: alertHref(p.id, 'finish_request'), go: 'Review', at: f.created_at });
     const role = roleOf(p);
     const ag: any = (ags ?? []).find((a: any) => a.project_id === p.id);
     const signed = new Set((sigs ?? []).filter((s: any) => s.project_id === p.id).map((s: any) => s.role as string));

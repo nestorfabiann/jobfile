@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation';
 import { loadProject } from '@/lib/project';
 import { supabaseAdmin } from '@/lib/supabase/server';
 import { notifyOtherSide } from '@/lib/notify';
+import { finishAsked, finishRequestsToday, MAX_FINISH_REQUESTS_PER_DAY } from '@/lib/finishRequest';
 
 /** The contractor side moves the job into closeout, then marks it complete. */
 export async function setStage(formData: FormData) {
@@ -49,7 +50,7 @@ export async function setStage(formData: FormData) {
 }
 
 
-/** The homeowner asks the contractor to mark the job complete. Once a day per project. */
+/** The homeowner asks the contractor to mark the job complete. Up to 3 times a day per project. */
 export async function requestFinish(formData: FormData) {
   const projectId = String(formData.get('project_id') ?? '');
   const { role, user, project } = await loadProject(projectId);
@@ -57,9 +58,8 @@ export async function requestFinish(formData: FormData) {
   const admin = supabaseAdmin();
   const { data: agr } = await admin.from('agreements').select('executed_at').eq('project_id', project.id).maybeSingle();
   if (!agr?.executed_at) return;
-  const since = new Date(Date.now() - 86400000).toISOString();
-  const { count } = await admin.from('notifications').select('id', { count: 'exact', head: true }).eq('project_id', project.id).eq('kind', 'finish_request').gt('created_at', since);
-  if ((count ?? 0) > 0) return;
+  if (await finishAsked(project.id)) return;
+  if ((await finishRequestsToday(project.id)) >= MAX_FINISH_REQUESTS_PER_DAY) return;
   await notifyOtherSide({
     projectId: project.id,
     senderId: user.id,
@@ -67,6 +67,23 @@ export async function requestFinish(formData: FormData) {
     kind: 'finish_request',
     title: (n) => `The homeowner says the work is finished on ${n}`,
     body: 'Open the project and mark it complete if the work is done. Marking it complete opens ratings for both sides.',
+  });
+  revalidatePath(`/projects/${project.id}`, 'layout');
+}
+
+/** The homeowner takes back a "the work is finished" request that is still waiting on the contractor. */
+export async function cancelFinish(formData: FormData) {
+  const projectId = String(formData.get('project_id') ?? '');
+  const { role, user, project } = await loadProject(projectId);
+  if (role !== 'homeowner' || project.completed_at) return;
+  if (!(await finishAsked(project.id))) return;
+  await notifyOtherSide({
+    projectId: project.id,
+    senderId: user.id,
+    senderRole: role,
+    kind: 'finish_cancel',
+    title: (n) => `The homeowner took back the finished request on ${n}`,
+    body: 'The work is not marked finished yet. Nothing for you to do.',
   });
   revalidatePath(`/projects/${project.id}`, 'layout');
 }
