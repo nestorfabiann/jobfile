@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Homeowner Landing Top</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#c4813f;--orl:#f9efe4;--orb:#ecd4a8;--fg:#1f4d3a;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:14px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px}
+h2{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;font-size:28px;line-height:1.05}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
+.sw{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.sw button,.rp{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:9px 4px;border-radius:99px;font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer}
+.sw button[aria-pressed=true]{background:var(--or);border-color:var(--or);color:#fff}
+.rp{width:100%;font-weight:600}
+.stage{display:flex;justify-content:center;padding:22px 0 8px;border-radius:30px;background:radial-gradient(120% 80% at 50% 0%,var(--orl),transparent 70%)}
+.ph{width:min(330px,92%);height:690px;background:#faf8f4;color:#1b1a18;border:7px solid #1b1a18;border-radius:36px;overflow:hidden;box-shadow:0 22px 44px -18px rgba(27,26,24,.45);display:flex;flex-direction:column}
+.url{height:40px;background:#f3f1ec;display:flex;align-items:center;justify-content:center;font-size:11px;color:#6b655e;padding-top:8px;flex:none}
+.pb{flex:1;padding:12px;display:flex;flex-direction:column;gap:10px;font-size:12px;line-height:1.4;overflow:hidden}
+.nm-hero{background:linear-gradient(135deg,#2f5a45,#3a6b52);color:#fff;border-radius:18px;padding:13px 14px;display:flex;gap:10px;align-items:flex-start}
+.nm-hero b{display:block;font:800 18px/1.05 'Bricolage Grotesque',sans-serif;letter-spacing:-.03em}.nm-hero span{font-size:11px;opacity:.95;display:block;margin-top:4px}
+.nm-bell{position:relative;flex:none;width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.16);display:grid;place-items:center;transform-origin:50% 12%}
+.nm-bell svg{width:20px;height:20px}
+.nm-dot{position:absolute;top:3px;right:3px;width:11px;height:11px;border-radius:50%;background:#e5484d;border:2px solid #2f5a45;transform:scale(0)}
+.go .nm-bell{animation:ring 1.1s .4s ease-in-out 1}
+.go .nm-dot{animation:pop .35s 1.1s cubic-bezier(.3,1.6,.5,1) forwards}
+@keyframes ring{0%,100%{transform:rotate(0)}15%{transform:rotate(18deg)}30%{transform:rotate(-16deg)}45%{transform:rotate(12deg)}60%{transform:rotate(-9deg)}75%{transform:rotate(5deg)}}
+@keyframes pop{to{transform:scale(1)}}
+.nm-tl{display:flex;flex-direction:column}
+.nm-st{display:flex;gap:11px;position:relative;padding-bottom:11px}
+.nm-st:last-child{padding-bottom:0}
+.nm-st::before{content:'';position:absolute;left:14px;top:30px;bottom:-1px;width:2px;background:#e4dfd6;transform-origin:top;}
+.nm-st:last-child::before{display:none}
+.nm-st::after{content:'';position:absolute;left:14px;top:30px;bottom:-1px;width:2px;background:#1f4d3a;transform:scaleY(0);transform-origin:top}
+.nm-st:last-child::after{display:none}
+.nm-n{flex:none;width:30px;height:30px;border-radius:50%;background:#f9efe4;color:#a8692c;display:grid;place-items:center;font:800 12px 'IBM Plex Sans',sans-serif;position:relative;z-index:1;transition:background .3s,color .3s}
+.nm-st b{display:block;font:800 13px/1.15 'Bricolage Grotesque',sans-serif;letter-spacing:-.02em}
+.nm-st small{font-size:11px;color:#6b655e}
+.nm-st .tx{padding-top:2px;flex:1}
+.go .nm-st .nm-n{animation:npop .5s calc(var(--i)*.55s + .2s) cubic-bezier(.3,1.6,.5,1) both}
+.go .nm-st::after{animation:draw .45s calc(var(--i)*.55s + .5s) ease-out forwards}
+.go .nm-st .nm-n.dn{animation-name:npop}
+@keyframes npop{0%{transform:scale(.6);background:#f9efe4}55%{transform:scale(1.22);background:#c4813f;color:#fff}100%{transform:scale(1);background:#c4813f;color:#fff}}
+@keyframes draw{to{transform:scaleY(1)}}
+.nm-ck{background:#e4f0e8!important;color:#1f4d3a!important}
+.go .nm-st:last-child .nm-n{animation:cpop .6s calc(var(--i)*.55s + .2s) cubic-bezier(.3,1.6,.5,1) both}
+@keyframes cpop{0%{transform:scale(.5);background:#f9efe4}60%{transform:scale(1.3);background:#1f4d3a;color:#fff}100%{transform:scale(1);background:#e4f0e8;color:#1f4d3a}}
+.nm-h{font:800 17px/1.1 'Bricolage Grotesque',sans-serif;letter-spacing:-.03em;margin:2px 0 0}
+.nm-cd{background:#fff;border:1px solid #e4dfd6;border-radius:14px;padding:9px 11px;display:flex;gap:9px;align-items:center;opacity:0;transform:translateY(14px)}
+.nm-cd b{display:block;font:800 12.5px 'Bricolage Grotesque',sans-serif}.nm-cd span{font-size:10.5px;color:#6b655e}
+.nm-ic{flex:none;width:26px;height:26px;border-radius:8px;background:#f9efe4;display:grid;place-items:center;font-size:13px}
+.go .nm-cd{animation:rise .5s calc(2.9s + var(--c)*.25s) ease-out forwards}
+@keyframes rise{to{opacity:1;transform:none}}
+.nm-hd{opacity:0}.go .nm-hd{animation:rise .4s 2.7s ease-out forwards}
+/* fuller version: tap a step */
+.tp{cursor:pointer}
+.nm-ex{display:none;margin-top:6px;background:#fff;border:1px solid #ecd4a8;border-radius:10px;padding:7px 9px;font-size:10.5px;color:#4a453f;animation:rise .3s ease-out forwards;opacity:0}
+.nm-ex .rw{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.nm-ex .ok{background:#e4f0e8;color:#1f4d3a;border-radius:99px;padding:1px 8px;font-weight:700;font-size:9.5px}
+.nm-st.open .nm-ex{display:block}
+.chev{font-size:10px;color:#c4813f;font-weight:700;margin-left:4px}
+.nm-st.hint .nm-n{box-shadow:0 0 0 0 rgba(196,129,63,.5);animation:pulse 1.6s 1 ease-out}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(196,129,63,.55)}100%{box-shadow:0 0 0 12px rgba(196,129,63,0)}}
+.tapnote{font-size:10px;color:#8a8379;text-align:center}
+.tabs{height:50px;background:#fff;border-top:1px solid #e4dfd6;display:flex;justify-content:space-around;align-items:center;font-size:9.5px;color:#6b655e;flex:none}
+.why{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:9px}
+.why ul{margin:0;padding-left:18px;color:var(--mut);font-size:14px;line-height:1.5;display:flex;flex-direction:column;gap:6px}.why li b{color:var(--ink)}
+.sec[hidden]{display:none}.sec{display:flex;flex-direction:column;gap:14px}
+@media (prefers-reduced-motion:reduce){.go *{animation:none!important}.nm-cd,.nm-hd{opacity:1;transform:none}.nm-dot{transform:scale(1)}.nm-st::after{transform:scaleY(1)}.nm-n{background:#c4813f;color:#fff}.nm-ck{background:#e4f0e8!important;color:#1f4d3a!important}}
+
+.nm-hero{background:linear-gradient(135deg,#2f5a45,#3a6b52);color:#fff;border-radius:18px;padding:13px 14px;display:block}
+.nm-hero b{display:block;font:800 18px/1.05 'Bricolage Grotesque',sans-serif;letter-spacing:-.03em}.nm-hero span{font-size:11px;opacity:.95;display:block;margin-top:4px}
+.mg{display:flex;flex-direction:column}
+.mst{position:relative;padding-bottom:9px;display:flex;gap:11px;cursor:pointer}
+.mst::before{content:'';position:absolute;left:14px;top:30px;bottom:-1px;width:2px;background:#e4dfd6}.mst:last-child::before{display:none}
+.mn{flex:none;width:30px;height:30px;border-radius:50%;background:#f9efe4;color:#a8692c;display:grid;place-items:center;font:800 12px 'IBM Plex Sans',sans-serif;position:relative;z-index:1}
+.mck{background:#e4f0e8;color:#1f4d3a}
+.mst .tx{flex:1;padding-top:1px}.mst b{display:block;font:800 13px/1.15 'Bricolage Grotesque',sans-serif;letter-spacing:-.02em}
+.mst small{font-size:10.5px;color:#6b655e;display:block}
+.pay{display:block;font-size:10.5px;color:#1f4d3a;font-weight:600;margin-top:2px}
+.chv{position:absolute;right:0;top:6px;color:#c4813f;font-weight:700;font-size:13px;transition:transform .2s}
+.mst.open .chv{transform:rotate(90deg)}
+.mex{display:none;margin-top:6px;background:#fff;border:1px solid #ecd4a8;border-radius:10px;padding:7px 9px;font-size:10.5px;color:#4a453f}
+.mst.open .mex{display:block}
+.mex .rw{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.mex .ok{background:#e4f0e8;color:#1f4d3a;border-radius:99px;padding:1px 8px;font-weight:700;font-size:9.5px}
+.peace{background:#f9efe4;border-radius:14px;padding:10px 12px;font-size:11.5px}
+.nh{font:800 16px/1.1 'Bricolage Grotesque',sans-serif;letter-spacing:-.03em;margin:2px 0 0}
+.nc{background:#fff;border:1px solid #e4dfd6;border-radius:14px;padding:8px 11px}.nc b{display:block;font:800 12px 'Bricolage Grotesque',sans-serif}.nc span{font-size:10.5px;color:#6b655e}
+.tn{font-size:10px;color:#8a8379;text-align:center}
+
+.bo{display:flex;flex-direction:column;gap:8px}
+.bl{font-size:12px;font-weight:600;color:var(--mut);text-transform:uppercase;letter-spacing:.08em}
+.hA,.hB,.hC,.hD{background:linear-gradient(135deg,#2f5a45,#3a6b52);color:#fff;border-radius:18px;padding:16px}
+.hA h3,.hB h3,.hC h3,.hD h3{margin:0;font:800 24px/1.05 'Bricolage Grotesque',sans-serif;letter-spacing:-.035em}
+.hA p,.hB p,.hC p,.hD p{margin:8px 0 0;font-size:14px;line-height:1.45;opacity:.93}
+.bc{position:relative;display:grid;place-items:center;border-radius:50%;background:rgba(255,255,255,.16);flex:none}
+.bc svg{display:block}
+.dot{position:absolute;top:2px;right:2px;width:11px;height:11px;border-radius:50%;background:#e5484d;border:2px solid #2f5a45}
+.hA .top{display:flex;align-items:center;gap:10px}
+.hB .bc{width:40px;height:40px;margin-bottom:10px}
+.hC .bc{width:40px;height:40px;margin-bottom:10px}
+.hD{display:flex;gap:12px;align-items:flex-start}
+.hD .bc{width:44px;height:44px}
+.pick{font-size:13px;color:var(--mut)}
+
+.sw2{display:grid;grid-template-columns:1fr 1fr;gap:6px}.sw2 button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:9px 4px;border-radius:99px;font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer}.sw2 button[aria-pressed=true]{background:var(--or);border-color:var(--or);color:#fff}
+.pg{background:#faf8f4;color:#1b1a18;border:1px solid #e4dfd6;border-radius:22px;padding:20px 16px;display:flex;flex-direction:column;gap:14px}
+.eb{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#a8692c;font-weight:600}
+.pg h1{font:800 31px/1.02 'Bricolage Grotesque',sans-serif;letter-spacing:-.035em;margin:0;text-wrap:balance}.pg h1 em{font-style:normal;color:#c4813f}
+.sb{font-size:15.5px;line-height:1.5;color:#4a453f;margin:0}
+.sg{display:grid;grid-template-columns:1fr 1fr;background:#efeae0;border-radius:99px;padding:3px}.sg span{text-align:center;padding:9px 4px;border-radius:99px;font-size:13px;font-weight:600;color:#6b655e}.sg span.on{background:#fff;color:#1b1a18;box-shadow:0 1px 3px rgba(27,26,24,.12)}
+.cta{background:#c4813f;color:#fff;border-radius:99px;padding:15px;text-align:center;font-weight:700;font-size:16px}
+.fn{font-size:13px;color:#6b655e;text-align:center;margin:0}
+.fair{background:#fff;border:1px solid #ecd4a8;border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:8px}
+.fair .t{font:800 16px/1.15 'Bricolage Grotesque',sans-serif;letter-spacing:-.02em}
+.fair .j{font-size:12.5px;color:#6b655e}
+.bar{position:relative;height:10px;border-radius:99px;background:#efeae0}.bar i{position:absolute;left:18%;right:22%;top:0;bottom:0;border-radius:99px;background:linear-gradient(90deg,#e0b985,#c4813f)}.bar u{position:absolute;left:52%;top:-4px;width:4px;height:18px;border-radius:2px;background:#1f4d3a}
+.rg{display:flex;justify-content:space-between;font-size:12.5px}.rg b{font-family:'Bricolage Grotesque',sans-serif}
+.fine2{font-size:11.5px;color:#8a8379}
+.proof{display:flex;gap:10px;align-items:center;background:#e4f0e8;border-radius:16px;padding:11px 13px;font-size:13.5px;line-height:1.4;color:#1f4d3a}
+.proof .av{flex:none;width:36px;height:36px;border-radius:50%;background:#1f4d3a;color:#fff;display:grid;place-items:center;font:800 15px 'Bricolage Grotesque',sans-serif}
+.chips{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.chips div{background:#fff;border:1px solid #e4dfd6;border-radius:14px;padding:9px 6px;text-align:center;font-size:11.5px;line-height:1.3;color:#6b655e}.chips b{display:block;font:800 17px 'Bricolage Grotesque',sans-serif;color:#1b1a18}
+.gap{height:1px;background:#e4dfd6;margin:2px 0}
+.lbl{font-size:11px;font-weight:700;color:#8a8379;text-transform:uppercase;letter-spacing:.08em}
+.mid{background:#fff;border:1px dashed #d9c9a8;border-radius:16px;padding:12px;text-align:center;font-size:12.5px;color:#6b655e;display:flex;flex-direction:column;gap:8px}
+.mid .cta{padding:12px;font-size:14px}
+.faq{background:#fff;border:1px solid #e4dfd6;border-radius:16px;padding:6px 14px}.faq div{padding:10px 0;border-bottom:1px solid #efeae0;font-size:14px;font-weight:600;display:flex;justify-content:space-between}.faq div:last-child{border:0}.faq span{color:#c4813f}
+.tag{display:inline-block;background:#f9efe4;color:#8a5a1a;border-radius:99px;padding:2px 9px;font-size:10.5px;font-weight:700;margin-left:6px}
+</style></head>
+<body><div class="wrap">
+<h2>Stronger top of the page</h2>
+<div class="note"><b>Homeowner side only.</b> Compare the page now with the proposed top. The numbers chips would stay hidden until the counts are real.</div>
+<div class="sw2"><button id="b1" aria-pressed="false">Now</button><button id="b2" aria-pressed="true">Proposed</button></div>
+<div id="v"></div>
+<div class="why"><b>What changed</b><ul>
+<li><b>Headline:</b> leads with the fear (“is the price fair?”), not the feature.</li>
+<li><b>No obligation:</b> added to the line under the button.</li>
+<li><b>Price strip:</b> our best selling point moved up from the feature tiles. Labeled as an estimate.</li>
+<li><b>Real proof:</b> founder line, plus stats that show only when real. Nothing invented.</li>
+<li><b>Second button</b> after the trust cards, and a short FAQ near the end.</li>
+<li><b>Ratings note</b> reworded for homeowners (not shown here).</li></ul></div>
+</div>
+<script>
+var N='<div class="pg"><span class="eb">For homeowners</span><h1>Get bids from local pros. <em>Run the whole job</em> in one place.</h1>\n<p class="sb">Post your project, compare real bids, then keep the price, photos and payments in one shared record.</p>\n<div class="sg"><span class="on">I’m a homeowner</span><span>I’m a contractor</span></div>\n<div class="cta">Post your project, it’s free →</div><p class="fn">No fees. Your address stays private until you hire.</p>\n<div class="gap"></div><span class="lbl">Further down the page</span><div class="mid">Phone preview, 3 steps, trust cards, ratings, features, tracking</div></div>',P='<div class="pg"><span class="eb">For homeowners</span><h1>Get bids from local pros. <em>Know the price is fair.</em></h1>\n<p class="sb">Post your project free, compare real bids side by side, then keep the price, photos and payments in one shared record.</p>\n<div class="sg"><span class="on">I’m a homeowner</span><span>I’m a contractor</span></div>\n<div class="cta">Post your project, it’s free →</div><p class="fn">No fees. No obligation to hire. Your address stays private until you hire.</p>\n<div class="fair"><span class="lbl">See what it should cost <span class="tag">New</span></span><div class="t">Know the price before you talk to anyone</div><div class="j">Interior painting · 3 rooms · Plano</div>\n<div class="bar"><i></i><u></u></div><div class="rg"><span>Typical <b>$4,200 to $6,100</b></span><span><b>$5,008</b> bid</span></div><div class="fine2">An estimate to guide you, not a quote.</div></div>\n<div class="proof"><span class="av">N</span><span><b>Built by a Texas painting contractor</b> who got tired of “I never approved that.”</span></div>\n<div class="chips"><div><b>—</b>projects posted</div><div><b>—</b>local pros</div><div><b>—</b>avg. rating</div></div><span class="fine2" style="text-align:center">Real numbers only. Shown once they are worth showing.</span>\n<div class="gap"></div><span class="lbl">Further down the page</span>\n<div class="mid">After the trust cards:<div class="cta">Post your project, it’s free →</div>You choose. No obligation.</div>\n<div class="faq"><div>Is it really free?<span>+</span></div><div>Who sees my address?<span>+</span></div><div>What if a pro doesn’t show up?<span>+</span></div><div>How fast will I get bids?<span>+</span></div></div></div>';
+function set(m){document.getElementById('b1').setAttribute('aria-pressed',m==1);document.getElementById('b2').setAttribute('aria-pressed',m==2);document.getElementById('v').innerHTML=m==1?N:P}
+document.getElementById('b1').onclick=function(){set(1)};document.getElementById('b2').onclick=function(){set(2)};set(2);
+</script></body></html>
