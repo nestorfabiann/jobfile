@@ -26,7 +26,7 @@ export default async function DesignResult({ params }: { params: { id: string } 
       {results.map((p, i) => (
         <figure key={p} style={{ margin: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
           {urls.get(p) ? /* eslint-disable-next-line @next/next/no-img-element */ <img src={urls.get(p)} alt={`AI idea ${i + 1}`} style={{ width: '100%', borderRadius: 16 }} /> : null}
-          <figcaption className="muted small">Idea {i + 1} · {d.style || 'Your choices'} · AI idea</figcaption>
+          <figcaption className="muted small">Idea {i + 1} · {d.style || 'Your choices'} · AI idea{picks.length ? ` · changed only: ${picks.map(([k, v]) => `${k.toLowerCase()} ${v.toLowerCase()}`).join(', ')}` : ''}</figcaption>
           <Link className="btn" href={`/marketplace/new?idea=${d.id}&pick=${i}`}>Start a project with this one →</Link>
         </figure>
       ))}

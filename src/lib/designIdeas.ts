@@ -39,11 +39,12 @@ export function buildPrompt(space: Space, style: string, picks: Record<string, s
   const changes = Object.entries(picks).filter(([, v]) => !/^keep/i.test(v)).map(([k, v]) => `${k.toLowerCase()}: ${v}`);
   const lines = [
     `Edit this photo of a ${SPACES[space].toLowerCase()} into a realistic redesign idea.`,
-    `Keep the room's layout, walls, windows, doors and camera angle exactly the same. Only change finishes and materials.`,
+    `Keep the room's layout, walls, windows, doors and camera angle exactly the same.`,
+    `Change ONLY the items listed below. Everything else must stay exactly as in the photo: the sink and basin shape, faucet style unless fixtures are listed, mirror and its shape, towels, soap, candles, decor, lighting and any other objects.`,
     style ? `Overall style: ${style}.` : '',
-    changes.length ? `Changes to make: ${changes.join('; ')}.` : 'Choose a tasteful update to colors and finishes.',
+    changes.length ? `Items to change: ${changes.join('; ')}.` : 'Choose a tasteful update to paint colors and finishes only.',
     notes ? `Homeowner notes: ${notes}` : '',
-    variant === 1 ? 'Make this version a bit bolder in color.' : 'Make this version calm and timeless.',
+    variant === 1 ? 'Within those items, make this version a bit bolder in color.' : 'Within those items, make this version calm and timeless.',
     'No people, no text, no logos.',
   ];
   return lines.filter(Boolean).join(' ');
