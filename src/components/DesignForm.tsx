@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { createDesign } from '@/app/design/actions';
 import { shrinkImage } from '@/lib/uploadMedia';
 
@@ -13,6 +13,13 @@ export default function DesignForm({ picks, styles, spaces }: { picks: Record<st
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
   const [preview, setPreview] = useState('');
+  const [secs, setSecs] = useState(0);
+  useEffect(() => {
+    if (!busy) { setSecs(0); return; }
+    const t = setInterval(() => setSecs((n) => n + 1), 1000);
+    return () => clearInterval(t);
+  }, [busy]);
+  const stage = secs < 4 ? 'Getting your photo ready…' : secs < 12 ? 'Sending it to the design helper…' : secs < 35 ? 'Drawing two ideas for you…' : 'Almost there. Good ideas take a moment…';
 
   async function submit(fd: FormData) {
     setBusy(true);
@@ -71,6 +78,15 @@ export default function DesignForm({ picks, styles, spaces }: { picks: Record<st
         <input type="checkbox" name="consent" style={{ marginTop: 4 }} />
         <span className="small">I understand this photo is sent to an outside AI service to make the ideas. It has no faces, license plates or street address.</span>
       </label>
+      {busy ? (
+        <div role="status" aria-live="polite" style={{ position: 'fixed', inset: 0, zIndex: 1000, background: 'rgba(250,247,242,.94)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 14, padding: 24, textAlign: 'center' }}>
+          <style>{'@keyframes dfspin{to{transform:rotate(360deg)}}'}</style>
+          <div style={{ width: 54, height: 54, borderRadius: '50%', border: '5px solid #ecd9c2', borderTopColor: '#c4813f', animation: 'dfspin 1s linear infinite' }} />
+          <b style={{ fontSize: 18 }}>Creating your ideas</b>
+          <span className="muted">{stage}</span>
+          <span className="muted small">This takes about 30 seconds. Please keep this page open.</span>
+        </div>
+      ) : null}
       <button className="btn" type="submit" disabled={busy}>{busy ? 'Creating ideas… about 30 seconds' : 'Show me ideas'}</button>
       <p className="muted small" style={{ margin: 0 }}>AI ideas are pictures to spark conversation. They are not a plan and not a price.</p>
     </form>
