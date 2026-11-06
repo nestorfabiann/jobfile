@@ -54,10 +54,10 @@ const Private = () => (
 const COPY = {
   ho: {
     eye: 'For homeowners',
-    h: ['Get bids from local pros. ', 'Run the whole job', ' in one place.'],
-    sub: 'Post your project, compare real bids, then keep the price, photos and payments in one shared record.',
+    h: ['Get bids from local pros. ', 'Know the price is fair.', ''],
+    sub: 'Post your project free, compare real bids side by side, then keep the price, photos and payments in one shared record.',
     cta: 'Post your project, it’s free',
-    fine: 'No fees. Your address stays private until you hire.',
+    fine: 'No fees. No obligation to hire. Your address stays private until you hire.',
     steps: [['Post it', 'Pick the work, add photos and a budget. Takes a few minutes.'], ['Compare bids', 'See price, insurance and ratings side by side.'], ['Run the job', 'Schedule, changes and payments in one place.']],
     bh: 'Everything for your project',
     tiles: [
@@ -203,6 +203,25 @@ export default function LandingModern({ signedIn, nums, children }: { signedIn: 
         <p className="lm-fine">{c.fine}</p>
       </section>
 
+      <section className="lm-proof" aria-label="Why trust Jobfile">
+        {side === 'ho' && (
+          <div className="lm-fair">
+            <span className="lm-fl">See what it should cost</span>
+            <b>Know the price before you talk to anyone</b>
+            <span className="lm-fj">Example: interior painting · 3 rooms · Plano</span>
+            <div className="lm-fbar"><i /><u /></div>
+            <div className="lm-frg"><span>Typical <b>$4,200 to $6,100</b></span><span><b>$5,008</b> bid</span></div>
+            <span className="lm-ff">An estimate to guide you, not a quote.</span>
+          </div>
+        )}
+        <div className="lm-founder"><span className="lm-fav" aria-hidden="true">N</span><span><b>Built by a Texas painting contractor</b></span></div>
+        {nums.length > 0 && (
+          <div className="lm-nums" aria-label="Jobfile so far">
+            {nums.map(([n, t]) => (<div key={t}><b>{n}</b><span>{t}</span></div>))}
+          </div>
+        )}
+      </section>
+
       <section className="lm-stage" aria-label="Preview of the app">
         <div className="lm-phone"><div key={`${side}-${step}`} className="lm-fade"><Screen side={side} step={step} /></div></div>
       </section>
@@ -232,12 +251,17 @@ export default function LandingModern({ signedIn, nums, children }: { signedIn: 
         </div>
       </section>
 
+      <section className="lm-mid" aria-label="Get started">
+        <Link className="lm-cta" href={cta}>{c.cta} →</Link>
+        <p className="lm-fine">{side === 'ho' ? 'You choose. No obligation to hire anyone.' : 'No subscription. Nothing taken from jobs you win.'}</p>
+      </section>
+
       {side === 'ho' && (
         <div className="lm-both" role="note">
           <span aria-hidden="true"><Svg n="shield" size={20} /></span>
           <span className="lm-bt">
-            <span><b>Ratings go both ways.</b> Both sides show up prepared, and work gets done right.</span>
-            <span className="lm-bp"><i>You rate them <em aria-hidden="true">★★★★★</em></i><i>They rate you <em aria-hidden="true">★★★★★</em></i></span>
+            <span><b>Ratings go both ways.</b> You see each pro’s real track record, and pros show up prepared too.</span>
+            <span className="lm-bp"><i>You rate them <em aria-hidden="true">★★★★★</em></i><i>Pros rate the job <em aria-hidden="true">★★★★★</em></i></span>
           </span>
         </div>
       )}

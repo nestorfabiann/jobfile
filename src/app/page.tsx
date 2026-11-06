@@ -53,12 +53,6 @@ export default async function Home() {
           </ol>
         </section>
 
-        {nums.length > 0 && (
-          <div className="lm-nums" aria-label="Jobfile so far">
-            {nums.map(([n, t]) => (<div key={t}><b>{n}</b><span>{t}</span></div>))}
-          </div>
-        )}
-
         <section className="stack" style={{ gap: 12 }} aria-label="Open near you">
           <h2 style={{ margin: 0, fontSize: 26, letterSpacing: '-0.035em' }}>Open near you</h2>
           <p className="muted" style={{ margin: 0 }}>{signedIn ? 'Open projects from homeowners near you.' : 'Anyone can browse. Sign in to bid or post.'}</p>
