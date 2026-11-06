@@ -70,7 +70,7 @@ export default async function NewListing({ searchParams }: { searchParams: { err
       {designEnabled() && !ideaCard ? (
         <Link href="/design" className="box" style={{ background: 'var(--accent-soft, #f9efe4)', display: 'block' }}>
           <b>Not sure what you want?</b>
-          <span className="small" style={{ display: 'block' }}>Add a photo of your kitchen or bathroom and see AI design ideas first. →</span>
+          <span className="small" style={{ display: 'block' }}>Add a photo of a room or your home and see AI design ideas first. →</span>
         </Link>
       ) : null}
       {searchParams.error ? <div className="box bad">{searchParams.error}</div> : null}

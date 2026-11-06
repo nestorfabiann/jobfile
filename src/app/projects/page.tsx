@@ -181,7 +181,7 @@ export default async function Projects({ searchParams }: { searchParams: { error
         {latest?.thumb ? /* eslint-disable-next-line @next/next/no-img-element */ <img src={latest.thumb} alt="" className="dzth" /> : <span className="dzic" aria-hidden="true">✦</span>}
         <span className="dztx">
           <b>{latest ? 'Your design ideas' : 'Try design ideas'}</b>
-          <span>{latest ? `${spaceLabel(latest.space)}${latest.style ? ` · ${latest.style}` : ''} · tap to see` : 'See new looks for your kitchen or bathroom, from a photo.'}</span>
+          <span>{latest ? `${spaceLabel(latest.space)}${latest.style ? ` · ${latest.style}` : ''} · tap to see` : 'See new looks for a room or your home, from a photo.'}</span>
         </span>
         <span className="dzgo" aria-hidden="true">›</span>
       </Link>

@@ -23,7 +23,7 @@ export default async function Design({ searchParams }: { searchParams: { error?:
   return (
     <div className="stack" style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
       <h1>Design ideas</h1>
-      <p className="muted">Add a photo of your kitchen or bathroom and see new looks. Then start a project from the one you like.</p>
+      <p className="muted">Add a photo of a room or the outside of your home and see new looks. Then start a project from the one you like.</p>
       {searchParams.error ? <div className="box bad" role="alert">{searchParams.error}</div> : null}
       <DesignForm picks={PICKS} styles={[...STYLES]} spaces={SPACE_LIST} />
       {past.length > 0 ? (

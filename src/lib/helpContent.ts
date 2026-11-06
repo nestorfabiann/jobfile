@@ -1,6 +1,6 @@
 /** Ready answers for the Help button. Plain text only. Keep each answer short and true to how the app works today. */
-export type HelpTopic = 'start' | 'bidding' | 'payments' | 'visits' | 'projects' | 'trust' | 'team' | 'community';
-export type PageKey = 'home' | 'projects' | 'marketplace' | 'community' | 'find' | 'settings' | 'business' | 'invite' | 'app';
+export type HelpTopic = 'start' | 'bidding' | 'payments' | 'visits' | 'projects' | 'trust' | 'team' | 'community' | 'design';
+export type PageKey = 'home' | 'projects' | 'marketplace' | 'community' | 'find' | 'settings' | 'business' | 'invite' | 'app' | 'design';
 export type HelpItem = { q: string; a: string; topic: HelpTopic; who: 'h' | 'c' | 'both'; pages?: PageKey[] };
 
 export const TOPICS: [HelpTopic, string][] = [
@@ -12,6 +12,7 @@ export const TOPICS: [HelpTopic, string][] = [
   ['trust', 'Trust and privacy'],
   ['team', 'Teaming up'],
   ['community', 'Community'],
+  ['design', 'Design ideas'],
 ];
 
 export const HELP: HelpItem[] = [
@@ -82,11 +83,21 @@ export const HELP: HelpItem[] = [
   { topic: 'trust', who: 'c', pages: ['business'], q: 'How do I get the Verified and Insured badges?', a: 'Upload your insurance certificate in your Business profile. Once it is checked, the badge shows on every bid.' },
   { topic: 'trust', who: 'c', pages: ['business'], q: 'What is the profile meter?', a: 'How complete your profile is. A fuller profile wins more bids.' },
   { topic: 'start', who: 'both', pages: ['invite'], q: 'What does inviting do?', a: 'It gives you a link to send. You see only counts (opened, joined, posted a job), never who they are.' },
+  { topic: 'design', who: 'h', pages: ['design'], q: 'What are design ideas?', a: 'Add a photo of a room and pick a style and finishes. You get two AI pictures of how it could look. They spark ideas to talk about with a contractor. They are not a plan and not a price.' },
+  { topic: 'design', who: 'h', pages: ['design'], q: 'Which rooms and areas can I use?', a: 'Kitchen, Bathroom, Exterior, Living room, Bedroom, and Wall colors only. Wall colors only works for any room when you just want to see paint.' },
+  { topic: 'design', who: 'h', pages: ['design'], q: 'What makes a good photo?', a: 'Take the whole room from a corner in good light, straight on and not blurry. For the outside, stand back so the whole front of the house shows. Leave out people, faces, license plates and your street address.' },
+  { topic: 'design', who: 'h', pages: ['design'], q: 'The choices do not have what I want. What can I do?', a: 'Every field has a Type your own link. Describe it in a few words, like dusty rose or white oak floors. The Anything else box takes longer notes.' },
+  { topic: 'design', who: 'h', pages: ['design'], q: 'Why did it change things I did not pick?', a: 'The AI sometimes shifts small details. Try again with the same photo, or put what must stay the same in the Anything else box. Each set shows what was changed.' },
+  { topic: 'design', who: 'h', pages: ['design'], q: 'How many ideas can I make?', a: 'Three sets a day, with two pictures in each set. The limit renews 24 hours after you made them. It can take around 30 seconds, so keep the page open.' },
+  { topic: 'design', who: 'h', pages: ['design'], q: 'What happens to my photo?', a: 'It is sent to an outside AI service to make the pictures. Only you can see your ideas in Jobfile. Contractors see a picture only if you choose to share it when you post a project.' },
+  { topic: 'design', who: 'h', pages: ['design'], q: 'How do I start a project from an idea?', a: 'Open your ideas and tap Start a project with this one under the picture you like. The Post page opens with the room type and matching items filled in. You choose whether contractors see the AI picture and your original photo.' },
+  { topic: 'design', who: 'h', pages: ['design'], q: 'Is the AI picture a price or a promise?', a: 'No. It is a picture to spark conversation. Contractors bid on the work you describe, and the final look depends on materials, the room and the contractor.' },
 ];
 
 /** Which topic to lead with, by page. */
 export function topicForPath(path: string): HelpTopic | null {
   if (/^\/(collaborate|partner)/.test(path) || /^\/marketplace\/[^/]+\/team/.test(path) || /^\/projects\/[^/]+\/partners/.test(path)) return 'team';
+  if (/^\/design/.test(path)) return 'design';
   if (/^\/marketplace\/new/.test(path)) return 'start';
   if (/^\/(marketplace|jobs)/.test(path)) return 'bidding';
   if (/\/(payments|money)/.test(path)) return 'payments';
@@ -107,5 +118,6 @@ export function pageKey(path: string): PageKey | null {
   if (path === '/settings/business') return 'business';
   if (path === '/invite') return 'invite';
   if (path === '/app') return 'app';
+  if (/^\/design/.test(path)) return 'design';
   return null;
 }
