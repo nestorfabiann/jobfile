@@ -17,7 +17,7 @@ const IC: Record<string, string> = {
 };
 
 /** Bottom tab bar for signed-in people. Homeowners get Post, contractors get Find work. */
-export default function AppTabs({ contractor, marketplace, waiting, admin, invites = 0, signOutAction }: { contractor: boolean; marketplace: boolean; waiting: number; admin: boolean; invites?: number; signOutAction: () => void | Promise<void> }) {
+export default function AppTabs({ contractor, marketplace, waiting, admin, invites = 0, community = 0, signOutAction }: { contractor: boolean; marketplace: boolean; waiting: number; admin: boolean; invites?: number; community?: number; signOutAction: () => void | Promise<void> }) {
   const path = usePathname() || '/';
   const [open, setOpen] = useState(false);
   const { installed, nudge: getApp } = useGetApp();
@@ -31,7 +31,7 @@ export default function AppTabs({ contractor, marketplace, waiting, admin, invit
     return () => document.removeEventListener('keydown', k);
   }, [open]);
 
-  const tabs: { href?: string; icon: string; label: string; on: boolean; badge?: number }[] = [
+  const tabs: { href?: string; icon: string; label: string; on: boolean; badge?: number; pip?: boolean }[] = [
     { href: '/', icon: 'home', label: 'Home', on: path === '/' },
     { href: '/projects', icon: 'proj', label: 'Projects', on: path.startsWith('/projects') || path.startsWith('/invites'), badge: waiting },
     ...(marketplace
@@ -39,7 +39,7 @@ export default function AppTabs({ contractor, marketplace, waiting, admin, invit
           ? { href: '/marketplace', icon: 'find', label: 'Find work', on: path === '/marketplace' || (path.startsWith('/marketplace/') && !path.startsWith('/marketplace/new')) }
           : { href: '/marketplace/new', icon: 'post', label: 'Post', on: path.startsWith('/marketplace/new') }]
       : []),
-    { icon: 'menu', label: 'Menu', on: open },
+    { icon: 'menu', label: 'Menu', on: open, pip: community > 0 },
   ];
   const links: [string, string, string][] = [
     ['/', 'Home', 'home'],
@@ -61,7 +61,7 @@ export default function AppTabs({ contractor, marketplace, waiting, admin, invit
       {open && <div className="apptabs-shade" onClick={() => setOpen(false)} aria-hidden="true" />}
       {open && (
         <nav className="apptabs-sheet" id="apptabs-sheet" aria-label="More">
-          {links.filter(([h]) => !(h === '/app' && installed)).map(([h, l, i]) => h === '/app' ? <Link key={h} href={h} className={getApp ? 'mi-new' : undefined}><MenuIcon name={i} tile /><span>{l}<small className="mi-sub">Alerts on your phone</small></span>{getApp ? <span className="mi-tag">New</span> : null}</Link> : h === '/collaborate' ? <Link key={h} href={h} className={collab.highlight ? 'mi-new' : undefined}><MenuIcon name={i} tile /><span>{l}<small className="mi-sub">Team up on bids</small></span>{collab.tag ? <span className="mi-tag">{collab.tag}</span> : null}</Link> : <Link key={h} href={h}><MenuIcon name={i} tile />{l}{h === '/community' && commNew ? <span className="mi-tag">New</span> : null}</Link>)}
+          {links.filter(([h]) => !(h === '/app' && installed)).map(([h, l, i]) => h === '/app' ? <Link key={h} href={h} className={getApp ? 'mi-new' : undefined}><MenuIcon name={i} tile /><span>{l}<small className="mi-sub">Alerts on your phone</small></span>{getApp ? <span className="mi-tag">New</span> : null}</Link> : h === '/collaborate' ? <Link key={h} href={h} className={collab.highlight ? 'mi-new' : undefined}><MenuIcon name={i} tile /><span>{l}<small className="mi-sub">Team up on bids</small></span>{collab.tag ? <span className="mi-tag">{collab.tag}</span> : null}</Link> : <Link key={h} href={h}><MenuIcon name={i} tile />{l}{h === '/community' && community > 0 ? <span className="mi-count" aria-label={`${community} unread`}>{community}</span> : h === '/community' && commNew ? <span className="mi-tag">New</span> : null}</Link>)}
           <form action={signOutAction}><button type="submit"><MenuIcon name="out" tile />Sign out</button></form>
         </nav>
       )}
@@ -72,6 +72,7 @@ export default function AppTabs({ contractor, marketplace, waiting, admin, invit
               <>
                 <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" dangerouslySetInnerHTML={{ __html: IC[t.icon] }} />
                 {t.label}
+                {t.pip ? <span className="apptabs-pip" aria-label="Community has something new" /> : null}
                 {t.badge ? <span className="apptabs-dot" aria-label={`${t.badge} waiting`}>{t.badge > 9 ? '9+' : t.badge}</span> : null}
               </>
             );

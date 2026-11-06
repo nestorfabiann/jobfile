@@ -19,6 +19,8 @@ export default async function CommunityPost({ params, searchParams }: { params: 
   const db = supabaseAdmin();
   const { data: p } = await db.from('community_posts').select('*').eq('id', params.id).maybeSingle<Post>();
   if (!p) notFound();
+  // Opening the post clears its reply alerts.
+  try { await db.from('notifications').update({ read_at: new Date().toISOString() }).eq('user_id', user.id).eq('path', `/community/${params.id}`).in('kind', ['community', 'community_note']).is('read_at', null); } catch { /* path column missing */ }
   const mine = p.author_id === user.id;
   if (p.status !== 'live' && !mine) {
     // The other side of a project can look at a post that is waiting for their approval.

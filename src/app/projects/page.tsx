@@ -145,16 +145,13 @@ export default async function Projects({ searchParams }: { searchParams: { error
     .from('notifications')
     .select('id,title,created_at,project_id,kind')
     .is('read_at', null)
-    .in('kind', ['review', 'job_match', 'community_note'])
+    .in('kind', ['review', 'job_match'])
     .gt('created_at', new Date(Date.now() - 14 * 86400000).toISOString())
     .order('created_at', { ascending: true })
     .limit(30);
   const jobAlerts = (unread ?? []).filter((n: any) => n.kind === 'job_match');
   (unread ?? []).forEach((n: any) => {
     if (n.kind === 'review' && /rate your experience/i.test(n.title)) needs.push({ key: n.id, icon: 'star', title: n.title, sub: when(n.created_at), href: `/n/${n.id}`, go: 'Rate', at: n.created_at });
-  });
-  (unread ?? []).forEach((n: any) => {
-    if (n.kind === 'community_note') needs.push({ key: n.id, icon: 'msg', title: n.title, sub: `Community · ${when(n.created_at)}`, href: `/n/${n.id}`, go: 'Read', at: n.created_at });
   });
   if (jobAlerts.length > 0) needs.push({ key: 'jobs', icon: 'job', title: `${jobAlerts.length} new job${jobAlerts.length === 1 ? '' : 's'} near you`, sub: 'Matched to your trades and area', href: '/n/jobs', go: 'View', at: (jobAlerts[0] as any).created_at });
   needs.sort((x, y) => new Date(x.at).getTime() - new Date(y.at).getTime());

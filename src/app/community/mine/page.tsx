@@ -13,6 +13,8 @@ export default async function Mine({ searchParams }: { searchParams: { error?: s
   requireMarketplace();
   const { user } = await requireUser();
   const db = supabaseAdmin();
+  // Looking at My posts clears the Community alerts that point here.
+  try { await db.from('notifications').update({ read_at: new Date().toISOString() }).eq('user_id', user.id).eq('path', '/community/mine').in('kind', ['community', 'community_note']).is('read_at', null); } catch { /* path column missing */ }
 
   const [{ data: pms }, { data: cms }] = await Promise.all([
     db.from('project_members').select('project_id,role').eq('user_id', user.id),
