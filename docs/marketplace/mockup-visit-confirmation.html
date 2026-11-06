@@ -1,0 +1,113 @@
+<title>Confirm the Visit</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: one phone column, four tabs (list, map, group, what changes). Names are examples. */
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#c4813f;--orl:#f9efe4;--orb:#ecd4a8;--fg:#1f4d3a;--fgl:#e4f0e8;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--fgl:#173a2c;--fg:#8fd0ab;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--fgl:#173a2c;--fg:#8fd0ab;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:14px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px}
+h2{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;font-size:28px;line-height:1.05;text-wrap:balance}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
+.mut{color:var(--mut);font-size:14.5px;line-height:1.5;margin:0}
+.sw{display:grid;grid-template-columns:1fr 1fr;gap:6px}.sw button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:8px 4px;border-radius:99px;font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer}.sw button[aria-pressed=true]{background:var(--fg);color:#fff;border-color:var(--fg)}
+.sec{display:flex;flex-direction:column;gap:14px}.sec[hidden]{display:none}
+.stage{display:flex;justify-content:center;padding:22px 0 8px;border-radius:30px;background:radial-gradient(120% 80% at 50% 0%,var(--orl),transparent 70%)}
+.ph{width:min(330px,92%);height:720px;background:#faf8f4;color:#1b1a18;border:7px solid #1b1a18;border-radius:36px;overflow:hidden;box-shadow:0 22px 44px -18px rgba(27,26,24,.45);display:flex;flex-direction:column}
+.url{height:40px;background:#f3f1ec;display:flex;align-items:center;justify-content:center;font-size:11px;color:#6b655e;padding-top:8px;flex:none}
+.body{flex:1;padding:12px;display:flex;flex-direction:column;gap:9px;font-size:12px;line-height:1.4;overflow:hidden}
+.hd{background:linear-gradient(135deg,#c4813f,#a8692c);color:#fff;border-radius:16px;padding:11px 12px;display:flex;flex-direction:column;gap:2px}
+.hd small{font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;opacity:.9}.hd b{font:800 16px/1.05 'Bricolage Grotesque',sans-serif;letter-spacing:-.03em}.hd span{font-size:11px;opacity:.95}
+.cd{background:#fff;border:1px solid #e4dfd6;border-radius:14px;padding:10px 12px;display:flex;flex-direction:column;gap:6px}
+.stp{display:flex;align-items:flex-start}.s{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;position:relative;font-size:9.5px;font-weight:600;color:#8a8379;text-align:center}
+.s i{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font:800 11px 'IBM Plex Sans',sans-serif;font-style:normal;background:#fff;border:2px solid #e4dfd6;position:relative;z-index:1}
+.s::before{content:'';position:absolute;top:11px;left:-50%;right:50%;height:3px;background:#e4dfd6}.s:first-child::before{display:none}
+.s.done i{background:#1f4d3a;border-color:#1f4d3a;color:#fff}.s.done::before{background:#1f4d3a}.s.done{color:#1f4d3a}
+.s.now i{background:#c4813f;border-color:#c4813f;color:#fff}.s.now::before{background:#1f4d3a}.s.now{color:#1b1a18}
+.bar{height:6px;border-radius:99px;background:#efeae0;overflow:hidden}.bar i{display:block;height:100%;width:44%;background:linear-gradient(90deg,#e0b985,#c4813f)}
+.mn{display:flex;justify-content:space-between;font-size:10.5px;color:#6b655e}.mn b{color:#1b1a18}
+.todo{border-radius:12px;padding:9px 11px;background:#e4f0e8;color:#1f4d3a;font-weight:600;display:flex;justify-content:space-between;gap:8px}
+.lab{font-size:10px;text-transform:uppercase;letter-spacing:.08em;font-weight:600;color:#6b655e}
+.row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.pill{display:inline-block;border-radius:99px;padding:2px 8px;font-size:10px;font-weight:600}.ok{background:#e4f0e8;color:#1f4d3a}.wt{background:#f9efe4;color:#8a5a1a}
+.amt{font:800 15px 'Bricolage Grotesque',sans-serif}
+/* compact partner row */
+.pr{background:#fff;border:1px dashed #d9c9a8;border-radius:14px;padding:8px 10px;display:flex;align-items:center;gap:9px}
+.pr .plus{width:30px;height:30px;border-radius:50%;border:2px dashed #c4813f;color:#c4813f;display:grid;place-items:center;font:700 16px sans-serif;flex:none}
+.pr b{display:block;font-size:12.5px}.pr span{font-size:10.5px;color:#6b655e}
+.pr .add{margin-left:auto;background:#c4813f;color:#fff;border-radius:99px;padding:6px 12px;font-weight:600;font-size:11px}
+.av{width:28px;height:28px;border-radius:50%;color:#fff;font:800 12px 'Bricolage Grotesque',sans-serif;display:grid;place-items:center;border:2px solid #fff;flex:none}
+.tabs{height:50px;background:#fff;border-top:1px solid #e4dfd6;display:flex;justify-content:space-around;align-items:center;font-size:9.5px;color:#6b655e;flex:none}
+.why{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:9px}
+.why ul{margin:0;padding-left:18px;color:var(--mut);font-size:14px;line-height:1.5;display:flex;flex-direction:column;gap:6px}.why li b{color:var(--ink)}
+
+
+
+
+.tg{display:flex;background:#efeae0;border-radius:99px;padding:3px;align-self:flex-start}.tg span{padding:5px 14px;border-radius:99px;font-size:11.5px;font-weight:600;color:#6b655e}.tg span.on{background:#fff;color:#1b1a18;box-shadow:0 1px 3px rgba(27,26,24,.15)}
+.fl2{display:flex;gap:5px;overflow:hidden}.fl2 span{border:1px solid #e4dfd6;background:#fff;border-radius:99px;padding:4px 10px;font-size:10.5px;white-space:nowrap}.fl2 span.on{background:#c4813f;border-color:#c4813f;color:#fff}
+.map{position:relative;flex:1;min-height:300px;border-radius:16px;overflow:hidden;background:#e9e3d3;border:1px solid #e4dfd6}
+.map svg{position:absolute;inset:0;width:100%;height:100%}
+.pin{position:absolute;width:26px;height:26px;margin:-26px 0 0 -13px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);display:grid;place-items:center;border:2px solid #fff;box-shadow:0 2px 5px rgba(27,26,24,.35)}.pin i{transform:rotate(45deg);font:800 10px sans-serif;font-style:normal;color:#fff}
+.cl{position:absolute;width:34px;height:34px;margin:-17px 0 0 -17px;border-radius:50%;background:#1f4d3a;color:#fff;display:grid;place-items:center;font:800 13px sans-serif;border:3px solid #fff;box-shadow:0 2px 6px rgba(27,26,24,.35)}
+.me{position:absolute;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:#2f5f8a;border:3px solid #fff;box-shadow:0 0 0 6px rgba(47,95,138,.18)}
+.sheet{position:absolute;left:8px;right:8px;bottom:8px;background:#fff;border-radius:16px;padding:10px 12px;box-shadow:0 8px 20px -6px rgba(27,26,24,.4);display:flex;flex-direction:column;gap:4px}
+.sheet .go{align-self:flex-end;background:#c4813f;color:#fff;border-radius:99px;padding:5px 14px;font-weight:600;font-size:11px}
+.jc{background:#fff;border:1px solid #e4dfd6;border-radius:14px;padding:9px 11px;display:flex;flex-direction:column;gap:4px}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px}
+
+.ea{display:inline-flex;align-items:center;gap:4px;background:#e4f0e8;color:#1f4d3a;border-radius:99px;padding:2px 8px;font-size:10px;font-weight:700}
+.tm{background:#f9efe4;color:#8a5a1a;border-radius:99px;padding:2px 8px;font-size:10px;font-weight:700}
+.lk{background:#efeae0;color:#6b655e;border-radius:99px;padding:2px 8px;font-size:10px;font-weight:700}
+.fade{opacity:.55}
+.btn2{align-self:flex-start;background:#c4813f;color:#fff;border-radius:99px;padding:6px 14px;font-weight:600;font-size:11px}
+.tgl{width:34px;height:20px;border-radius:99px;background:#1f4d3a;position:relative;flex:none}.tgl i{position:absolute;right:2px;top:2px;width:16px;height:16px;border-radius:50%;background:#fff}
+.fld{border:1px solid #e4dfd6;border-radius:10px;padding:7px 10px;background:#fff;font-size:11px;display:flex;justify-content:space-between}
+
+.fr{display:flex;gap:5px;overflow:hidden}.fr span{border:1px solid #e4dfd6;background:#fff;border-radius:99px;padding:5px 11px;font-size:10.5px;font-weight:700;white-space:nowrap;color:#4a453f}.fr span.on{background:#c4813f;border-color:#c4813f;color:#fff}
+.tip{background:#fff;border:1px solid #e4dfd6;border-radius:14px;padding:10px 11px;display:flex;flex-direction:column;gap:6px}
+.tip h4{margin:0;font:800 13px/1.15 'Bricolage Grotesque',sans-serif;letter-spacing:-.02em}
+.tip p{margin:0;font-size:11px;line-height:1.45;color:#4a453f}
+.by{font-size:10px;color:#6b655e;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.pt1{background:#e4f0e8;color:#1f4d3a;border-radius:99px;padding:2px 8px;font-size:9.5px;font-weight:700}.ht1{background:#f9efe4;color:#8a5a1a;border-radius:99px;padding:2px 8px;font-size:9.5px;font-weight:700}
+.hp{display:inline-flex;gap:4px;align-items:center;border:1.5px solid #e4dfd6;border-radius:99px;padding:4px 10px;font-size:10.5px;font-weight:700}.hp.on{border-color:#c4813f;color:#c4813f;background:#f9efe4}
+.safe{background:#fbeccd;border-radius:10px;padding:6px 8px;font-size:10px;color:#6b4b10;line-height:1.4}
+.row2{display:flex;justify-content:space-between;align-items:center}
+.fld2{border:1px solid #e4dfd6;border-radius:10px;padding:7px 9px;background:#fff;font-size:10.5px;color:#6b655e}
+.btn3{background:#c4813f;color:#fff;border-radius:99px;padding:8px;text-align:center;font-weight:700;font-size:11px}
+.cnt2{font-size:9.5px;color:#6b655e;text-align:right}
+.tag{font-size:9.5px;text-transform:uppercase;letter-spacing:.1em;color:#a8692c;font-weight:700}
+
+.vb{border-radius:12px;padding:9px 11px;font-size:11px;line-height:1.4}
+.vb.q{background:#f9efe4;color:#6b4b10;border:1px solid #ecd4a8}
+.vb.g{background:#e4f0e8;color:#1f4d3a}
+.vb.r{background:#fbe6e3;color:#8a2a1f}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.b2{border:1.5px solid #e4dfd6;background:#fff;border-radius:99px;padding:8px;text-align:center;font-weight:700;font-size:11px}
+.push{background:#fff;border:1px solid #e4dfd6;border-radius:14px;padding:9px 11px;box-shadow:0 6px 16px -8px rgba(27,26,24,.4);display:flex;flex-direction:column;gap:2px}
+.push small{color:#6b655e;font-size:9.5px;text-transform:uppercase;letter-spacing:.08em;font-weight:600}
+</style><div class="wrap"><div class="note"><b>Mockup.</b> Both sides confirm the site visit happened. Names and times are examples.</div><h2>Did the visit really happen?</h2><p class="mut">The contractor marks it, the homeowner confirms it.</p>
+<div class="sw" role="group" aria-label="Screen"><button type="button" data-s="a" aria-pressed="true">1 &middot; Contractor</button><button type="button" data-s="b" aria-pressed="false">2 &middot; Homeowner</button><button type="button" data-s="c" aria-pressed="false">3 &middot; Didn't happen</button><button type="button" data-s="d" aria-pressed="false">4 &middot; What changes</button></div>
+<div class="sec" id="a"><div class="stage"><div class="ph"><div class="url">Visit · Kitchen repaint</div><div class="body"><div class="tag">Contractor, after the visit</div><div class="cd"><div class="row"><b>Site visit</b><span class="pill ok">Confirmed</span></div><div class="stp"><div class="s done"><i>✓</i>Requested</div><div class="s done"><i>✓</i>Times sent</div><div class="s now"><i>3</i>Confirmed</div><div class="s "><i>4</i>Visited</div></div><span class="mn">Thu, Nov 5 · 2:00 PM</span></div>
+<div class="cd"><b>Finish the visit and leave notes</b><div class="fld2" style="min-height:70px">Kitchen is about 14 by 12 feet. Ceiling needs a skim coat near the vent.</div><div class="btn3">Mark visited</div><span class="mn">Only shown from 1 hour before the visit.</span></div>
+<div class="vb q"><b>What happens next:</b> the homeowner is asked to confirm you came. Your bid opens once they do, or after 48 hours with no reply.</div></div><div class="tabs"><span>Home</span><span>Projects</span><span>Find work</span><span>Menu</span></div></div></div></div><div class="sec" id="b" hidden><div class="stage"><div class="ph"><div class="url">Visit · Kitchen repaint</div><div class="body"><div class="tag">Homeowner gets an alert</div><div class="push"><small>Jobfile · now</small><b style="font-size:12px">Did Nesty's Painting visit today?</b><span style="font-size:11px;color:#4a453f">Confirm so they can send you a bid.</span></div>
+<div class="cd"><div class="row"><b>Site visit</b><span class="pill wt">Your turn</span></div><div class="stp"><div class="s done"><i>✓</i>Requested</div><div class="s done"><i>✓</i>Times sent</div><div class="s done"><i>✓</i>Confirmed</div><div class="s now"><i>4</i>Visited</div></div>
+<div class="vb q"><b>Nesty's Painting marked this visited.</b><br>Did they come to your home on Nov 5?</div>
+<div class="two"><div class="btn3">Yes, they came</div><div class="b2">It didn't happen</div></div>
+<span class="mn">Not answering? It counts as visited after 48 hours.</span></div>
+<div class="cd"><span class="lab">Visit notes from the contractor</span><span style="font-size:11px">Kitchen is about 14 by 12 feet. Ceiling needs a skim coat near the vent.</span></div></div><div class="tabs"><span>Home</span><span>Projects</span><span>Find work</span><span>Menu</span></div></div></div></div><div class="sec" id="c" hidden><div class="stage"><div class="ph"><div class="url">Visit · Kitchen repaint</div><div class="body"><div class="tag">Homeowner taps "It didn't happen"</div><div class="cd"><b>What went wrong?</b><div class="fld2">They did not show up</div><div class="fld2">They came but I did not confirm a time</div><div class="fld2">Other</div><div class="btn3">Send</div></div>
+<div class="vb r"><b>What happens:</b> the visit goes back to Confirmed, the contractor is told, and Jobfile reviews it. No bid can be sent until a visit is confirmed by both.</div>
+<div class="vb g"><b>Contractor sees:</b> "The homeowner says the visit did not happen. Reply with what happened or rebook." Two buttons: Rebook a time, Reply to Jobfile.</div></div><div class="tabs"><span>Home</span><span>Projects</span><span>Find work</span><span>Menu</span></div></div></div></div>
+<div class="sec" id="d" hidden><div class="stage"><div class="ph"><div class="url">Visit · Kitchen repaint</div><div class="body"><div class="tag">Both sides confirmed</div><div class="cd"><div class="row"><b>Site visit</b><span class="pill ok">Visited ✓✓</span></div><div class="stp"><div class="s done"><i>✓</i>Requested</div><div class="s done"><i>✓</i>Times sent</div><div class="s done"><i>✓</i>Confirmed</div><div class="s done"><i>✓</i>Visited</div></div><span class="mn">Confirmed by both on Nov 5</span></div>
+<div class="cd"><span class="lab">Contractor profile</span><span class="ea">✓ 12 visits confirmed in person</span></div>
+<div class="vb g">Bids are now open for this contractor on this project.</div></div><div class="tabs"><span>Home</span><span>Projects</span><span>Find work</span><span>Menu</span></div></div></div><div class="why"><b>What changes</b><ul>
+<li><b>Contractor taps Mark visited</b> as today, but it now asks the homeowner instead of closing the step.</li>
+<li><b>Homeowner gets an alert</b> with two buttons: Yes, they came, or It didn't happen.</li>
+<li><b>48 hours, no reply:</b> counts as visited, so nobody gets stuck.</li>
+<li><b>It didn't happen:</b> goes back to Confirmed, asks why, tells the contractor, and lands in your review queue.</li>
+<li><b>Bids open only after a confirmed visit</b> (optional rule, you decide).</li>
+<li><b>Trust signal:</b> "visits confirmed in person" on the contractor profile.</li>
+<li><b>Not built yet.</b> Needs a small database step.</li></ul></div></div>
+<script>document.querySelectorAll('.sw button').forEach(function(b){b.addEventListener('click',function(){document.querySelectorAll('.sw button').forEach(function(x){x.setAttribute('aria-pressed',String(x===b))});document.querySelectorAll('.sec').forEach(function(s){s.hidden=s.id!==b.dataset.s});});});</script></div>
