@@ -836,3 +836,25 @@ html { scroll-behavior: smooth; }
 .jphoto .jfit { position: absolute; left: 8px; bottom: 8px; border-radius: 999px; padding: 3px 10px; font-size: 12px; font-weight: 700; }
 .jphoto .jfit.y { background: #e4f0e8; color: #1f4d3a; }
 .jphoto .jfit.n { background: rgba(27, 26, 24, 0.72); color: #fff; }
+
+/* Never miss an update */
+.lm-track { display: flex; flex-direction: column; gap: 14px; }
+.lm-trackh { background: linear-gradient(135deg, #1f4d3a, #2c6a50); color: #fff; border-radius: 22px; padding: 18px; display: flex; flex-direction: column; gap: 8px; }
+.lm-trackh h2 { margin: 0; font-size: 26px; letter-spacing: -0.035em; color: #fff; }
+.lm-trackh p { margin: 0; font-size: 15px; line-height: 1.45; opacity: 0.92; }
+.lm-tl { list-style: none; margin: 0; padding: 0 4px; display: flex; flex-direction: column; }
+.lm-tl li { display: flex; gap: 12px; align-items: flex-start; position: relative; padding-bottom: 14px; }
+.lm-tl li::before { content: ''; position: absolute; left: 13px; top: 28px; bottom: 0; width: 2px; background: var(--line); }
+.lm-tl li:last-child::before { display: none; }
+.lm-tl i { width: 28px; height: 28px; border-radius: 50%; background: #f9efe4; color: #a8692c; display: grid; place-items: center; font-style: normal; font-weight: 700; font-size: 13px; flex: none; }
+.lm-tl li.done i { background: #e4f0e8; color: #1f4d3a; }
+.lm-tl b { display: block; font-size: 15.5px; }
+.lm-tl li > span > span { font-size: 13.5px; color: var(--muted, #6b655e); }
+.lm-never { margin: 4px 0 0; font-size: 20px; letter-spacing: -0.03em; }
+.lm-pains { display: flex; flex-direction: column; gap: 10px; }
+.lm-pains div { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 13px 14px; display: flex; flex-direction: column; gap: 2px; }
+.lm-pains b { font-size: 15.5px; letter-spacing: -0.02em; }
+.lm-pains span { font-size: 14px; color: var(--muted, #6b655e); }
+.lm-peace { margin: 0; background: #f9efe4; border-radius: 16px; padding: 14px; font-size: 15px; }
+.lm-meet { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; border: 1px solid var(--line); border-radius: 18px; padding: 16px; background: var(--surface); }
+.lm-meet p { margin: 0; font-size: 14.5px; color: var(--ink-2); }

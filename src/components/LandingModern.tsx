@@ -65,7 +65,7 @@ const COPY = {
       ['Know it’s fair', 'An AI cost reference for your project before you commit, so you are not guessing.', 'spark', 'price'],
       ['Your details stay private', 'Your address and contact info go only to the contractor you hire.', 'lock', 'priv'],
     ],
-    also: [['doc', 'Everything in one record', 'Price, scope, photos, changes and payments in one place, not lost in texts.'], ['cal', 'Meet before you hire', 'Ask for a site visit and pick a time that works.']],
+    also: [['cal', 'Meet before you hire', 'Pick a time, see them at your home, then decide. Both sides confirm the visit happened.']],
     fh: 'Ready to get bids on your project?',
   },
   co: {
@@ -82,7 +82,7 @@ const COPY = {
       ['AI price reference', 'See what a job should cost in the area before you bid, so your price is fair and competitive.', 'spark', 'price'],
       ['Rate your homeowners too', 'Homeowners rate you. You rate them. Know who pays on time, decides fast and gives access before you take the job.', 'star', 'both'],
     ],
-    also: [['pay', 'Payments by milestone', 'Request each payment when the work is done. Jobfile records them. It does not hold or move your money.'], ['doc', 'Change orders you can bill', 'Extra work is approved with the price attached before you start it.'], ['cal', 'See the job first', 'Ask the homeowner for a visit before you price it.']],
+    also: [['pay', 'Payments by milestone', 'Request each payment when the work is done. Jobfile records them. It does not hold or move your money.'], ['doc', 'Change orders you can bill', 'Extra work is approved with the price attached before you start it.'], ['cal', 'See the job first', 'Ask the homeowner for a visit before you price it. Both sides confirm it happened.']],
     fh: 'Ready to find your next job?',
   },
 } as const;
@@ -216,9 +216,36 @@ export default function LandingModern({ signedIn, nums, children }: { signedIn: 
         ))}
       </section>
 
-      <section className="lm-also" aria-label="And also">
+      <section className="lm-track" aria-label="Never miss an update">
+        <div className="lm-trackh">
+          <h2>Never miss an update</h2>
+          <p>{side === 'ho' ? 'Every message, photo, change and payment is tracked in one place, so you always know where things stand.' : 'Every message, photo, change and payment is tracked in one place, so nothing is lost and you always have the record.'}</p>
+        </div>
+        <ol className="lm-tl">
+          {([['Price and scope agreed', 'Written down, both sides see it'], ['Change approved', 'Nothing extra without a yes'], ['Photos added', 'Progress and the finished work'], ['Payment recorded', 'A record you can come back to']] as const).map(([t, d], i) => (
+            <li key={t} className={i === 3 ? 'done' : ''}><i aria-hidden="true">{i === 3 ? '✓' : i + 1}</i><span><b>{t}</b><span>{d}</span></span></li>
+          ))}
+        </ol>
+        <h3 className="lm-never">No more “I never got that”</h3>
+        <div className="lm-pains">
+          <div><b>Every change in writing</b><span>Approved by both sides before the work starts.</span></div>
+          <div><b>Proof of what was agreed</b><span>Price, scope and photos in one record.</span></div>
+          <div><b>Nothing lost in texts</b><span>Messages and updates stay with the project.</span></div>
+        </div>
+        <p className="lm-peace"><b>Less worry, fewer arguments.</b> Peace of mind for homeowners and pros.</p>
+      </section>
+
+      {c.also.filter(([ic]) => ic === 'cal').map(([ic, t, d]) => (
+        <section key={t} className="lm-meet" aria-label={t}>
+          <span className="lm-tic o" aria-hidden="true"><Svg n={ic} size={18} /></span>
+          <b>{t}</b>
+          <p>{d}</p>
+        </section>
+      ))}
+
+      {c.also.some(([ic]) => ic !== 'cal') && <section className="lm-also" aria-label="And also">
         <h3>And also</h3>
-        {c.also.map(([ic, t, d], i) => (
+        {c.also.filter(([ic]) => ic !== 'cal').map(([ic, t, d], i) => (
           <div key={t}>
             <button type="button" className="lm-alt" aria-expanded={open === i} onClick={() => setOpen(open === i ? null : i)}>
               <span className="lm-ai"><Svg n={ic} /></span><b>{t}</b>
@@ -227,7 +254,7 @@ export default function LandingModern({ signedIn, nums, children }: { signedIn: 
             {open === i && <p className="lm-altd">{d}</p>}
           </div>
         ))}
-      </section>
+      </section>}
 
       {children}
 
