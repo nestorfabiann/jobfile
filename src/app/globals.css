@@ -959,3 +959,23 @@ html { scroll-behavior: smooth; }
 .dztx b { font-size: 15.5px; }
 .dztx span { font-size: 13px; color: var(--muted, #6b655e); }
 .dzgo { margin-left: auto; color: var(--accent, #c4813f); font-weight: 700; font-size: 22px; }
+
+/* Get the app: two tilted phones */
+.gta-stage { position: relative; height: 330px; border-radius: 22px; overflow: hidden; background: radial-gradient(120% 90% at 50% 0%, #f9efe4, transparent 72%); }
+.gta-ph { position: absolute; width: 150px; height: 300px; border-radius: 26px; border: 5px solid #1b1a18; background: #faf8f4; color: #1b1a18; overflow: hidden; box-shadow: 0 20px 36px -16px rgba(27,26,24,.55); }
+.gta-a { left: 9%; top: 22px; transform: rotate(-8deg); }
+.gta-b { right: 8%; top: 6px; transform: rotate(7deg); background: #2c3a35; }
+.gta-notch { position: absolute; top: 6px; left: 50%; transform: translateX(-50%); width: 44px; height: 12px; border-radius: 9px; background: #1b1a18; z-index: 2; }
+.gta-hs { padding: 26px 10px 8px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 9px 6px; }
+.gta-hs i { display: block; aspect-ratio: 1; border-radius: 10px; background: #d8d4cb; }
+.gta-hs i.gta-jf { background: #c4813f; color: #fff; display: grid; place-items: center; font: 800 15px system-ui, sans-serif; font-style: normal; box-shadow: 0 0 0 2px #fff, 0 0 0 4px #c4813f; }
+.gta-lock { padding: 32px 10px 8px; color: #fff; text-align: center; }
+.gta-t { font: 600 34px system-ui, sans-serif; letter-spacing: -.02em; margin-top: 2px; }
+.gta-d { font-size: 9px; opacity: .85; }
+.gta-nt { margin-top: 8px; background: rgba(255,255,255,.94); color: #1b1a18; border-radius: 12px; padding: 8px 9px; text-align: left; font-size: 9px; line-height: 1.3; display: flex; gap: 7px; }
+.gta-lock .gta-nt:first-of-type { margin-top: 14px; }
+.gta-ni { flex: none; width: 20px; height: 20px; border-radius: 6px; background: #c4813f; color: #fff; display: grid; place-items: center; font: 800 10px system-ui, sans-serif; }
+.gta-nt b { display: block; font-size: 9.5px; }
+.gta-nt small { display: block; color: #666; font-size: 8.5px; }
+@media (prefers-reduced-motion: no-preference) { .gta-b { animation: gtafloat 5s ease-in-out infinite; } }
+@keyframes gtafloat { 0%, 100% { transform: rotate(7deg) translateY(0); } 50% { transform: rotate(7deg) translateY(-5px); } }
