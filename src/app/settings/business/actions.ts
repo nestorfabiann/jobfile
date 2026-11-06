@@ -56,7 +56,8 @@ export async function saveBusinessProfile(formData: FormData) {
   if (error) redirect('/settings/business?error=Could+not+save.+Check+that+the+database+step+was+run.');
   revalidatePath('/settings/business');
   revalidatePath(`/contractors/${companyId}`);
-  redirect('/settings/business?saved=1');
+  const next = txt(formData, 'next', 60);
+  redirect(/^\/marketplace\/[0-9a-f-]{36}$/i.test(next) ? next : '/settings/business?saved=1');
 }
 
 /** Logo (kind=logo) or a work photo (kind=work). The browser shrinks the image first. */

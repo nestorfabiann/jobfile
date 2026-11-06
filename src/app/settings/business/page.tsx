@@ -17,7 +17,7 @@ import { cancelIdCheck } from './idActions';
 
 export const dynamic = 'force-dynamic';
 
-export default async function Business({ searchParams }: { searchParams: { saved?: string; error?: string } }) {
+export default async function Business({ searchParams }: { searchParams: { saved?: string; error?: string; next?: string } }) {
   const me = await myOwnedCompany();
   if (!me) {
     redirect('/settings?error=Only+a+company+owner+can+edit+the+business+profile.');
@@ -94,6 +94,7 @@ export default async function Business({ searchParams }: { searchParams: { saved
       )}
 
       <form action={saveBusinessProfile} className="card">
+        {/^\/marketplace\/[0-9a-f-]{36}$/i.test(searchParams.next ?? '') ? <input type="hidden" name="next" value={searchParams.next} /> : null}
         <h2 id="bp-about" style={{ scrollMarginTop: 80 }}>About your business</h2>
         <label className="fld">Business name<input name="name" defaultValue={c?.name ?? ''} maxLength={120} required /></label>
         <label className="fld">Description (up to 800 characters)<textarea name="about" rows={5} maxLength={800} defaultValue={c?.about ?? ''} /></label>
@@ -128,7 +129,7 @@ export default async function Business({ searchParams }: { searchParams: { saved
             <label className="fld">Business ZIP code<input name="business_zip" inputMode="numeric" maxLength={5} defaultValue={c?.business_zip ?? ''} placeholder="75074" /></label>
             <p className="muted small">Marketplace jobs show how far away they are, and you only get alerts for jobs inside your travel distance (25 miles if you leave it blank). Distances are straight-line estimates.</p>
             <fieldset className="stack" style={{ border: 0, padding: 0, margin: 0 }}>
-              <legend className="small muted">Jobs you want (leave all unchecked to see every type)</legend>
+              <legend className="small muted">Jobs you do (pick at least one to bid)</legend>
               <div className="chips">{Object.keys(JOB_TYPES).map((s) => <label className="chip" key={s}><input type="checkbox" name="trades" value={s} defaultChecked={has(c?.trades, s)} /><span>{s}</span></label>)}</div>
             </fieldset>
             <label className="row" style={{ alignItems: 'flex-start', flexWrap: 'nowrap' }}>

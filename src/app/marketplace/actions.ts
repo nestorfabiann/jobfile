@@ -10,7 +10,7 @@ import { supabaseAdmin } from '@/lib/supabase/server';
 import { notifyUsers } from '@/lib/notify';
 import { dollars, parseDollars } from '@/lib/money';
 import {
-  AI_DAILY_LIMIT, cleanItems, inputHash, JOB_TYPES, listingOpen, listingTitle, MAX_BIDS_PER_DAY, MAX_LISTINGS_PER_DAY, MAX_OPEN_LISTINGS,
+  AI_DAILY_LIMIT, cleanItems, inputHash, JOB_TYPES, listingOpen, listingTitle, MAX_BIDS_PER_DAY, MAX_LISTINGS_PER_DAY, MAX_OPEN_LISTINGS, bidProfileReady,
   requireMarketplace, scopeText, type Bid, type Listing,
 } from '@/lib/marketplace';
 import { aiConfigured, makeReference, makePostReview, type Reference } from '@/lib/marketplaceAI';
@@ -388,6 +388,7 @@ export async function placeBid(formData: FormData) {
   // An admin can hide a business from the marketplace (017). It cannot place new bids while hidden.
   const { data: hc } = await supabaseAdmin().from('companies').select('*').eq('id', co.companyId).maybeSingle<any>();
   if (hc?.hidden_at) back(path, 'Your business is hidden from the marketplace right now, so you cannot place new bids. Contact Jobfile for help.');
+  if (!bidProfileReady(hc)) back(path, 'Add at least one trade and your business ZIP in your business profile before bidding.');
 
   const price = parseDollars(txt(formData, 'price', 20));
   if (price < 100_00 || price > 10_000_000_00) back(path, 'Enter your price in dollars (for example 31400).');

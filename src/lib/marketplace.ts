@@ -155,6 +155,10 @@ export const JOB_TYPES: Record<string, { size: number; sizeLabel: string; groups
   },
 };
 
+/** A company can bid once it lists at least one trade and a 5-digit business ZIP. Matching, alerts and invites depend on both. */
+export const bidProfileReady = (c: { trades?: string[] | null; business_zip?: string | null } | null | undefined) =>
+  !!c && (c.trades ?? []).length > 0 && /^\d{5}$/.test(c.business_zip ?? '');
+
 /** Keeps only items that really exist for that job type, so nothing made up gets stored. */
 export function cleanItems(jobType: string, picked: string[]): { group: string; item: string }[] {
   const t = JOB_TYPES[jobType];

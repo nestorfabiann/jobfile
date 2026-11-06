@@ -10,7 +10,7 @@ import { dollars } from '@/lib/money';
 import { companyReviews, summarize } from '@/lib/reviews';
 import { outsideRatingsFor } from '@/lib/googleRatings';
 import { fmtDate, INSURANCE_KINDS, isCurrent, signedUrls } from '@/lib/companyProfile';
-import { firstNameInitial, JOB_TYPES, listingOpen, listingTitle, requireMarketplace, type Bid, type Listing } from '@/lib/marketplace';
+import { firstNameInitial, JOB_TYPES, listingOpen, listingTitle, requireMarketplace, type Bid, type Listing, bidProfileReady } from '@/lib/marketplace';
 import RangeBar from '@/components/RangeBar';
 import AcceptBid from '@/components/AcceptBid';
 import HireTeam from '@/components/HireTeam';
@@ -203,9 +203,12 @@ export default async function ListingPage({ params, searchParams }: { params: { 
   const shown = (onlyInsured ? visible.filter((b) => info.get(b.company_id)?.insured) : visible).filter((b) => !partnerBidIds.has(b.id));
   // A contractor without current verified insurance gets a nudge, since the badge helps them stand out.
   let needsInsurance = false;
+  let needsProfile = false;
   if (!owner && companyId) {
     const { data: mine } = await db.from('company_insurance').select('status,expires_on').eq('company_id', companyId);
     needsInsurance = !(mine ?? []).some((i: any) => isCurrent(i));
+    const { data: cp } = await db.from('companies').select('trades,business_zip').eq('id', companyId).maybeSingle<any>();
+    needsProfile = !bidProfileReady(cp);
   }
 
   // Side-by-side view: ?compare=<bid id>&compare=<bid id> (2 or 3 bids, homeowner only).
@@ -560,8 +563,8 @@ export default async function ListingPage({ params, searchParams }: { params: { 
             </div>
           ) : null}
           {(() => {
-            const showForm = open && !myTeamPart && !myTeamLead && (!myBid || myBid.status === 'waiting' || myBid.status === 'withdrawn');
-            const showTeam = open && !myPendingTeam && (!myBid || myBid.status === 'withdrawn');
+            const showForm = !needsProfile && open && !myTeamPart && !myTeamLead && (!myBid || myBid.status === 'waiting' || myBid.status === 'withdrawn');
+            const showTeam = !needsProfile && open && !myPendingTeam && (!myBid || myBid.status === 'withdrawn');
             const formJsx = (<form action={placeBid} className="stack" style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               <input type="hidden" name="listing_id" value={l.id} />
               {hasAI && <p className="muted small">AI reference for this scope: {dollars(l.ai_low_cents as number)} – {dollars(l.ai_high_cents as number)}. Bid what the work really costs you.</p>}
@@ -602,6 +605,13 @@ export default async function ListingPage({ params, searchParams }: { params: { 
             );
             return (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 20, marginTop: 6 }}>
+                {open && needsProfile && (!myBid || myBid.status === 'withdrawn') ? (
+                  <div className="box" style={{ background: 'var(--accent-soft, #f9efe4)' }}>
+                    <b>Add your trades and business ZIP to bid.</b>
+                    <span className="small" style={{ display: 'block' }}>Homeowners and the job matching use them to see who works near the job. It takes a minute, and you come right back to this project.</span>
+                    <Link className="btn" style={{ marginTop: 8 }} href={`/settings/business?next=${encodeURIComponent(`/marketplace/${l.id}`)}#bp-where`}>Finish my business profile</Link>
+                  </div>
+                ) : null}
                 {showTeam ? hint : null}
                 {showForm && showTeam ? <BidChoice alone={formJsx} team={teamCard} /> : showForm ? formJsx : showTeam ? teamCard : null}
               </div>
