@@ -1,0 +1,48 @@
+<title>Protecting Invited Contractors</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+:root{--bg:#f6f2ec;--fg:#2a2118;--mut:#6f6356;--ac:#c4813f;--acbg:#f9efe4;--card:#fff;--line:#e4dccf;--ok:#1f6b45;--okbg:#e2f1e8;--bl:#2f5f8a;--blbg:#e6eef6}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1b1713;--fg:#f1e9de;--mut:#a89a8a;--ac:#d99a58;--acbg:#33281c;--card:#262019;--line:#3a3128;--ok:#8fd0ab;--okbg:#173a2c;--bl:#7fb2e0;--blbg:#1c2b3a;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#1b1713;--fg:#f1e9de;--mut:#a89a8a;--ac:#d99a58;--acbg:#33281c;--card:#262019;--line:#3a3128;--ok:#8fd0ab;--okbg:#173a2c;--bl:#7fb2e0;--blbg:#1c2b3a;color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:system-ui,sans-serif;padding-block:20px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));line-height:1.45}
+h1{font-size:21px;margin:0 0 6px}h2{font-size:15px;margin:26px 0 4px}p{margin:0 0 10px;color:var(--mut);max-width:62ch}
+.row{display:flex;gap:16px;flex-wrap:wrap}
+.ph{width:min(100%,290px);border:1px solid var(--line);border-radius:22px;background:var(--bg);padding:14px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.cap{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--mut)}
+.box{border:1px solid var(--line);background:var(--card);border-radius:14px;padding:11px 12px;font-size:13px}
+.box b{display:block;margin-bottom:2px}
+.note{background:var(--blbg);border-color:transparent;color:var(--fg)}
+.good{background:var(--okbg);border-color:transparent}
+.tag{display:inline-block;font-size:11px;font-weight:700;border-radius:99px;padding:1px 8px;background:var(--ok);color:var(--bg);margin-left:6px}
+.btn{background:var(--ac);color:#fff;border-radius:99px;text-align:center;padding:10px;font-weight:700;font-size:13px}
+.ghost{border:1px solid var(--line);border-radius:99px;text-align:center;padding:9px;font-size:13px;background:var(--card)}
+.chips{display:flex;gap:6px;flex-wrap:wrap}.chip{border:1px solid var(--line);border-radius:99px;padding:5px 10px;font-size:12px;background:var(--card)}
+.chip.on{background:var(--acbg);border-color:var(--ac);color:var(--ac)}
+.facts li{margin-bottom:5px}.facts{color:var(--mut);padding-left:18px;max-width:62ch}
+</style>
+<h1>Protecting a contractor's invited customer</h1>
+<p>What I found in the app today: a project a contractor opens for a homeowner has no link to anything the homeowner posts on the marketplace later. The first contractor is never told, and the project's quote and notes stay private to its members.</p>
+<h2>What changes</h2>
+<ul class="facts">
+<li>The invited project stays private. It never shows on Find work. (Already true. We keep it that way.)</li>
+<li>If the homeowner posts the same kind of job within 60 days, the first contractor gets an alert and a place on the bid list.</li>
+<li>A short note on the Post page tells the homeowner this will happen. Nothing is blocked.</li>
+<li>When a homeowner closes the project, they can pick a reason and the contractor sees it.</li>
+</ul>
+<div class="row" style="margin-top:14px">
+<div><div class="cap">1 · Homeowner, Post page</div><div class="ph">
+<div class="box note"><b>You started a project with Rivera Painting</b>If you post this job again, Rivera Painting is told and can bid with everyone else. Your price and notes stay private.</div>
+<div class="box"><b>Job type</b>Painting</div><div class="box"><b>ZIP</b>75201</div><div class="btn">Post my project</div></div></div>
+<div><div class="cap">2 · Contractor, alert</div><div class="ph">
+<div class="box"><b>Maria Lopez posted a painting project</b>She started a project with you 12 days ago. You can bid on this one like everyone else.</div>
+<div class="btn">See the project</div><div class="ghost">Not interested</div></div></div>
+<div><div class="cap">3 · Contractor, bid list</div><div class="ph">
+<div class="box good"><b>Interior painting · Dallas<span class="tag">Your customer</span></b>Maria started a project with you on Oct 25. Bids are open.</div>
+<div class="box"><b>3 other pros can bid</b>They cannot see your quote or notes.</div><div class="btn">Place your bid</div></div></div>
+<div><div class="cap">4 · Homeowner, closing a project</div><div class="ph">
+<div class="box"><b>Why are you closing this project?</b>The contractor will see your answer.</div>
+<div class="chips"><span class="chip">Went with someone else</span><span class="chip on">Changed my mind</span><span class="chip">Too expensive</span><span class="chip">Other</span></div>
+<div class="btn">Close project</div><div class="ghost">Keep it open</div></div></div>
+</div>
+<h2>What it does not do</h2>
+<p>It does not stop the homeowner from posting or hiring anyone. The contractor gets told and a fair chance to win the job.</p>
