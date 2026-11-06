@@ -1,0 +1,46 @@
+<title>Collaborate Page Order</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+:root{--bg:#f6f2ec;--fg:#2a2118;--mut:#6f6356;--ac:#c4813f;--acbg:#f9efe4;--card:#fff;--line:#e4dccf;--ok:#1f6b45;--okbg:#e2f1e8}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1b1713;--fg:#f1e9de;--mut:#a89a8a;--ac:#d99a58;--acbg:#33281c;--card:#262019;--line:#3a3128;--ok:#8fd0ab;--okbg:#173a2c;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#1b1713;--fg:#f1e9de;--mut:#a89a8a;--ac:#d99a58;--acbg:#33281c;--card:#262019;--line:#3a3128;--ok:#8fd0ab;--okbg:#173a2c;color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:system-ui,sans-serif;padding-block:20px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));line-height:1.45}
+h1{font-size:21px;margin:0 0 6px}p.i{margin:0 0 14px;color:var(--mut);max-width:62ch}
+.row{display:flex;gap:18px;flex-wrap:wrap}
+.cap{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);margin-bottom:6px}
+.ph{width:min(100%,330px);border:1px solid var(--line);border-radius:22px;padding:14px;display:flex;flex-direction:column;gap:9px;min-width:0}
+h2{font-size:15px;margin:6px 0 0}h3{font-size:19px;margin:0}
+.box{border:1px solid var(--line);background:var(--card);border-radius:14px;padding:10px 12px;font-size:13px}
+.box b{display:block}.sm{font-size:12px;color:var(--mut)}
+.big{padding:14px}
+.on{background:var(--okbg);color:var(--ok);font-weight:700;font-size:12px;border-radius:99px;padding:3px 12px}
+.btn{border:1px solid var(--line);border-radius:99px;text-align:center;padding:9px;font-size:13px;font-weight:600;background:var(--card)}
+.pri{background:var(--ac);color:#fff;border-color:var(--ac)}
+.rowf{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.tog{width:40px;height:22px;border-radius:99px;background:var(--ok);position:relative;flex:none}.tog:after{content:"";position:absolute;right:3px;top:3px;width:16px;height:16px;border-radius:50%;background:#fff}
+.mv{outline:2px dashed var(--ac);outline-offset:2px}
+a{color:var(--ac);font-size:12px}
+</style>
+<h1>Collaborate page: what comes first</h1>
+<p class="i">Before and after. The dashed outline marks Open to partnering. The after version puts anything that needs action at the top and turns the setting into a slim row near Find a partner.</p>
+<div class="row">
+<div><div class="cap">Before</div><div class="ph">
+<h3>Collaborate</h3>
+<div class="box"><b>How teaming up works</b><span class="sm">Walkthrough, 3 steps</span></div>
+<div class="box big mv"><div class="rowf"><b>Open to partnering</b><span class="on">On</span></div><span class="sm">When on, a badge shows on your public profile and you appear first when nearby companies look for a partner.</span><div class="btn" style="margin-top:8px">Turn off</div></div>
+<h2>Invites waiting (1)</h2>
+<div class="box"><b>Plano Pro Paint invited you</b><span class="sm">Kitchen and walls painting</span></div>
+<h2>My team bids</h2><div class="box sm">None yet.</div>
+<h2>Find a partner</h2><div class="box sm">Nearby companies</div>
+</div></div>
+<div><div class="cap">After</div><div class="ph">
+<h3>Collaborate</h3>
+<h2 style="margin-top:0">Invites waiting (1)</h2>
+<div class="box" style="border-color:var(--ac)"><b>Plano Pro Paint invited you</b><span class="sm">Kitchen and walls painting</span><div class="btn pri" style="margin-top:8px">Review the invite</div></div>
+<h2>My team bids</h2><div class="box sm">None yet.</div>
+<h2>Jobs where I'm a partner</h2><div class="box sm">None yet.</div>
+<div class="box"><b>How teaming up works</b><span class="sm">Walkthrough. Collapses once you have team activity.</span></div>
+<div class="box mv"><div class="rowf"><div><b style="display:inline">Open to partnering</b> <span class="on">On</span><br><a href="#" onclick="return false">What this does</a></div><span class="tog" aria-label="On"></span></div></div>
+<h2>Find a partner</h2><div class="box sm">Nearby companies</div>
+</div></div>
+</div>
