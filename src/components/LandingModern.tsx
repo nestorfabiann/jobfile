@@ -154,21 +154,7 @@ export default function LandingModern({ signedIn, nums, children }: { signedIn: 
   const [held, setHeld] = useState(false);
   const [reduce, setReduce] = useState(false);
   const stepsRef = useRef<HTMLElement | null>(null);
-  // "Never miss an update" plays once when it scrolls into view. Without motion it simply shows.
-  const trackRef = useRef<HTMLElement | null>(null);
-  const [trackArm, setTrackArm] = useState(false);
-  const [trackGo, setTrackGo] = useState(false);
   const STEP_MS = 4000;
-  useEffect(() => {
-    const el = trackRef.current;
-    let calm = false;
-    try { calm = !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches; } catch { /* fine */ }
-    if (!el || calm || typeof IntersectionObserver === 'undefined') return;
-    setTrackArm(true);
-    const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setTrackGo(true); io.disconnect(); } }, { threshold: 0.3 });
-    io.observe(el);
-    return () => io.disconnect();
-  }, []);
   useEffect(() => {
     try { setReduce(!!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches); } catch { /* fine */ }
     const el = stepsRef.current;
@@ -260,27 +246,21 @@ export default function LandingModern({ signedIn, nums, children }: { signedIn: 
         ))}
       </section>
 
-      <section ref={trackRef} className={`lm-track${trackArm ? ' lm-arm' : ''}${trackGo ? ' lm-go' : ''}`} aria-label="Never miss an update">
+      <section className="lm-track" aria-label="Never miss an update">
         <div className="lm-trackh">
-          <div className="lm-bellrow">
-            <span className="lm-bell" aria-hidden="true">
-              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" /><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" /></svg>
-              <i className="lm-bdot" />
-            </span>
-            <h2>Never miss an update</h2>
-          </div>
+          <h2>Never miss an update</h2>
           <p>{side === 'ho' ? 'Every message, photo, change and payment is tracked in one place, so you always know where things stand.' : 'Every message, photo, change and payment is tracked in one place, so nothing is lost and you always have the record.'}</p>
         </div>
         <ol className="lm-tl">
           {([['Price and scope agreed', 'Written down, both sides see it'], ['Change approved', 'Nothing extra without a yes'], ['Photos added', 'Progress and the finished work'], ['Payment recorded', 'A record you can come back to']] as const).map(([t, d], i) => (
-            <li key={t} className={i === 3 ? 'done' : ''} style={{ ['--i' as any]: i }}><i aria-hidden="true">{i === 3 ? '✓' : i + 1}</i><span><b>{t}</b><span>{d}</span></span></li>
+            <li key={t} className={i === 3 ? 'done' : ''}><i aria-hidden="true">{i === 3 ? '✓' : i + 1}</i><span><b>{t}</b><span>{d}</span></span></li>
           ))}
         </ol>
         <h3 className="lm-never">No more “I never got that”</h3>
         <div className="lm-pains">
-          <div style={{ ['--c' as any]: 0 }}><b>Every change in writing</b><span>Approved by both sides before the work starts.</span></div>
-          <div style={{ ['--c' as any]: 1 }}><b>Proof of what was agreed</b><span>Price, scope and photos in one record.</span></div>
-          <div style={{ ['--c' as any]: 2 }}><b>Nothing lost in texts</b><span>Messages and updates stay with the project.</span></div>
+          <div><b>Every change in writing</b><span>Approved by both sides before the work starts.</span></div>
+          <div><b>Proof of what was agreed</b><span>Price, scope and photos in one record.</span></div>
+          <div><b>Nothing lost in texts</b><span>Messages and updates stay with the project.</span></div>
         </div>
         <p className="lm-peace"><b>Less worry, fewer arguments.</b> Peace of mind for homeowners and pros.</p>
       </section>
