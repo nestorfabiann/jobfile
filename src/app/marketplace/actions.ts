@@ -64,7 +64,7 @@ export async function getReference(input: { jobType: string; items: string[]; si
 
   const r = await makeReference({ jobType, items: picked, size, zip, city: '', details });
   if (!r.ok) return r;
-  const hash = inputHash(jobType, picked.map((p) => p.item), size, zip, baseDetails);
+  const hash = inputHash(jobType, picked.map((p) => p.item), size, zip, details);
   const { data: row } = await db.from('marketplace_ai_calls').insert({ user_id: user.id, input_hash: hash, result: r.ref }).select('id').single();
   if (!row) return { ok: false, error: 'Could not save the reference. Try again.' };
   return { ok: true, id: row.id as string, ref: r.ref };
@@ -117,7 +117,7 @@ async function createListingInner(formData: FormData): Promise<CreateResult> {
   if (refId) {
     const { data: call } = await db.from('marketplace_ai_calls').select('input_hash,result,created_at').eq('id', refId).eq('user_id', user.id).maybeSingle();
     const fresh = call && Date.now() - new Date(call.created_at as string).getTime() < 3 * 3600_000;
-    if (fresh && call.input_hash === inputHash(jobType, picked.map((p) => p.item), size, zip, details)) ref = call.result as Reference;
+    if (fresh && call.input_hash === inputHash(jobType, picked.map((p) => p.item), size, zip, baseDetails)) ref = call.result as Reference;
   }
 
   let answers: Record<string, string> = {};
