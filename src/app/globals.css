@@ -894,3 +894,10 @@ html { scroll-behavior: smooth; }
 /* Kept for screen readers only; the caption already shows each step. */
 .tw-text { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 @media (prefers-reduced-motion: reduce) { .tw-a, .tw-pulse { animation: none; } .tw-prog button.cur::after { animation: none; transform: scaleX(1); } }
+
+/* Three steps autoplay progress bar */
+.lm-st { position: relative; overflow: hidden; }
+.lm-sbar { position: absolute; left: 0; bottom: 0; height: 3px; background: var(--accent, #c4813f); width: 0; animation: lm-sfill linear both; }
+.lm-hold .lm-sbar { animation-play-state: paused; }
+@keyframes lm-sfill { from { width: 0; } to { width: 100%; } }
+@media (prefers-reduced-motion: reduce) { .lm-sbar { display: none; } }

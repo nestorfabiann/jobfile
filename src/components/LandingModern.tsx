@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import Link from 'next/link';
 
 type Side = 'ho' | 'co';
@@ -147,6 +147,34 @@ export default function LandingModern({ signedIn, nums, children }: { signedIn: 
   const [side, setSide] = useState<Side>('ho');
   const [step, setStep] = useState(0);
   const [open, setOpen] = useState<number | null>(null);
+  // Autoplay for the three steps: starts a moment after the section is on screen, stops for good when someone taps a step.
+  const [inView, setInView] = useState(false);
+  const [ready, setReady] = useState(false);
+  const [stopped, setStopped] = useState(false);
+  const [held, setHeld] = useState(false);
+  const [reduce, setReduce] = useState(false);
+  const stepsRef = useRef<HTMLElement | null>(null);
+  const STEP_MS = 4000;
+  useEffect(() => {
+    try { setReduce(!!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches); } catch { /* fine */ }
+    const el = stepsRef.current;
+    if (!el || typeof IntersectionObserver === 'undefined') return;
+    const io = new IntersectionObserver(([e]) => setInView(e.isIntersecting), { threshold: 0.45 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+  useEffect(() => {
+    setReady(false);
+    if (!inView || stopped || reduce) return;
+    setStep(0);
+    const t = setTimeout(() => setReady(true), 1500);
+    return () => clearTimeout(t);
+  }, [inView, stopped, reduce]);
+  useEffect(() => {
+    if (!ready || held || stopped || reduce) return;
+    const t = setTimeout(() => setStep((x) => (x + 1) % 3), STEP_MS);
+    return () => clearTimeout(t);
+  }, [ready, held, stopped, reduce, step]);
   const c = COPY[side as Side];
   const homeHref = signedIn ? '/marketplace/new' : `/login?next=${encodeURIComponent('/marketplace/new')}`;
   const proHref = signedIn ? '/settings/business' : `/login?next=${encodeURIComponent('/settings/business')}`;
@@ -171,12 +199,14 @@ export default function LandingModern({ signedIn, nums, children }: { signedIn: 
         <div className="lm-phone"><div key={`${side}-${step}`} className="lm-fade"><Screen side={side} step={step} /></div></div>
       </section>
 
-      <section className="lm-steps" aria-label="How it works">
-        <h2>Three steps. Tap one.</h2>
+      <section ref={stepsRef} className={`lm-steps${held ? ' lm-hold' : ''}`} aria-label="How it works"
+        onPointerDown={() => setHeld(true)} onPointerUp={() => setHeld(false)} onPointerCancel={() => setHeld(false)} onPointerLeave={() => setHeld(false)}>
+        <h2>How it works in 3 steps</h2>
         {c.steps.map(([t, d], i) => (
-          <button key={t} type="button" className="lm-st" aria-pressed={step === i} onClick={() => setStep(i)}>
+          <button key={t} type="button" className="lm-st" aria-pressed={step === i} onClick={() => { setStep(i); setStopped(true); }}>
             <span className="lm-n">{i + 1}</span>
             <span><b>{t}</b><span className="lm-d">{d}</span></span>
+            {step === i && ready && !stopped && !reduce ? <i key={`${side}-${step}`} className="lm-sbar" style={{ animationDuration: `${STEP_MS}ms` }} aria-hidden="true" /> : null}
           </button>
         ))}
       </section>
