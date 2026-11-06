@@ -42,6 +42,7 @@ export default async function Marketplace({ searchParams }: { searchParams: { ty
   const away = new Map<string, number>();
   let coordMap = new Map<string, [number, number]>();
   let hiddenByTrade = 0;
+  let hiddenByDist = 0;
   if (isPro) {
     if (!allTrades) {
       const before = listings.length;
@@ -54,7 +55,9 @@ export default async function Marketplace({ searchParams }: { searchParams: { ty
       const me = coords.get(bizZip);
       if (me) {
         listings.forEach((l) => { const at = coords.get(l.zip); if (at) away.set(l.id, miles(me, at)); });
+        const beforeD = listings.length;
         listings = listings.filter((l) => !away.has(l.id) || (away.get(l.id) as number) <= limitMi);
+        hiddenByDist = beforeD - listings.length;
         listings.sort((a, b) => (away.get(a.id) ?? Infinity) - (away.get(b.id) ?? Infinity));
       }
     }
@@ -175,6 +178,17 @@ export default async function Marketplace({ searchParams }: { searchParams: { ty
         </>
       )}
 
+      {isPro && (hiddenByTrade > 0 || hiddenByDist > 0) && (
+        <div className="box" style={{ background: 'var(--accent-soft, #f9efe4)', display: 'flex', flexDirection: 'column', gap: 6 }} role="status">
+          <b>{hiddenByTrade + hiddenByDist} open job{hiddenByTrade + hiddenByDist === 1 ? ' is' : 's are'} hidden</b>
+          <span className="small">{[hiddenByTrade > 0 ? `${hiddenByTrade} outside your trades` : '', hiddenByDist > 0 ? `${hiddenByDist} farther than ${miParam} miles` : ''].filter(Boolean).join(' · ')}</span>
+          <span className="row" style={{ gap: 8 }}>
+            {hiddenByTrade > 0 ? <Link scroll={false} className="btn ghost" href={qs({ trades: 'all' })}>Show all trades</Link> : null}
+            {hiddenByDist > 0 ? <Link scroll={false} className="btn ghost" href={qs({ mi: 'any' })}>Any distance</Link> : null}
+          </span>
+        </div>
+      )}
+
       {mapView && meAt && (
         <>
           <ProjectsMap me={{ lat: meAt[0], lng: meAt[1] }} radiusMi={Number.isFinite(limitMi) ? limitMi : null} groups={mapGroups} />
@@ -183,7 +197,7 @@ export default async function Marketplace({ searchParams }: { searchParams: { ty
       )}
 
       {listings.length === 0 && (
-        <div className="card"><p className="muted">{isPro ? 'No open projects right now. Check back soon.' : 'You have not posted a project yet.'}</p></div>
+        <div className="card"><p className="muted">{isPro ? (hiddenByTrade + hiddenByDist > 0 ? 'No jobs match your trades and distance. See the note above to show the hidden ones.' : 'No open projects right now. Check back soon.') : 'You have not posted a project yet.'}</p></div>
       )}
 
       {qs2.length > 0 && (
@@ -260,7 +274,7 @@ export default async function Marketplace({ searchParams }: { searchParams: { ty
         );
       })}
       {isPro && hiddenByTrade > 0 && (
-        <p className="muted small">{hiddenByTrade} job{hiddenByTrade === 1 ? '' : 's'} in other trades hidden. <Link href={qs({ trades: 'all' })}>Show all trades</Link> or change your trades in Settings.</p>
+        <p className="muted small">You can change your trades in <Link href="/settings/business">Settings</Link>.</p>
       )}
     </>
   );

@@ -2,6 +2,7 @@ import { supabaseAdmin } from '@/lib/supabase/server';
 import { JOB_TYPES } from '@/lib/marketplace';
 import { publicReviews, summarize } from '@/lib/reviews';
 import { signedUrls } from '@/lib/companyProfile';
+import { DEFAULT_RADIUS, miles, zipCoords } from '@/lib/matching';
 
 /** What a signed-out visitor may see. No street address, homeowner name, notes, budget, photos or bidder names. */
 export type PublicListing = {
@@ -62,6 +63,30 @@ export async function listingThumbs(ids: string[]) {
   });
   const urls = await signedUrls('listing-photos', Array.from(first.values()), 3600);
   first.forEach((path, id) => { out.get(id)!.url = urls.get(path) ?? null; });
+  return out;
+}
+
+/** For a signed-in contractor: does each job match their trades and service area? Used for the tags on Home. */
+export async function contractorFit(userId: string, listings: { id: string; job_type: string; zip: string }[]) {
+  const out = new Map<string, { ok: boolean; label: string }>();
+  try {
+    const db = supabaseAdmin();
+    const { data: m } = await db.from('company_members').select('company_id').eq('user_id', userId).limit(1);
+    const cid = (m ?? [])[0]?.company_id as string | undefined;
+    if (!cid) return out;
+    const { data: co } = await db.from('companies').select('business_zip,service_radius_mi,trades').eq('id', cid).maybeSingle<any>();
+    const trades: string[] = co?.trades ?? [];
+    const radius: number = co?.service_radius_mi ?? DEFAULT_RADIUS;
+    const coords = co?.business_zip ? await zipCoords([co.business_zip as string, ...listings.map((l) => l.zip)]) : new Map<string, [number, number]>();
+    const me = co?.business_zip ? coords.get(co.business_zip as string) : undefined;
+    listings.forEach((l) => {
+      const at = me ? coords.get(l.zip) : undefined;
+      const mi = me && at ? miles(me, at) : null;
+      if (trades.length && !trades.includes(l.job_type)) out.set(l.id, { ok: false, label: 'Outside your trades' });
+      else if (mi != null && mi > radius) out.set(l.id, { ok: false, label: `Farther than your ${radius} mi radius` });
+      else out.set(l.id, { ok: true, label: mi != null ? `✓ Matches you · ${Math.round(mi)} mi` : '✓ Matches your trade' });
+    });
+  } catch { /* tags are a bonus */ }
   return out;
 }
 

@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { supabaseServer } from '@/lib/supabase/server';
 import { marketplaceEnabled } from '@/lib/marketplace';
-import { isContractor, landingStats, listingThumbs, publicListings } from '@/lib/publicMarketplace';
+import { contractorFit, isContractor, landingStats, listingThumbs, publicListings } from '@/lib/publicMarketplace';
 import PublicJobCard from '@/components/PublicJobCard';
 import LandingModern from '@/components/LandingModern';
 
@@ -15,6 +15,7 @@ export default async function Home() {
 
   const { listings, counts } = await publicListings('', 3);
   const thumbs = (await isContractor(user?.id)) ? await listingThumbs(listings.map((l) => l.id)) : null;
+  const fits = thumbs && user ? await contractorFit(user.id, listings) : null;
   const st = await landingStats();
   const nums: [string, string][] = [];
   if (st.posted) nums.push([st.posted.toLocaleString('en-US'), 'Projects posted']);
@@ -64,7 +65,7 @@ export default async function Home() {
           {listings.length === 0 ? (
             <div className="card"><p className="muted" style={{ margin: 0 }}>No open projects right now. Be the first to post one.</p></div>
           ) : (
-            listings.map((l) => <PublicJobCard key={l.id} l={l} bids={counts.get(l.id) ?? 0} photos={thumbs?.get(l.id)} />)
+            listings.map((l) => <PublicJobCard key={l.id} l={l} bids={counts.get(l.id) ?? 0} photos={thumbs?.get(l.id)} fit={fits?.get(l.id)} />)
           )}
           <Link className="btn ghost" href="/jobs">See all open jobs →</Link>
         </section>

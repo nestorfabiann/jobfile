@@ -7,7 +7,7 @@ import type { PublicListing } from '@/lib/publicMarketplace';
 const when = (iso: string) => new Date(iso).toLocaleDateString('en-US', { timeZone: 'America/Chicago', month: 'short', day: 'numeric' });
 
 /** A job in a list. Photos are shown only to signed-in contractors (`photos` is passed), never to signed-out visitors. */
-export default function PublicJobCard({ l, bids, photos }: { l: PublicListing; bids: number; photos?: { url: string | null; count: number } }) {
+export default function PublicJobCard({ l, bids, photos, fit }: { l: PublicListing; bids: number; photos?: { url: string | null; count: number }; fit?: { ok: boolean; label: string } }) {
   const hasAI = l.ai_low_cents != null && l.ai_high_cents != null;
   const withPhoto = !!photos;
   return (
@@ -20,6 +20,7 @@ export default function PublicJobCard({ l, bids, photos }: { l: PublicListing; b
           ) : <span className="jnone"><TradeIcon trade={l.job_type} size={28} />No photo yet</span>}
           <span className="pill jtl"><TradeIcon trade={l.job_type} size={15} />{l.job_type}</span>
           <span className="pill ok jtr">Open</span>
+          {fit ? <span className={`jfit ${fit.ok ? 'y' : 'n'}`}>{fit.label}</span> : null}
           {photos!.count > 1 ? <span className="jct">{photos!.count} photos</span> : null}
         </div>
       ) : (

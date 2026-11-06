@@ -821,3 +821,6 @@ html { scroll-behavior: smooth; }
 .jphoto .jtr { right: 8px; }
 .jphoto .jct { position: absolute; right: 8px; bottom: 8px; background: rgba(27, 26, 24, 0.72); color: #fff; border-radius: 999px; padding: 2px 9px; font-size: 12px; font-weight: 700; }
 .jphoto .jnone { display: flex; flex-direction: column; align-items: center; gap: 4px; color: #a8692c; font-size: 13px; font-weight: 700; }
+.jphoto .jfit { position: absolute; left: 8px; bottom: 8px; border-radius: 999px; padding: 3px 10px; font-size: 12px; font-weight: 700; }
+.jphoto .jfit.y { background: #e4f0e8; color: #1f4d3a; }
+.jphoto .jfit.n { background: rgba(27, 26, 24, 0.72); color: #fff; }
