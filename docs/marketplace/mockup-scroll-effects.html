@@ -142,7 +142,9 @@ h2{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;
 .old{opacity:.8;border-top:1px solid #e4dfd6;padding:8px 0;font-size:11px;font-weight:700;display:flex;justify-content:space-between}
 
 .sc{overflow-y:auto!important;scroll-behavior:smooth;display:block!important;padding-bottom:0!important}
-.sc>*{margin-bottom:12px}
+.sc{overscroll-behavior:contain;touch-action:pan-y;-webkit-overflow-scrolling:touch}
+.sc>*{margin-bottom:46px}
+.sc>.stk{margin-bottom:0}
 .rv{opacity:0;transform:translateY(14px);transition:opacity .5s ease,transform .5s ease}.rv.in{opacity:1;transform:none}
 .fx-off .rv{opacity:1;transform:none;transition:none}
 .tl2{display:flex;flex-direction:column;padding-left:4px}
@@ -162,7 +164,7 @@ h2{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;
 @media (prefers-reduced-motion:reduce){.rv{opacity:1;transform:none;transition:none}.t2:after{height:calc(100% - 24px)}.stk{opacity:1;transform:none}}
 </style><div class="wrap"><div class="note"><b>Mockup.</b> Scroll inside the phone to try the effects. Numbers are examples.</div><h2>Scroll effects</h2><p class="mut">Small, calm motion. No pop-ups.</p>
 <div class="sw" role="group" aria-label="Screen"><button type="button" data-s="a" aria-pressed="true">1 &middot; Try it</button><button type="button" data-s="b" aria-pressed="false">2 &middot; What I would add</button></div>
-<div class="sec" id="a"><div class="fxs"><button type="button" data-f="on" aria-pressed="true">Effects on</button><button type="button" data-f="off" aria-pressed="false">Effects off</button></div><p class="hint">Scroll inside the phone. Reload to replay.</p><div class="stage"><div class="ph"><div class="url">Landing</div><div class="body sc" id="sc">
+<div class="sec" id="a"><div class="fxs"><button type="button" data-f="on" aria-pressed="true">Effects on</button><button type="button" data-f="off" aria-pressed="false">Effects off</button></div><div class="fxs"><button type="button" id="play" aria-pressed="true">▶ Play the demo</button></div><p class="hint">It scrolls by itself, slowly. You can also scroll inside the phone.</p><div class="stage"><div class="ph"><div class="url">Landing</div><div class="body sc" id="sc">
 <div class="rv in"><div class="hero2" style="background:linear-gradient(135deg,#c4813f,#a8692c);color:#fff;border-radius:20px;padding:14px"><h3 style="font:800 20px/1.1 'Bricolage Grotesque',sans-serif;margin:0 0 6px;color:#fff">Hire with confidence</h3><p style="margin:0;font-size:11.5px">Scroll down. Each block rises in as it appears.</p></div></div>
 <div class="nums rv"><div><b data-n="312">0</b><span>Projects posted</span></div><div><b data-n="48">0</b><span>Local pros</span></div><div><b data-n="4.8" data-d="1">0</b><span>Avg. rating</span></div></div>
 <div class="gr rv"><div class="tc"><span class="ic o"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6z"/></svg></span><b>Insurance checked</b></div><div class="tc"><span class="ic g"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/></svg></span><b>Free, no fees</b></div></div>
@@ -183,4 +185,10 @@ document.querySelectorAll('.t2').forEach(function(el,i){el.style.setProperty('--
 sc.addEventListener('scroll',function(){stk.classList.toggle('show',sc.scrollTop>180)});
 document.querySelectorAll('.sw button').forEach(function(b){b.addEventListener('click',function(){document.querySelectorAll('.sw button').forEach(function(x){x.setAttribute('aria-pressed',String(x===b))});document.querySelectorAll('.sec').forEach(function(s){s.hidden=s.id!==b.dataset.s})})});
 document.querySelectorAll('.fxs button').forEach(function(b){b.addEventListener('click',function(){document.querySelectorAll('.fxs button').forEach(function(x){x.setAttribute('aria-pressed',String(x===b))});wrap.classList.toggle('fx-off',b.dataset.f==='off')})});
+
+var timer=null;
+function reset(){clearInterval(timer);sc.style.scrollBehavior='auto';sc.scrollTop=0;stk.classList.remove('show');document.querySelectorAll('.rv,.t2').forEach(function(el){el.classList.remove('in');if(!el.classList.contains('t2')&&el===document.querySelector('.rv'))el.classList.add('in');io.observe(el)});document.querySelectorAll('[data-n]').forEach(function(n){n.dataset.done='';n.textContent='0'});sc.style.scrollBehavior='smooth'}
+function play(){reset();var y=0,max=sc.scrollHeight-sc.clientHeight;setTimeout(function(){timer=setInterval(function(){y+=1.2;sc.scrollTop=y;sc.style.scrollBehavior='auto';if(y>=max)clearInterval(timer)},16)},700)}
+document.getElementById('play').addEventListener('click',play);
+setTimeout(play,600);
 </script></div>
