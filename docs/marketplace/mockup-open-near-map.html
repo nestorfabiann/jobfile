@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Open Near You Map</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#c4813f;--orl:#f9efe4;--orb:#ecd4a8;--fg:#1f4d3a;--page:#e9e5dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--page:#0d0c0b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--page:#0d0c0b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:14px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px}
+h2{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;font-size:28px;line-height:1.05}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
+.sw{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.sw button,.rp{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:9px 4px;border-radius:99px;font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer}
+.sw button[aria-pressed=true]{background:var(--or);border-color:var(--or);color:#fff}
+.rp{width:100%;font-weight:600}
+.stage{display:flex;justify-content:center;padding:22px 0 8px;border-radius:30px;background:radial-gradient(120% 80% at 50% 0%,var(--orl),transparent 70%)}
+.ph{width:min(330px,92%);height:690px;background:#faf8f4;color:#1b1a18;border:7px solid #1b1a18;border-radius:36px;overflow:hidden;box-shadow:0 22px 44px -18px rgba(27,26,24,.45);display:flex;flex-direction:column}
+.url{height:40px;background:#f3f1ec;display:flex;align-items:center;justify-content:center;font-size:11px;color:#6b655e;padding-top:8px;flex:none}
+.pb{flex:1;padding:12px;display:flex;flex-direction:column;gap:10px;font-size:12px;line-height:1.4;overflow:hidden}
+.nm-hero{background:linear-gradient(135deg,#2f5a45,#3a6b52);color:#fff;border-radius:18px;padding:13px 14px;display:flex;gap:10px;align-items:flex-start}
+.nm-hero b{display:block;font:800 18px/1.05 'Bricolage Grotesque',sans-serif;letter-spacing:-.03em}.nm-hero span{font-size:11px;opacity:.95;display:block;margin-top:4px}
+.nm-bell{position:relative;flex:none;width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.16);display:grid;place-items:center;transform-origin:50% 12%}
+.nm-bell svg{width:20px;height:20px}
+.nm-dot{position:absolute;top:3px;right:3px;width:11px;height:11px;border-radius:50%;background:#e5484d;border:2px solid #2f5a45;transform:scale(0)}
+.go .nm-bell{animation:ring 1.1s .4s ease-in-out 1}
+.go .nm-dot{animation:pop .35s 1.1s cubic-bezier(.3,1.6,.5,1) forwards}
+@keyframes ring{0%,100%{transform:rotate(0)}15%{transform:rotate(18deg)}30%{transform:rotate(-16deg)}45%{transform:rotate(12deg)}60%{transform:rotate(-9deg)}75%{transform:rotate(5deg)}}
+@keyframes pop{to{transform:scale(1)}}
+.nm-tl{display:flex;flex-direction:column}
+.nm-st{display:flex;gap:11px;position:relative;padding-bottom:11px}
+.nm-st:last-child{padding-bottom:0}
+.nm-st::before{content:'';position:absolute;left:14px;top:30px;bottom:-1px;width:2px;background:#e4dfd6;transform-origin:top;}
+.nm-st:last-child::before{display:none}
+.nm-st::after{content:'';position:absolute;left:14px;top:30px;bottom:-1px;width:2px;background:#1f4d3a;transform:scaleY(0);transform-origin:top}
+.nm-st:last-child::after{display:none}
+.nm-n{flex:none;width:30px;height:30px;border-radius:50%;background:#f9efe4;color:#a8692c;display:grid;place-items:center;font:800 12px 'IBM Plex Sans',sans-serif;position:relative;z-index:1;transition:background .3s,color .3s}
+.nm-st b{display:block;font:800 13px/1.15 'Bricolage Grotesque',sans-serif;letter-spacing:-.02em}
+.nm-st small{font-size:11px;color:#6b655e}
+.nm-st .tx{padding-top:2px;flex:1}
+.go .nm-st .nm-n{animation:npop .5s calc(var(--i)*.55s + .2s) cubic-bezier(.3,1.6,.5,1) both}
+.go .nm-st::after{animation:draw .45s calc(var(--i)*.55s + .5s) ease-out forwards}
+.go .nm-st .nm-n.dn{animation-name:npop}
+@keyframes npop{0%{transform:scale(.6);background:#f9efe4}55%{transform:scale(1.22);background:#c4813f;color:#fff}100%{transform:scale(1);background:#c4813f;color:#fff}}
+@keyframes draw{to{transform:scaleY(1)}}
+.nm-ck{background:#e4f0e8!important;color:#1f4d3a!important}
+.go .nm-st:last-child .nm-n{animation:cpop .6s calc(var(--i)*.55s + .2s) cubic-bezier(.3,1.6,.5,1) both}
+@keyframes cpop{0%{transform:scale(.5);background:#f9efe4}60%{transform:scale(1.3);background:#1f4d3a;color:#fff}100%{transform:scale(1);background:#e4f0e8;color:#1f4d3a}}
+.nm-h{font:800 17px/1.1 'Bricolage Grotesque',sans-serif;letter-spacing:-.03em;margin:2px 0 0}
+.nm-cd{background:#fff;border:1px solid #e4dfd6;border-radius:14px;padding:9px 11px;display:flex;gap:9px;align-items:center;opacity:0;transform:translateY(14px)}
+.nm-cd b{display:block;font:800 12.5px 'Bricolage Grotesque',sans-serif}.nm-cd span{font-size:10.5px;color:#6b655e}
+.nm-ic{flex:none;width:26px;height:26px;border-radius:8px;background:#f9efe4;display:grid;place-items:center;font-size:13px}
+.go .nm-cd{animation:rise .5s calc(2.9s + var(--c)*.25s) ease-out forwards}
+@keyframes rise{to{opacity:1;transform:none}}
+.nm-hd{opacity:0}.go .nm-hd{animation:rise .4s 2.7s ease-out forwards}
+/* fuller version: tap a step */
+.tp{cursor:pointer}
+.nm-ex{display:none;margin-top:6px;background:#fff;border:1px solid #ecd4a8;border-radius:10px;padding:7px 9px;font-size:10.5px;color:#4a453f;animation:rise .3s ease-out forwards;opacity:0}
+.nm-ex .rw{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.nm-ex .ok{background:#e4f0e8;color:#1f4d3a;border-radius:99px;padding:1px 8px;font-weight:700;font-size:9.5px}
+.nm-st.open .nm-ex{display:block}
+.chev{font-size:10px;color:#c4813f;font-weight:700;margin-left:4px}
+.nm-st.hint .nm-n{box-shadow:0 0 0 0 rgba(196,129,63,.5);animation:pulse 1.6s 1 ease-out}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(196,129,63,.55)}100%{box-shadow:0 0 0 12px rgba(196,129,63,0)}}
+.tapnote{font-size:10px;color:#8a8379;text-align:center}
+.tabs{height:50px;background:#fff;border-top:1px solid #e4dfd6;display:flex;justify-content:space-around;align-items:center;font-size:9.5px;color:#6b655e;flex:none}
+.why{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:9px}
+.why ul{margin:0;padding-left:18px;color:var(--mut);font-size:14px;line-height:1.5;display:flex;flex-direction:column;gap:6px}.why li b{color:var(--ink)}
+.sec[hidden]{display:none}.sec{display:flex;flex-direction:column;gap:14px}
+@media (prefers-reduced-motion:reduce){.go *{animation:none!important}.nm-cd,.nm-hd{opacity:1;transform:none}.nm-dot{transform:scale(1)}.nm-st::after{transform:scaleY(1)}.nm-n{background:#c4813f;color:#fff}.nm-ck{background:#e4f0e8!important;color:#1f4d3a!important}}
+
+.nm-hero{background:linear-gradient(135deg,#2f5a45,#3a6b52);color:#fff;border-radius:18px;padding:13px 14px;display:block}
+.nm-hero b{display:block;font:800 18px/1.05 'Bricolage Grotesque',sans-serif;letter-spacing:-.03em}.nm-hero span{font-size:11px;opacity:.95;display:block;margin-top:4px}
+.mg{display:flex;flex-direction:column}
+.mst{position:relative;padding-bottom:9px;display:flex;gap:11px;cursor:pointer}
+.mst::before{content:'';position:absolute;left:14px;top:30px;bottom:-1px;width:2px;background:#e4dfd6}.mst:last-child::before{display:none}
+.mn{flex:none;width:30px;height:30px;border-radius:50%;background:#f9efe4;color:#a8692c;display:grid;place-items:center;font:800 12px 'IBM Plex Sans',sans-serif;position:relative;z-index:1}
+.mck{background:#e4f0e8;color:#1f4d3a}
+.mst .tx{flex:1;padding-top:1px}.mst b{display:block;font:800 13px/1.15 'Bricolage Grotesque',sans-serif;letter-spacing:-.02em}
+.mst small{font-size:10.5px;color:#6b655e;display:block}
+.pay{display:block;font-size:10.5px;color:#1f4d3a;font-weight:600;margin-top:2px}
+.chv{position:absolute;right:0;top:6px;color:#c4813f;font-weight:700;font-size:13px;transition:transform .2s}
+.mst.open .chv{transform:rotate(90deg)}
+.mex{display:none;margin-top:6px;background:#fff;border:1px solid #ecd4a8;border-radius:10px;padding:7px 9px;font-size:10.5px;color:#4a453f}
+.mst.open .mex{display:block}
+.mex .rw{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.mex .ok{background:#e4f0e8;color:#1f4d3a;border-radius:99px;padding:1px 8px;font-weight:700;font-size:9.5px}
+.peace{background:#f9efe4;border-radius:14px;padding:10px 12px;font-size:11.5px}
+.nh{font:800 16px/1.1 'Bricolage Grotesque',sans-serif;letter-spacing:-.03em;margin:2px 0 0}
+.nc{background:#fff;border:1px solid #e4dfd6;border-radius:14px;padding:8px 11px}.nc b{display:block;font:800 12px 'Bricolage Grotesque',sans-serif}.nc span{font-size:10.5px;color:#6b655e}
+.tn{font-size:10px;color:#8a8379;text-align:center}
+
+.bo{display:flex;flex-direction:column;gap:8px}
+.bl{font-size:12px;font-weight:600;color:var(--mut);text-transform:uppercase;letter-spacing:.08em}
+.hA,.hB,.hC,.hD{background:linear-gradient(135deg,#2f5a45,#3a6b52);color:#fff;border-radius:18px;padding:16px}
+.hA h3,.hB h3,.hC h3,.hD h3{margin:0;font:800 24px/1.05 'Bricolage Grotesque',sans-serif;letter-spacing:-.035em}
+.hA p,.hB p,.hC p,.hD p{margin:8px 0 0;font-size:14px;line-height:1.45;opacity:.93}
+.bc{position:relative;display:grid;place-items:center;border-radius:50%;background:rgba(255,255,255,.16);flex:none}
+.bc svg{display:block}
+.dot{position:absolute;top:2px;right:2px;width:11px;height:11px;border-radius:50%;background:#e5484d;border:2px solid #2f5a45}
+.hA .top{display:flex;align-items:center;gap:10px}
+.hB .bc{width:40px;height:40px;margin-bottom:10px}
+.hC .bc{width:40px;height:40px;margin-bottom:10px}
+.hD{display:flex;gap:12px;align-items:flex-start}
+.hD .bc{width:44px;height:44px}
+.pick{font-size:13px;color:var(--mut)}
+
+.row3{display:grid;grid-template-columns:1fr;gap:18px}
+.col{display:flex;flex-direction:column;align-items:center;gap:8px}
+.cl{font-size:12px;font-weight:600;color:var(--mut);text-transform:uppercase;letter-spacing:.08em}
+.pp{width:270px;background:#fff;color:#1b1a18;border:7px solid #1b1a18;border-radius:36px;padding:14px 12px 16px;box-shadow:0 22px 44px -18px rgba(27,26,24,.45);display:flex;flex-direction:column;gap:8px;min-height:380px}
+.pp .ph2{font:800 13px 'Bricolage Grotesque',sans-serif;display:flex;justify-content:space-between;align-items:center}
+.pill{font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;background:#e8eefc;color:#3556c9}
+.mini{background:#faf8f4;border:1px solid #e4dfd6;border-radius:14px;padding:9px 11px;display:flex;flex-direction:column;gap:2px;font-size:12px;transition:border-color .2s,box-shadow .2s}
+.mini b{font:800 12.5px 'Bricolage Grotesque',sans-serif}.vm{font-size:11px;color:#6b655e}.pr{font:800 13px 'Bricolage Grotesque',sans-serif}
+.mini.hl{border-color:#c4813f;box-shadow:0 0 0 2px #f0dcc0}
+.map{position:relative;border-radius:14px;overflow:hidden;height:96px;background:#ece7da;border:1px solid #e4dfd6;flex:none}
+.map svg{position:absolute;inset:0;width:100%;height:100%}
+.pin{position:absolute;width:20px;height:20px;margin:-20px 0 0 -10px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:#c4813f;border:2px solid #fff;box-shadow:0 2px 4px rgba(27,26,24,.35);transition:transform .15s,background .15s}
+.pin.hl{background:#1f4d3a;transform:rotate(-45deg) scale(1.3);z-index:2}
+.pin i{position:absolute;inset:0;transform:rotate(45deg);display:grid;place-items:center;color:#fff;font:800 9px sans-serif;font-style:normal}
+.smp{position:absolute;left:6px;bottom:5px;font-size:8.5px;background:rgba(255,255,255,.85);border-radius:99px;padding:1px 7px;color:#6b655e;font-weight:600}
+.tpn{font-size:11px;color:var(--mut);text-align:center;max-width:270px}
+</style></head>
+<body><div class="wrap">
+<h2>Map in "Open near you"</h2>
+<div class="note"><b>Drawn map, sample pins.</b> No real map service, no location permission. Tap a card or a pin to see them link up (that part is optional).</div>
+<div class="row3">
+<div class="col"><span class="cl">Now</span><div class="pp"><div class="ph2">Open near you <span class="pill">3</span></div><div class="mini"><b>Kitchen and walls painting</b><div class="vm">Plano · 1,800 sq ft</div><div class="pr">$6,000 to $6,500</div></div><div class="mini"><b>Bathroom remodel</b><div class="vm">Frisco · 3 bids</div></div><div class="mini"><b>Fence replacement</b><div class="vm">McKinney · 0 bids</div></div></div></div>
+<div class="col"><span class="cl">A. Map above the cards</span><div class="pp"><div class="ph2">Open near you <span class="pill">3</span></div><div class="map"><svg viewBox="0 0 250 96" preserveAspectRatio="none"><rect width="250" height="96" fill="#ece7da"/><path d="M0 70 Q60 55 120 66 T250 50" stroke="#fff" stroke-width="7" fill="none"/><path d="M40 0 L70 96" stroke="#fff" stroke-width="5" fill="none"/><path d="M160 0 Q150 40 190 96" stroke="#fff" stroke-width="5" fill="none"/><path d="M0 30 Q90 20 250 28" stroke="#f6f2e8" stroke-width="3" fill="none"/><ellipse cx="205" cy="22" rx="26" ry="10" fill="#cfe3d3"/><ellipse cx="22" cy="84" rx="20" ry="8" fill="#cfe3d3"/></svg>
+<span class="pin" id="p10" style="left:62px;top:60px" onclick="hl(1,0)"><i>1</i></span><span class="pin" id="p11" style="left:140px;top:38px" onclick="hl(1,1)"><i>2</i></span><span class="pin" id="p12" style="left:204px;top:74px" onclick="hl(1,2)"><i>3</i></span><span class="smp">Sample</span></div><div class="mini" id="c10" onclick="hl(1,0)"><b>Kitchen and walls painting</b><div class="vm">Plano · 1,800 sq ft</div><div class="pr">$6,000 to $6,500</div></div><div class="mini" id="c11" onclick="hl(1,1)"><b>Bathroom remodel</b><div class="vm">Frisco · 3 bids</div></div><div class="mini" id="c12" onclick="hl(1,2)"><b>Fence replacement</b><div class="vm">McKinney · 0 bids</div></div></div><span class="tpn">Map first, then the list. Reads as "jobs near you" right away.</span></div>
+<div class="col"><span class="cl">B. Map below the cards</span><div class="pp"><div class="ph2">Open near you <span class="pill">3</span></div><div class="mini" id="c20" onclick="hl(2,0)"><b>Kitchen and walls painting</b><div class="vm">Plano · 1,800 sq ft</div><div class="pr">$6,000 to $6,500</div></div><div class="mini" id="c21" onclick="hl(2,1)"><b>Bathroom remodel</b><div class="vm">Frisco · 3 bids</div></div><div class="mini" id="c22" onclick="hl(2,2)"><b>Fence replacement</b><div class="vm">McKinney · 0 bids</div></div><div class="map"><svg viewBox="0 0 250 96" preserveAspectRatio="none"><rect width="250" height="96" fill="#ece7da"/><path d="M0 70 Q60 55 120 66 T250 50" stroke="#fff" stroke-width="7" fill="none"/><path d="M40 0 L70 96" stroke="#fff" stroke-width="5" fill="none"/><path d="M160 0 Q150 40 190 96" stroke="#fff" stroke-width="5" fill="none"/><path d="M0 30 Q90 20 250 28" stroke="#f6f2e8" stroke-width="3" fill="none"/><ellipse cx="205" cy="22" rx="26" ry="10" fill="#cfe3d3"/><ellipse cx="22" cy="84" rx="20" ry="8" fill="#cfe3d3"/></svg>
+<span class="pin" id="p20" style="left:62px;top:60px" onclick="hl(2,0)"><i>1</i></span><span class="pin" id="p21" style="left:140px;top:38px" onclick="hl(2,1)"><i>2</i></span><span class="pin" id="p22" style="left:204px;top:74px" onclick="hl(2,2)"><i>3</i></span><span class="smp">Sample</span></div></div><span class="tpn">Fills the empty space and keeps the job cards at the top.</span></div>
+</div>
+<div class="why"><b>My pick</b><ul><li><b>A</b> if the map is the selling point. <b>B</b> if you'd rather keep the cards first. I lean to <b>B</b>: it uses the empty space without moving anything.</li></ul></div>
+</div>
+<script>
+function hl(k,i){for(var j=0;j<3;j++){var c=document.getElementById('c'+k+j),p=document.getElementById('p'+k+j);var on=j===i&&!c.classList.contains('hl');c.classList.toggle('hl',on);p.classList.toggle('hl',on)}}
+</script></body></html>
