@@ -919,3 +919,10 @@ html { scroll-behavior: smooth; }
 .lm-tapnote { margin: -4px 0 0; text-align: center; font-size: 12.5px; color: var(--muted, #6b655e); }
 
 .lm-bell { width: 40px; height: 40px; border-radius: 50%; background: rgba(255, 255, 255, 0.16); display: grid; place-items: center; }
+
+/* Drawn sample map in the Open near you preview (no map service). */
+.lm-map { position: relative; border-radius: 14px; overflow: hidden; height: 96px; background: #ece7da; border: 1px solid var(--line); flex: none; }
+.lm-map svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.lm-pin { position: absolute; width: 20px; height: 20px; margin: -20px 0 0 -10px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); background: #c4813f; border: 2px solid #fff; box-shadow: 0 2px 4px rgba(27, 26, 24, 0.35); }
+.lm-pin i { position: absolute; inset: 0; transform: rotate(45deg); display: grid; place-items: center; color: #fff; font: 800 9px sans-serif; font-style: normal; }
+.lm-smp { position: absolute; left: 6px; bottom: 5px; font-size: 8.5px; background: rgba(255, 255, 255, 0.85); border-radius: 99px; padding: 1px 7px; color: #6b655e; font-weight: 600; }

@@ -110,7 +110,14 @@ function Screen({ side, step }: { side: Side; step: number }): ReactNode {
     <div className="lm-ph">Open near you <span className="lm-pill b">3</span></div>
     <div className="lm-mini"><b>Kitchen and walls painting</b><div className="lm-vm">Plano · 1,800 sq ft</div><div className="lm-price sm">$6,000 to $6,500</div></div>
     <div className="lm-mini"><b>Bathroom remodel</b><div className="lm-vm">Frisco · 3 bids</div></div>
-    <div className="lm-mini"><b>Fence replacement</b><div className="lm-vm">McKinney · 0 bids</div></div></>);
+    <div className="lm-mini"><b>Fence replacement</b><div className="lm-vm">McKinney · 0 bids</div></div>
+    <div className="lm-map" aria-hidden="true">
+      <svg viewBox="0 0 250 96" preserveAspectRatio="none"><rect width="250" height="96" fill="#ece7da" /><path d="M0 70 Q60 55 120 66 T250 50" stroke="#fff" strokeWidth="7" fill="none" /><path d="M40 0 L70 96" stroke="#fff" strokeWidth="5" fill="none" /><path d="M160 0 Q150 40 190 96" stroke="#fff" strokeWidth="5" fill="none" /><path d="M0 30 Q90 20 250 28" stroke="#f6f2e8" strokeWidth="3" fill="none" /><ellipse cx="205" cy="22" rx="26" ry="10" fill="#cfe3d3" /><ellipse cx="22" cy="84" rx="20" ry="8" fill="#cfe3d3" /></svg>
+      <span className="lm-pin" style={{ left: '25%', top: '62%' }}><i>1</i></span>
+      <span className="lm-pin" style={{ left: '56%', top: '40%' }}><i>2</i></span>
+      <span className="lm-pin" style={{ left: '82%', top: '77%' }}><i>3</i></span>
+      <span className="lm-smp">Sample</span>
+    </div></>);
   if (step === 1) return (<>
     <div className="lm-ph">Your bid</div>
     <div className="lm-mini"><BidCard name="Nesty’s Painting" sub="4 weeks · starts Nov 19" price="$5,008" /></div>
