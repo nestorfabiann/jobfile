@@ -63,11 +63,16 @@ export default function TeamWalkthrough() {
     let seen = false;
     try { seen = localStorage.getItem(KEY) === '1'; } catch { /* fine */ }
     // Open every time. Autoplay only for a first-time visitor who has not asked for less motion.
-    start(!seen && !rm);
-    if (!seen && !rm) { try { localStorage.setItem(KEY, '1'); } catch { /* fine */ } }
+    // Open at once, showing step 1. A first-time visitor gets autoplay after a short pause so the page can settle first.
+    start(false);
+    let wait: ReturnType<typeof setTimeout> | null = null;
+    if (!seen && !rm) {
+      try { localStorage.setItem(KEY, '1'); } catch { /* fine */ }
+      wait = setTimeout(() => setPlaying(true), 1500);
+    }
     const onOpen = () => { start(!rm); root.current?.scrollIntoView({ behavior: rm ? 'auto' : 'smooth', block: 'start' }); };
     window.addEventListener('tw-open', onOpen);
-    return () => window.removeEventListener('tw-open', onOpen);
+    return () => { window.removeEventListener('tw-open', onOpen); if (wait) clearTimeout(wait); };
   }, [start]);
 
   useEffect(() => {
