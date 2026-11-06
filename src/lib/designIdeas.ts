@@ -29,7 +29,7 @@ const FLOORS = ['Light wood look', 'Dark wood look', 'Medium oak look', 'Gray wo
 const CABS = ['White', 'Off white', 'Light gray', 'Charcoal', 'Black', 'Navy', 'Sage green', 'Forest green', 'Natural wood', 'Walnut', 'Two tone: white and wood'];
 const METALS = ['Brushed nickel', 'Matte black', 'Brass', 'Chrome', 'Oil rubbed bronze', 'Brushed gold'];
 const TRIM = ['White', 'Cream', 'Black', 'Charcoal', 'Light gray'];
-const keep = (x: string, ...rest: string[]) => [x, ...rest, OTHER];
+const keep = (x: string, ...rest: string[]) => [x, OTHER, ...rest];
 export const PICKS: Record<Space, Record<string, string[]>> = {
   kitchen: {
     Cabinets: keep('Keep as they are', ...CABS),

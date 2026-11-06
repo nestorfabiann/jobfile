@@ -98,8 +98,13 @@ function PickField({ label, opts }: { label: string; opts: string[] }) {
       <b>{label}</b>
       <select name={label} value={v} onChange={(e) => setV(e.target.value)}>{opts.map((o) => <option key={o}>{o}</option>)}</select>
       {v === OTHER_VALUE ? (
-        <input type="text" name={`${label}__custom`} maxLength={40} placeholder="For example: dusty rose, or Sherwin-Williams Agreeable Gray" autoFocus />
-      ) : null}
+        <>
+          <input type="text" name={`${label}__custom`} maxLength={40} placeholder="For example: dusty rose, or Sherwin-Williams Agreeable Gray" autoFocus />
+          <button type="button" className="small" style={{ alignSelf: 'flex-start', background: 'none', border: 0, padding: 0, color: 'var(--accent, #c4813f)', textDecoration: 'underline' }} onClick={() => setV(opts[0])}>Pick from the list instead</button>
+        </>
+      ) : (
+        <button type="button" className="small" style={{ alignSelf: 'flex-start', background: 'none', border: 0, padding: 0, color: 'var(--accent, #c4813f)', fontWeight: 600 }} onClick={() => setV(OTHER_VALUE)}>+ Type your own</button>
+      )}
     </label>
   );
 }
