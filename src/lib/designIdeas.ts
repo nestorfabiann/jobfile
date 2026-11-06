@@ -15,7 +15,7 @@ export const SPACE_LIST: { key: Space; label: string; sub: string; icon: string;
   { key: 'exterior', label: 'Exterior', sub: 'Paint, trim, siding', icon: '🏠', isNew: true },
   { key: 'living', label: 'Living room', sub: 'Walls, floor, trim', icon: '🛋️', isNew: true },
   { key: 'bedroom', label: 'Bedroom', sub: 'Walls, floor', icon: '🛏️', isNew: true },
-  { key: 'colors', label: 'Wall colors only', sub: 'Any room, paint only', icon: '🎨', isNew: true },
+  { key: 'colors', label: 'Paint colors', sub: 'Walls, trim, accent wall. Any room.', icon: '🎨', isNew: true },
 ];
 const NOUN: Record<Space, string> = { kitchen: 'kitchen', bathroom: 'bathroom', exterior: 'front of a house', living: 'living room', bedroom: 'bedroom', colors: 'room' };
 /** The job type to start on the Post form for each space. */
