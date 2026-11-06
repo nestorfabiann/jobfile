@@ -926,3 +926,8 @@ html { scroll-behavior: smooth; }
 .lm-pin { position: absolute; width: 20px; height: 20px; margin: -20px 0 0 -10px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); background: #c4813f; border: 2px solid #fff; box-shadow: 0 2px 4px rgba(27, 26, 24, 0.35); }
 .lm-pin i { position: absolute; inset: 0; transform: rotate(45deg); display: grid; place-items: center; color: #fff; font: 800 9px sans-serif; font-style: normal; }
 .lm-smp { position: absolute; left: 6px; bottom: 5px; font-size: 8.5px; background: rgba(255, 255, 255, 0.85); border-radius: 99px; padding: 1px 7px; color: #6b655e; font-weight: 600; }
+
+/* Ratings note: centered stack, badges span the full width. */
+.lm-both { flex-direction: column; align-items: center; text-align: center; gap: 10px; }
+.lm-both .lm-bt { width: 100%; align-items: center; }
+.lm-both .lm-bp { width: 100%; }
