@@ -79,3 +79,4 @@ export function groupSum(rows: ProjectMoney[], key: (p: ProjectMoney) => string)
   for (const p of rows) { const k = key(p); const c = m.get(k) ?? { agreed: 0, paid: 0, n: 0 }; c.agreed += p.agreed; c.paid += p.paid; c.n++; m.set(k, c); }
   return [...m.entries()].map(([k, v]) => ({ k, ...v })).sort((a, b) => b.agreed - a.agreed);
 }
+// deploy retrigger
