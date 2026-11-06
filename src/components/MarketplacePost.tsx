@@ -17,7 +17,7 @@ type Types = Record<string, { size: number; sizeLabel: string; groups: [string, 
 const money = (n: number) => '$' + Math.round(n).toLocaleString('en-US');
 const digits = (v: string) => parseInt(v.replace(/\D/g, ''), 10) || 0;
 
-export default function MarketplacePost({ types, aiOn, draft, inviteCompany, inviteName, idea }: { idea?: { id: string; pick: number; thumb: string | null; label: string; blurb: string } | null; types: Types; aiOn: boolean; inviteCompany?: string; inviteName?: string; draft?: { id: string; at: string; data: DraftData } | null }) {
+export default function MarketplacePost({ types, aiOn, draft, inviteCompany, inviteName, idea, ideaPicks }: { ideaPicks?: string[]; idea?: { id: string; pick: number; thumb: string | null; label: string; blurb: string } | null; types: Types; aiOn: boolean; inviteCompany?: string; inviteName?: string; draft?: { id: string; at: string; data: DraftData } | null }) {
   const names = Object.keys(types);
   const d0 = draft?.data;
   const [type, setType] = useState(d0 && types[d0.type] ? d0.type : names[0]);
@@ -26,6 +26,8 @@ export default function MarketplacePost({ types, aiOn, draft, inviteCompany, inv
   const [zip, setZip] = useState(d0?.zip ?? '');
   const [city, setCity] = useState(d0?.city ?? '');
   const [details, setDetails] = useState(d0?.details ?? '');
+  const [extra, setExtra] = useState('');
+  const [extraOpen, setExtraOpen] = useState(false);
   const [bmin, setBmin] = useState(d0?.bmin ?? '');
   const [bmax, setBmax] = useState(d0?.bmax ?? '');
   const [answers, setAnswers] = useState<Answers>(d0?.answers ?? {});
@@ -207,11 +209,19 @@ export default function MarketplacePost({ types, aiOn, draft, inviteCompany, inv
             <legend className="small muted" style={{ marginBottom: 6 }}>{group}</legend>
             <div className="chips">
               {items.map((it) => (
-                <label className="chip" key={it}><input type="checkbox" checked={picks.includes(it)} onChange={() => toggle(it)} /><span>{it}</span></label>
+                <label className="chip" key={it}><input type="checkbox" checked={picks.includes(it)} onChange={() => toggle(it)} /><span>{it}{ideaPicks?.includes(it) ? <small style={{ marginLeft: 6, fontSize: 10, fontWeight: 700, opacity: 0.8 }}>From your idea</small> : null}</span></label>
               ))}
             </div>
           </fieldset>
         ))}
+        {extraOpen ? (
+          <label className="fld">Something else you want done
+            <input name="extra" maxLength={200} value={extra} onChange={(e) => setExtra(e.target.value)} placeholder="Example: pocket door, built-in shelves" autoFocus />
+            <span className="small muted">Contractors will read this. The AI price range only counts the items you tap above.</span>
+          </label>
+        ) : (
+          <button type="button" className="small" style={{ alignSelf: 'flex-start', background: 'none', border: 0, padding: 0, color: 'var(--accent, #c4813f)', fontWeight: 600 }} onClick={() => setExtraOpen(true)}>+ Add something else</button>
+        )}
         <div className="box" style={{ background: 'var(--surface-2)' }}>
           <b>Your scope ({picks.length} selected)</b>
           <div className="small muted" style={{ whiteSpace: 'pre-line' }}>{picks.length ? picks.map((p) => `• ${p}`).join('\n') : 'Nothing picked yet.'}</div>

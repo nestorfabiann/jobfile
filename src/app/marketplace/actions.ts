@@ -64,7 +64,7 @@ export async function getReference(input: { jobType: string; items: string[]; si
 
   const r = await makeReference({ jobType, items: picked, size, zip, city: '', details });
   if (!r.ok) return r;
-  const hash = inputHash(jobType, picked.map((p) => p.item), size, zip, details);
+  const hash = inputHash(jobType, picked.map((p) => p.item), size, zip, baseDetails);
   const { data: row } = await db.from('marketplace_ai_calls').insert({ user_id: user.id, input_hash: hash, result: r.ref }).select('id').single();
   if (!row) return { ok: false, error: 'Could not save the reference. Try again.' };
   return { ok: true, id: row.id as string, ref: r.ref };
@@ -98,7 +98,10 @@ async function createListingInner(formData: FormData): Promise<CreateResult> {
   if (!/^\d{5}$/.test(zip)) return bad('Enter a 5-digit ZIP code.');
   const sizeN = parseInt(txt(formData, 'size', 10).replace(/\D/g, ''), 10);
   const size = Number.isFinite(sizeN) && sizeN > 0 ? Math.min(1_000_000, sizeN) : null;
-  const details = txt(formData, 'details', 1000);
+  const extraRaw = txt(formData, 'extra', 200).replace(/[<>]/g, '');
+  const baseDetails = txt(formData, 'details', 1000);
+  // The database caps details at 1000 characters, so the typed extra item shares that room.
+  const details = extraRaw ? `${baseDetails.slice(0, 780)}${baseDetails ? '\n' : ''}Also wanted: ${extraRaw}`.slice(0, 1000) : baseDetails;
   let bmin: number | null = parseDollars(txt(formData, 'budget_min', 20)) || null;
   let bmax: number | null = parseDollars(txt(formData, 'budget_max', 20)) || null;
   if (bmin && bmax && bmin > bmax) [bmin, bmax] = [bmax, bmin];

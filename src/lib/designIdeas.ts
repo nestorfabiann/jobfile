@@ -20,6 +20,28 @@ export const SPACE_LIST: { key: Space; label: string; sub: string; icon: string;
 const NOUN: Record<Space, string> = { kitchen: 'kitchen', bathroom: 'bathroom', exterior: 'front of a house', living: 'living room', bedroom: 'bedroom', colors: 'room' };
 /** The job type to start on the Post form for each space. */
 export const SPACE_JOB: Record<Space, string> = { kitchen: 'Kitchen remodel', bathroom: 'Bathroom', exterior: 'Painting', living: 'Painting', bedroom: 'Painting', colors: 'Painting' };
+/** Scope items on the Post form that a design idea clearly implies. Anything unclear stays out and goes in the details. */
+export function ideaItems(space: string, picks: Record<string, string>): string[] {
+  const on = (k: string) => { const v = picks[k]; return !!v && !/^(keep|none)/i.test(v); };
+  const out = new Set<string>();
+  if (space === 'living' || space === 'bedroom' || space === 'colors') {
+    if (on('Wall color') || on('Walls') || on('Accent wall')) out.add('Walls');
+    if (on('Trim and doors') || on('Trim')) out.add('Trim and doors');
+    if (on('Ceiling')) out.add('Ceilings');
+    if (on('Accent wall')) out.add('Accent wall');
+  } else if (space === 'exterior') {
+    if (on('Body color') || on('Trim color') || on('Front door') || on('Shutters')) out.add('Exterior paint');
+    if (on('Front door')) out.add('Front door');
+  } else if (space === 'kitchen') {
+    if (/tile/i.test(picks['Backsplash'] ?? '')) out.add('Tile backsplash');
+    if (/quartz/i.test(picks['Countertops'] ?? '')) out.add('Quartz');
+    if (/granite/i.test(picks['Countertops'] ?? '')) out.add('Granite');
+    if (/tile/i.test(picks['Floor'] ?? '')) out.add('New tile floor');
+  } else if (space === 'bathroom') {
+    if (/tile/i.test(picks['Floor'] ?? '')) out.add('New tile floor');
+  }
+  return Array.from(out);
+}
 export const spaceLabel = (s: string) => (s in SPACES ? SPACES[s as Space] : 'Room');
 export const STYLES = ['Modern', 'Farmhouse', 'Traditional', 'Coastal'] as const;
 

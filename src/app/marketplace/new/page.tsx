@@ -5,7 +5,7 @@ import { supabaseAdmin } from '@/lib/supabase/server';
 import { JOB_TYPES, requireMarketplace } from '@/lib/marketplace';
 import { cleanDraft } from '@/lib/drafts';
 import { aiConfigured } from '@/lib/marketplaceAI';
-import { designEnabled, DESIGN_BUCKET, SPACE_JOB, spaceLabel } from '@/lib/designIdeas';
+import { designEnabled, DESIGN_BUCKET, SPACE_JOB, spaceLabel, ideaItems } from '@/lib/designIdeas';
 import { signedUrls } from '@/lib/companyProfile';
 import MarketplacePost from '@/components/MarketplacePost';
 
@@ -14,6 +14,7 @@ export default async function NewListing({ searchParams }: { searchParams: { err
   const { user } = await requireUser();
   const { data: mem } = await supabaseAdmin().from('company_members').select('company_id').eq('user_id', user.id).limit(1);
   if ((mem ?? []).length > 0) redirect('/marketplace?error=Contractors+bid+on+projects.+Homeowners+post+them.');
+  let ideaPicks: string[] = [];
   let ideaCard: { id: string; pick: number; thumb: string | null; label: string; blurb: string } | null = null;
   let draft: { id: string; at: string; data: ReturnType<typeof cleanDraft> } | null = null;
   if (searchParams.draft && /^[0-9a-f-]{36}$/i.test(searchParams.draft)) {
@@ -34,7 +35,8 @@ export default async function NewListing({ searchParams }: { searchParams: { err
       if (di) {
         const ch = Object.entries((di.picks ?? {}) as Record<string, string>).filter(([, v]) => !/^keep/i.test(v)).map(([k, v]) => `${k.toLowerCase()} ${v.toLowerCase()}`);
         const details = `I tried an AI design idea${di.style ? ` (${di.style} style)` : ''}${ch.length ? `: ${ch.join(', ')}` : ''}.${di.notes ? ` ${di.notes}` : ''}`;
-        draft = { id: '', at: new Date().toISOString(), data: cleanDraft({ type: SPACE_JOB[di.space as keyof typeof SPACE_JOB] ?? 'Painting', details }) };
+        ideaPicks = ideaItems(di.space, (di.picks ?? {}) as Record<string, string>);
+        draft = { id: '', at: new Date().toISOString(), data: cleanDraft({ type: SPACE_JOB[di.space as keyof typeof SPACE_JOB] ?? 'Painting', details, picks: ideaPicks }) };
         const pickN = Math.max(0, Math.min(1, parseInt(searchParams.pick ?? '0', 10) || 0));
         const { data: full } = await supabaseAdmin().from('design_ideas').select('results').eq('id', searchParams.idea as string).maybeSingle<any>();
         const rp = ((full?.results ?? []) as string[])[pickN] ?? ((full?.results ?? []) as string[])[0];
@@ -78,7 +80,7 @@ export default async function NewListing({ searchParams }: { searchParams: { err
           <span className="small" style={{ display: 'block' }}>Other local contractors can still bid on your project. {inviteName} must serve your ZIP code to be invited.</span>
         </div>
       ) : null}
-      <MarketplacePost idea={ideaCard} types={JOB_TYPES} aiOn={aiConfigured()} draft={draft} inviteCompany={inviteId} inviteName={inviteName} />
+      <MarketplacePost ideaPicks={ideaPicks} idea={ideaCard} types={JOB_TYPES} aiOn={aiConfigured()} draft={draft} inviteCompany={inviteId} inviteName={inviteName} />
     </>
   );
 }
