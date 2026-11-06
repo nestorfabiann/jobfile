@@ -1,0 +1,30 @@
+<title>Design Ideas Loading Screen</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+:root{--bg:#f6f2ec;--fg:#2a2118;--mut:#7a6d60;--ac:#c4813f;--ring:#ecd9c2;--card:#fff;--line:#e4dccf}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1b1713;--fg:#f1e9de;--mut:#a89a8a;--ac:#d99a58;--ring:#4a3a28;--card:#262019;--line:#3a3128;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#1b1713;--fg:#f1e9de;--mut:#a89a8a;--ac:#d99a58;--ring:#4a3a28;--card:#262019;--line:#3a3128;color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:system-ui,sans-serif;padding-block:20px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1{font-size:20px;margin:0 0 4px}p{color:var(--mut);margin:0 0 16px;max-width:60ch;line-height:1.45}
+.row{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start}
+.ph{width:min(100%,300px);height:520px;border:1px solid var(--line);border-radius:28px;background:var(--bg);position:relative;overflow:hidden}
+.lbl{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);margin-bottom:8px}
+.form{padding:18px;display:flex;flex-direction:column;gap:10px}
+.fld{height:38px;border:1px solid var(--line);border-radius:10px;background:var(--card)}
+.btn{background:var(--ac);color:#fff;border-radius:99px;text-align:center;padding:12px;font-weight:700}
+.ov{position:absolute;inset:0;background:color-mix(in srgb,var(--bg) 94%,transparent);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;padding:24px}
+.sp{width:50px;height:50px;border-radius:50%;border:5px solid var(--ring);border-top-color:var(--ac);animation:s 1s linear infinite}
+@keyframes s{to{transform:rotate(360deg)}}
+.sm{font-size:12px;color:var(--mut)}.st{color:var(--mut);min-height:20px}
+@media(prefers-reduced-motion:reduce){.sp{animation-duration:3s}}
+</style>
+<h1>What homeowners see after tapping "Show me ideas"</h1>
+<p>The form is covered by a loading screen for about 30 seconds. The message changes as it goes, then the two ideas open by themselves.</p>
+<div class="row">
+<div><div class="lbl">Before</div><div class="ph"><div class="form"><b>Wall color</b><div class="fld"></div><b>Anything else?</b><div class="fld" style="height:70px"></div><div class="btn">Show me ideas</div></div></div></div>
+<div><div class="lbl">While it works (live)</div><div class="ph"><div class="ov"><div class="sp"></div><b style="font-size:18px">Creating your ideas</b><span class="st" id="st">Getting your photo ready…</span><span class="sm">This takes about 30 seconds. Please keep this page open.</span></div></div></div>
+</div>
+<script>
+var m=['Getting your photo ready…','Sending it to the design helper…','Drawing two ideas for you…','Almost there. Good ideas take a moment…'],i=0,e=document.getElementById('st');
+setInterval(function(){i=(i+1)%m.length;e.textContent=m[i]},3000);
+</script>
