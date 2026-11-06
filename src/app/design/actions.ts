@@ -4,7 +4,9 @@ import { redirect } from 'next/navigation';
 import { requireUser } from '@/lib/session';
 import { supabaseAdmin } from '@/lib/supabase/server';
 import { requireMarketplace } from '@/lib/marketplace';
-import { buildPrompt, cleanPicks, designEnabled, DESIGN_BUCKET, DESIGN_DAILY_LIMIT, generateImage, SPACES, STYLES, type Space } from '@/lib/designIdeas';
+import { adminEmails } from '@/lib/admin';
+import { notifyUsers } from '@/lib/notify';
+import { buildPrompt, cleanPicks, designEnabled, DESIGN_BUCKET, DESIGN_DAILY_LIMIT, generateImageEx, SPACES, STYLES, type Space } from '@/lib/designIdeas';
 
 const back = (msg: string): never => redirect(`/design?error=${encodeURIComponent(msg)}`);
 
@@ -41,7 +43,10 @@ export async function createDesign(fd: FormData) {
   const up = await db.storage.from(DESIGN_BUCKET).upload(originalPath, buf, { contentType: file.type });
   if (up.error) back('Could not upload the photo. Try again.');
 
-  const outs = await Promise.all([0, 1].map((v) => generateImage(buf, file.type, buildPrompt(space, style, picks, notes, v))));
+  const results = await Promise.all([0, 1].map((v) => generateImageEx(buf, file.type, buildPrompt(space, style, picks, notes, v))));
+  const outs = results.map((r) => r.buf);
+  const outOfCredit = results.some((r) => r.outOfCredit);
+  if (outOfCredit) await alertOutOfCredit();
   const paths: string[] = [];
   for (let i = 0; i < outs.length; i++) {
     const o = outs[i];
@@ -52,7 +57,7 @@ export async function createDesign(fd: FormData) {
   }
   if (!paths.length) {
     await db.storage.from(DESIGN_BUCKET).remove([originalPath]);
-    back('We could not make ideas from that photo. Try a clearer, well-lit photo.');
+    back(outOfCredit ? 'Design ideas are temporarily unavailable. Please try again later.' : 'We could not make ideas from that photo. Try a clearer, well-lit photo.');
   }
   const { error } = await db.from('design_ideas').insert({ id, user_id: user.id, space, style, picks, notes, original_path: originalPath, results: paths });
   if (error) back('Could not save your ideas. Try again.');
@@ -71,4 +76,31 @@ export async function deleteDesign(fd: FormData) {
     await db.from('design_ideas').delete().eq('id', id).eq('user_id', user.id);
   }
   redirect('/design');
+}
+
+/** Tell the owner the image service refused for billing or quota reasons. At most one alert every 6 hours. */
+async function alertOutOfCredit() {
+  try {
+    const db = supabaseAdmin();
+    const title = 'Design ideas stopped: the AI account needs credit';
+    const since = new Date(Date.now() - 6 * 3600_000).toISOString();
+    const { count } = await db.from('notifications').select('id', { count: 'exact', head: true }).eq('title', title).gt('created_at', since);
+    if ((count ?? 0) > 0) return;
+    const emails = adminEmails();
+    if (!emails.length) return;
+    const { data: owners } = await db.from('profiles').select('id').in('email', emails);
+    const ids = (owners ?? []).map((o) => o.id as string);
+    if (!ids.length) return;
+    await notifyUsers({
+      userIds: ids,
+      projectId: null,
+      kind: 'admin',
+      path: '/admin',
+      title,
+      body: 'Google refused a design request because the balance or quota is used up. Homeowners see "temporarily unavailable". Add credit in Google AI Studio, Billing.',
+      force: true,
+    });
+  } catch {
+    // never block the homeowner on an alert
+  }
 }

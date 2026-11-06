@@ -102,9 +102,17 @@ export function buildPrompt(space: Space, style: string, picks: Record<string, s
 }
 
 /** One picture from the chosen image service. Returns null on any failure. */
-export async function generateImage(img: Buffer, mime: string, prompt: string): Promise<Buffer | null> {
+export type GenResult = { buf: Buffer | null; outOfCredit: boolean };
+
+/** True when the provider refused because of billing, credit or quota, not because of the photo. */
+function creditProblem(status: number, text: string) {
+  if (status === 402 || status === 429) return true;
+  return /quota|billing|credit|insufficient|resource_exhausted|exceeded your/i.test(text) && status >= 400;
+}
+
+export async function generateImageEx(img: Buffer, mime: string, prompt: string): Promise<GenResult> {
   const key = process.env.DESIGN_IMAGE_KEY;
-  if (!key) return null;
+  if (!key) return { buf: null, outOfCredit: false };
   const provider = (process.env.DESIGN_PROVIDER ?? 'gemini').toLowerCase();
   try {
     if (provider === 'openai') {
@@ -114,10 +122,10 @@ export async function generateImage(img: Buffer, mime: string, prompt: string): 
       fd.set('size', '1024x1024');
       fd.set('image', new Blob([new Uint8Array(img)], { type: mime }), 'room.jpg');
       const r = await fetch('https://api.openai.com/v1/images/edits', { method: 'POST', headers: { Authorization: `Bearer ${key}` }, body: fd });
-      if (!r.ok) return null;
+      if (!r.ok) return { buf: null, outOfCredit: creditProblem(r.status, await r.text().catch(() => '')) };
       const j = (await r.json()) as { data?: { b64_json?: string }[] };
       const b = j.data?.[0]?.b64_json;
-      return b ? Buffer.from(b, 'base64') : null;
+      return { buf: b ? Buffer.from(b, 'base64') : null, outOfCredit: false };
     }
     const model = process.env.DESIGN_MODEL || 'gemini-2.5-flash-image';
     const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {
@@ -128,15 +136,19 @@ export async function generateImage(img: Buffer, mime: string, prompt: string): 
         generationConfig: { responseModalities: ['TEXT', 'IMAGE'] },
       }),
     });
-    if (!r.ok) return null;
+    if (!r.ok) return { buf: null, outOfCredit: creditProblem(r.status, await r.text().catch(() => '')) };
     const j = (await r.json()) as { candidates?: { content?: { parts?: { inlineData?: { data?: string }; inline_data?: { data?: string } }[] } }[] };
     const parts = j.candidates?.[0]?.content?.parts ?? [];
     for (const p of parts) {
       const d = p.inlineData?.data ?? p.inline_data?.data;
-      if (d) return Buffer.from(d, 'base64');
+      if (d) return { buf: Buffer.from(d, 'base64'), outOfCredit: false };
     }
-    return null;
+    return { buf: null, outOfCredit: false };
   } catch {
-    return null;
+    return { buf: null, outOfCredit: false };
   }
+}
+
+export async function generateImage(img: Buffer, mime: string, prompt: string): Promise<Buffer | null> {
+  return (await generateImageEx(img, mime, prompt)).buf;
 }
