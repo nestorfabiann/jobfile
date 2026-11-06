@@ -102,25 +102,17 @@ export default async function Collaborate({ searchParams }: { searchParams: { er
     } catch { /* column missing */ }
   }
 
+  const hasActivity = mineBids.length > 0 || partnerJobs.length > 0 || past.size > 0;
+
   return (
     <div className="stack" style={{ display: 'flex', flexDirection: 'column', gap: 14, paddingBottom: 90 }}>
       <h1>Collaborate</h1>
       <p className="muted">Team up with another company on a marketplace bid, or bring a contractor you work with onto a job you found yourself.</p>
-      <TeamWalkthrough />
       {searchParams.error ? <div className="box warn" role="alert">{searchParams.error}</div> : null}
       {searchParams.ok ? <div className="box ok" role="status">{searchParams.ok}</div> : null}
       {setupMissing ? <div className="box warn">Team bids need one database step. Ask Jobfile support to run it.</div> : null}
 
-      <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-        <div className="row" style={{ justifyContent: 'space-between' }}>
-          <b>Open to partnering</b>
-          <span className={`pill${openToPartner ? ' ok' : ''}`}>{openToPartner ? 'On' : 'Off'}</span>
-        </div>
-        <p className="muted small">When on, an “Open to partnering” badge shows on your public profile and you appear first when nearby companies look for a partner.</p>
-        <form action={setOpenToPartner}><input type="hidden" name="on" value={openToPartner ? '0' : '1'} /><button className="btn ghost" type="submit">{openToPartner ? 'Turn off' : 'Turn on'}</button></form>
-      </div>
-
-      <h2>Invites waiting ({invites.length + partnerInvites.length})</h2>
+      {invites.length + partnerInvites.length > 0 ? <h2>Invites waiting ({invites.length + partnerInvites.length})</h2> : null}
       {partnerInvites.map((j) => (
         <div className="card" key={j.id} style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
           <div className="row" style={{ justifyContent: 'space-between' }}><b>{pInfo.get(j.id)?.lead ?? 'A contractor'}</b><b>{dollars(j.price_cents)}</b></div>
@@ -128,7 +120,6 @@ export default async function Collaborate({ searchParams }: { searchParams: { er
           <Link className="btn" href={`/partner/${j.id}`}>Review</Link>
         </div>
       ))}
-      {invites.length === 0 && partnerInvites.length === 0 ? <div className="card"><p className="muted">No invites right now. When another company asks you to join a team bid, it shows up here.</p></div> : null}
       {invites.map((p) => {
         const tb = inById.get(p.team_bid_id)!;
         const l = listing.get(tb.listing_id);
@@ -185,6 +176,10 @@ export default async function Collaborate({ searchParams }: { searchParams: { er
         </Link>
       ))}
 
+      {hasActivity ? (
+        <details className="card"><summary><b>How teaming up works</b></summary><div style={{ marginTop: 10 }}><TeamWalkthrough /></div></details>
+      ) : <TeamWalkthrough />}
+
       <h2>Invite someone you work with</h2>
       <p className="muted small">For a job you found yourself. Pick the project, then add the contractor by email. They only see their part.</p>
       {myProjects.length === 0 ? <div className="card"><p className="muted">You have no active projects yet.</p></div> : null}
@@ -197,6 +192,14 @@ export default async function Collaborate({ searchParams }: { searchParams: { er
       {Array.from(past.entries()).map(([id, n]) => (
         <div className="card row" key={id} style={{ justifyContent: 'space-between' }}><span><b>{name.get(id) ?? 'A contractor'}</b><span className="muted small"> · {n} team bid{n > 1 ? 's' : ''}</span></span><Link href={`/contractors/${id}`} style={{ fontWeight: 700 }}>View profile ›</Link></div>
       ))}
+
+      <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: 6, padding: '12px 14px' }}>
+        <div className="row" style={{ justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
+          <span><b>Open to partnering</b> <span className={`pill${openToPartner ? ' ok' : ''}`}>{openToPartner ? 'On' : 'Off'}</span></span>
+          <form action={setOpenToPartner}><input type="hidden" name="on" value={openToPartner ? '0' : '1'} /><button className="btn ghost" type="submit" style={{ padding: '6px 14px', minHeight: 0 }}>{openToPartner ? 'Turn off' : 'Turn on'}</button></form>
+        </div>
+        <details><summary className="muted small" style={{ cursor: 'pointer' }}>What this does</summary><p className="muted small" style={{ margin: '6px 0 0' }}>When on, an “Open to partnering” badge shows on your public profile and you appear first when nearby companies look for a partner.</p></details>
+      </div>
 
       <h2>Find a partner</h2>
       <form method="get" className="row" style={{ gap: 8, flexWrap: 'nowrap' }}>
