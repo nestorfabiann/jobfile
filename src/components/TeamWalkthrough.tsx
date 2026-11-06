@@ -38,10 +38,9 @@ const STEPS: Step[] = [
   ) },
 ];
 
-const KEY = 'jf_team_walkthrough_seen';
 const DUR = 3600;
 
-/** A short animated explanation of how a team bid works. Plays once for a first-time visitor, then folds away. */
+/** A short animated explanation of how a team bid works. Open and playing by default; the visitor can hide it for the visit. */
 export default function TeamWalkthrough() {
   const [mounted, setMounted] = useState(false);
   const [open, setOpen] = useState(false);
@@ -51,7 +50,6 @@ export default function TeamWalkthrough() {
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const root = useRef<HTMLElement | null>(null);
 
-  const markSeen = () => { try { localStorage.setItem(KEY, '1'); } catch { /* fine */ } };
   const start = useCallback((auto: boolean) => { setI(0); setPlaying(auto); setOpen(true); }, []);
 
   useEffect(() => {
@@ -59,9 +57,7 @@ export default function TeamWalkthrough() {
     let rm = false;
     try { rm = !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches; } catch { /* fine */ }
     setReduce(rm);
-    let seen = false;
-    try { seen = localStorage.getItem(KEY) === '1'; } catch { /* fine */ }
-    if (!seen) start(!rm);
+    start(!rm);
     const onOpen = () => { start(!rm); root.current?.scrollIntoView({ behavior: rm ? 'auto' : 'smooth', block: 'start' }); };
     window.addEventListener('tw-open', onOpen);
     return () => window.removeEventListener('tw-open', onOpen);
@@ -72,7 +68,7 @@ export default function TeamWalkthrough() {
     if (!open || !playing) return;
     timer.current = setTimeout(() => {
       if (i < STEPS.length - 1) setI(i + 1);
-      else { setPlaying(false); markSeen(); }
+      else setPlaying(false);
     }, DUR);
     return () => { if (timer.current) clearTimeout(timer.current); };
   }, [open, playing, i]);
@@ -82,7 +78,7 @@ export default function TeamWalkthrough() {
     <section ref={root} id="team-walkthrough" className="tw card" aria-label="How a team bid works">
       <div className="tw-head">
         <b>How a team bid works</b>
-        {mounted ? <button type="button" className="tw-link" onClick={() => { if (open) { setOpen(false); setPlaying(false); markSeen(); } else start(!reduce); }}>{open ? 'Hide' : '▶ Watch (20 sec)'}</button> : null}
+        {mounted ? <button type="button" className="tw-link" onClick={() => { if (open) { setOpen(false); setPlaying(false); } else start(!reduce); }}>{open ? 'Hide' : '▶ Watch (20 sec)'}</button> : null}
       </div>
       {open ? (
         <div className="tw-body">
