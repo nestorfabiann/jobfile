@@ -946,3 +946,5 @@ html { scroll-behavior: smooth; }
 .lm-founder { display: flex; align-items: center; gap: 10px; background: #e4f0e8; color: #1f4d3a; border-radius: 16px; padding: 11px 13px; font-size: 14.5px; }
 .lm-fav { flex: none; width: 36px; height: 36px; border-radius: 50%; background: #1f4d3a; color: #fff; display: grid; place-items: center; font: 800 15px 'Bricolage Grotesque', system-ui, sans-serif; }
 .lm-mid { display: flex; flex-direction: column; gap: 10px; align-items: stretch; }
+
+.lm-bell { background: rgba(246, 199, 68, 0.2); }
