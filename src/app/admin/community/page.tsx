@@ -32,7 +32,7 @@ export default async function AdminCommunity() {
   return (
     <>
       <h1>Community review</h1>
-      <p className="muted small">Both sides already agreed to these. Check the photos for faces, house numbers, license plates, and anything that shows an address or contact details. Approve only if it is safe to show.</p>
+      <p className="muted small">Projects were already agreed by both sides. Tips come straight from one person. Check the photos for faces, house numbers, license plates, and anything that shows an address or contact details. Approve only if it is safe to show.</p>
       {missing ? <div className="box warn">The Community tables are not created yet.</div> : null}
 
       <h2>Waiting for review ({pending.length})</h2>
@@ -41,7 +41,13 @@ export default async function AdminCommunity() {
         <div className="card" key={p.id}>
           {p.before_path && p.after_path && urls.get(p.before_path) && urls.get(p.after_path) ? <BeforeAfter before={urls.get(p.before_path)!} after={urls.get(p.after_path)!} alt={p.title} /> : null}
           <b>{p.title}</b>
-          <span className="muted small">{names.company.get(p.company_id ?? '')?.name ?? 'Company'} · {p.city}, TX · {p.trade}{p.days ? ` · ${p.days} days` : ''} · {ago(p.created_at)}</span>
+          {p.kind === 'tip'
+            ? <span className="muted small"><b>Tip</b> · {names.company.get(p.company_id ?? '')?.name ?? names.person.get(p.author_id) ?? 'Someone'}{p.trade ? ` · ${p.trade}` : ''} · {ago(p.created_at)}</span>
+            : <span className="muted small">{names.company.get(p.company_id ?? '')?.name ?? 'Company'} · {p.city}, TX · {p.trade}{p.days ? ` · ${p.days} days` : ''} · {ago(p.created_at)}</span>}
+          {p.kind === 'tip' && p.photo_path && urls.get(p.photo_path) ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={urls.get(p.photo_path)!} alt="" style={{ width: '100%', maxHeight: 220, objectFit: 'cover', borderRadius: 12 }} />
+          ) : null}
           {p.body ? <p className="small" style={{ whiteSpace: 'pre-wrap' }}>{p.body}</p> : null}
           <form action={reviewShowcase} className="stack" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             <input type="hidden" name="post_id" value={p.id} />
@@ -59,7 +65,7 @@ export default async function AdminCommunity() {
       {held.map((p) => (
         <div className="card" key={p.id}>
           <Link href={`/community/${p.id}`}><b>{p.title}</b></Link>
-          <span className="muted small">{p.kind === 'idea' ? 'Question' : 'Project'} by {names.company.get(p.company_id ?? '')?.name ?? names.person.get(p.author_id) ?? 'someone'}</span>
+          <span className="muted small">{p.kind === 'idea' ? 'Question' : p.kind === 'tip' ? 'Tip' : 'Project'} by {names.company.get(p.company_id ?? '')?.name ?? names.person.get(p.author_id) ?? 'someone'}</span>
           {ctl('post', p.id)}
         </div>
       ))}

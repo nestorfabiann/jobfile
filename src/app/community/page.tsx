@@ -11,6 +11,7 @@ import TradeIcon from '@/components/TradeIcon';
 const Ico = ({ d }: { d: string }) => <svg viewBox="0 0 24 24" aria-hidden="true"><path d={d} /></svg>;
 const ICON = {
   cam: 'M3 9a3 3 0 013-3h1.5L9 4h6l1.5 2H18a3 3 0 013 3v8a3 3 0 01-3 3H6a3 3 0 01-3-3zM12 16.5a3.5 3.5 0 100-7 3.5 3.5 0 000 7z',
+  tip: 'M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.5 6.6 19.5l1.2-6L3.3 9.3l6.1-.7z',
   bulb: 'M9 18h6M10 21h4M12 3a6 6 0 00-4 10.5c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A6 6 0 0012 3z',
   mark: 'M6 3h12v18l-6-4-6 4z',
   grid: 'M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z',
@@ -24,7 +25,7 @@ export default async function Community({ searchParams }: { searchParams: { k?: 
   requireMarketplace();
   const { user } = await requireUser();
   const db = supabaseAdmin();
-  const kind: 'all' | 'idea' | 'showcase' = searchParams.k === 'idea' ? 'idea' : searchParams.k === 'showcase' ? 'showcase' : 'all';
+  const kind: 'all' | 'idea' | 'showcase' | 'tip' = searchParams.k === 'idea' ? 'idea' : searchParams.k === 'tip' ? 'tip' : searchParams.k === 'showcase' ? 'showcase' : 'all';
   const trade = JOB_TYPES[searchParams.t ?? ''] ? (searchParams.t as string) : '';
   // When they last looked: a visit within 30 minutes of the last one keeps the same marker, so tags stay while they browse.
   const ck = cookies();
@@ -41,7 +42,7 @@ export default async function Community({ searchParams }: { searchParams: { k?: 
   let missing = false;
   const activeAt = new Map<string, number>();
   const freshReplies = new Map<string, number>();
-  let newShow = 0, newIdeas = 0, newMine = 0;
+  let newShow = 0, newIdeas = 0, newTips = 0, newMine = 0;
   try {
     let q = db.from('community_posts').select('*').eq('status', 'live').order('created_at', { ascending: false }).limit(60);
     if (kind !== 'all') q = q.eq('kind', kind);
@@ -65,6 +66,8 @@ export default async function Community({ searchParams }: { searchParams: { k?: 
         db.from('community_posts').select('id', { count: 'exact', head: true }).eq('status', 'live').eq('kind', 'idea').gt('created_at', sinceIso).neq('author_id', user.id),
       ]);
       newShow = a ?? 0; newIdeas = b ?? 0;
+      const { count: t } = await db.from('community_posts').select('id', { count: 'exact', head: true }).eq('status', 'live').eq('kind', 'tip').gt('created_at', sinceIso).neq('author_id', user.id);
+      newTips = t ?? 0;
       const { data: mine } = await db.from('community_posts').select('id').eq('author_id', user.id).limit(200);
       const mineIds = ((mine ?? []) as any[]).map((m) => m.id as string);
       if (mineIds.length) {
@@ -105,17 +108,19 @@ export default async function Community({ searchParams }: { searchParams: { k?: 
       <div className="cmtiles">
         <Link className="cmtile main" href="/community/share"><Ico d={ICON.cam} />Share a project</Link>
         <Link className="cmtile" href="/community/ask"><Ico d={ICON.bulb} />Ask for ideas</Link>
+        <Link className="cmtile" href="/community/tip"><Ico d={ICON.tip} />Share a tip</Link>
         <Link className="cmtile" href="/community/mine"><Ico d={ICON.mark} />Mine and saved</Link>
       </div>
       <div className="chips" aria-label="Show">
         <Chip to={href('all')} on={kind === 'all'} icon={ICON.grid} label="All" />
         <Chip to={href('showcase')} on={kind === 'showcase'} icon={ICON.home} label="Projects" n={newShow} />
         <Chip to={href('idea')} on={kind === 'idea'} icon={ICON.bulb} label="Ideas" n={newIdeas} />
+        <Chip to={href('tip')} on={kind === 'tip'} icon={ICON.tip} label="Tips" n={newTips} />
       </div>
-      {since && (newShow || newIdeas || newMine) ? (
+      {since && (newShow || newIdeas || newTips || newMine) ? (
         <div className="box" role="status" style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           <b>Since your last visit</b>
-          {newShow || newIdeas ? <span className="small">{[newShow ? `${newShow} new project${newShow > 1 ? 's' : ''}` : '', newIdeas ? `${newIdeas} new idea${newIdeas > 1 ? 's' : ''}` : ''].filter(Boolean).join(' · ')}</span> : null}
+          {newShow || newIdeas || newTips ? <span className="small">{[newShow ? `${newShow} new project${newShow > 1 ? 's' : ''}` : '', newIdeas ? `${newIdeas} new idea${newIdeas > 1 ? 's' : ''}` : '', newTips ? `${newTips} new tip${newTips > 1 ? 's' : ''}` : ''].filter(Boolean).join(' · ')}</span> : null}
           {newMine ? <span className="small">{newMine} new repl{newMine > 1 ? 'ies' : 'y'} on your posts · <Link href="/community/mine">See them</Link></span> : null}
         </div>
       ) : null}
@@ -129,9 +134,9 @@ export default async function Community({ searchParams }: { searchParams: { k?: 
 
       {posts.length === 0 && !missing ? (
         <div className="card" style={{ alignItems: 'flex-start' }}>
-          <h2>{kind === 'idea' ? 'No questions yet' : kind === 'all' ? 'Nothing shared yet' : 'No projects shared yet'}</h2>
-          <p className="muted">{kind === 'idea' ? 'Ask the first one. Pros and neighbors reply with ideas.' : 'Finished a project on Jobfile? Share the before and after, and be the first one here.'}</p>
-          <Link className="btn accent" href={kind === 'idea' ? '/community/ask' : '/community/share'}>{kind === 'idea' ? 'Ask for ideas' : 'Share a finished project'}</Link>
+          <h2>{kind === 'tip' ? 'No tips yet' : kind === 'idea' ? 'No questions yet' : kind === 'all' ? 'Nothing shared yet' : 'No projects shared yet'}</h2>
+          <p className="muted">{kind === 'tip' ? 'Know a trick that saves time or money? Share the first tip.' : kind === 'idea' ? 'Ask the first one. Pros and neighbors reply with ideas.' : 'Finished a project on Jobfile? Share the before and after, and be the first one here.'}</p>
+          <Link className="btn accent" href={kind === 'tip' ? '/community/tip' : kind === 'idea' ? '/community/ask' : '/community/share'}>{kind === 'tip' ? 'Share a tip' : kind === 'idea' ? 'Ask for ideas' : 'Share a finished project'}</Link>
         </div>
       ) : null}
       {posts.map((p) => <CommunityCard key={p.id} p={p} urls={urls} names={names} stats={stats} contractor={contractor} fresh={isNew(p)} active={isActive(p)} newReplies={freshReplies.get(p.id) ?? 0} />)}

@@ -9,7 +9,7 @@ import { notifyUsers } from '@/lib/notify';
 import { parseDollars } from '@/lib/money';
 import { hasContactInfo } from '@/lib/contactInfo';
 import { JOB_TYPES, requireMarketplace } from '@/lib/marketplace';
-import { COMMUNITY_BUCKET, HOLD_AFTER_REPORTS, MAX_COMMENTS_PER_DAY, MAX_IDEAS_PER_DAY, MAX_OPEN_SHOWCASES, type Post } from '@/lib/community';
+import { COMMUNITY_BUCKET, HOLD_AFTER_REPORTS, MAX_COMMENTS_PER_DAY, MAX_IDEAS_PER_DAY, MAX_OPEN_SHOWCASES, MAX_TIPS_PER_DAY, TIP_MAX, type Post } from '@/lib/community';
 
 const txt = (f: FormData, k: string, n: number) => String(f.get(k) ?? '').trim().slice(0, n);
 function go(path: string, key: 'error' | 'ok', msg: string): never {
@@ -58,8 +58,26 @@ export async function toggleLike(postId: string): Promise<{ on: boolean } | { er
   if (!(await livePost(db, postId))) return { error: 'This post is not available.' };
   const { data: ex } = await db.from('community_likes').select('post_id').eq('post_id', postId).eq('user_id', user.id).maybeSingle();
   if (ex) await db.from('community_likes').delete().eq('post_id', postId).eq('user_id', user.id);
-  else await db.from('community_likes').insert({ post_id: postId, user_id: user.id });
+  else {
+    await db.from('community_likes').insert({ post_id: postId, user_id: user.id });
+    await helpfulMilestone(db, postId);
+  }
   return { on: !ex };
+}
+
+/** Tell a tip's author when it gets its first Helpful and its tenth. Only these two, so alerts never pile up. */
+async function helpfulMilestone(db: Db, postId: string) {
+  try {
+    const { data: p } = await db.from('community_posts').select('kind,author_id,title').eq('id', postId).maybeSingle<any>();
+    if (!p || p.kind !== 'tip') return;
+    const { count } = await db.from('community_likes').select('post_id', { count: 'exact', head: true }).eq('post_id', postId);
+    const n = count ?? 0;
+    if (n !== 1 && n !== 10) return;
+    const title = n === 1 ? `Your tip helped someone: “${String(p.title).slice(0, 50)}”` : `10 people found your tip helpful: “${String(p.title).slice(0, 40)}”`;
+    const { count: dup } = await db.from('notifications').select('id', { count: 'exact', head: true }).eq('user_id', p.author_id).eq('title', title);
+    if ((dup ?? 0) > 0) return;
+    await notifyUsers({ userIds: [p.author_id], projectId: null, kind: 'community_note', path: `/community/${postId}`, title, body: 'Thanks for sharing what you know.', cta: 'See your tip' });
+  } catch { /* an alert is never worth breaking the tap */ }
 }
 
 export async function toggleSave(postId: string): Promise<{ on: boolean } | { error: string }> {
@@ -201,6 +219,42 @@ export async function createIdea(formData: FormData) {
   if (error) go(path, 'error', 'Could not post your question. Check that the database step was run.');
   revalidatePath('/community');
   redirect(`/community/${id}`);
+}
+
+// ---------- Tips ----------
+
+/** A short tip from experience. It waits for Jobfile to review before anyone sees it. */
+export async function createTip(formData: FormData) {
+  requireMarketplace();
+  const { user } = await requireUser();
+  const path = '/community/tip';
+  const db = supabaseAdmin();
+  const title = txt(formData, 'title', 100);
+  const body = txt(formData, 'body', TIP_MAX);
+  if (title.length < 3) go(path, 'error', 'Give your tip a short title.');
+  if (body.length < 20) go(path, 'error', 'Write a few more words so the tip is useful.');
+  if ([title, body].some(hasContactInfo)) go(path, 'error', NO_CONTACT);
+  const trade = txt(formData, 'trade', 60);
+  const { count } = await db.from('community_posts').select('id', { count: 'exact', head: true }).eq('author_id', user.id).eq('kind', 'tip').gt('created_at', new Date(Date.now() - 24 * 3600_000).toISOString());
+  if ((count ?? 0) >= MAX_TIPS_PER_DAY) go(path, 'error', 'You shared a few tips today already. Try again tomorrow.');
+  const id = randomUUID();
+  let photoPath: string | null = null;
+  const f = formData.get('photo');
+  if (f instanceof File && f.size > 0) {
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(f.type) || f.size > 3_000_000) go(path, 'error', 'The photo must be a JPG, PNG or WebP under 3 MB.');
+    photoPath = `tip/${id}/photo.jpg`;
+    const up = await db.storage.from(COMMUNITY_BUCKET).upload(photoPath, Buffer.from(await f.arrayBuffer()), { contentType: f.type });
+    if (up.error) go(path, 'error', 'Could not upload the photo. Try again.');
+  }
+  const { data: cm } = await db.from('company_members').select('company_id').eq('user_id', user.id).limit(1);
+  const companyId = ((cm ?? [])[0]?.company_id as string | undefined) ?? null;
+  const { error } = await db.from('community_posts').insert({
+    id, kind: 'tip', author_id: user.id, author_role: companyId ? 'contractor' : 'homeowner', company_id: companyId, title, body,
+    trade: JOB_TYPES[trade] ? trade : '', photo_path: photoPath, status: 'pending_review',
+  });
+  if (error) go(path, 'error', 'Could not save your tip. Check that the database step was run.');
+  revalidatePath('/community/mine');
+  go('/community/mine', 'ok', 'Thanks. Jobfile reviews your tip first. You will get an alert when it is live.');
 }
 
 // ---------- Showcases ----------

@@ -71,6 +71,7 @@ export const HELP: HelpItem[] = [
   { topic: 'bidding', who: 'c', pages: ['marketplace'], q: 'How do I narrow the list?', a: 'Filter by kind of work and distance, and tap My bids to see yours.' },
   { topic: 'community', who: 'both', pages: ['community'], q: 'What is Community?', a: 'Finished projects people share, plus questions asking for ideas.' },
   { topic: 'community', who: 'both', pages: ['community'], q: 'How do I share a finished project?', a: 'Pick a finished project and a before and an after photo. The other side approves it, then Jobfile reviews. Only the city is shown.' },
+  { topic: 'community', who: 'both', pages: ['community'], q: 'How do I share a tip?', a: 'Tap Share a tip, write a short trick from your own experience, and send it. Jobfile reviews it first, then you get an alert when it is live. People mark it Helpful.' },
   { topic: 'community', who: 'both', pages: ['community'], q: 'How do I ask for ideas?', a: 'Tap Ask for ideas, add a photo if you like, and add a poll with 2 to 4 choices.' },
   { topic: 'start', who: 'h', pages: ['find'], q: 'Who do I see here?', a: 'Contractors within 50 miles of your saved ZIP. You can filter by kind of work.' },
   { topic: 'start', who: 'h', pages: ['find'], q: 'How do I reach one?', a: 'Open their profile and tap Invite to bid, Ask a question or Start a project.' },

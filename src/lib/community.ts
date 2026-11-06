@@ -6,10 +6,14 @@ export const COMMUNITY_BUCKET = 'community-photos';
 export const MAX_COMMENTS_PER_DAY = 20;
 export const MAX_IDEAS_PER_DAY = 3;
 export const MAX_OPEN_SHOWCASES = 5;
+export const MAX_TIPS_PER_DAY = 3;
+export const TIP_MAX = 400;
+/** Trades where a wrong tip can hurt someone. Tips here get a safety line. */
+export const RISKY_TRADES = ['Electrical', 'Plumbing', 'HVAC', 'Roofing', 'Foundation', 'Gas'];
 export const HOLD_AFTER_REPORTS = 3;
 
 export type Post = {
-  id: string; kind: 'showcase' | 'idea'; author_id: string; author_role: 'contractor' | 'homeowner'; company_id: string | null; project_id: string | null;
+  id: string; kind: 'showcase' | 'idea' | 'tip'; author_id: string; author_role: 'contractor' | 'homeowner'; company_id: string | null; project_id: string | null;
   title: string; body: string; trade: string; city: string; days: number | null; cost_low_cents: number | null; cost_high_cents: number | null;
   before_path: string | null; after_path: string | null; photo_path: string | null; poll: { label: string }[];
   status: 'pending_other' | 'pending_review' | 'live' | 'rejected' | 'held' | 'removed'; reject_reason: string; created_at: string;

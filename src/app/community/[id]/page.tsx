@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import { requireUser } from '@/lib/session';
 import { supabaseAdmin } from '@/lib/supabase/server';
 import { JOB_TYPES, requireMarketplace } from '@/lib/marketplace';
-import { ago, costText, nameMaps, photoUrls, postStats, STATUS_LABEL, type Post } from '@/lib/community';
+import { RISKY_TRADES, ago, costText, nameMaps, photoUrls, postStats, STATUS_LABEL, type Post } from '@/lib/community';
 import BeforeAfter from '@/components/BeforeAfter';
 import PostActions from '@/components/PostActions';
 import IdeaPoll from '@/components/IdeaPoll';
@@ -66,13 +66,13 @@ export default async function CommunityPost({ params, searchParams }: { params: 
 
   return (
     <div className="stack" style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-      <Link href={p.kind === 'idea' ? '/community?k=idea' : '/community'} className="small">‹ Community</Link>
+      <Link href={p.kind === 'idea' ? '/community?k=idea' : p.kind === 'tip' ? '/community?k=tip' : '/community'} className="small">‹ Community</Link>
       {searchParams.error ? <div className="box bad" role="alert">{searchParams.error}</div> : null}
       {searchParams.ok ? <div className="box ok" role="status">{searchParams.ok}</div> : null}
       {!live ? <div className="box warn"><b>{STATUS_LABEL[p.status]}.</b>{p.reject_reason ? ` ${p.reject_reason}` : ''} Only you{mine ? '' : ' and the other side'} can see this.</div> : null}
 
       {p.kind === 'showcase' && before && after ? <BeforeAfter before={before} after={after} alt={p.title} /> : null}
-      {p.kind === 'idea' && photo ? (
+      {(p.kind === 'idea' || p.kind === 'tip') && photo ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={photo} alt="" className="cmphoto" style={{ borderRadius: 16 }} />
       ) : null}
@@ -81,7 +81,7 @@ export default async function CommunityPost({ params, searchParams }: { params: 
         <h1 style={{ fontSize: 28 }}>{p.title}</h1>
         <span className="small">
           <b>{who}</b>
-          {p.kind === 'idea' && p.author_role === 'contractor' ? <span className="pill ok" style={{ marginLeft: 6 }}>Pro</span> : null}
+          {p.kind !== 'showcase' && p.author_role === 'contractor' ? <span className="pill ok" style={{ marginLeft: 6 }}>Pro</span> : null}
           {co?.verified && p.kind === 'showcase' ? <span className="pill ok" style={{ marginLeft: 6 }}>✓ Verified</span> : null}
           <span className="muted"> · {ago(p.created_at)}</span>
         </span>
@@ -96,10 +96,12 @@ export default async function CommunityPost({ params, searchParams }: { params: 
         </div>
       ) : null}
       {p.body ? <p style={{ whiteSpace: 'pre-wrap' }}>{p.body}</p> : null}
+      {p.kind === 'tip' ? <span className="row" style={{ gap: 6 }}><span className="pill ok">{p.author_role === 'contractor' ? 'Pro tip' : 'Homeowner tip'}</span>{p.trade ? <span className="pill">{p.trade}</span> : null}</span> : null}
+      {p.kind === 'tip' && (RISKY_TRADES.includes(p.trade) || !p.trade) ? <div className="box warn"><b>Safety first.</b> A tip is one person’s experience, not professional advice. For electrical, gas, plumbing, roofing or structural work, hire a licensed pro.</div> : null}
       {p.kind === 'showcase' ? <div className="box ok"><b>Finished on Jobfile.</b> This project was completed and confirmed by both sides, and both agreed to share it. Names and addresses are never shown.</div> : null}
       {p.kind === 'idea' && p.poll.length ? <IdeaPoll postId={p.id} options={p.poll.map((o) => o.label)} counts={counts} mine={myVote} /> : null}
 
-      {live ? <PostActions postId={p.id} title={p.title} liked={stats.liked.has(p.id)} likes={stats.likes.get(p.id) ?? 0} saved={stats.saved.has(p.id)} /> : null}
+      {live ? <PostActions postId={p.id} title={p.title} liked={stats.liked.has(p.id)} likes={stats.likes.get(p.id) ?? 0} saved={stats.saved.has(p.id)} helpful={p.kind === 'tip'} /> : null}
 
       {live && p.kind === 'showcase' && !contractor ? <Link className="btn accent" href={`/marketplace/new?like=${p.id}`}>Start a project like this</Link> : null}
       {live && p.kind === 'showcase' && p.company_id ? <Link className="btn ghost" href={`/contractors/${p.company_id}`}>View {co?.name ?? 'the contractor'}’s profile</Link> : null}
@@ -107,7 +109,7 @@ export default async function CommunityPost({ params, searchParams }: { params: 
 
       {live ? (
         <section id="comments" className="stack" style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <h2>{p.kind === 'idea' ? 'Replies' : 'Comments'} ({comments.length})</h2>
+          <h2>{p.kind === 'idea' || p.kind === 'tip' ? 'Replies' : 'Comments'} ({comments.length})</h2>
           {comments.length === 0 ? <p className="muted small">{p.kind === 'idea' ? 'No replies yet. Be the first to help.' : 'No comments yet. Ask a question about the project.'}</p> : null}
           {comments.map((c) => {
             const cc = c.company_id ? names.company.get(c.company_id) : undefined;

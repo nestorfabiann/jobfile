@@ -606,7 +606,8 @@ html { scroll-behavior: smooth; }
 .cmhero p { color: rgba(255, 255, 255, 0.9); margin: 0; max-width: 30ch; }
 .cmlive { display: inline-flex; align-items: center; gap: 6px; width: max-content; background: rgba(255, 255, 255, 0.2); border-radius: 99px; padding: 4px 11px; font: 700 12px system-ui, sans-serif; }
 .cmlive i { width: 8px; height: 8px; border-radius: 50%; background: #7be0a4; }
-.cmtiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.cmtiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+@media (min-width: 520px) { .cmtiles { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 .cmtile { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; min-height: 76px; padding: 10px 4px; border-radius: 16px; border: 1.5px solid var(--line); background: var(--surface); color: var(--ink); font: 700 13px/1.2 system-ui, sans-serif; text-align: center; text-decoration: none; }
 .cmtile svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
 .cmtile.main { background: var(--accent); border-color: var(--accent); color: var(--accent-fg, #fff); box-shadow: 0 8px 18px -8px rgba(196, 129, 63, 0.9); }

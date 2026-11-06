@@ -8,7 +8,7 @@ const Mark = () => <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v
 const Up = () => <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12v7h16v-7M12 4v11M8 8l4-4 4 4" /></svg>;
 
 /** Like, save and share with instant feedback. The server confirms; a failure puts the button back. */
-export default function PostActions({ postId, title, liked, likes, saved }: { postId: string; title: string; liked: boolean; likes: number; saved: boolean }) {
+export default function PostActions({ postId, title, liked, likes, saved, helpful = false }: { postId: string; title: string; liked: boolean; likes: number; saved: boolean; helpful?: boolean }) {
   const [l, setL] = useState({ on: liked, n: likes });
   const [s, setS] = useState(saved);
   const [msg, setMsg] = useState('');
@@ -36,7 +36,7 @@ export default function PostActions({ postId, title, liked, likes, saved }: { po
   };
   return (
     <div className="cmacts">
-      <button type="button" className="cmib" aria-pressed={l.on} onClick={like}><Heart /><span>{l.n}</span></button>
+      <button type="button" className="cmib" aria-pressed={l.on} onClick={like}><Heart /><span>{helpful ? `Helpful · ${l.n}` : l.n}</span></button>
       <button type="button" className="cmib" aria-pressed={s} onClick={save}><Mark /><span>{s ? 'Saved' : 'Save'}</span></button>
       <button type="button" className="cmib" onClick={share}><Up /><span>Share</span></button>
       {msg ? <span className="small muted" role="status" style={{ overflowWrap: 'anywhere' }}>{msg}</span> : null}

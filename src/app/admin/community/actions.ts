@@ -16,11 +16,11 @@ export async function reviewShowcase(formData: FormData) {
   const now = new Date().toISOString();
   if (decision === 'approve') {
     await db.from('community_posts').update({ status: 'live', reviewed_at: now, reviewed_by: me.id, updated_at: now }).eq('id', id);
-    await notifyUsers({ userIds: [p.author_id], projectId: null, kind: 'community', path: `/community/${id}`, title: 'Your project is live in Community', body: 'Jobfile approved it. People can see it, like it and share it now.', cta: 'See your post' });
+    await notifyUsers({ userIds: [p.author_id], projectId: null, kind: 'community', path: `/community/${id}`, title: p.kind === 'tip' ? 'Your tip is live in Community' : 'Your project is live in Community', body: p.kind === 'tip' ? 'Jobfile approved it. People can read it and mark it Helpful now.' : 'Jobfile approved it. People can see it, like it and share it now.', cta: p.kind === 'tip' ? 'See your tip' : 'See your post' });
   } else if (decision === 'reject') {
     const why = reason || 'It did not meet the Community guidelines.';
     await db.from('community_posts').update({ status: 'rejected', reject_reason: why, reviewed_at: now, reviewed_by: me.id, updated_at: now }).eq('id', id);
-    await notifyUsers({ userIds: [p.author_id], projectId: null, kind: 'community', path: '/community/mine', title: 'Your post was not approved', body: `Reason: ${why}`, cta: 'Open Community' });
+    await notifyUsers({ userIds: [p.author_id], projectId: null, kind: 'community', path: '/community/mine', title: p.kind === 'tip' ? 'Your tip was not approved' : 'Your post was not approved', body: `Reason: ${why}`, cta: 'Open Community' });
   } else return;
   await audit(me, decision === 'approve' ? 'community_approve' : 'community_reject', { type: 'community_post', id }, { reason });
   revalidatePath('/admin/community');

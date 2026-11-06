@@ -85,7 +85,7 @@ export default async function Mine({ searchParams }: { searchParams: { error?: s
             <Link href={`/community/${p.id}`}><b>{p.title}</b></Link>
             <span className={`pill${p.status === 'live' ? ' ok' : p.status === 'rejected' || p.status === 'held' ? ' bad' : ''}`}>{p.status === 'live' ? 'Live' : p.status === 'pending_other' ? 'Waiting for approval' : p.status === 'pending_review' ? 'In review' : p.status === 'rejected' ? 'Not approved' : 'Hidden'}</span>
           </div>
-          <span className="muted small">{p.kind === 'idea' ? 'Question' : 'Project'} · {STATUS_LABEL[p.status]} · {ago(p.created_at)}{p.reject_reason ? ` · ${p.reject_reason}` : ''}</span>
+          <span className="muted small">{p.kind === 'idea' ? 'Question' : p.kind === 'tip' ? 'Tip' : 'Project'} · {STATUS_LABEL[p.status]} · {ago(p.created_at)}{p.reject_reason ? ` · ${p.reject_reason}` : ''}</span>
           <form action={removeMyPost}><input type="hidden" name="post_id" value={p.id} /><button className="btn ghost" type="submit">Remove</button></form>
         </div>
       ))}
