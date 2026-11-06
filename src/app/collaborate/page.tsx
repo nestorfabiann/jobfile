@@ -6,6 +6,7 @@ import { dollars } from '@/lib/money';
 import { listingTitle, requireMarketplace, type Listing } from '@/lib/marketplace';
 import { companyOf, localPartners, PARTNER_LABEL, type TeamBid, type TeamPartner } from '@/lib/team';
 import { myPartnerRows, PSTATUS, type ProjectPartner } from '@/lib/partners';
+import TeamWalkthrough, { WatchTeamHow } from '@/components/TeamWalkthrough';
 import { acceptCounter, cancelTeamBid, setOpenToPartner } from './actions';
 
 export const dynamic = 'force-dynamic';
@@ -105,6 +106,7 @@ export default async function Collaborate({ searchParams }: { searchParams: { er
     <div className="stack" style={{ display: 'flex', flexDirection: 'column', gap: 14, paddingBottom: 90 }}>
       <h1>Collaborate</h1>
       <p className="muted">Team up with another company on a marketplace bid, or bring a contractor you work with onto a job you found yourself.</p>
+      <TeamWalkthrough />
       {searchParams.error ? <div className="box warn" role="alert">{searchParams.error}</div> : null}
       {searchParams.ok ? <div className="box ok" role="status">{searchParams.ok}</div> : null}
       {setupMissing ? <div className="box warn">Team bids need one database step. Ask Jobfile support to run it.</div> : null}
@@ -144,7 +146,7 @@ export default async function Collaborate({ searchParams }: { searchParams: { er
       })}
 
       <h2>My team bids</h2>
-      {mineBids.length === 0 && confirmedIn.length === 0 ? <div className="card"><p className="muted">None yet. Open a project in the Marketplace and tap “Bid as a team”.</p></div> : null}
+      {mineBids.length === 0 && confirmedIn.length === 0 ? <div className="card" style={{ alignItems: 'flex-start' }}><p className="muted">None yet. Open a project in the Marketplace and tap “Bid as a team”.</p><WatchTeamHow /></div> : null}
       {mineBids.map((b) => {
         const l = listing.get(b.listing_id);
         const ps = allParts.filter((p) => p.team_bid_id === b.id);
