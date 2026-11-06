@@ -339,9 +339,21 @@ input[type='date'], input[type='time'], input[type='datetime-local'] { min-width
 .lm-nums { display: flex; justify-content: space-around; text-align: center; padding: 18px 0; border-block: 1px solid var(--line); }
 .lm-nums b { display: block; font-size: 24px; font-weight: 800; color: var(--accent); }
 .lm-nums span { font-size: 13px; color: var(--ink-2); }
+.lm-trustwrap { display: flex; flex-direction: column; gap: 10px; }
+.lm-trusth { margin: 0; font-size: 20px; letter-spacing: -0.03em; }
 .lm-trust { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.lm-trust div { display: flex; gap: 10px; align-items: center; font-size: 14px; font-weight: 600; border: 1px solid var(--line); border-radius: 16px; padding: 12px; background: var(--surface); }
-.lm-trust svg { color: var(--accent); flex: none; }
+.lm-trust > div { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; border: 1px solid var(--line); border-radius: 18px; padding: 14px; background: var(--surface); box-shadow: 0 8px 18px -14px rgba(27, 26, 24, 0.5); animation: lm-rise 0.5s ease both; }
+.lm-trust b { font-size: 15px; line-height: 1.2; letter-spacing: -0.02em; }
+.lm-trust .lm-td { font-size: 13px; line-height: 1.4; color: var(--muted, #6b655e); font-weight: 400; }
+.lm-tic { width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; }
+.lm-tic.o { background: #f9efe4; color: var(--accent, #c4813f); }
+.lm-tic.g { background: #e4f0e8; color: #1f4d3a; }
+@keyframes lm-rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .lm-trust > div { animation: none; } }
+.lm-both .lm-bt { display: flex; flex-direction: column; gap: 8px; }
+.lm-both .lm-bp { display: flex; gap: 8px; }
+.lm-both .lm-bp i { flex: 1; font-style: normal; font-weight: 700; font-size: 13px; text-align: center; background: var(--surface); border-radius: 12px; padding: 8px 6px; }
+.lm-both .lm-bp em { display: block; font-style: normal; color: #e0a526; letter-spacing: 2px; font-size: 15px; }
 .lm-bento { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .lm-bento h2 { grid-column: 1 / -1; font-size: 26px; }
 .lm-tile { border-radius: 22px; padding: 16px; display: flex; flex-direction: column; gap: 6px; background: var(--surface); border: 1px solid var(--line); min-width: 0; }

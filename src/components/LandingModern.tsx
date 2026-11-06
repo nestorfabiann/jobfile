@@ -181,17 +181,26 @@ export default function LandingModern({ signedIn, nums, children }: { signedIn: 
         ))}
       </section>
 
-      <section className="lm-trust" aria-label="Why people trust Jobfile">
-        <div><Svg n="shield" size={20} />Insured and verified</div>
-        <div><Svg n="pin" size={20} />Address stays private</div>
-        <div><Svg n="clock" size={20} />Free, no fees</div>
-        <div><Svg n="star" size={20} />Built for Texas</div>
+      <section className="lm-trustwrap" aria-label="Why people trust Jobfile">
+        <h2 className="lm-trusth">Why Jobfile</h2>
+        <div className="lm-trust">
+          {([['shield', 'Insurance checked', 'We review each pro’s license and insurance before they bid.', 'o'], ['pin', 'Address stays private', 'Only the pro you hire sees where you live.', 'g'], ['clock', 'Free, no fees', 'Post, bid and hire without paying Jobfile.', 'o'], ['star', 'Built for Texas', 'Made for Texas homes, codes and weather.', 'g']] as const).map(([ic, t, d, tone], i) => (
+            <div key={t} style={{ animationDelay: `${i * 70}ms` }}>
+              <span className={`lm-tic ${tone}`} aria-hidden="true"><Svg n={ic} size={18} /></span>
+              <b>{t}</b>
+              <span className="lm-td">{d}</span>
+            </div>
+          ))}
+        </div>
       </section>
 
       {side === 'ho' && (
         <div className="lm-both" role="note">
           <span aria-hidden="true"><Svg n="shield" size={20} /></span>
-          <span><b>Ratings go both ways.</b> You rate your contractor and they rate you, so both sides show up prepared and work gets done right.</span>
+          <span className="lm-bt">
+            <span><b>Ratings go both ways.</b> Both sides show up prepared, and work gets done right.</span>
+            <span className="lm-bp"><i>You rate them <em aria-hidden="true">★★★★★</em></i><i>They rate you <em aria-hidden="true">★★★★★</em></i></span>
+          </span>
         </div>
       )}
 
