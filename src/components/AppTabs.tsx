@@ -17,7 +17,7 @@ const IC: Record<string, string> = {
 };
 
 /** Bottom tab bar for signed-in people. Homeowners get Post, contractors get Find work. */
-export default function AppTabs({ contractor, marketplace, waiting, admin, invites = 0, community = 0, signOutAction }: { contractor: boolean; marketplace: boolean; waiting: number; admin: boolean; invites?: number; community?: number; signOutAction: () => void | Promise<void> }) {
+export default function AppTabs({ contractor, marketplace, waiting, admin, invites = 0, community = 0, design = false, signOutAction }: { design?: boolean; contractor: boolean; marketplace: boolean; waiting: number; admin: boolean; invites?: number; community?: number; signOutAction: () => void | Promise<void> }) {
   const path = usePathname() || '/';
   const [open, setOpen] = useState(false);
   const { installed, nudge: getApp } = useGetApp();
@@ -48,6 +48,7 @@ export default function AppTabs({ contractor, marketplace, waiting, admin, invit
     ...(marketplace ? ([['/community', 'Community', 'comm']] as [string, string, string][]) : []),
     ...(marketplace && contractor ? ([['/collaborate', 'Collaborate', 'collab']] as [string, string, string][]) : []),
     ...(marketplace && !contractor ? ([['/find', 'Find contractors', 'find']] as [string, string, string][]) : []),
+    ...(marketplace && design && !contractor ? ([['/design', 'Design ideas', 'design']] as [string, string, string][]) : []),
     ['/settings', 'Settings', 'set'],
     ...(contractor ? ([['/settings/business', 'Business profile', 'biz']] as [string, string, string][]) : []),
     ['/invite', 'Invite friends', 'inv'],

@@ -9,7 +9,7 @@ import { useCollab } from '@/lib/useCollab';
 import { useIsNew } from '@/lib/useSeen';
 
 /** Signed-in header menu: Home first, then the usual links. Closes on navigation, outside tap and Escape. */
-export default function AppMenu({ marketplace, contractor, admin, invites = 0, community = 0, signOutAction }: { marketplace: boolean; contractor?: boolean; admin: boolean; invites?: number; community?: number; signOutAction: () => void | Promise<void> }) {
+export default function AppMenu({ marketplace, contractor, admin, invites = 0, community = 0, design = false, signOutAction }: { marketplace: boolean; design?: boolean; contractor?: boolean; admin: boolean; invites?: number; community?: number; signOutAction: () => void | Promise<void> }) {
   const [open, setOpen] = useState(false);
   const path = usePathname();
   const box = useRef<HTMLDivElement>(null);
@@ -34,6 +34,7 @@ export default function AppMenu({ marketplace, contractor, admin, invites = 0, c
     ...(marketplace ? ([['/community', 'Community', 'comm']] as [string, string, string][]) : []),
     ...(marketplace && contractor ? ([['/collaborate', 'Collaborate', 'collab']] as [string, string, string][]) : []),
     ...(marketplace && !contractor ? ([['/find', 'Find contractors', 'find']] as [string, string, string][]) : []),
+    ...(marketplace && design && !contractor ? ([['/design', 'Design ideas', 'design']] as [string, string, string][]) : []),
     ['/settings', 'Settings', 'set'],
     ...(contractor ? ([['/settings/business', 'Business profile', 'biz']] as [string, string, string][]) : []),
     ['/invite', 'Invite friends', 'inv'],

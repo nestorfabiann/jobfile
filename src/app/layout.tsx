@@ -7,6 +7,7 @@ import { adminRoleOf } from '@/lib/admin';
 import { marketplaceEnabled } from '@/lib/marketplace';
 import PubTabs from '@/components/PubTabs';
 import AppMenu from '@/components/AppMenu';
+import { designEnabled } from '@/lib/designIdeas';
 import { inviteCount } from '@/lib/team';
 import HelpButton from '@/components/HelpButton';
 import AlertPill from '@/components/AlertPill';
@@ -77,7 +78,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <header className="pubtop app">
             <div className="in pubtop-in">
               <Link href="/" className="publogo">Job<b>file</b></Link>
-              {user && <AppMenu marketplace={marketplaceEnabled()} contractor={contractor} admin={isAdmin} invites={invites} community={comm} signOutAction={signOut} />}
+              {user && <AppMenu marketplace={marketplaceEnabled()} contractor={contractor} admin={isAdmin} invites={invites} community={comm} design={designEnabled()} signOutAction={signOut} />}
             </div>
           </header>
         )}
@@ -87,7 +88,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         {user && <UsageBeacon />}
         {user && <AlertPill />}
         {user && <WelcomeAlerts />}
-        {user && <AppTabs contractor={contractor} marketplace={marketplaceEnabled()} waiting={waiting} admin={isAdmin} invites={invites} community={comm} signOutAction={signOut} />}
+        {user && <AppTabs contractor={contractor} marketplace={marketplaceEnabled()} waiting={waiting} admin={isAdmin} invites={invites} community={comm} design={designEnabled()} signOutAction={signOut} />}
       </body>
     </html>
   );
