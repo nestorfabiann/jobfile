@@ -91,6 +91,26 @@ export default function DesignForm({ picks, styles, spaces }: { picks: Record<st
 }
 
 const OTHER_VALUE = 'Other (type my own)';
+const EXAMPLES: Record<string, string> = {
+  Cabinets: 'dusty blue shaker, or Sherwin-Williams Urbane Bronze',
+  Countertops: 'white quartz with gray veining, or soapstone',
+  Backsplash: 'green zellige tile, or herringbone white tile',
+  Floor: 'wide plank white oak, or terracotta tile',
+  'Wall color': 'dusty rose, or Sherwin-Williams Agreeable Gray',
+  Walls: 'dusty rose, or Sherwin-Williams Agreeable Gray',
+  Vanity: 'floating walnut vanity, or deep green',
+  'Tile and walls': 'zellige tile, or white tile with dark grout',
+  Fixtures: 'champagne bronze, or polished chrome',
+  'Body color': 'warm greige, or Benjamin Moore Hale Navy',
+  'Trim color': 'bright white, or Sherwin-Williams Iron Ore',
+  'Front door': 'deep teal, or stained mahogany',
+  'Siding or stone': 'white brick, or stacked stone',
+  Shutters: 'black louvered shutters',
+  'Trim and doors': 'crisp white, or Benjamin Moore Chantilly Lace',
+  Trim: 'crisp white, or soft cream',
+  Ceiling: 'soft white, or pale blue',
+  'Accent wall': 'deep green behind the bed, or vertical wood slats',
+};
 function PickField({ label, opts }: { label: string; opts: string[] }) {
   const [v, setV] = useState(opts[0]);
   return (
@@ -99,7 +119,7 @@ function PickField({ label, opts }: { label: string; opts: string[] }) {
       <select name={label} value={v} onChange={(e) => setV(e.target.value)}>{opts.map((o) => <option key={o}>{o}</option>)}</select>
       {v === OTHER_VALUE ? (
         <>
-          <input type="text" name={`${label}__custom`} maxLength={40} placeholder="For example: dusty rose, or Sherwin-Williams Agreeable Gray" autoFocus />
+          <input type="text" name={`${label}__custom`} maxLength={40} placeholder={`For example: ${EXAMPLES[label] ?? 'a color, material or style you like'}`} autoFocus />
           <button type="button" className="small" style={{ alignSelf: 'flex-start', background: 'none', border: 0, padding: 0, color: 'var(--accent, #c4813f)', textDecoration: 'underline' }} onClick={() => setV(opts[0])}>Pick from the list instead</button>
         </>
       ) : (
