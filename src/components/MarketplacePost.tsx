@@ -203,7 +203,7 @@ export default function MarketplacePost({ types, aiOn, draft, inviteCompany, inv
       </div>
 
       {(() => {
-        const names = (leads ?? []).filter((c) => !c.trades.length || c.trades.includes(type)).map((c) => c.name);
+        const names = (leads ?? []).filter((c) => c.trades.includes(type)).map((c) => c.name);
         return names.length ? (
           <div className="box" style={{ background: 'var(--accent-soft, #f9efe4)' }}>
             <b>You started a project with {names.join(' and ')}</b>
