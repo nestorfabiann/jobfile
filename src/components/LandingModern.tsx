@@ -147,6 +147,7 @@ export default function LandingModern({ signedIn, nums, children }: { signedIn: 
   const [side, setSide] = useState<Side>('ho');
   const [step, setStep] = useState(0);
   const [open, setOpen] = useState<number | null>(null);
+  const [trackOpen, setTrackOpen] = useState<number | null>(null);
   // Autoplay for the three steps: starts a moment after the section is on screen, stops for good when someone taps a step.
   const [inView, setInView] = useState(false);
   const [ready, setReady] = useState(false);
@@ -252,16 +253,24 @@ export default function LandingModern({ signedIn, nums, children }: { signedIn: 
           <p>{side === 'ho' ? 'Every message, photo, change and payment is tracked in one place, so you always know where things stand.' : 'Every message, photo, change and payment is tracked in one place, so nothing is lost and you always have the record.'}</p>
         </div>
         <ol className="lm-tl">
-          {([['Price and scope agreed', 'Written down, both sides see it'], ['Change approved', 'Nothing extra without a yes'], ['Photos added', 'Progress and the finished work'], ['Payment recorded', 'A record you can come back to']] as const).map(([t, d], i) => (
-            <li key={t} className={i === 3 ? 'done' : ''}><i aria-hidden="true">{i === 3 ? '✓' : i + 1}</i><span><b>{t}</b><span>{d}</span></span></li>
+          {([
+            ['Price and scope agreed', 'Written down, both sides see it', 'No more “that is not what we agreed.”', 'Interior paint, 3 rooms', '$2,400'],
+            ['Change approved', 'Nothing extra without a yes', 'No more “I never approved that.”', 'Extra coat on ceiling, +$180', 'Approved ✓'],
+            ['Photos added', 'Progress and the finished work', 'No more “I never saw that.”', '12 photos · Day 3 of 5', 'New'],
+            ['Payment recorded', 'A record you can come back to', 'No more “I never got paid” or “I already paid.”', 'Deposit $800 · marked paid', 'Recorded ✓'],
+          ] as const).map(([t, d, pay, ex, tag], i) => (
+            <li key={t} className={`${i === 3 ? 'done' : ''}${trackOpen === i ? ' open' : ''}`}>
+              <button type="button" className="lm-tbtn" aria-expanded={trackOpen === i} onClick={() => setTrackOpen(trackOpen === i ? null : i)}>
+                <i aria-hidden="true">{i === 3 ? '✓' : i + 1}</i>
+                <span className="lm-ttx"><b>{t}</b><span>{d}</span><em>{pay}</em>
+                  {trackOpen === i ? <span className="lm-tex"><span>{ex}</span><strong>{tag}</strong></span> : null}
+                </span>
+                <span className="lm-tchv" aria-hidden="true">›</span>
+              </button>
+            </li>
           ))}
         </ol>
-        <h3 className="lm-never">No more “I never got that”</h3>
-        <div className="lm-pains">
-          <div><b>Every change in writing</b><span>Approved by both sides before the work starts.</span></div>
-          <div><b>Proof of what was agreed</b><span>Price, scope and photos in one record.</span></div>
-          <div><b>Nothing lost in texts</b><span>Messages and updates stay with the project.</span></div>
-        </div>
+        <p className="lm-tapnote">Tap a step to see an example</p>
         <p className="lm-peace"><b>Less worry, fewer arguments.</b> Peace of mind for homeowners and pros.</p>
       </section>
 
