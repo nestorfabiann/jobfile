@@ -269,8 +269,8 @@ export default async function ListingPage({ params, searchParams }: { params: { 
       {searchParams.error ? <div className="box bad">{searchParams.error}</div> : null}
       {!owner && invRows[0] && invRows[0].status !== 'declined' && !bidders.has(companyId as string) && (
         <div className="box" style={{ background: 'var(--accent-soft, #f9efe4)' }}>
-          <b>{invRows[0].status === 'invited' ? 'The homeowner invited you to bid.' : 'The homeowner asked you a question.'}</b>
-          {invRows[0].note ? <span className="small" style={{ display: 'block' }}>&ldquo;{invRows[0].note}&rdquo;</span> : null}
+          <b>{invRows[0].note === 'Started a project with you' ? 'Your customer posted this project.' : invRows[0].status === 'invited' ? 'The homeowner invited you to bid.' : 'The homeowner asked you a question.'}</b>
+          {invRows[0].note === 'Started a project with you' ? <span className="small" style={{ display: 'block' }}>They started a project with you on Jobfile. You can bid like everyone else, and your own quote and notes stay private.</span> : invRows[0].note ? <span className="small" style={{ display: 'block' }}>&ldquo;{invRows[0].note}&rdquo;</span> : null}
           <span className="row" style={{ gap: 10, marginTop: 8 }}>
             <Link className="btn ghost" href={`/marketplace/${l.id}/invite/${invRows[0].id}`}>{invRows[0].status === 'asked' ? 'Read and reply' : 'Ask a question'}</Link>
             <form action={declineInvite}><input type="hidden" name="id" value={invRows[0].id} /><button className="btn ghost" type="submit">Pass on this one</button></form>
@@ -514,7 +514,12 @@ export default async function ListingPage({ params, searchParams }: { params: { 
           {l.status === 'awarded' && l.project_id && <Link className="btn" href={`/projects/${l.project_id}/overview`}>Open the project</Link>}
           {shown.length > 1 && <CompareBar action={`/marketplace/${l.id}`} />}
           {open && (
-            <form action={closeListing}><input type="hidden" name="listing_id" value={l.id} /><button className="btn ghost" type="submit">Close this project (no more bids)</button></form>
+            <form action={closeListing} className="stack" style={{ gap: 6 }}>
+              <input type="hidden" name="listing_id" value={l.id} />
+              <label className="small muted" htmlFor="close-reason">Why are you closing it? (optional, contractors see this)</label>
+              <select id="close-reason" name="reason" defaultValue="other"><option value="other">Prefer not to say</option><option value="other_pro">Went with someone else</option><option value="changed_mind">Changed my mind</option><option value="price">Prices were too high</option></select>
+              <button className="btn ghost" type="submit">Close this project (no more bids)</button>
+            </form>
           )}
         </>
       )}

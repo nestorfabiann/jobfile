@@ -50,6 +50,8 @@ export default async function NewListing({ searchParams }: { searchParams: { err
     const { data: ic } = await supabaseAdmin().from('companies').select('id,name,hidden_at').eq('id', searchParams.invite as string).maybeSingle<any>();
     if (ic && !ic.hidden_at) { inviteId = ic.id as string; inviteName = ic.name as string; }
   }
+  const { leadCompanies } = await import('@/lib/leadProtect');
+  const leadNames = (await leadCompanies(user.email)).map((c) => c.name);
   return (
     <>
       <div className="stack">
@@ -57,6 +59,12 @@ export default async function NewListing({ searchParams }: { searchParams: { err
         <h1>Post a project</h1>
         <p className="muted">Pick what you want done, and local contractors can send you bids.</p>
       </div>
+      {leadNames.length ? (
+        <div className="box" style={{ background: 'var(--accent-soft, #f9efe4)' }}>
+          <b>You started a project with {leadNames.join(' and ')}</b>
+          <span className="small" style={{ display: 'block' }}>If you post the same kind of job, they are told and can bid with everyone else. Their quote and notes stay private to your project.</span>
+        </div>
+      ) : null}
       {designEnabled() && !ideaCard ? (
         <Link href="/design" className="box" style={{ background: 'var(--accent-soft, #f9efe4)', display: 'block' }}>
           <b>Not sure what you want?</b>

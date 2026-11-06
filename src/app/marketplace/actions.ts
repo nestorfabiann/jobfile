@@ -164,6 +164,22 @@ async function createListingInner(formData: FormData): Promise<CreateResult> {
       }
     } catch { /* never block posting */ }
   }
+  // A contractor who already opened a project for this homeowner (last 60 days, same kind of work) is told and added to the bid list.
+  try {
+    const { leadCompanies, LEAD_NOTE } = await import('@/lib/leadProtect');
+    const first = await leadCompanies(user.email, jobType);
+    if (first.length) {
+      const { makeInvite, tellCompany } = await import('@/lib/bidInvites');
+      const { data: full } = await db.from('marketplace_listings').select('id,homeowner_id,job_type,items,zip,status,expires_at,homeowner_name').eq('id', l.id).maybeSingle<any>();
+      if (full) {
+        for (const c of first) {
+          if (c.id === inviteCo) continue;
+          const r = await makeInvite(full, c.id, LEAD_NOTE, 'invited');
+          if (!('error' in r) && r.created) await tellCompany(c.id, full, `Your customer posted ${listingTitle(full)}`, `${full.homeowner_name || 'A homeowner'} started a project with you on Jobfile and just posted this one. You can bid like everyone else. Your own quote and notes stay private.`);
+        }
+      }
+    }
+  } catch { /* never block posting */ }
   // "Start a project from this idea": copy the chosen AI picture (and, if ticked, the original as the "before") onto the listing.
   const ideaId = txt(formData, 'idea_id', 40);
   if (/^[0-9a-f-]{36}$/i.test(ideaId)) {
@@ -324,10 +340,12 @@ export async function closeListing(formData: FormData) {
   const l = await loadListing(String(formData.get('listing_id') ?? ''));
   if (!l || l.homeowner_id !== user.id) redirect('/marketplace');
   const db = supabaseAdmin();
+  const REASONS: Record<string, string> = { other_pro: 'The homeowner went with someone else.', changed_mind: 'The homeowner changed their mind.', price: 'The homeowner said the prices were too high.', other: '' };
+  const why = REASONS[String(formData.get('reason') ?? '')] ?? '';
   const { data: done } = await db.from('marketplace_listings').update({ status: 'closed' }).eq('id', l.id).eq('status', 'open').select('id');
   if ((done ?? []).length) {
     const { data: bids } = await db.from('marketplace_bids').update({ status: 'not_selected', updated_at: new Date().toISOString() }).eq('listing_id', l.id).eq('status', 'waiting').select('id,bidder_id');
-    await notifyUsers({ userIds: Array.from(new Set((bids ?? []).map((b) => b.bidder_id as string))), projectId: null, kind: 'bid', path: '/marketplace/bids', title: `${listingTitle(l)} was closed`, body: 'The homeowner closed this project, so it is no longer taking bids.' });
+    await notifyUsers({ userIds: Array.from(new Set((bids ?? []).map((b) => b.bidder_id as string))), projectId: null, kind: 'bid', path: '/marketplace/bids', title: `${listingTitle(l)} was closed`, body: `The homeowner closed this project, so it is no longer taking bids.${why ? ` ${why}` : ''}` });
     await tellTeamPartners((bids ?? []).map((b) => b.id as string), `${listingTitle(l)} was closed`, 'The homeowner closed this project, so your team bid is closed.');
   }
   revalidatePath('/marketplace');
