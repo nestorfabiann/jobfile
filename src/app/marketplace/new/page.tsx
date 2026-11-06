@@ -53,7 +53,7 @@ export default async function NewListing({ searchParams }: { searchParams: { err
     if (ic && !ic.hidden_at) { inviteId = ic.id as string; inviteName = ic.name as string; }
   }
   const { leadCompanies } = await import('@/lib/leadProtect');
-  const leadNames = (await leadCompanies(user.email)).map((c) => c.name);
+  const leads = (await leadCompanies(user.email)).map((c) => ({ name: c.name, trades: c.trades }));
   return (
     <>
       <div className="stack">
@@ -61,12 +61,6 @@ export default async function NewListing({ searchParams }: { searchParams: { err
         <h1>Post a project</h1>
         <p className="muted">Pick what you want done, and local contractors can send you bids.</p>
       </div>
-      {leadNames.length ? (
-        <div className="box" style={{ background: 'var(--accent-soft, #f9efe4)' }}>
-          <b>You started a project with {leadNames.join(' and ')}</b>
-          <span className="small" style={{ display: 'block' }}>If you post the same kind of job, they are told and can bid with everyone else. Their quote and notes stay private to your project.</span>
-        </div>
-      ) : null}
       {designEnabled() && !ideaCard ? (
         <Link href="/design" className="box" style={{ background: 'var(--accent-soft, #f9efe4)', display: 'block' }}>
           <b>Not sure what you want?</b>
@@ -80,7 +74,7 @@ export default async function NewListing({ searchParams }: { searchParams: { err
           <span className="small" style={{ display: 'block' }}>Other local contractors can still bid on your project. {inviteName} must serve your ZIP code to be invited.</span>
         </div>
       ) : null}
-      <MarketplacePost ideaPicks={ideaPicks} idea={ideaCard} types={JOB_TYPES} aiOn={aiConfigured()} draft={draft} inviteCompany={inviteId} inviteName={inviteName} />
+      <MarketplacePost leads={leads} ideaPicks={ideaPicks} idea={ideaCard} types={JOB_TYPES} aiOn={aiConfigured()} draft={draft} inviteCompany={inviteId} inviteName={inviteName} />
     </>
   );
 }

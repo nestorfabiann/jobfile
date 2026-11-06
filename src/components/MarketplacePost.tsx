@@ -17,7 +17,7 @@ type Types = Record<string, { size: number; sizeLabel: string; groups: [string, 
 const money = (n: number) => '$' + Math.round(n).toLocaleString('en-US');
 const digits = (v: string) => parseInt(v.replace(/\D/g, ''), 10) || 0;
 
-export default function MarketplacePost({ types, aiOn, draft, inviteCompany, inviteName, idea, ideaPicks }: { ideaPicks?: string[]; idea?: { id: string; pick: number; thumb: string | null; label: string; blurb: string } | null; types: Types; aiOn: boolean; inviteCompany?: string; inviteName?: string; draft?: { id: string; at: string; data: DraftData } | null }) {
+export default function MarketplacePost({ types, aiOn, draft, inviteCompany, inviteName, idea, ideaPicks, leads }: { leads?: { name: string; trades: string[] }[]; ideaPicks?: string[]; idea?: { id: string; pick: number; thumb: string | null; label: string; blurb: string } | null; types: Types; aiOn: boolean; inviteCompany?: string; inviteName?: string; draft?: { id: string; at: string; data: DraftData } | null }) {
   const names = Object.keys(types);
   const d0 = draft?.data;
   const [type, setType] = useState(d0 && types[d0.type] ? d0.type : names[0]);
@@ -202,6 +202,15 @@ export default function MarketplacePost({ types, aiOn, draft, inviteCompany, inv
         </div>
       </div>
 
+      {(() => {
+        const names = (leads ?? []).filter((c) => !c.trades.length || c.trades.includes(type)).map((c) => c.name);
+        return names.length ? (
+          <div className="box" style={{ background: 'var(--accent-soft, #f9efe4)' }}>
+            <b>You started a project with {names.join(' and ')}</b>
+            <span className="small" style={{ display: 'block' }}>If you post this kind of job, they are told and can bid with everyone else. Their quote and notes stay private to your project.</span>
+          </div>
+        ) : null;
+      })()}
       <div className="card">
         <h2>Tap what you want done</h2>
         {types[type].groups.map(([group, items]) => (
