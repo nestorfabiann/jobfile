@@ -23,42 +23,54 @@ export const SPACE_JOB: Record<Space, string> = { kitchen: 'Kitchen remodel', ba
 export const spaceLabel = (s: string) => (s in SPACES ? SPACES[s as Space] : 'Room');
 export const STYLES = ['Modern', 'Farmhouse', 'Traditional', 'Coastal'] as const;
 
-const WALLS = ['Keep as they are', 'Warm white', 'Soft gray', 'Pale green', 'Soft sage', 'Warm beige'];
+export const OTHER = 'Other (type my own)';
+const WALL_COLORS = ['Warm white', 'Bright white', 'Soft gray', 'Charcoal gray', 'Greige', 'Warm beige', 'Cream', 'Tan', 'Pale green', 'Soft sage', 'Deep green', 'Light blue', 'Soft blue', 'Navy', 'Blush pink', 'Terracotta', 'Soft yellow'];
+const FLOORS = ['Light wood look', 'Dark wood look', 'Medium oak look', 'Gray wood look', 'Gray tile', 'Large light tile', 'Concrete look', 'Herringbone wood look'];
+const CABS = ['White', 'Off white', 'Light gray', 'Charcoal', 'Black', 'Navy', 'Sage green', 'Forest green', 'Natural wood', 'Walnut', 'Two tone: white and wood'];
+const METALS = ['Brushed nickel', 'Matte black', 'Brass', 'Chrome', 'Oil rubbed bronze', 'Brushed gold'];
+const TRIM = ['White', 'Cream', 'Black', 'Charcoal', 'Light gray'];
+const keep = (x: string, ...rest: string[]) => [x, ...rest, OTHER];
 export const PICKS: Record<Space, Record<string, string[]>> = {
   kitchen: {
-    Cabinets: ['Keep as they are', 'White', 'Navy', 'Sage green', 'Natural wood'],
-    Countertops: ['Keep as they are', 'White quartz', 'Gray granite', 'Butcher block'],
-    Floor: ['Keep as it is', 'Light wood look', 'Dark wood look', 'Gray tile'],
-    'Wall color': ['Keep as it is', 'Warm white', 'Soft gray', 'Pale green'],
+    Cabinets: keep('Keep as they are', ...CABS),
+    Countertops: keep('Keep as they are', 'White quartz', 'Gray quartz', 'Black granite', 'Gray granite', 'Marble look', 'Butcher block', 'Concrete look'),
+    Backsplash: keep('Keep as it is', 'White subway tile', 'Gray subway tile', 'Marble look tile', 'Green tile', 'Blue tile', 'Natural stone'),
+    Floor: keep('Keep as it is', ...FLOORS),
+    'Wall color': keep('Keep as it is', ...WALL_COLORS),
   },
   bathroom: {
-    Vanity: ['Keep as it is', 'White', 'Dark wood', 'Navy'],
-    'Tile and walls': ['Keep as they are', 'White subway tile', 'Gray large tile', 'Warm beige'],
-    Floor: ['Keep as it is', 'Gray tile', 'Wood look tile', 'Black and white pattern'],
-    Fixtures: ['Keep as they are', 'Brushed nickel', 'Matte black', 'Brass'],
+    Vanity: keep('Keep as it is', 'White', 'Light gray', 'Dark wood', 'Natural wood', 'Navy', 'Black', 'Sage green'),
+    'Tile and walls': keep('Keep as they are', 'White subway tile', 'Gray large tile', 'Marble look tile', 'Beige tile', 'Green tile', 'Blue tile', 'Warm beige paint', 'Soft gray paint'),
+    Floor: keep('Keep as it is', 'Gray tile', 'Wood look tile', 'Black and white pattern', 'Hex tile', 'Marble look tile', 'Large light tile'),
+    Fixtures: keep('Keep as they are', ...METALS),
+    'Wall color': keep('Keep as it is', ...WALL_COLORS),
   },
   exterior: {
-    'Body color': ['Keep as it is', 'Warm white', 'Soft gray', 'Greige', 'Sage green', 'Navy', 'Charcoal'],
-    'Trim color': ['Keep as it is', 'White', 'Charcoal', 'Black', 'Cream'],
-    'Front door': ['Keep as it is', 'Navy', 'Black', 'Red', 'Natural wood', 'Sage green'],
-    'Siding or stone': ['Keep as it is', 'Board and batten', 'Natural stone accent', 'Brick look'],
+    'Body color': keep('Keep as it is', 'Warm white', 'Soft gray', 'Greige', 'Tan', 'Sage green', 'Forest green', 'Light blue', 'Navy', 'Charcoal', 'Black', 'Terracotta'),
+    'Trim color': keep('Keep as it is', 'White', 'Cream', 'Charcoal', 'Black', 'Dark bronze'),
+    'Front door': keep('Keep as it is', 'Navy', 'Black', 'Red', 'Natural wood', 'Sage green', 'Yellow', 'Teal', 'White'),
+    'Siding or stone': keep('Keep as it is', 'Board and batten', 'Natural stone accent', 'Brick look', 'Horizontal lap siding', 'Stucco look', 'Cedar shake look'),
+    Shutters: keep('Keep as they are', 'None', 'Black', 'Navy', 'Charcoal', 'Green', 'White'),
   },
   living: {
-    'Wall color': WALLS.map((w) => (w === 'Keep as they are' ? 'Keep as it is' : w)),
-    Floor: ['Keep as it is', 'Light wood look', 'Dark wood look', 'Gray tile'],
-    'Trim and doors': ['Keep as they are', 'White', 'Black', 'Cream'],
-    Ceiling: ['Keep as it is', 'White', 'Soft cream'],
+    'Wall color': keep('Keep as it is', ...WALL_COLORS),
+    Floor: keep('Keep as it is', ...FLOORS, 'Soft gray carpet'),
+    'Trim and doors': keep('Keep as they are', ...TRIM),
+    Ceiling: keep('Keep as it is', 'White', 'Soft cream', 'Light gray', 'Wood plank look'),
+    'Accent wall': keep('None', 'Navy', 'Deep green', 'Charcoal', 'Terracotta', 'Wood slat look', 'Shiplap'),
   },
   bedroom: {
-    'Wall color': WALLS.map((w) => (w === 'Keep as they are' ? 'Keep as it is' : w)),
-    Floor: ['Keep as it is', 'Light wood look', 'Dark wood look', 'Soft gray carpet'],
-    'Trim and doors': ['Keep as they are', 'White', 'Black', 'Cream'],
-    Ceiling: ['Keep as it is', 'White', 'Soft cream'],
+    'Wall color': keep('Keep as it is', ...WALL_COLORS),
+    Floor: keep('Keep as it is', ...FLOORS, 'Soft gray carpet', 'Cream carpet'),
+    'Trim and doors': keep('Keep as they are', ...TRIM),
+    Ceiling: keep('Keep as it is', 'White', 'Soft cream', 'Light gray'),
+    'Accent wall': keep('None', 'Navy', 'Deep green', 'Charcoal', 'Blush pink', 'Wood slat look', 'Shiplap'),
   },
   colors: {
-    Walls: WALLS,
-    Trim: ['Keep as it is', 'White', 'Cream', 'Black'],
-    'Accent wall': ['None', 'Navy', 'Deep green', 'Charcoal', 'Terracotta'],
+    Walls: keep('Keep as they are', ...WALL_COLORS),
+    Trim: keep('Keep as it is', ...TRIM),
+    Ceiling: keep('Keep as it is', 'White', 'Soft cream', 'Light gray'),
+    'Accent wall': keep('None', 'Navy', 'Deep green', 'Charcoal', 'Terracotta', 'Blush pink', 'Soft blue'),
   },
 };
 
@@ -66,7 +78,10 @@ export function cleanPicks(space: Space, raw: Record<string, FormDataEntryValue 
   const out: Record<string, string> = {};
   for (const [k, opts] of Object.entries(PICKS[space])) {
     const v = String(raw[k] ?? '');
-    if (opts.includes(v)) out[k] = v;
+    if (v === OTHER) {
+      const t = String(raw[`${k}__custom`] ?? '').replace(/[^\p{L}\p{N} ,.'&/-]/gu, '').replace(/\s+/g, ' ').trim().slice(0, 40);
+      if (t) out[k] = t;
+    } else if (opts.includes(v)) out[k] = v;
   }
   return out;
 }

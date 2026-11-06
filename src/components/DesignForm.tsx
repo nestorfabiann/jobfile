@@ -65,10 +65,7 @@ export default function DesignForm({ picks, styles, spaces }: { picks: Record<st
         </div>
       </div>
       {Object.entries(picks[space]).map(([label, opts]) => (
-        <label key={`${space}-${label}`} className="stack" style={{ gap: 4 }}>
-          <b>{label}</b>
-          <select name={label} defaultValue={opts[0]}>{opts.map((o) => <option key={o}>{o}</option>)}</select>
-        </label>
+        <PickField key={`${space}-${label}`} label={label} opts={opts} />
       ))}
       <label className="stack" style={{ gap: 4 }}>
         <b>Anything else? <span className="muted small">(optional)</span></b>
@@ -90,5 +87,19 @@ export default function DesignForm({ picks, styles, spaces }: { picks: Record<st
       <button className="btn" type="submit" disabled={busy}>{busy ? 'Creating ideas… about 30 seconds' : 'Show me ideas'}</button>
       <p className="muted small" style={{ margin: 0 }}>AI ideas are pictures to spark conversation. They are not a plan and not a price.</p>
     </form>
+  );
+}
+
+const OTHER_VALUE = 'Other (type my own)';
+function PickField({ label, opts }: { label: string; opts: string[] }) {
+  const [v, setV] = useState(opts[0]);
+  return (
+    <label className="stack" style={{ gap: 4 }}>
+      <b>{label}</b>
+      <select name={label} value={v} onChange={(e) => setV(e.target.value)}>{opts.map((o) => <option key={o}>{o}</option>)}</select>
+      {v === OTHER_VALUE ? (
+        <input type="text" name={`${label}__custom`} maxLength={40} placeholder="For example: dusty rose, or Sherwin-Williams Agreeable Gray" autoFocus />
+      ) : null}
+    </label>
   );
 }
