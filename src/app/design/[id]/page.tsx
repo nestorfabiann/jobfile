@@ -4,7 +4,7 @@ import { requireUser } from '@/lib/session';
 import { supabaseAdmin } from '@/lib/supabase/server';
 import { requireMarketplace } from '@/lib/marketplace';
 import { signedUrls } from '@/lib/companyProfile';
-import { DESIGN_BUCKET, designEnabled, SPACES } from '@/lib/designIdeas';
+import { DESIGN_BUCKET, designEnabled, spaceLabel } from '@/lib/designIdeas';
 import { deleteDesign } from '../actions';
 
 export const dynamic = 'force-dynamic';
@@ -21,7 +21,7 @@ export default async function DesignResult({ params }: { params: { id: string } 
   return (
     <div className="stack" style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
       <Link href="/design" className="small">‹ Design ideas</Link>
-      <h1>{SPACES[d.space as keyof typeof SPACES]} ideas</h1>
+      <h1>{spaceLabel(d.space)} ideas</h1>
       <p className="muted small" style={{ margin: 0 }}>AI ideas, not a plan, not a price. Real work depends on what is behind the walls.</p>
       {results.map((p, i) => (
         <figure key={p} style={{ margin: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>

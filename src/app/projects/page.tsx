@@ -11,7 +11,7 @@ import { dollars } from '@/lib/money';
 import { firstNameInitial, listingOpen, listingTitle, marketplaceEnabled, type Bid, type Listing } from '@/lib/marketplace';
 import ProjectsTabs from '@/components/ProjectsTabs';
 import NeedsYou from '@/components/NeedsYou';
-import { designEnabled, DESIGN_BUCKET } from '@/lib/designIdeas';
+import { designEnabled, DESIGN_BUCKET, spaceLabel } from '@/lib/designIdeas';
 import { signedUrls } from '@/lib/companyProfile';
 import { projectTasks, type NeedItem } from '@/lib/needs';
 import { unseenViews, viewStatus } from '@/lib/bidViews';
@@ -181,7 +181,7 @@ export default async function Projects({ searchParams }: { searchParams: { error
         {latest?.thumb ? /* eslint-disable-next-line @next/next/no-img-element */ <img src={latest.thumb} alt="" className="dzth" /> : <span className="dzic" aria-hidden="true">✦</span>}
         <span className="dztx">
           <b>{latest ? 'Your design ideas' : 'Try design ideas'}</b>
-          <span>{latest ? `${latest.space === 'bathroom' ? 'Bathroom' : 'Kitchen'}${latest.style ? ` · ${latest.style}` : ''} · tap to see` : 'See new looks for your kitchen or bathroom, from a photo.'}</span>
+          <span>{latest ? `${spaceLabel(latest.space)}${latest.style ? ` · ${latest.style}` : ''} · tap to see` : 'See new looks for your kitchen or bathroom, from a photo.'}</span>
         </span>
         <span className="dzgo" aria-hidden="true">›</span>
       </Link>

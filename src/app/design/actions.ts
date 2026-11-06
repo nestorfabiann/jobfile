@@ -19,7 +19,7 @@ export async function createDesign(fd: FormData) {
   if (fd.get('consent') !== 'on') back('Please tick the box to confirm the photo can be sent to an AI service.');
 
   const space = String(fd.get('space') ?? '') as Space;
-  if (!(space in SPACES)) back('Pick kitchen or bathroom.');
+  if (!(space in SPACES)) back('Pick a room.');
   const style = (STYLES as readonly string[]).includes(String(fd.get('style'))) ? String(fd.get('style')) : '';
   const notes = String(fd.get('notes') ?? '').trim().slice(0, 300);
   const picks = cleanPicks(space, Object.fromEntries(fd.entries()));

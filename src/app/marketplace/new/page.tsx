@@ -5,7 +5,7 @@ import { supabaseAdmin } from '@/lib/supabase/server';
 import { JOB_TYPES, requireMarketplace } from '@/lib/marketplace';
 import { cleanDraft } from '@/lib/drafts';
 import { aiConfigured } from '@/lib/marketplaceAI';
-import { designEnabled, DESIGN_BUCKET } from '@/lib/designIdeas';
+import { designEnabled, DESIGN_BUCKET, SPACE_JOB, spaceLabel } from '@/lib/designIdeas';
 import { signedUrls } from '@/lib/companyProfile';
 import MarketplacePost from '@/components/MarketplacePost';
 
@@ -34,12 +34,12 @@ export default async function NewListing({ searchParams }: { searchParams: { err
       if (di) {
         const ch = Object.entries((di.picks ?? {}) as Record<string, string>).filter(([, v]) => !/^keep/i.test(v)).map(([k, v]) => `${k.toLowerCase()} ${v.toLowerCase()}`);
         const details = `I tried an AI design idea${di.style ? ` (${di.style} style)` : ''}${ch.length ? `: ${ch.join(', ')}` : ''}.${di.notes ? ` ${di.notes}` : ''}`;
-        draft = { id: '', at: new Date().toISOString(), data: cleanDraft({ type: di.space === 'bathroom' ? 'Bathroom' : 'Kitchen remodel', details }) };
+        draft = { id: '', at: new Date().toISOString(), data: cleanDraft({ type: SPACE_JOB[di.space as keyof typeof SPACE_JOB] ?? 'Painting', details }) };
         const pickN = Math.max(0, Math.min(1, parseInt(searchParams.pick ?? '0', 10) || 0));
         const { data: full } = await supabaseAdmin().from('design_ideas').select('results').eq('id', searchParams.idea as string).maybeSingle<any>();
         const rp = ((full?.results ?? []) as string[])[pickN] ?? ((full?.results ?? []) as string[])[0];
         const thumb = rp ? (await signedUrls(DESIGN_BUCKET, [rp])).get(rp) ?? null : null;
-        ideaCard = { id: searchParams.idea as string, pick: pickN, thumb, label: `${di.space === 'bathroom' ? 'Bathroom' : 'Kitchen'}${di.style ? ` · ${di.style}` : ''}`, blurb: ch.length ? ch.join(', ') : 'Your chosen look' };
+        ideaCard = { id: searchParams.idea as string, pick: pickN, thumb, label: `${spaceLabel(di.space)}${di.style ? ` · ${di.style}` : ''}`, blurb: ch.length ? ch.join(', ') : 'Your chosen look' };
       }
     } catch { /* design table not created yet */ }
   }

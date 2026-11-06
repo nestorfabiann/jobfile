@@ -1,6 +1,7 @@
 'use server';
 
 import { randomUUID } from 'node:crypto';
+import { spaceLabel } from '@/lib/designIdeas';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 import { alertMatchingContractors } from '@/lib/matching';
@@ -180,7 +181,7 @@ async function createListingInner(formData: FormData): Promise<CreateResult> {
         const aiFrom = ((di.results ?? []) as string[])[pick];
         if (formData.get('share_ai') === 'on' && aiFrom) {
           const to = `${l.id}/idea-${randomUUID()}.png`;
-          if (await copy(aiFrom, to, 'image/png')) { patch.idea_path = to; patch.idea_label = `${di.space === 'bathroom' ? 'Bathroom' : 'Kitchen'}${di.style ? ` · ${di.style}` : ''}`; }
+          if (await copy(aiFrom, to, 'image/png')) { patch.idea_path = to; patch.idea_label = `${spaceLabel(di.space)}${di.style ? ` · ${di.style}` : ''}`; }
         }
         if (formData.get('share_before') === 'on' && di.original_path) {
           const to = `${l.id}/${randomUUID()}.jpg`;
