@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { createTip } from '@/app/community/actions';
 import { shrinkImage } from '@/lib/uploadMedia';
-import { TIP_MAX } from '@/lib/community';
+const TIP_MAX = 400;
 
 /** Share a short tip. The photo is shrunk on the phone first so it uploads fast. */
 export default function TipForm({ trades }: { trades: string[] }) {
