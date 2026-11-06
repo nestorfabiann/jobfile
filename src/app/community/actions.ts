@@ -73,7 +73,8 @@ export async function toggleSave(postId: string): Promise<{ on: boolean } | { er
   return { on: !ex };
 }
 
-export async function voteIdea(postId: string, option: number): Promise<{ counts: number[]; mine: number } | { error: string }> {
+/** Vote for an option. Voting again on another option moves the vote; the same option leaves it as is. One vote per person per poll. */
+export async function voteIdea(postId: string, option: number): Promise<{ counts: number[]; mine: number | null } | { error: string }> {
   requireMarketplace();
   const { user } = await requireUser();
   const db = supabaseAdmin();
@@ -83,9 +84,25 @@ export async function voteIdea(postId: string, option: number): Promise<{ counts
   if (!(opt >= 0 && opt < p.poll.length)) return { error: 'Pick one of the options.' };
   const { data: ex } = await db.from('community_votes').select('option').eq('post_id', postId).eq('user_id', user.id).maybeSingle();
   if (!ex) await db.from('community_votes').insert({ post_id: postId, user_id: user.id, option: opt });
+  else if (ex.option !== opt) await db.from('community_votes').update({ option: opt }).eq('post_id', postId).eq('user_id', user.id);
+  return tally(db, postId, p.poll.length, opt);
+}
+
+/** Take back your vote. */
+export async function removeVote(postId: string): Promise<{ counts: number[]; mine: number | null } | { error: string }> {
+  requireMarketplace();
+  const { user } = await requireUser();
+  const db = supabaseAdmin();
+  const p = await livePost(db, postId);
+  if (!p || p.kind !== 'idea' || !Array.isArray(p.poll) || !p.poll.length) return { error: 'This poll is not available.' };
+  await db.from('community_votes').delete().eq('post_id', postId).eq('user_id', user.id);
+  return tally(db, postId, p.poll.length, null);
+}
+
+async function tally(db: ReturnType<typeof supabaseAdmin>, postId: string, n: number, mine: number | null) {
   const { data: all } = await db.from('community_votes').select('option').eq('post_id', postId).limit(20000);
-  const counts = p.poll.map((_, i) => ((all ?? []) as any[]).filter((v) => v.option === i).length);
-  return { counts, mine: ex ? (ex.option as number) : opt };
+  const counts = Array.from({ length: n }, (_, i) => ((all ?? []) as any[]).filter((v) => v.option === i).length);
+  return { counts, mine };
 }
 
 // ---------- Comments and reports ----------
