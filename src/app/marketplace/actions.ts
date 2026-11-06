@@ -163,6 +163,36 @@ async function createListingInner(formData: FormData): Promise<CreateResult> {
       }
     } catch { /* never block posting */ }
   }
+  // "Start a project from this idea": copy the chosen AI picture (and, if ticked, the original as the "before") onto the listing.
+  const ideaId = txt(formData, 'idea_id', 40);
+  if (/^[0-9a-f-]{36}$/i.test(ideaId)) {
+    try {
+      const { data: di } = await db.from('design_ideas').select('space,style,original_path,results').eq('id', ideaId).eq('user_id', user.id).maybeSingle<any>();
+      if (di) {
+        const pick = Math.max(0, Math.min(((di.results ?? []) as string[]).length - 1, parseInt(txt(formData, 'idea_pick', 2), 10) || 0));
+        const copy = async (from: string, to: string, type: string) => {
+          const dl = await db.storage.from('design-ideas').download(from);
+          if (dl.error || !dl.data) return false;
+          const up = await db.storage.from('listing-photos').upload(to, Buffer.from(await dl.data.arrayBuffer()), { contentType: type, upsert: false });
+          return !up.error;
+        };
+        const patch: Record<string, string> = {};
+        const aiFrom = ((di.results ?? []) as string[])[pick];
+        if (formData.get('share_ai') === 'on' && aiFrom) {
+          const to = `${l.id}/idea-${randomUUID()}.png`;
+          if (await copy(aiFrom, to, 'image/png')) { patch.idea_path = to; patch.idea_label = `${di.space === 'bathroom' ? 'Bathroom' : 'Kitchen'}${di.style ? ` · ${di.style}` : ''}`; }
+        }
+        if (formData.get('share_before') === 'on' && di.original_path) {
+          const to = `${l.id}/${randomUUID()}.jpg`;
+          if (await copy(di.original_path as string, to, 'image/jpeg')) {
+            const ins = await db.from('marketplace_photos').insert({ listing_id: l.id, path: to });
+            if (!ins.error) patch.before_path = to; else await db.storage.from('listing-photos').remove([to]);
+          }
+        }
+        if (Object.keys(patch).length) await db.from('marketplace_listings').update(patch).eq('id', l.id);
+      }
+    } catch { /* never block posting */ }
+  }
   const draftId = txt(formData, 'draft_id', 40);
   if (/^[0-9a-f-]{36}$/i.test(draftId)) await db.from('marketplace_drafts').delete().eq('id', draftId).eq('user_id', user.id);
   revalidatePath('/marketplace');

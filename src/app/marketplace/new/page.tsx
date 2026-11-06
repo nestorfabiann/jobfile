@@ -5,14 +5,16 @@ import { supabaseAdmin } from '@/lib/supabase/server';
 import { JOB_TYPES, requireMarketplace } from '@/lib/marketplace';
 import { cleanDraft } from '@/lib/drafts';
 import { aiConfigured } from '@/lib/marketplaceAI';
-import { designEnabled } from '@/lib/designIdeas';
+import { designEnabled, DESIGN_BUCKET } from '@/lib/designIdeas';
+import { signedUrls } from '@/lib/companyProfile';
 import MarketplacePost from '@/components/MarketplacePost';
 
-export default async function NewListing({ searchParams }: { searchParams: { error?: string; draft?: string; like?: string; invite?: string; idea?: string } }) {
+export default async function NewListing({ searchParams }: { searchParams: { error?: string; draft?: string; like?: string; invite?: string; idea?: string; pick?: string } }) {
   requireMarketplace();
   const { user } = await requireUser();
   const { data: mem } = await supabaseAdmin().from('company_members').select('company_id').eq('user_id', user.id).limit(1);
   if ((mem ?? []).length > 0) redirect('/marketplace?error=Contractors+bid+on+projects.+Homeowners+post+them.');
+  let ideaCard: { id: string; pick: number; thumb: string | null; label: string; blurb: string } | null = null;
   let draft: { id: string; at: string; data: ReturnType<typeof cleanDraft> } | null = null;
   if (searchParams.draft && /^[0-9a-f-]{36}$/i.test(searchParams.draft)) {
     const { data: d } = await supabaseAdmin().from('marketplace_drafts').select('id,data,updated_at').eq('id', searchParams.draft).eq('user_id', user.id).maybeSingle();
@@ -33,6 +35,11 @@ export default async function NewListing({ searchParams }: { searchParams: { err
         const ch = Object.entries((di.picks ?? {}) as Record<string, string>).filter(([, v]) => !/^keep/i.test(v)).map(([k, v]) => `${k.toLowerCase()} ${v.toLowerCase()}`);
         const details = `I tried an AI design idea${di.style ? ` (${di.style} style)` : ''}${ch.length ? `: ${ch.join(', ')}` : ''}.${di.notes ? ` ${di.notes}` : ''}`;
         draft = { id: '', at: new Date().toISOString(), data: cleanDraft({ type: di.space === 'bathroom' ? 'Bathroom' : 'Kitchen remodel', details }) };
+        const pickN = Math.max(0, Math.min(1, parseInt(searchParams.pick ?? '0', 10) || 0));
+        const { data: full } = await supabaseAdmin().from('design_ideas').select('results').eq('id', searchParams.idea as string).maybeSingle<any>();
+        const rp = ((full?.results ?? []) as string[])[pickN] ?? ((full?.results ?? []) as string[])[0];
+        const thumb = rp ? (await signedUrls(DESIGN_BUCKET, [rp])).get(rp) ?? null : null;
+        ideaCard = { id: searchParams.idea as string, pick: pickN, thumb, label: `${di.space === 'bathroom' ? 'Bathroom' : 'Kitchen'}${di.style ? ` · ${di.style}` : ''}`, blurb: ch.length ? ch.join(', ') : 'Your chosen look' };
       }
     } catch { /* design table not created yet */ }
   }
@@ -50,7 +57,7 @@ export default async function NewListing({ searchParams }: { searchParams: { err
         <h1>Post a project</h1>
         <p className="muted">Pick what you want done, and local contractors can send you bids.</p>
       </div>
-      {designEnabled() ? (
+      {designEnabled() && !ideaCard ? (
         <Link href="/design" className="box" style={{ background: 'var(--accent-soft, #f9efe4)', display: 'block' }}>
           <b>Not sure what you want?</b>
           <span className="small" style={{ display: 'block' }}>Add a photo of your kitchen or bathroom and see AI design ideas first. →</span>
@@ -63,7 +70,7 @@ export default async function NewListing({ searchParams }: { searchParams: { err
           <span className="small" style={{ display: 'block' }}>Other local contractors can still bid on your project. {inviteName} must serve your ZIP code to be invited.</span>
         </div>
       ) : null}
-      <MarketplacePost types={JOB_TYPES} aiOn={aiConfigured()} draft={draft} inviteCompany={inviteId} inviteName={inviteName} />
+      <MarketplacePost idea={ideaCard} types={JOB_TYPES} aiOn={aiConfigured()} draft={draft} inviteCompany={inviteId} inviteName={inviteName} />
     </>
   );
 }

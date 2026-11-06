@@ -55,6 +55,7 @@ export default async function ListingPage({ params, searchParams }: { params: { 
     db.from('marketplace_videos').select('id,path').eq('listing_id', l.id).order('created_at'),
   ]);
   const photoUrls = await signedUrls('listing-photos', (photoRows ?? []).map((p) => p.path as string));
+  const ideaUrls = (l as any).idea_path ? await signedUrls('listing-photos', [(l as any).idea_path as string]) : new Map<string, string>();
   const videoUrls = await signedUrls('listing-videos', (videoRows ?? []).map((v) => v.path as string));
   const allBids = (bidRows ?? []) as Bid[];
   // The homeowner has now seen the bids; the Projects page stops calling them new. Ignored if the 014 column is not there yet.
@@ -327,11 +328,32 @@ export default async function ListingPage({ params, searchParams }: { params: { 
         </div>
       )}
 
-      {((photoRows ?? []).length > 0 || owner) && (
+      {(l as any).idea_path ? (
+        <div className="card" style={{ borderColor: '#ecd4a8' }}>
+          <h2>Homeowner’s idea</h2>
+          <div style={{ display: 'grid', gridTemplateColumns: (l as any).before_path && photoUrls.get((l as any).before_path) ? '1fr 1fr' : '1fr', gap: 8 }}>
+            {(l as any).before_path && photoUrls.get((l as any).before_path) ? (
+              <figure style={{ margin: 0, position: 'relative' }}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={photoUrls.get((l as any).before_path)} alt="The room today" style={{ width: '100%', aspectRatio: '1', objectFit: 'cover', borderRadius: 12 }} />
+                <figcaption className="small" style={{ position: 'absolute', left: 8, bottom: 8, background: 'rgba(27,26,24,.78)', color: '#fff', borderRadius: 99, padding: '2px 10px', fontWeight: 700 }}>Before · their photo</figcaption>
+              </figure>
+            ) : null}
+            <figure style={{ margin: 0, position: 'relative' }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              {ideaUrls.get((l as any).idea_path) ? <img src={ideaUrls.get((l as any).idea_path)} alt="AI design idea" style={{ width: '100%', aspectRatio: (l as any).before_path ? '1' : undefined, objectFit: 'cover', borderRadius: 12 }} /> : null}
+              <figcaption className="small" style={{ position: 'absolute', left: 8, top: 8, background: 'rgba(27,26,24,.78)', color: '#fff', borderRadius: 99, padding: '2px 10px', fontWeight: 700 }}>AI idea{(l as any).before_path ? ' · after' : ''}</figcaption>
+            </figure>
+          </div>
+          <p className="muted small" style={{ margin: 0 }}>{(l as any).idea_label ? `${(l as any).idea_label}. ` : ''}An AI picture of the look the homeowner likes. Not a plan, not a price.</p>
+        </div>
+      ) : null}
+
+      {((photoRows ?? []).filter((p) => p.path !== (l as any).before_path).length > 0 || owner) && (
         <div className="card">
           <h2>Photos</h2>
           <div className="grid2" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(110px, 1fr))' }}>
-            {(photoRows ?? []).map((p) => (
+            {(photoRows ?? []).filter((p) => p.path !== (l as any).before_path).map((p) => (
               <form key={p.id} action={deleteListingPhoto} className="stack" style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                 <input type="hidden" name="id" value={p.id} /><input type="hidden" name="listing_id" value={l.id} />
                 {/* eslint-disable-next-line @next/next/no-img-element */}

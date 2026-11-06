@@ -17,7 +17,7 @@ type Types = Record<string, { size: number; sizeLabel: string; groups: [string, 
 const money = (n: number) => '$' + Math.round(n).toLocaleString('en-US');
 const digits = (v: string) => parseInt(v.replace(/\D/g, ''), 10) || 0;
 
-export default function MarketplacePost({ types, aiOn, draft, inviteCompany, inviteName }: { types: Types; aiOn: boolean; inviteCompany?: string; inviteName?: string; draft?: { id: string; at: string; data: DraftData } | null }) {
+export default function MarketplacePost({ types, aiOn, draft, inviteCompany, inviteName, idea }: { idea?: { id: string; pick: number; thumb: string | null; label: string; blurb: string } | null; types: Types; aiOn: boolean; inviteCompany?: string; inviteName?: string; draft?: { id: string; at: string; data: DraftData } | null }) {
   const names = Object.keys(types);
   const d0 = draft?.data;
   const [type, setType] = useState(d0 && types[d0.type] ? d0.type : names[0]);
@@ -109,7 +109,7 @@ export default function MarketplacePost({ types, aiOn, draft, inviteCompany, inv
     if (posting) return;
     if (!answers.when) { setPostErr('Choose when you want to start. It is in the questions above.'); return; }
     // Once, and only when there are no photos or videos: a gentle nudge. Publishing is never blocked.
-    if (!media.length && !skipPhotos.current) { setNudge(true); return; }
+    if (!media.length && !skipPhotos.current && !idea) { setNudge(true); return; }
     setPostErr('');
     setPosting(true);
     setStatus('Publishing your project…');
@@ -176,6 +176,20 @@ export default function MarketplacePost({ types, aiOn, draft, inviteCompany, inv
       {picks.map((p) => <input key={p} type="hidden" name="items" value={p} />)}
       <input type="hidden" name="answers" value={JSON.stringify(answers)} />
       {ref ? <input type="hidden" name="ref_id" value={ref.id} /> : null}
+      {idea ? (
+        <div className="card" style={{ borderColor: '#ecd4a8', display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <input type="hidden" name="idea_id" value={idea.id} />
+          <input type="hidden" name="idea_pick" value={idea.pick} />
+          <b className="small muted" style={{ textTransform: 'uppercase', letterSpacing: '0.08em' }}>Your design idea</b>
+          <div className="row" style={{ gap: 12, alignItems: 'center', flexWrap: 'nowrap' }}>
+            {idea.thumb ? /* eslint-disable-next-line @next/next/no-img-element */ <img src={idea.thumb} alt="Your AI design idea" style={{ width: 96, height: 72, objectFit: 'cover', borderRadius: 12, flex: 'none' }} /> : null}
+            <span><b>{idea.label}</b><br /><span className="muted small">{idea.blurb}</span><br /><a href={`/design/${idea.id}`} className="small" style={{ fontWeight: 700 }}>Change idea</a></span>
+          </div>
+          <label className="row" style={{ gap: 10, flexWrap: 'nowrap' }}><input type="checkbox" name="share_ai" defaultChecked /><span>Show the AI picture to contractors</span></label>
+          <label className="row" style={{ gap: 10, flexWrap: 'nowrap' }}><input type="checkbox" name="share_before" defaultChecked /><span>Also show my original photo as the “before”</span></label>
+          <p className="muted small" style={{ margin: 0 }}>Only signed-in contractors can see photos. Check there are no people or personal items in the shot. The AI picture is not a plan and not a price.</p>
+        </div>
+      ) : null}
 
       <div className="card">
         <h2>What kind of job?</h2>
