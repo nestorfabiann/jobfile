@@ -1,0 +1,46 @@
+<title>Scope Options and Design Link</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+:root{--bg:#f6f2ec;--fg:#2a2118;--mut:#6f6356;--ac:#c4813f;--acbg:#f9efe4;--card:#fff;--line:#e4dccf;--ok:#1f6b45;--okbg:#e2f1e8}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1b1713;--fg:#f1e9de;--mut:#a89a8a;--ac:#d99a58;--acbg:#33281c;--card:#262019;--line:#3a3128;--ok:#8fd0ab;--okbg:#173a2c;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#1b1713;--fg:#f1e9de;--mut:#a89a8a;--ac:#d99a58;--acbg:#33281c;--card:#262019;--line:#3a3128;--ok:#8fd0ab;--okbg:#173a2c;color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:system-ui,sans-serif;padding-block:20px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));line-height:1.45}
+h1{font-size:21px;margin:0 0 6px}p{margin:0 0 12px;color:var(--mut);max-width:62ch}
+.row{display:flex;gap:18px;flex-wrap:wrap}
+.ph{width:min(100%,320px);border:1px solid var(--line);border-radius:22px;background:var(--bg);padding:14px;display:flex;flex-direction:column;gap:9px;min-width:0}
+.cap{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);margin-bottom:6px}
+.g{font-size:12px;color:var(--mut);margin-top:4px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}.chip{border:1px solid var(--line);border-radius:99px;padding:6px 11px;font-size:13px;background:var(--card)}
+.chip.on{background:var(--acbg);border-color:var(--ac);color:var(--ac);font-weight:600}
+.chip.new{border-style:dashed}
+.src{font-size:10px;font-weight:700;background:var(--ok);color:var(--bg);border-radius:99px;padding:1px 6px;margin-left:5px}
+.box{border:1px solid var(--line);background:var(--card);border-radius:12px;padding:10px 12px;font-size:13px}
+.idea{background:var(--okbg);border-color:transparent}
+.add{color:var(--ac);font-weight:600;font-size:13px}
+.inp{border:1px solid var(--line);border-radius:10px;padding:9px 10px;font-size:13px;background:var(--card);color:var(--mut)}
+.sm{font-size:12px;color:var(--mut)}
+</style>
+<h1>More scope options, and the design idea fills the form</h1>
+<p>Left: a Bathroom project with a longer list and a way to add your own item. Right: a homeowner who came from a Wall colors idea. The matching items are already ticked and labeled, and every one can be unticked.</p>
+<div class="row">
+<div><div class="cap">A · Tap what you want done (Bathroom)</div><div class="ph">
+<div class="g">Shower or tub</div><div class="chips"><span class="chip">Walk-in shower</span><span class="chip">Replace the tub</span><span class="chip">Shower over tub refresh</span><span class="chip">Glass shower door</span><span class="chip">Bench or niche</span><span class="chip">Grab bars</span></div>
+<div class="g">Vanity</div><div class="chips"><span class="chip">Single vanity</span><span class="chip">Double vanity</span><span class="chip">New mirror</span></div>
+<div class="g">Tile</div><div class="chips"><span class="chip">New tile floor</span><span class="chip">Tile on shower walls</span><span class="chip">Heated floor</span></div>
+<div class="g">Fixtures and air</div><div class="chips"><span class="chip">New toilet</span><span class="chip">Lighting and fan</span><span class="chip">Exhaust fan</span><span class="chip">Towel bars</span></div>
+<div class="g">Plumbing</div><div class="chips"><span class="chip">Move plumbing</span><span class="chip">New shower valve</span></div>
+<div class="g">Finish</div><div class="chips"><span class="chip">Fresh paint</span></div>
+<div class="add">+ Add something else</div>
+<div class="inp">For example: pocket door, built-in shelves</div>
+<div class="sm">Extra items show to contractors. The AI price range only counts the tap-to-pick items.</div>
+</div></div>
+<div><div class="cap">B · Post a project, from a design idea</div><div class="ph">
+<div class="box idea"><b>Your design idea · Wall colors only · Modern</b><div class="sm">Soft sage walls, white trim, deep green accent wall</div></div>
+<div class="g">Inside</div><div class="chips"><span class="chip on">Walls<span class="src">From your idea</span></span><span class="chip on">Trim and doors<span class="src">From your idea</span></span><span class="chip">Ceilings</span><span class="chip">Cabinets</span></div>
+<div class="g">Prep</div><div class="chips"><span class="chip">Drywall repair</span><span class="chip">Popcorn ceiling removal</span></div>
+<div class="g">Details</div>
+<div class="box">I tried an AI design idea (Modern style): walls soft sage, trim white, accent wall deep green. Keep the dining room accent wall.</div>
+<div class="sm">Items from your idea are ticked for you. Tap any one to remove it.</div>
+</div></div>
+</div>
+<p style="margin-top:16px">How the idea maps: wall, trim, ceiling and exterior body colors tick the matching Painting items. Floor picks tick the matching Flooring items. Cabinets stay unticked, since a color alone doesn't say painted or replaced, and the choice goes in the details.</p>
