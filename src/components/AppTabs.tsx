@@ -23,6 +23,7 @@ export default function AppTabs({ contractor, marketplace, waiting, admin, invit
   const { installed, nudge: getApp } = useGetApp();
   const collab = useCollab(invites);
   const commNew = useIsNew('jf-community-seen', '/community');
+  const designNew = useIsNew('jf-design-seen', '/design');
   useEffect(() => { setOpen(false); }, [path]);
   useEffect(() => {
     if (!open) return;
@@ -62,7 +63,7 @@ export default function AppTabs({ contractor, marketplace, waiting, admin, invit
       {open && <div className="apptabs-shade" onClick={() => setOpen(false)} aria-hidden="true" />}
       {open && (
         <nav className="apptabs-sheet" id="apptabs-sheet" aria-label="More">
-          {links.filter(([h]) => !(h === '/app' && installed)).map(([h, l, i]) => h === '/app' ? <Link key={h} href={h} className={getApp ? 'mi-new' : undefined}><MenuIcon name={i} tile /><span>{l}<small className="mi-sub">Alerts on your phone</small></span>{getApp ? <span className="mi-tag">New</span> : null}</Link> : h === '/collaborate' ? <Link key={h} href={h} className={collab.highlight ? 'mi-new' : undefined}><MenuIcon name={i} tile /><span>{l}<small className="mi-sub">Team up on bids</small></span>{collab.tag ? <span className="mi-tag">{collab.tag}</span> : null}</Link> : <Link key={h} href={h}><MenuIcon name={i} tile />{l}{h === '/community' && community > 0 ? <span className="mi-count" aria-label={`${community} unread`}>{community}</span> : h === '/community' && commNew ? <span className="mi-tag">New</span> : null}</Link>)}
+          {links.filter(([h]) => !(h === '/app' && installed)).map(([h, l, i]) => h === '/app' ? <Link key={h} href={h} className={getApp ? 'mi-new' : undefined}><MenuIcon name={i} tile /><span>{l}<small className="mi-sub">Alerts on your phone</small></span>{getApp ? <span className="mi-tag">New</span> : null}</Link> : h === '/collaborate' ? <Link key={h} href={h} className={collab.highlight ? 'mi-new' : undefined}><MenuIcon name={i} tile /><span>{l}<small className="mi-sub">Team up on bids</small></span>{collab.tag ? <span className="mi-tag">{collab.tag}</span> : null}</Link> : <Link key={h} href={h}><MenuIcon name={i} tile />{l}{h === '/community' && community > 0 ? <span className="mi-count" aria-label={`${community} unread`}>{community}</span> : h === '/community' && commNew ? <span className="mi-tag">New</span> : h === '/design' && designNew ? <span className="mi-tag">New</span> : null}</Link>)}
           <form action={signOutAction}><button type="submit"><MenuIcon name="out" tile />Sign out</button></form>
         </nav>
       )}

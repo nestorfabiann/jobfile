@@ -37,6 +37,7 @@ export default function HomeownerProjects(p: {
   email: string;
   needsCard: React.ReactNode;
   zipCard: React.ReactNode;
+  designCard?: React.ReactNode;
   invites: React.ReactNode;
   alerts: React.ReactNode;
   error?: string;
@@ -195,6 +196,7 @@ export default function HomeownerProjects(p: {
         </Link>
       </div>
 
+      {p.designCard}
       {!first && <PushCard />}
       {p.error ? <div className="box bad">{p.error}</div> : null}
       {p.needsCard}

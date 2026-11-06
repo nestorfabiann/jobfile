@@ -11,6 +11,8 @@ import { dollars } from '@/lib/money';
 import { firstNameInitial, listingOpen, listingTitle, marketplaceEnabled, type Bid, type Listing } from '@/lib/marketplace';
 import ProjectsTabs from '@/components/ProjectsTabs';
 import NeedsYou from '@/components/NeedsYou';
+import { designEnabled, DESIGN_BUCKET } from '@/lib/designIdeas';
+import { signedUrls } from '@/lib/companyProfile';
 import { projectTasks, type NeedItem } from '@/lib/needs';
 import { unseenViews, viewStatus } from '@/lib/bidViews';
 import WhyJobfile from '@/components/WhyJobfile';
@@ -161,6 +163,30 @@ export default async function Projects({ searchParams }: { searchParams: { error
   const tab = mk && !company && searchParams.tab === 'posted' ? 'posted' : 'projects';
   const tabs = mk ? <ProjectsTabs active={tab === 'posted' ? 'extra' : 'projects'} role={company ? 'contractor' : 'homeowner'} projects={list.length} extra={extra} /> : null;
   const left = (l: Listing) => Math.max(0, Math.ceil((new Date(l.expires_at).getTime() - Date.now()) / 86400000));
+
+  // Design ideas card for homeowners (only when the feature is on). Shows the latest idea once they have made one.
+  let designCard: React.ReactNode = null;
+  if (mk && !company && designEnabled()) {
+    let latest: { id: string; space: string; style: string; thumb: string | null } | null = null;
+    try {
+      const { data: di } = await supabaseAdmin().from('design_ideas').select('id,space,style,results').eq('user_id', user.id).order('created_at', { ascending: false }).limit(1).maybeSingle<any>();
+      if (di) {
+        const first = ((di.results ?? []) as string[])[0];
+        const url = first ? (await signedUrls(DESIGN_BUCKET, [first])).get(first) ?? null : null;
+        latest = { id: di.id as string, space: String(di.space), style: String(di.style ?? ''), thumb: url };
+      }
+    } catch { /* design table not created yet */ }
+    designCard = (
+      <Link href={latest ? `/design/${latest.id}` : '/design'} className="dzcard">
+        {latest?.thumb ? /* eslint-disable-next-line @next/next/no-img-element */ <img src={latest.thumb} alt="" className="dzth" /> : <span className="dzic" aria-hidden="true">✦</span>}
+        <span className="dztx">
+          <b>{latest ? 'Your design ideas' : 'Try design ideas'}</b>
+          <span>{latest ? `${latest.space === 'bathroom' ? 'Bathroom' : 'Kitchen'}${latest.style ? ` · ${latest.style}` : ''} · tap to see` : 'See new looks for your kitchen or bathroom, from a photo.'}</span>
+        </span>
+        <span className="dzgo" aria-hidden="true">›</span>
+      </Link>
+    );
+  }
 
   const whyHidden = cookies().get('jf_why')?.value === 'hidden';
 
@@ -341,6 +367,7 @@ export default async function Projects({ searchParams }: { searchParams: { error
         email={user.email ?? ''}
         needsCard={needsCard}
         zipCard={zipCard}
+        designCard={designCard}
         invites={invitesBlock}
         alerts={alertsBlock}
         error={searchParams.error}
