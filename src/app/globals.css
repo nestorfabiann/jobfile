@@ -641,6 +641,7 @@ html { scroll-behavior: smooth; }
 .mic-biz { --c: #6b7a2a; --b: #eef1dd; }
 .mic-app { --c: #1f4d3a; --b: #d2e6d9; }
 .mic-out { --c: #b3412f; --b: #fbeae6; }
+.mic-design { --c: #5b4bb0; --b: #ece9f8; }
 @media (prefers-color-scheme: dark) {
   .mic-home, .mic-inv { --c: #e0933f; --b: #33281c; }
   .mic-proj, .mic-help, .mic-find { --c: #7fb2e0; --b: #1c2b3a; }
@@ -651,6 +652,7 @@ html { scroll-behavior: smooth; }
   .mic-biz { --c: #b5c46a; --b: #2a2f17; }
   .mic-app { --c: #8fd0ab; --b: #173a2c; }
   .mic-out { --c: #f08a78; --b: #3a1f1a; }
+  .mic-design { --c: #a99af0; --b: #272340; }
 }
 .appmenu-sheet a[aria-current='page'] .mic { --b: #fff; }
 
