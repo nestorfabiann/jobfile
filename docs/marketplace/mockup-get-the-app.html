@@ -1,90 +1,71 @@
-<title>Get The App Wording</title>
+<title>Get The App Mockup</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-/* Layout: one column. Four places the wording changes, each shown before and after. Example copy. */
-:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#c4813f;--orl:#f9efe4;--orb:#ecd4a8;--fg:#1f4d3a;--page:#e9e5dc}
+:root{--bg:#faf8f4;--card:#fff;--ink:#1b1a18;--mut:#6b655e;--line:#e4dfd6;--or:#c4813f;--orl:#f9efe4;--orb:#ecd4a8;--gr:#1f4d3a;--page:#e9e5dc}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--page:#0d0c0b;color-scheme:dark}}
 :root[data-theme="dark"]{--bg:#161513;--card:#201e1b;--ink:#f3efe8;--mut:#a39c92;--line:#35312c;--orl:#33281c;--orb:#5a4426;--page:#0d0c0b;color-scheme:dark}
 *{box-sizing:border-box}
-body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
-.wrap{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;padding-block:14px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px}
-h2{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;font-size:28px;line-height:1.05;text-wrap:balance}
-.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px}.note b{color:var(--ink)}
-.sw{display:grid;grid-template-columns:1fr 1fr;gap:6px}.sw button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:6px 4px;border-radius:99px;font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer;min-height:44px}.sw button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-.sec{display:flex;flex-direction:column;gap:12px}.sec[hidden]{display:none}
-.lab{font-size:12px;text-transform:uppercase;letter-spacing:.08em;font-weight:600;color:var(--mut)}
-.mut{color:var(--mut);font-size:14.5px;line-height:1.5;margin:0}
-.menu{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:8px;display:flex;flex-direction:column;gap:2px}
-.mi{display:flex;gap:12px;align-items:center;padding:11px 12px;border-radius:14px;font-weight:600;font-size:15.5px}
-.mi svg{flex:none}.mi small{display:block;font-weight:400;font-size:12.5px;color:var(--mut);margin-top:1px}
-.mi.hl{background:var(--orl)}
-.old{opacity:.7}
-.gc{background:var(--fg);color:#fff;border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px}
-.gc .t{display:flex;gap:12px;align-items:center}.gc img{width:54px;height:54px;border-radius:14px;background:var(--or);display:grid;place-items:center;flex:none}
-.ic{width:54px;height:54px;border-radius:14px;background:var(--or);display:grid;place-items:center;flex:none;font:800 30px 'Bricolage Grotesque',sans-serif;color:#fff}
-.gc b{font:800 19px/1.15 'Bricolage Grotesque',sans-serif;letter-spacing:-.02em;display:block}.gc span.s{font-size:14px;opacity:.85;line-height:1.4}
-.gc .r{display:flex;justify-content:space-between;align-items:center;gap:8px}
-.gc .go{background:#fff;color:var(--fg);border-radius:99px;padding:11px 18px;font-weight:600;font-size:14.5px}.gc .no{opacity:.8;font-size:14px}
-.pg{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:18px;display:flex;flex-direction:column;gap:10px}
-.pg h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;font-size:26px;line-height:1.05;text-wrap:balance}
-.pg .b{display:flex;gap:10px;align-items:flex-start;font-size:14.5px;line-height:1.4}.pg .b i{flex:none;width:22px;height:22px;border-radius:50%;background:var(--orl);color:var(--or);font-style:normal;font-weight:700;display:grid;place-items:center;font-size:12px}
-.pg .b b{display:block}
-.wel{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:18px;display:flex;flex-direction:column;gap:10px}
-.wel .bell{width:56px;height:56px;border-radius:18px;background:var(--or);display:grid;place-items:center}
-.wel h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.03em;margin:0;font-size:26px;line-height:1.05;text-wrap:balance}
-.btn{border-radius:99px;padding:13px;text-align:center;font-weight:600;background:var(--fg);color:#fff}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif;padding-block:18px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1{font:800 21px 'Bricolage Grotesque',sans-serif;letter-spacing:-.02em;margin:0 0 4px}
+.intro{color:var(--mut);font-size:14px;line-height:1.5;max-width:62ch;margin:0 0 16px}
+.row{display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start}
+.cap{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);margin-bottom:8px}
+.frame{width:min(100%,380px);background:var(--bg);border:1px solid var(--line);border-radius:26px;overflow:hidden;min-width:0}
+.bar{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--line);background:var(--card)}
+.bar .x{color:var(--mut);font-size:18px;line-height:1}
+.bar .ic{width:40px;height:40px;border-radius:10px;background:var(--or);display:grid;place-items:center;color:#fff;font:800 18px 'Bricolage Grotesque'}
+.bar .tx{flex:1;min-width:0}.bar b{display:block;font-size:14px}.bar span{font-size:12px;color:var(--mut)}
+.bar .go{background:var(--ink);color:var(--bg);border-radius:99px;padding:8px 14px;font-weight:600;font-size:13px;flex:none}
+.hdr{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;font:800 20px 'Bricolage Grotesque'}
+.hdr i{font-style:normal;color:var(--or)}.menu{font:500 12px 'IBM Plex Sans';border:1px solid var(--line);border-radius:99px;padding:6px 12px;background:var(--card)}
+.pg{padding:6px 16px 20px;display:flex;flex-direction:column;gap:12px}
+h2{font:800 32px/1.02 'Bricolage Grotesque',sans-serif;letter-spacing:-.03em;margin:0}
+.sub{color:var(--mut);font-size:14px;margin:0}
+.stage{height:330px;position:relative;border-radius:22px;background:radial-gradient(120% 90% at 50% 0%,var(--orl),transparent 72%);overflow:hidden}
+.ph{position:absolute;width:150px;height:300px;border-radius:26px;border:5px solid #1b1a18;background:#faf8f4;color:#1b1a18;overflow:hidden;box-shadow:0 20px 36px -16px rgba(27,26,24,.55)}
+.ph.a{left:9%;top:22px;transform:rotate(-8deg)}
+.ph.b{right:8%;top:6px;transform:rotate(7deg);background:#2c3a35}
+.ph .notch{position:absolute;top:6px;left:50%;transform:translateX(-50%);width:44px;height:12px;border-radius:9px;background:#1b1a18;z-index:2}
+.hs{padding:26px 10px 8px;display:grid;grid-template-columns:repeat(4,1fr);gap:9px 6px;font-size:7px;text-align:center;color:#555}
+.hs i{display:block;aspect-ratio:1;border-radius:10px;background:#d8d4cb;margin-bottom:2px}
+.hs i.jf{background:var(--or);color:#fff;display:grid;place-items:center;font:800 15px 'Bricolage Grotesque';box-shadow:0 0 0 2px #fff,0 0 0 4px var(--or)}
+.lock{padding:32px 10px 8px;color:#fff;text-align:center}
+.lock .t{font:600 34px 'IBM Plex Sans';letter-spacing:-.02em;margin-top:2px}.lock .d{font-size:9px;opacity:.85}
+.nt{margin-top:14px;background:rgba(255,255,255,.94);color:#1b1a18;border-radius:12px;padding:8px 9px;text-align:left;font-size:9px;line-height:1.3;display:flex;gap:7px}
+.nt+.nt{margin-top:6px;opacity:.9}
+.nt .ni{flex:none;width:20px;height:20px;border-radius:6px;background:var(--or);color:#fff;display:grid;place-items:center;font:800 10px 'Bricolage Grotesque'}
+.nt b{display:block;font-size:9.5px}.nt small{color:#666;font-size:8.5px}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{background:var(--orl);border:1px solid var(--orb);border-radius:99px;padding:6px 11px;font-size:12px;font-weight:600}
+.btn{background:var(--or);color:#fff;border-radius:99px;text-align:center;padding:13px;font-weight:600}
+.steps{display:flex;flex-direction:column;gap:8px;font-size:13px;color:var(--mut)}
+.steps div{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px}
+.steps b{color:var(--ink)}
+.note{font-size:13px;line-height:1.5;color:var(--mut);background:var(--card);border:1px dashed var(--orb);border-radius:14px;padding:10px 12px;margin-top:14px;max-width:62ch}.note b{color:var(--ink)}
 </style>
-<div class="wrap">
-  <div class="note"><b>Mockup.</b> Wording only. "Get the app" replaces "Add to Home Screen" in four places. Example copy.</div>
-  <h2>Get the app</h2>
-  <div class="sw" role="group" aria-label="Place">
-    <button type="button" data-s="menu" aria-pressed="true">Menu</button>
-    <button type="button" data-s="card" aria-pressed="false">Projects card</button>
-    <button type="button" data-s="page" aria-pressed="false">The page</button>
-    <button type="button" data-s="wel" aria-pressed="false">Welcome</button>
-  </div>
-
-  <div class="sec" id="menu">
-    <div class="lab">Now</div>
-    <div class="menu old"><div class="mi"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="3" width="10" height="18" rx="2"/><path d="M12 8v6M9 11h6"/></svg>Add to Home Screen</div></div>
-    <div class="lab">Proposed</div>
-    <div class="menu"><div class="mi hl"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c4813f" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="3" width="10" height="18" rx="2"/><path d="M12 8v6M9 11h6"/></svg><span>Get the app<small>Alerts on your phone</small></span></div></div>
-    <p class="mut">A second line names the payoff, so people know why to tap it.</p>
-  </div>
-
-  <div class="sec" id="card" hidden>
-    <div class="lab">Now</div>
-    <div class="gc old"><div class="t"><div class="ic">J</div><div><b>Keep Jobfile on your Home Screen</b><span class="s">Opens full screen. Takes 10 seconds.</span></div></div><div class="r"><span class="go">Show me how</span><span class="no">Not now</span></div></div>
-    <div class="lab">Proposed</div>
-    <div class="gc"><div class="t"><div class="ic">J</div><div><b>Get Jobfile on your phone</b><span class="s">Instant alerts when a contractor bids or replies. Takes 10 seconds.</span></div></div><div class="r"><span class="go">Show me how</span><span class="no">Not now</span></div></div>
-  </div>
-
-  <div class="sec" id="page" hidden>
-    <div class="pg">
-      <h3>Get the Jobfile app</h3>
-      <p class="mut" style="margin:0">Bids and replies on your phone in about 10 seconds. No App Store needed.</p>
-      <div class="b"><i>1</i><div><b>Instant alerts</b>Know the moment a contractor bids or a homeowner replies.</div></div>
-      <div class="b"><i>2</i><div><b>One tap to open</b>Jobfile sits on your Home Screen with the other apps.</div></div>
-      <div class="b"><i>3</i><div><b>Full screen</b>No browser bars. It looks and feels like an app.</div></div>
-    </div>
-    <p class="mut">The three benefits come first, then the existing step-by-step guide with the animated phone. The steps still say "Add to Home Screen" because that is the button on the iPhone.</p>
-  </div>
-
-  <div class="sec" id="wel" hidden>
-    <div class="wel">
-      <div class="bell"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg></div>
-      <h3>Get the app, never miss a bid</h3>
-      <p class="mut" style="margin:0">On iPhone, alerts work from the Home Screen. Two quick steps. No App Store needed.</p>
-      <div class="btn">Show me how</div>
-      <div class="mut" style="text-align:center">Not now</div>
-    </div>
-    <p class="mut">The one-time welcome screen uses the same words. Help answers and the Home Screen card get matching wording.</p>
-  </div>
+<h1>Get the app: top bar and phone hero</h1>
+<p class="intro">Left: a small bar at the top of any page on a phone where Jobfile isn't installed yet. Right: the Get the app page with two phones that show the Home Screen icon and a lock screen alert. All names and prices are sample data.</p>
+<div class="row">
+<div><div class="cap">1 · Top bar on any page</div>
+<div class="frame">
+<div class="bar"><span class="x">×</span><span class="ic">J</span><div class="tx"><b>Jobfile on your phone</b><span>Free. No App Store needed.</span></div><span class="go">Show me</span></div>
+<div class="hdr"><span>Job<i>file</i></span><span class="menu">Menu ≡</span></div>
+<div class="pg"><h2>Get bids from local pros. <span style="color:var(--or)">Know the price is fair.</span></h2><p class="sub">The rest of the page continues as it does today.</p></div>
+</div></div>
+<div><div class="cap">2 · Get the Jobfile app page</div>
+<div class="frame"><div class="pg" style="padding-top:16px">
+<h2>Get the Jobfile app</h2>
+<p class="sub">Bids and replies on your phone in about 10 seconds. No App Store needed.</p>
+<div class="stage" aria-hidden="true">
+<div class="ph a"><div class="notch"></div><div class="hs"><i></i><i></i><i class="jf">J</i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+<div class="ph b"><div class="notch"></div><div class="lock"><div class="d">Thursday, November 13</div><div class="t">9:41</div>
+<div class="nt"><span class="ni">J</span><div><b>New bid: $5,008</b>Nesty's Painting bid on Kitchen and walls painting.<br><small>Jobfile · now</small></div></div>
+<div class="nt"><span class="ni">J</span><div><b>Pick a time for the site visit</b>Thu, 10:00 am<br><small>Jobfile · 2m ago</small></div></div></div></div>
 </div>
-<script>
-document.querySelectorAll('.sw button').forEach(function(b){b.addEventListener('click',function(){
-  document.querySelectorAll('.sw button').forEach(function(x){x.setAttribute('aria-pressed',x===b)});
-  ['menu','card','page','wel'].forEach(function(id){document.getElementById(id).hidden=id!==b.dataset.s});
-})});
-</script>
+<div class="chips"><span class="chip">Instant alerts</span><span class="chip">One tap to open</span><span class="chip">Full screen</span></div>
+<div class="btn">Show me how, 3 steps</div>
+<div class="steps"><div><b>1.</b> Open Jobfile in Safari</div><div><b>2.</b> Tap Share, then Add to Home Screen</div><div><b>3.</b> Open it from your Home Screen</div></div>
+</div></div></div>
+</div>
+<div class="note"><b>What stays honest:</b> there is no App Store wording, badge or logo, because Jobfile is added from the browser. The bar only appears on phones where Jobfile isn't installed, and once someone taps the close button it stays away. On iPhone the Show me button opens the steps. On Android it can later turn into a real install button.</div>
