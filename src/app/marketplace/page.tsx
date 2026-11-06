@@ -5,6 +5,7 @@ import { requireUser } from '@/lib/session';
 import { supabaseAdmin } from '@/lib/supabase/server';
 import { dollars } from '@/lib/money';
 import { DEFAULT_RADIUS, miles, zipCoords } from '@/lib/matching';
+import { listingThumbs } from '@/lib/publicMarketplace';
 import { detailPercent } from '@/lib/scopeQuestions';
 import { firstNameInitial, JOB_TYPES, listingOpen, listingTitle, requireMarketplace, type Listing } from '@/lib/marketplace';
 
@@ -63,6 +64,7 @@ export default async function Marketplace({ searchParams }: { searchParams: { ty
     }
     listings = listings.slice(0, 60);
   }
+  const thumbs = isPro && searchParams.view !== 'map' ? await listingThumbs(listings.map((l) => l.id)) : null;
   const qs = (p: Record<string, string>) => {
     const u = new URLSearchParams();
     if (type) u.set('type', type);
@@ -256,10 +258,22 @@ export default async function Marketplace({ searchParams }: { searchParams: { ty
         }
         return (
           <Link key={l.id} href={`/marketplace/${l.id}`} className="card" style={{ color: 'inherit', textDecoration: 'none' }}>
-            <div className="row" style={{ justifyContent: 'space-between' }}>
-              <span className="pill"><TradeIcon trade={l.job_type} size={15} />{l.job_type}</span>
-              <span className={`pill ${open ? 'ok' : ''}`}>{status}</span>
-            </div>
+            {thumbs ? (
+              <div className="jphoto" style={thumbs.get(l.id)?.url ? undefined : { background: 'repeating-linear-gradient(45deg, #f3ede2, #f3ede2 10px, #efe7d8 10px, #efe7d8 20px)' }}>
+                {thumbs.get(l.id)?.url ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={thumbs.get(l.id)!.url!} alt="" loading="lazy" />
+                ) : <span className="jnone"><TradeIcon trade={l.job_type} size={28} />No photo yet</span>}
+                <span className="pill jtl"><TradeIcon trade={l.job_type} size={15} />{l.job_type}</span>
+                <span className={`pill jtr ${open ? 'ok' : ''}`}>{status}</span>
+                {(thumbs.get(l.id)?.count ?? 0) > 1 ? <span className="jct">{thumbs.get(l.id)!.count} photos</span> : null}
+              </div>
+            ) : (
+              <div className="row" style={{ justifyContent: 'space-between' }}>
+                <span className="pill"><TradeIcon trade={l.job_type} size={15} />{l.job_type}</span>
+                <span className={`pill ${open ? 'ok' : ''}`}>{status}</span>
+              </div>
+            )}
             <h3>{listingTitle(l)}</h3>
             <p className="muted small">{[l.city, `ZIP ${l.zip}`, away.has(l.id) ? `${Math.round(away.get(l.id) as number)} mi away` : '', l.size_sqft ? `${l.size_sqft.toLocaleString('en-US')} sq ft` : ''].filter(Boolean).join(' · ')}</p>
             <div className="row" style={{ justifyContent: 'space-between' }}>
