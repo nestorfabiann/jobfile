@@ -48,11 +48,12 @@ export async function needsCount(userId: string): Promise<number> {
     .from('notifications')
     .select('title,kind')
     .is('read_at', null)
-    .in('kind', ['review', 'job_match'])
+    .in('kind', ['review', 'job_match', 'community_note'])
     .gt('created_at', new Date(Date.now() - 14 * 86400000).toISOString())
     .limit(30);
   const rows = (unread ?? []) as { title: string; kind: string }[];
   n += rows.filter((r) => r.kind === 'review' && /rate your experience/i.test(r.title)).length;
   if (rows.some((r) => r.kind === 'job_match')) n += 1;
+  n += rows.filter((r) => r.kind === 'community_note').length;
   return Math.min(n, 8);
 }

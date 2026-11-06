@@ -7,7 +7,7 @@ type Prefs = { bids: boolean; visits: boolean; pay: boolean; msg: boolean; tips:
 type State = 'loading' | 'hidden' | 'install' | 'unsupported' | 'blocked' | 'off' | 'on';
 
 const ROWS: [keyof Prefs, string, string][] = [
-  ['bids', 'New bids', 'When a contractor bids on your project'],
+  ['bids', 'Bids and community', 'When a contractor bids on your project, or someone replies to your Community post'],
   ['visits', 'Visits', 'Requests, times and reminders'],
   ['pay', 'Payments and changes', 'Payment requests and change orders'],
   ['msg', 'Messages', 'New messages and questions in a project'],

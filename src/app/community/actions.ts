@@ -109,7 +109,7 @@ export async function addComment(formData: FormData) {
   if (error) go(path, 'error', 'Could not post your comment. Try again.');
   if (p.author_id !== user.id) {
     const title = `${companyId ? 'A pro' : 'Someone'} replied to “${p.title.slice(0, 50)}”`;
-    const { count: sent } = await db.from('notifications').select('id', { count: 'exact', head: true }).eq('user_id', p.author_id).eq('title', title).gt('created_at', new Date(Date.now() - 24 * 3600_000).toISOString());
+    const { count: sent } = await db.from('notifications').select('id', { count: 'exact', head: true }).eq('user_id', p.author_id).eq('title', title).is('read_at', null).gt('created_at', new Date(Date.now() - 24 * 3600_000).toISOString());
     if ((sent ?? 0) === 0) await notifyUsers({ userIds: [p.author_id], projectId: null, kind: 'community_note', path, title, body: 'Open Community to read it and reply.', cta: 'Read the reply' });
   }
   revalidatePath(path);

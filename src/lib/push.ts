@@ -11,7 +11,7 @@ export const pushConfigured = () => !!(process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY 
 export function pushCategory(kind: string): PushKey | null {
   const k = kind.toLowerCase();
   if (k === 'bid' || k === 'community') return 'bids';
-  if (k === 'community_note') return 'msg';
+  if (k === 'community_note') return 'bids';
   if (k === 'visit' || k === 'schedule') return 'visits';
   if (k === 'payment' || k === 'change' || k === 'co' || k === 'ms') return 'pay';
   if (k === 'message') return 'msg';
