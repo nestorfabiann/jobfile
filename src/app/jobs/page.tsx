@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { JOB_TYPES, requireMarketplace } from '@/lib/marketplace';
-import { publicListings } from '@/lib/publicMarketplace';
+import { isContractor, listingThumbs, publicListings } from '@/lib/publicMarketplace';
+import { supabaseServer } from '@/lib/supabase/server';
 import PublicJobCard from '@/components/PublicJobCard';
 
 export const dynamic = 'force-dynamic';
@@ -9,6 +10,8 @@ export default async function OpenJobs({ searchParams }: { searchParams: { type?
   requireMarketplace();
   const type = searchParams.type && JOB_TYPES[searchParams.type] ? searchParams.type : '';
   const { listings, counts } = await publicListings(type, 60);
+  const { data: { user } } = await supabaseServer().auth.getUser();
+  const thumbs = (await isContractor(user?.id)) ? await listingThumbs(listings.map((l) => l.id)) : null;
   const on = { background: 'var(--brand)', color: '#fff', borderColor: 'var(--brand)' } as const;
   return (
     <>
@@ -24,7 +27,7 @@ export default async function OpenJobs({ searchParams }: { searchParams: { type?
         ))}
       </div>
       {listings.length === 0 && <div className="card"><p className="muted">No open projects{type ? ` in ${type}` : ''} right now. Check back soon.</p></div>}
-      {listings.map((l) => <PublicJobCard key={l.id} l={l} bids={counts.get(l.id) ?? 0} />)}
+      {listings.map((l) => <PublicJobCard key={l.id} l={l} bids={counts.get(l.id) ?? 0} photos={thumbs?.get(l.id)} />)}
       <div className="box warn">Street addresses, homeowner names and phone numbers stay private. Only the city and ZIP show until a homeowner accepts a bid.</div>
     </>
   );

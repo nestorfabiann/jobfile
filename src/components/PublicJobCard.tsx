@@ -6,14 +6,28 @@ import type { PublicListing } from '@/lib/publicMarketplace';
 
 const when = (iso: string) => new Date(iso).toLocaleDateString('en-US', { timeZone: 'America/Chicago', month: 'short', day: 'numeric' });
 
-export default function PublicJobCard({ l, bids }: { l: PublicListing; bids: number }) {
+/** A job in a list. Photos are shown only to signed-in contractors (`photos` is passed), never to signed-out visitors. */
+export default function PublicJobCard({ l, bids, photos }: { l: PublicListing; bids: number; photos?: { url: string | null; count: number } }) {
   const hasAI = l.ai_low_cents != null && l.ai_high_cents != null;
+  const withPhoto = !!photos;
   return (
     <Link href={`/jobs/${l.id}`} className="card" style={{ color: 'inherit', textDecoration: 'none' }}>
-      <div className="row" style={{ justifyContent: 'space-between' }}>
-        <span className="pill"><TradeIcon trade={l.job_type} size={15} />{l.job_type}</span>
-        <span className="pill ok">Open</span>
-      </div>
+      {withPhoto ? (
+        <div className="jphoto" style={photos!.url ? undefined : { background: 'repeating-linear-gradient(45deg, #f3ede2, #f3ede2 10px, #efe7d8 10px, #efe7d8 20px)' }}>
+          {photos!.url ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={photos!.url} alt="" loading="lazy" />
+          ) : <span className="jnone"><TradeIcon trade={l.job_type} size={28} />No photo yet</span>}
+          <span className="pill jtl"><TradeIcon trade={l.job_type} size={15} />{l.job_type}</span>
+          <span className="pill ok jtr">Open</span>
+          {photos!.count > 1 ? <span className="jct">{photos!.count} photos</span> : null}
+        </div>
+      ) : (
+        <div className="row" style={{ justifyContent: 'space-between' }}>
+          <span className="pill"><TradeIcon trade={l.job_type} size={15} />{l.job_type}</span>
+          <span className="pill ok">Open</span>
+        </div>
+      )}
       <h3 style={{ margin: 0 }}>{listingTitle(l)}</h3>
       <p className="muted small" style={{ margin: 0 }}>
         {[l.city, `ZIP ${l.zip}`, l.size_sqft ? `${l.size_sqft.toLocaleString('en-US')} sq ft` : ''].filter(Boolean).join(' · ')}

@@ -812,3 +812,12 @@ html { scroll-behavior: smooth; }
 .bchoice button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 .bchoice-new { position: absolute; top: 10px; right: 10px; font-style: normal; font-size: 11px; font-weight: 800; letter-spacing: 0.04em; background: #1f4d3a; color: #fff; border-radius: 999px; padding: 2px 8px; }
 @media (prefers-reduced-motion: reduce) { .bchoice button { transition: none; } }
+
+/* Job card photo (signed-in contractors only) */
+.jphoto { position: relative; height: 140px; border-radius: 14px; overflow: hidden; background: var(--surface-2, #f4efe6); display: flex; align-items: center; justify-content: center; }
+.jphoto img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.jphoto .jtl, .jphoto .jtr { position: absolute; top: 8px; background: rgba(255, 255, 255, 0.94); }
+.jphoto .jtl { left: 8px; }
+.jphoto .jtr { right: 8px; }
+.jphoto .jct { position: absolute; right: 8px; bottom: 8px; background: rgba(27, 26, 24, 0.72); color: #fff; border-radius: 999px; padding: 2px 9px; font-size: 12px; font-weight: 700; }
+.jphoto .jnone { display: flex; flex-direction: column; align-items: center; gap: 4px; color: #a8692c; font-size: 13px; font-weight: 700; }

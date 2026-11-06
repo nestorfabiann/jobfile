@@ -1,6 +1,7 @@
 import { supabaseAdmin } from '@/lib/supabase/server';
 import { JOB_TYPES } from '@/lib/marketplace';
 import { publicReviews, summarize } from '@/lib/reviews';
+import { signedUrls } from '@/lib/companyProfile';
 
 /** What a signed-out visitor may see. No street address, homeowner name, notes, budget, photos or bidder names. */
 export type PublicListing = {
@@ -43,6 +44,32 @@ export async function publicListing(id: string) {
   const l = data as PublicListing;
   const counts = await bidCounts([l.id]);
   return { listing: l, bids: counts.get(l.id) ?? 0, open: l.status === 'open' && new Date(l.expires_at).getTime() > Date.now() };
+}
+
+/** First photo and photo count for each listing. Only call this for a signed-in contractor: signed-out visitors never see photos. */
+export async function listingThumbs(ids: string[]) {
+  const out = new Map<string, { url: string | null; count: number }>();
+  ids.forEach((id) => out.set(id, { url: null, count: 0 }));
+  if (!ids.length) return out;
+  const db = supabaseAdmin();
+  const { data } = await db.from('marketplace_photos').select('listing_id,path').in('listing_id', ids).order('created_at').limit(2000);
+  const first = new Map<string, string>();
+  ((data ?? []) as any[]).forEach((p) => {
+    const o = out.get(p.listing_id as string);
+    if (!o) return;
+    o.count += 1;
+    if (!first.has(p.listing_id as string)) first.set(p.listing_id as string, p.path as string);
+  });
+  const urls = await signedUrls('listing-photos', Array.from(first.values()), 3600);
+  first.forEach((path, id) => { out.get(id)!.url = urls.get(path) ?? null; });
+  return out;
+}
+
+/** True when the signed-in person works for a company, so they may see job photos. */
+export async function isContractor(userId: string | null | undefined) {
+  if (!userId) return false;
+  const { data } = await supabaseAdmin().from('company_members').select('company_id').eq('user_id', userId).limit(1);
+  return (data ?? []).length > 0;
 }
 
 /** Real numbers for the landing page. A value is null until there is something true to show. */
