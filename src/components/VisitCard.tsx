@@ -1,7 +1,7 @@
-import { calendarUrl, countdown, fmtWhen, visitTodo, type Visit } from '@/lib/visits';
+import { calendarUrl, confirmView, countdown, fmtWhen, visitTodo, type Visit } from '@/lib/visits';
 import { addDays, todayChi } from '@/lib/schedule';
 import VisitPrefFields from '@/components/VisitPrefFields';
-import { answerVisitAsk, askToSeeJob, setVisitPref, cancelVisit, declineTimes, pickVisitTime, proposeVisit, requestVisit, saveAccess, saveVisitReport, setVisitLive } from '@/app/visits/actions';
+import { confirmVisitHappened, answerVisitAsk, askToSeeJob, setVisitPref, cancelVisit, declineTimes, pickVisitTime, proposeVisit, requestVisit, saveAccess, saveVisitReport, setVisitLive } from '@/app/visits/actions';
 
 type Role = 'contractor' | 'homeowner';
 type Where = { scope: 'bid' | 'project' | 'listing'; listingId?: string; bidId?: string; projectId?: string; returnPath: string; address?: string; free?: string };
@@ -79,7 +79,7 @@ const LIVE: Record<string, string> = { on_way: 'is on the way', late15: 'is runn
 export default function VisitCard({ visit: v, role, where: w }: { visit: Visit; role: Role; where: Where }) {
   if (v.status === 'canceled') return null;
   const todo = visitTodo(v, role);
-  const pill = v.status === 'asked' ? (todo ? ['Your turn', 'warn'] : ['Waiting', '']) : v.status === 'done' ? ['Visited', 'ok'] : v.status === 'confirmed' ? ['Confirmed', 'ok'] : todo ? ['Your turn', 'warn'] : ['Waiting', ''];
+  const pill = v.status === 'asked' ? (todo ? ['Your turn', 'warn'] : ['Waiting', '']) : v.status === 'done' ? (confirmView(v) === 'pending' ? (role === 'homeowner' ? ['Please confirm', 'warn'] : ['Waiting for the homeowner', '']) : ['Visited', 'ok']) : v.status === 'confirmed' ? ['Confirmed', 'ok'] : todo ? ['Your turn', 'warn'] : ['Waiting', ''];
   const acc = v.access ?? {};
   const accessLines = [['Gate or entry', acc.gate], ['Pets', acc.pets], ['Parking', acc.parking], ['Other', acc.other]].filter(([, x]) => x);
   const at = v.status === 'done' ? 3 : v.status === 'confirmed' ? 2 : v.status === 'proposed' ? 1 : 0;
@@ -223,6 +223,28 @@ export default function VisitCard({ visit: v, role, where: w }: { visit: Visit; 
             <div className="row"><button className="btn accent" type="submit">{v.status === 'done' ? 'Save notes' : 'Mark visited'}</button></div>
           </form>
         </details>
+      )}
+
+      {v.status === 'confirmed' && v.confirm_state === 'no' && (
+        <div className="box warn"><b>{role === 'homeowner' ? 'You said this visit did not happen.' : 'The homeowner says this visit did not happen.'}</b>{v.dispute_reason ? ` ${v.dispute_reason}.` : ''} Jobfile has been told.</div>
+      )}
+
+      {v.status === 'done' && confirmView(v) === 'pending' && role === 'homeowner' && (
+        <form action={confirmVisitHappened} className="stack box" style={{ gap: 8 }}>
+          <Hidden w={w} id={v.id} />
+          <b>Did your contractor visit?</b>
+          <span className="small muted">They marked it as visited. If you do not answer, it counts as visited after 2 days.</span>
+          <label className="fld">If it did not happen, what went wrong?
+            <select name="why" defaultValue=""><option value="">Pick one</option><option value="They did not show up">They did not show up</option><option value="They came but we never agreed on a time">They came but we never agreed on a time</option><option value="Other">Other</option></select>
+          </label>
+          <div className="row">
+            <button className="btn accent" type="submit" name="answer" value="yes">Yes, they came</button>
+            <button className="btn ghost" type="submit" name="answer" value="no">It did not happen</button>
+          </div>
+        </form>
+      )}
+      {v.status === 'done' && confirmView(v) === 'pending' && role === 'contractor' && (
+        <span className="small muted">The homeowner was asked to confirm you came. It counts as visited after 2 days with no answer.</span>
       )}
 
       {v.status === 'done' && (

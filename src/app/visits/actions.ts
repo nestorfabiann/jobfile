@@ -6,6 +6,7 @@ import { requireUser } from '@/lib/session';
 import { loadProject } from '@/lib/project';
 import { supabaseAdmin } from '@/lib/supabase/server';
 import { notifyOtherSide, notifyUsers } from '@/lib/notify';
+import { adminEmails } from '@/lib/admin';
 import { chiToIso, fmtWhen, type Visit } from '@/lib/visits';
 import { requireMarketplace } from '@/lib/marketplace';
 
@@ -236,11 +237,41 @@ export async function saveVisitReport(formData: FormData) {
   if (c.role !== 'contractor') go(c.back, 'Only the contractor adds visit notes.');
   if (v.status !== 'confirmed' && v.status !== 'done') go(c.back, 'This visit is not confirmed.');
   const report = txt(formData, 'report', 1500);
-  await c.db.from('visits').update({ status: 'done', report, updated_at: new Date().toISOString() }).eq('id', v.id);
-  await c.tell(`Visit notes: ${v.title}`, report ? report.slice(0, 200) : 'The visit is done.');
+  const first = v.status === 'confirmed';
+  const now = new Date().toISOString();
+  const { error } = await c.db.from('visits').update(first ? { status: 'done', report, done_at: now, confirm_state: 'pending', updated_at: now } : { report, updated_at: now }).eq('id', v.id);
+  if (error) go(c.back, 'Could not save. Check that the database step was run.');
+  if (first) await c.tell('Please confirm the visit happened', `Your contractor marked "${v.title}" as visited. Open it and tell us if they came.${report ? ` Their notes: ${report.slice(0, 150)}` : ''}`);
+  else await c.tell(`Visit notes: ${v.title}`, report ? report.slice(0, 200) : 'The visit is done.');
   go(c.back);
 }
 
+
+/** The homeowner says whether the contractor really came. Yes closes it. "It did not happen" reopens the visit and flags it for Jobfile. */
+export async function confirmVisitHappened(formData: FormData) {
+  const c = await context(formData);
+  const v = await loadVisit(c, formData);
+  if (c.role !== 'homeowner') go(c.back, 'Only the homeowner confirms this.');
+  if (v.status !== 'done' || v.confirm_state !== 'pending') go(c.back);
+  const now = new Date().toISOString();
+  if (String(formData.get('answer') ?? '') === 'yes') {
+    await c.db.from('visits').update({ confirm_state: 'yes', updated_at: now }).eq('id', v.id);
+    await c.tell('The homeowner confirmed your visit', 'It is marked as done by both sides.');
+  } else {
+    const why = txt(formData, 'why', 200) || 'No reason given';
+    await c.db.from('visits').update({ status: 'confirmed', confirm_state: 'no', dispute_reason: why, updated_at: now }).eq('id', v.id);
+    await c.tell('The homeowner says the visit did not happen', `${why}. Open it to reply or set a new time. Jobfile has been told.`);
+    try {
+      const emails = adminEmails();
+      if (emails.length) {
+        const { data: admins } = await c.db.from('profiles').select('id').in('email', emails);
+        const ids = ((admins ?? []) as any[]).map((a) => a.id as string);
+        if (ids.length) await notifyUsers({ userIds: ids, projectId: null, kind: 'admin', path: '/admin/mediation', title: 'A homeowner says a visit did not happen', body: `${why}. Visit: ${v.title}.` });
+      }
+    } catch { /* the homeowner's answer is already saved */ }
+  }
+  go(c.back);
+}
 
 /** The homeowner answers a visit request on a post set to "ask me first". */
 export async function answerVisitAsk(formData: FormData) {

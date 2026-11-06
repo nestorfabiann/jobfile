@@ -9,7 +9,16 @@ export type Visit = {
   created_by: string | null; access: { gate?: string; pets?: string; parking?: string; other?: string } | null;
   live: { state?: 'on_way' | 'late15' | 'late30' | 'arrived'; at?: string } | null; report: string | null;
   created_at: string;
+  done_at?: string | null; confirm_state?: 'pending' | 'yes' | 'no' | null; dispute_reason?: string | null;
 };
+
+export const CONFIRM_HOURS = 48;
+/** Where the homeowner's check on a finished visit stands. No answer in 48 hours counts as confirmed. */
+export function confirmView(v: Visit): 'none' | 'pending' | 'confirmed' | 'auto' {
+  if (v.status !== 'done' || v.confirm_state !== 'pending') return v.status === 'done' && v.confirm_state === 'yes' ? 'confirmed' : 'none';
+  const age = v.done_at ? (Date.now() - Date.parse(v.done_at)) / 3600000 : 0;
+  return age >= CONFIRM_HOURS ? 'auto' : 'pending';
+}
 
 /** "2026-11-13T10:00" typed in Central time to a UTC ISO string. */
 export function chiToIso(local: string): string | null {
@@ -38,7 +47,8 @@ export const chiDay = (iso: string) => new Date(iso).toLocaleDateString('en-CA',
 export const other = (role: 'contractor' | 'homeowner') => (role === 'contractor' ? 'homeowner' : 'contractor');
 
 /** What this viewer should do about a visit, if anything. */
-export function visitTodo(v: Visit, role: 'contractor' | 'homeowner'): 'propose' | 'pick' | 'approve' | null {
+export function visitTodo(v: Visit, role: 'contractor' | 'homeowner'): 'propose' | 'pick' | 'approve' | 'confirm' | null {
+  if (role === 'homeowner' && confirmView(v) === 'pending') return 'confirm';
   if (v.status === 'asked') return role === 'homeowner' ? 'approve' : null;
   if (v.status === 'requested' && v.requested_role && v.requested_role !== role) return 'propose';
   if (v.status === 'proposed' && v.last_role && v.last_role !== role) return 'pick';

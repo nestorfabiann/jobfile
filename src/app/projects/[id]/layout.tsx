@@ -30,7 +30,7 @@ export default async function ProjectLayout({
   }
 
   // A visit waiting on this person (pick a time, or propose times) also lights up Schedule.
-  const { data: vrows } = await supabaseAdmin().from('visits').select('*').eq('project_id', project.id).in('status', ['requested', 'proposed']);
+  const { data: vrows } = await supabaseAdmin().from('visits').select('*').eq('project_id', project.id).in('status', ['requested', 'proposed', 'done']);
   if (((vrows ?? []) as unknown as Visit[]).some((v) => visitTodo(v, role as 'homeowner' | 'contractor')) && !dots.includes('Schedule')) dots.push('Schedule');
 
   // Problems tab: shows once the agreement is signed. Counts open problems and those the other side reported.

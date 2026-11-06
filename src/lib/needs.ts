@@ -34,7 +34,7 @@ export async function projectTasks(userId: string, projects: P[], myCompanyIds: 
     db.from('change_orders').select('*').in('project_id', ids),
     db.from('agreement_milestones').select('*').in('project_id', ids).order('position'),
     db.from('agreement_items').select('id,project_id,position,title,description,kind,price_cents').in('project_id', ids),
-    db.from('visits').select('*').in('project_id', ids).in('status', ['requested', 'proposed']),
+    db.from('visits').select('*').in('project_id', ids).in('status', ['requested', 'proposed', 'done']),
     db.from('selections').select('id,project_id,title,needed_by,created_at').in('project_id', ids).eq('status', 'open'),
     db.from('schedule_changes').select('project_id,created_at').in('project_id', ids).is('homeowner_seen_at', null),
   ]);
@@ -81,7 +81,7 @@ export async function projectTasks(userId: string, projects: P[], myCompanyIds: 
     ((vis ?? []) as unknown as (Visit & { updated_at?: string })[]).filter((v) => v.project_id === p.id).forEach((v) => {
       const todo = visitTodo(v, role);
       if (!todo) return;
-      out.push({ key: `visit-${v.id}`, icon: 'visit', title: todo === 'pick' ? `Pick a time for ${v.title.toLowerCase()}` : `Propose times for ${v.title.toLowerCase()}`, sub: todo === 'pick' ? `${p.name} · ${v.slots.length} time${v.slots.length === 1 ? '' : 's'} suggested` : p.name, href: here('visit'), go: todo === 'pick' ? 'Pick' : 'Propose', at: v.updated_at ?? v.created_at });
+      out.push({ key: `visit-${v.id}`, icon: 'visit', title: todo === 'confirm' ? `Did your contractor visit? (${v.title.toLowerCase()})` : todo === 'pick' ? `Pick a time for ${v.title.toLowerCase()}` : `Propose times for ${v.title.toLowerCase()}`, sub: todo === 'confirm' ? `${p.name} · Tell us if they came` : todo === 'pick' ? `${p.name} · ${v.slots.length} time${v.slots.length === 1 ? '' : 's'} suggested` : p.name, href: here('visit'), go: todo === 'confirm' ? 'Confirm' : todo === 'pick' ? 'Pick' : 'Propose', at: v.updated_at ?? v.created_at });
     });
 
     // Homeowner: choices due within a week, and date changes not yet seen.
