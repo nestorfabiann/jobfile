@@ -548,7 +548,7 @@ export default async function ListingPage({ params, searchParams }: { params: { 
               <button className="btn" type="submit" style={{ width: '100%' }}>{myBid && myBid.status === 'waiting' ? 'Update my bid' : 'Send bid'}</button>
             </form>);
             const hint = teamTrades > 1 ? (
-              <div className="box" style={{ background: 'var(--accent-soft, #f9efe4)', display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <div className="box" style={{ background: 'var(--accent-soft, #f9efe4)', display: 'flex', flexDirection: 'column', gap: 10, padding: 16 }}>
                 <b>This job needs {teamTrades} trades</b>
                 <span className="row" style={{ gap: 6 }}>{tradeGroups.map((g) => <span key={g} className="pill">{g}</span>)}</span>
                 <span className="small">Teaming up lets you bid on all of it.</span>
@@ -574,10 +574,10 @@ export default async function ListingPage({ params, searchParams }: { params: { 
               </div>
             );
             return (
-              <>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 20, marginTop: 6 }}>
                 {showTeam ? hint : null}
                 {showForm && showTeam ? <BidChoice alone={formJsx} team={teamCard} /> : showForm ? formJsx : showTeam ? teamCard : null}
-              </>
+              </div>
             );
           })()}
           {myBid && myBid.status !== 'withdrawn' && thread(myBid.id, 'the homeowner', myBid.status === 'waiting')}

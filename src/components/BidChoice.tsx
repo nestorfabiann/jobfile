@@ -6,7 +6,7 @@ import { useState } from 'react';
 export default function BidChoice({ alone, team }: { alone: React.ReactNode; team: React.ReactNode }) {
   const [tab, setTab] = useState<'alone' | 'team'>('alone');
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
       <div role="tablist" aria-label="How to bid" className="bchoice">
         <button type="button" role="tab" id="bid-tab-alone" aria-selected={tab === 'alone'} aria-controls="bid-panel-alone" onClick={() => setTab('alone')}>
           <svg viewBox="0 0 24 24" width={26} height={26} fill="none" stroke="currentColor" strokeWidth={1.9} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3.5" /><path d="M5 20c0-3.9 3.1-7 7-7s7 3.1 7 7" /></svg>
