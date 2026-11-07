@@ -150,6 +150,7 @@ export const HELP: HelpItem[] = [
   { topic: 'projects', who: 'both', pages: ['p-overview'], q: "What is the Scope of work card?", a: "Every work line from the signed agreement, plus approved change orders, with its status: not started, in progress or done. The bar shows how much is finished." },
   { topic: 'projects', who: 'c', pages: ['p-overview'], q: "How do I mark a line done?", a: "Tap Mark done + photo to take or pick a picture of the finished work, or Done, no photo. The photo also appears on the Photos tab. Undo puts it back to in progress." },
   { topic: 'projects', who: 'h', pages: ['p-overview'], q: "What do Looks good and Question do?", a: "Done shows as soon as the contractor marks it, so nothing waits on you. Looks good records that you saw it. Question sends your words to Messages with that line quoted." },
+  { topic: 'design', who: 'h', pages: ['design'], q: "What are the dots on my picture?", a: "Each dot marks an item you changed, such as the faucet or the vanity. Tap one, then Find this item to see stores that sell something similar. A dot only shows when the app is sure where the item is. Items without a dot are still listed under Shop this look." },
 ];
 
 /** Which topic to lead with, by page. */

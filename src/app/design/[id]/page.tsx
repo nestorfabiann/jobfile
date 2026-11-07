@@ -6,7 +6,8 @@ import { requireMarketplace } from '@/lib/marketplace';
 import { signedUrls } from '@/lib/companyProfile';
 import { DESIGN_BUCKET, designEnabled, spaceLabel } from '@/lib/designIdeas';
 import { deleteDesign } from '../actions';
-import { finderLinks, shopItems, storesFor } from '@/lib/shopLook';
+import { finderLinks, shopItems, storesFor, type Spot } from '@/lib/shopLook';
+import { ShopPhoto, ShopStrip } from '@/components/ShopLookUI';
 
 export const dynamic = 'force-dynamic';
 
@@ -28,6 +29,9 @@ export default async function DesignResult({ params, searchParams }: { params: {
       zip = ((ls ?? []) as any[])[0]?.zip ?? '';
     }
   }
+  const canLocate = 'spots' in d && !!process.env.DESIGN_IMAGE_KEY && (process.env.DESIGN_PROVIDER ?? 'gemini').toLowerCase() === 'gemini';
+  const spotsSaved = (d.spots && typeof d.spots === 'object' ? d.spots : null) as Record<string, Spot[]> | null;
+  const lite = items.map((it, i) => ({ n: i + 1, label: it.label, swatch: it.swatch }));
   const picks = Object.entries((d.picks ?? {}) as Record<string, string>).filter(([, v]) => !/^keep/i.test(v));
   return (
     <div className="stack" style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -36,17 +40,18 @@ export default async function DesignResult({ params, searchParams }: { params: {
       <p className="muted small" style={{ margin: 0 }}>AI ideas, not a plan, not a price. Real work depends on what is behind the walls.</p>
       {results.map((p, i) => (
         <figure key={p} style={{ margin: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
-          {urls.get(p) ? /* eslint-disable-next-line @next/next/no-img-element */ <img src={urls.get(p)} alt={`AI idea ${i + 1}`} style={{ width: '100%', borderRadius: 16 }} /> : null}
+          {urls.get(p) ? (items.length ? <ShopPhoto designId={d.id} index={i} src={urls.get(p) as string} alt={`AI idea ${i + 1}`} items={lite} initial={spotsSaved ? spotsSaved[String(i)] ?? [] : null} canLocate={canLocate} /> : /* eslint-disable-next-line @next/next/no-img-element */ <img src={urls.get(p)} alt={`AI idea ${i + 1}`} style={{ width: '100%', borderRadius: 16 }} />) : null}
           <figcaption className="muted small">Idea {i + 1} · {d.style || 'Your choices'} · AI idea{picks.length ? ` · changed only: ${picks.map(([k, v]) => `${k.toLowerCase()} ${v.toLowerCase()}`).join(', ')}` : ''}</figcaption>
+          {i === 0 && items.length ? <ShopStrip items={lite} withDots={canLocate} /> : null}
           <Link className="btn" href={`/marketplace/new?idea=${d.id}&pick=${i}`}>Start a project with this one →</Link>
         </figure>
       ))}
       {items.length ? (
-        <section className="card shop" aria-label="Shop this look">
+        <section className="card shop" id="shop" aria-label="Shop this look" style={{ scrollMarginTop: 12 }}>
           <h2>Shop this look</h2>
           <p className="muted small">Similar items to the ones in these ideas. Ideas only. Not a quote or an order. Colors and sizes can look different in your home, so check a real sample.</p>
           {items.map((it) => (
-            <details key={`${it.label}-${it.desc}`} className="shop-it">
+            <details key={`${it.label}-${it.desc}`} id={`shop-${items.indexOf(it) + 1}`} className="shop-it" style={{ scrollMarginTop: 12 }}>
               <summary>
                 <span className="shop-sw" style={{ background: it.swatch }} aria-hidden="true" />
                 <span className="shop-tx"><b>{it.label}</b><span className="muted small">{it.desc}</span></span>

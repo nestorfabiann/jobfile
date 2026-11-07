@@ -88,3 +88,21 @@ export const storesFor = (item: ShopItem): Store[] => BY_KIND[item.kind].map((na
 /** Store finders near a ZIP. These open Google Maps, which shows the closest locations. They do not show stock. */
 const FINDERS = ['Home Depot', "Lowe's", 'Floor & Decor', 'The Tile Shop', 'Sherwin-Williams', 'Ace Hardware', 'Ferguson'];
 export const finderLinks = (zip: string): Store[] => FINDERS.map((name) => ({ name, url: `https://www.google.com/maps/search/${enc(`${name} near ${zip}`)}` }));
+
+/** Keeps only believable points: inside the picture, not on top of each other. x and y are 0 to 1. */
+export type Spot = { n: number; x: number; y: number };
+export function cleanSpots(raw: unknown, count: number): Spot[] {
+  const out: Spot[] = [];
+  const arr = Array.isArray((raw as any)?.items) ? (raw as any).items : [];
+  for (const r of arr) {
+    const n = Math.round(Number(r?.n));
+    const y = Number(r?.y) / 1000;
+    const x = Number(r?.x) / 1000;
+    if (!Number.isFinite(n) || n < 1 || n > count || !Number.isFinite(x) || !Number.isFinite(y)) continue;
+    if (x < 0.05 || x > 0.95 || y < 0.05 || y > 0.95) continue;
+    if (out.some((o) => o.n === n)) continue;
+    if (out.some((o) => Math.hypot(o.x - x, o.y - y) < 0.09)) continue;
+    out.push({ n, x: Math.round(x * 1000) / 1000, y: Math.round(y * 1000) / 1000 });
+  }
+  return out;
+}
