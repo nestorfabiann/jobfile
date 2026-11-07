@@ -24,6 +24,8 @@ import HomeownerProjects from '@/components/HomeownerProjects';
 import { homeownerSummaries, contractorSummaries } from '@/lib/homeSummary';
 import ContractorProjects from '@/components/ContractorProjects';
 import { moneyFor } from '@/lib/expenses';
+import { announcementFor } from '@/lib/announce';
+import AnnouncementCard from '@/components/AnnouncementCard';
 
 const TZ = 'America/Chicago';
 const when = (iso: string) =>
@@ -160,6 +162,8 @@ export default async function Projects({ searchParams }: { searchParams: { error
   needs.sort((x, y) => new Date(x.at).getTime() - new Date(y.at).getTime());
   const hasAnything = list.length > 0 || posted.length > 0 || !!company;
   const needsCard = <NeedsYou items={needs.slice(0, 8)} caughtUp={hasAnything} compact={mk} />;
+  const annShown = await announcementFor(user.id);
+  const annCard = annShown ? <AnnouncementCard ann={annShown.ann} imageUrl={annShown.imageUrl} /> : null;
 
   const tab = mk && !company && searchParams.tab === 'posted' ? 'posted' : 'projects';
   const tabs = mk ? <ProjectsTabs active={tab === 'posted' ? 'extra' : 'projects'} role={company ? 'contractor' : 'homeowner'} projects={list.length} extra={extra} /> : null;
@@ -319,7 +323,7 @@ export default async function Projects({ searchParams }: { searchParams: { error
         firstName={firstName}
         companyId={company.company_id}
         companyName={company.companies?.name ?? ''}
-        needsCard={needsCard}
+        needsCard={<>{annCard}{needsCard}</>}
         invites={invitesBlock}
         alerts={alertsBlock}
         error={searchParams.error}
@@ -354,7 +358,7 @@ export default async function Projects({ searchParams }: { searchParams: { error
         needsName={!savedName}
         firstName={firstName}
         email={user.email ?? ''}
-        needsCard={needsCard}
+        needsCard={<>{annCard}{needsCard}</>}
         zipCard={zipCard}
         designCard={designCard}
         invites={invitesBlock}
