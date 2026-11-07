@@ -1,0 +1,96 @@
+<title>Ready To Complete Mockup</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+:root{--bg:#f9f7f3;--fg:#2a2118;--mut:#6f6356;--ac:#c4813f;--acbg:#f6e8d6;--card:#fff;--line:#e4dccf;--gr:#1f6b45;--grbg:#e9f1ec;--rd:#b3261e}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1b1713;--fg:#f1e9de;--mut:#a89a8a;--ac:#d99a58;--acbg:#3a2c1c;--card:#262019;--line:#3a3128;--gr:#7fc6a0;--grbg:#1c2e25;--rd:#f09a92;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#1b1713;--fg:#f1e9de;--mut:#a89a8a;--ac:#d99a58;--acbg:#3a2c1c;--card:#262019;--line:#3a3128;--gr:#7fc6a0;--grbg:#1c2e25;--rd:#f09a92;color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,sans-serif;padding-block:20px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));line-height:1.4}
+h1{font-size:21px;margin:0 0 6px}p.i{margin:0 0 14px;color:var(--mut);max-width:64ch}
+.row{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start}
+.cap{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);margin-bottom:6px}
+.ph{width:min(100%,330px);border:1px solid var(--line);border-radius:22px;padding:12px;min-width:0;background:var(--bg);display:flex;flex-direction:column;gap:10px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.card.go{background:var(--grbg);border-color:var(--gr)}
+h2{font-size:16px;margin:0}h3{font-size:13px;margin:0}
+.sm{font-size:12px;color:var(--mut);margin:0}
+.chk{display:flex;gap:9px;align-items:flex-start;font-size:13px}
+.ck{flex:none;width:20px;height:20px;border-radius:99px;display:grid;place-items:center;font-size:11px;background:var(--gr);color:#fff}
+.ck.o{background:var(--line);color:var(--mut)}
+.chk a{color:var(--ac);font-weight:700;font-size:12px;display:block}
+.rate{background:var(--acbg);border-radius:12px;padding:9px 10px;font-size:13px;display:flex;flex-direction:column;gap:3px}
+.rate b{font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--ac)}
+.stars{color:var(--ac);letter-spacing:2px;font-size:15px}
+.btn{text-align:center;border-radius:99px;padding:11px;font-weight:700;font-size:14px;background:var(--gr);color:#fff}
+.btn.a{background:var(--ac)}.btn.o{background:none;color:var(--ac);border:1.5px solid var(--ac)}
+.push{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;font-size:13px;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.push b{display:block;font-size:12px;color:var(--mut);font-weight:600;margin-bottom:2px}
+.need{display:flex;gap:8px;align-items:flex-start;font-size:13px}.need small{display:block;color:var(--mut);font-size:11.5px}
+.dot{min-width:20px;height:20px;border-radius:99px;background:var(--rd);color:#fff;font-size:11.5px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.note{font-size:12px;color:var(--mut);max-width:330px;margin-top:8px}
+.ex{font-size:11px;color:var(--mut);text-align:center}
+</style>
+<h1>Ready to complete</h1>
+<p class="i">When the scope is done, payments are confirmed and nothing is open, both sides get a clear prompt to complete the project, and ratings lead the message. Example content.</p>
+<div class="row">
+
+<div><div class="cap">1 · Contractor, everything done</div><div class="ph">
+<div class="card go">
+<h2>Everything is done and paid</h2>
+<div class="chk"><span class="ck">✓</span>All scope lines done</div>
+<div class="chk"><span class="ck">✓</span>All payments confirmed received</div>
+<div class="chk"><span class="ck">✓</span>No open punch-list items</div>
+<div class="rate"><b>Unlocks ratings</b><span class="stars">★★★★★</span>Your homeowner can rate your work. Ratings show on your public profile.</div>
+<div class="btn">Mark project complete</div>
+<p class="sm">Both of you rate. Ratings show once you have both rated, or after 14 days.</p>
+</div>
+<div class="ex">Example content</div>
+</div><div class="note">Goes right under the stepper. One tap skips the separate "Start closeout" step when nothing is left to check.</div></div>
+
+<div><div class="cap">2 · Contractor, something still open</div><div class="ph">
+<div class="card">
+<h2>Almost ready to complete</h2>
+<div class="chk"><span class="ck">✓</span>All scope lines done</div>
+<div class="chk"><span class="ck o">•</span><span>1 payment not confirmed yet<a>Confirm payment ›</a></span></div>
+<div class="chk"><span class="ck">✓</span>No open punch-list items</div>
+<div class="rate"><b>Unlocks ratings</b>Complete the project and your homeowner can rate your work.</div>
+<div class="btn o">Mark complete anyway</div>
+</div>
+<div class="ex">Example content</div>
+</div><div class="note">The card names exactly what is left and links to it. "Complete anyway" stays available, as it is today.</div></div>
+
+<div><div class="cap">3 · Homeowner, everything done and paid</div><div class="ph">
+<div class="card go">
+<h2>Everything is done and paid</h2>
+<p class="sm">When you are happy with the work, tell Nesty's Painting it is finished.</p>
+<div class="rate"><b>Then you can rate each other</b><span class="stars">★★★★★</span>Rate your contractor and help other homeowners choose. Ratings show once you both rate, or after 14 days.</div>
+<div class="btn">The work is finished</div>
+<div class="btn o">Something's missing</div>
+</div>
+<div class="ex">Example content</div>
+</div><div class="note">The homeowner version of the card from the last update, now also waiting on confirmed payments. Rating is an invitation, never required.</div></div>
+
+<div><div class="cap">4 · Confirm screen (contractor)</div><div class="ph">
+<div class="card">
+<h2>Mark this project complete?</h2>
+<div class="rate"><b>What you get</b>Your homeowner is asked to rate your work. Ratings appear on your public profile.</div>
+<ol class="sm" style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--fg)">
+<li>Rate your homeowner. Ratings show after you both rate, or after 14 days.</li>
+<li>The project moves to Completed. You can move it back to active.</li>
+</ol>
+<div class="btn">Yes, mark complete</div>
+<div class="btn o">Cancel</div>
+</div>
+<div class="ex">Example content</div>
+</div><div class="note">Ratings come first because they are the reason to finish. Nothing promises more jobs, only what is true.</div></div>
+
+<div><div class="cap">5 · Alert and Needs you</div><div class="ph">
+<div class="push"><b>Jobfile · now (contractor)</b>Everything is done and paid on the Maple Ct kitchen. Mark it complete so you can both rate.</div>
+<div class="push"><b>Jobfile · now (homeowner)</b>Everything is done and paid. Tell your contractor the work is finished, then rate each other.</div>
+<div class="card">
+<h3>Needs you</h3>
+<div class="need"><span class="dot">!</span><span>Ready to complete<small>Maple Ct kitchen · unlocks ratings</small></span></div>
+</div>
+<div class="ex">Example content</div>
+</div><div class="note">One alert per side, sent once when the last open item clears.</div></div>
+
+</div>
