@@ -1023,3 +1023,4 @@ html { scroll-behavior: smooth; }
 .idea-go { flex: none; font-size: 24px; color: var(--accent); }
 @media (prefers-color-scheme: dark) { :root:not([data-theme='light']) .idea-card { background: #33281c; } :root:not([data-theme='light']) .idea-tile { background: #272340; color: #a99af0; } }
 :root[data-theme='dark'] .idea-card { background: #33281c; } :root[data-theme='dark'] .idea-tile { background: #272340; color: #a99af0; }
+
