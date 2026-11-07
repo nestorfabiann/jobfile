@@ -195,11 +195,12 @@ export type Listing = {
   answers?: Record<string, string> | null;
   visit_pref?: 'yes' | 'maybe' | 'no'; visit_free?: string;
   max_bids?: number | null;
+  concerns?: string | null; concerns_other?: string | null;
   status: 'open' | 'awarded' | 'closed'; expires_at: string; awarded_bid_id: string | null; project_id: string | null; created_at: string;
 };
 export type Bid = {
   id: string; listing_id: string; company_id: string; bidder_id: string; price_cents: number; weeks: number | null; start_date: string | null;
-  inclusions: string; note: string; status: 'waiting' | 'won' | 'not_selected' | 'withdrawn'; created_at: string; updated_at: string;
+  inclusions: string; note: string; concern_note?: string | null; status: 'waiting' | 'won' | 'not_selected' | 'withdrawn'; created_at: string; updated_at: string;
 };
 export const listingOpen = (l: { status: string; expires_at: string }) => l.status === 'open' && new Date(l.expires_at).getTime() > Date.now();
 

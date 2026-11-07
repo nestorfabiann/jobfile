@@ -11,7 +11,7 @@ import MediaPicker from '@/components/MediaPicker';
 import { tipsFor } from '@/lib/photoTips';
 import { uploadMedia, type MediaItem, type FileState } from '@/lib/uploadMedia';
 import UploadProgress from '@/components/UploadProgress';
-import { optionsOf, questionsFor, readiness, type Answers } from '@/lib/scopeQuestions';
+import { CONCERNS, MAX_CONCERNS, optionsOf, questionsFor, readiness, type Answers } from '@/lib/scopeQuestions';
 
 type Types = Record<string, { size: number; sizeLabel: string; groups: [string, string[]][] }>;
 const money = (n: number) => '$' + Math.round(n).toLocaleString('en-US');
@@ -32,6 +32,9 @@ export default function MarketplacePost({ types, aiOn, draft, inviteCompany, inv
   const [bmax, setBmax] = useState(d0?.bmax ?? '');
   const [answers, setAnswers] = useState<Answers>(d0?.answers ?? {});
   const [maxBids, setMaxBids] = useState(d0?.maxBids ?? '5');
+  const [concerns, setConcerns] = useState<string[]>(d0?.concerns ?? []);
+  const [concernsOther, setConcernsOther] = useState(d0?.concernsOther ?? '');
+  const [concernMsg, setConcernMsg] = useState('');
   const [review, setReview] = useState<{ busy: boolean; error: string; questions: string[] }>({ busy: false, error: '', questions: [] });
   const [saveMsg, setSaveMsg] = useState<{ tone: 'ok' | 'bad' | 'wait'; text: string } | null>(null);
   const draftId = useRef<string | undefined>(draft?.id);
@@ -114,7 +117,7 @@ export default function MarketplacePost({ types, aiOn, draft, inviteCompany, inv
   // Saves the form on the server a moment after each change, so nothing is lost if the page closes.
   useEffect(() => {
     if (posting) return;
-    const data = { type, picks, size, zip, city, details, bmin, bmax, answers, maxBids };
+    const data = { type, picks, size, zip, city, details, bmin, bmax, answers, maxBids, concerns, concernsOther };
     const meaningful = picks.length > 0 || zip !== '' || city !== '' || details !== '' || Object.keys(answers).length > 0;
     const snap = JSON.stringify(data);
     if (firstRun.current) { firstRun.current = false; if (draft) { lastSaved.current = snap; return; } }
@@ -132,7 +135,7 @@ export default function MarketplacePost({ types, aiOn, draft, inviteCompany, inv
       });
     }, 900);
     return () => clearTimeout(t);
-  }, [type, picks, size, zip, city, details, bmin, bmax, answers, posting]);
+  }, [type, picks, size, zip, city, details, bmin, bmax, answers, maxBids, concerns, concernsOther, posting]);
 
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -354,6 +357,24 @@ export default function MarketplacePost({ types, aiOn, draft, inviteCompany, inv
             </div>
           </>
         ) : null}
+      </div>
+
+      <div className="card">
+        <h2>What matters most to you? <span className="muted small" style={{ fontWeight: 400 }}>(optional)</span></h2>
+        <p className="muted small" style={{ margin: 0 }}>Pick up to {MAX_CONCERNS}. Contractors see these and can answer them in their bid.</p>
+        <div className="chips" role="group" aria-label="What matters most to you">
+          {CONCERNS.map((c) => (
+            <label className="chip" key={c}><input type="checkbox" checked={concerns.includes(c)} onChange={() => {
+              setConcernMsg('');
+              if (concerns.includes(c)) setConcerns(concerns.filter((x) => x !== c));
+              else if (concerns.length >= MAX_CONCERNS) setConcernMsg(`You can pick up to ${MAX_CONCERNS}. Tap one to remove it first.`);
+              else setConcerns([...concerns, c]);
+            }} /><span>{c}</span></label>
+          ))}
+        </div>
+        {concerns.map((c) => <input key={c} type="hidden" name="concerns" value={c} />)}
+        <label className="fld">Something else (optional)<input name="concerns_other" maxLength={120} value={concernsOther} onChange={(e) => setConcernsOther(e.target.value)} placeholder="Example: two dogs, one is nervous" /></label>
+        <span className="small muted" aria-live="polite">{concernMsg || `${concerns.length} of ${MAX_CONCERNS} picked`}</span>
       </div>
 
       <div className="card">

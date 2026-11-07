@@ -21,7 +21,7 @@ import InsuranceBadge from '@/components/InsuranceBadge';
 import BidThread, { type ThreadMsg } from '@/components/BidThread';
 import ListingPhotoUploader from '@/components/ListingPhotoUploader';
 import BidViewNotice from '@/components/BidViewNotice';
-import { answerRows, detailPercent } from '@/lib/scopeQuestions';
+import { answerRows, cleanConcerns, detailPercent } from '@/lib/scopeQuestions';
 import { ackBidView, recordBidViews, recordCompared } from '@/lib/bidViews';
 import { acceptBid, acceptTeamBoth, closeListing, deleteListingPhoto, deleteListingVideo, extendListing, placeBid, setMaxBids, withdrawBid } from '../actions';
 import VisitCard, { NewVisit, VisitPrefEditor } from '@/components/VisitCard';
@@ -244,6 +244,18 @@ export default async function ListingPage({ params, searchParams }: { params: { 
           {l.is_homestead && <span className="pill warn">Homestead</span>}
           {timingTags(l.answers).map((t) => <span key={t.text} className={`tm-pill${t.urgent ? ' u' : ''}`}>{t.text}</span>)}
         </div>
+        {(() => {
+          const cs = cleanConcerns(l.concerns);
+          const other = (l.concerns_other ?? '').trim();
+          if (!cs.length && !other) return null;
+          return (
+            <div className="row" style={{ gap: 6, alignItems: 'center' }}>
+              <b className="small muted" style={{ textTransform: 'uppercase', letterSpacing: '0.06em' }}>Top concerns</b>
+              {cs.map((c) => <span key={c} className="pill warn">{c}</span>)}
+              {other ? <span className="small muted" style={{ width: '100%' }}>Homeowner&apos;s own words: &quot;{other}&quot;</span> : null}
+            </div>
+          );
+        })()}
         <p className="muted small">{[l.city, `ZIP ${l.zip}`, l.size_sqft ? `${l.size_sqft.toLocaleString('en-US')} sq ft` : '', `Posted ${when(l.created_at)}`, owner ? '' : `by ${firstNameInitial(l.homeowner_name)}`].filter(Boolean).join(' · ')}</p>
       </div>
       {strip && <ProgressStrip {...strip} />}
@@ -531,6 +543,14 @@ export default async function ListingPage({ params, searchParams }: { params: { 
                 {high && <div className="box warn">This bid is well above the local range. Ask what makes it higher.</div>}
                 {b.inclusions ? <p className="small"><b>Included:</b> {b.inclusions}</p> : null}
                 {b.note ? <p className="small" style={{ whiteSpace: 'pre-wrap' }}>{b.note}</p> : null}
+                {(b as any).concern_note ? (
+                  <div className="box" style={{ background: 'var(--ok-soft, #e9f1ec)' }}>
+                    <b className="small" style={{ textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--ok)' }}>From the contractor</b>
+                    <span className="small" style={{ display: 'block', whiteSpace: 'pre-wrap' }}>{(b as any).concern_note}</span>
+                    <span className="muted small">This is the contractor&apos;s own note about your concerns, not a promise from Jobfile.</span>
+                  </div>
+                ) : null}
+
                 {thread(b.id, c?.name ?? 'the contractor', b.status === 'waiting')}
                 {visitFor(b.id, 'homeowner', b.status === 'waiting')}
                 {open && b.status === 'waiting' && (sep ? (() => {
@@ -596,6 +616,17 @@ export default async function ListingPage({ params, searchParams }: { params: { 
             const showTeam = !needsProfile && open && !blockedFull && !myPendingTeam && (!myBid || myBid.status === 'withdrawn');
             const formJsx = (<form action={placeBid} className="stack" style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               <input type="hidden" name="listing_id" value={l.id} />
+              {(() => {
+                const cs = cleanConcerns(l.concerns);
+                if (!cs.length && !(l.concerns_other ?? '').trim()) return null;
+                return (
+                  <label className="fld">
+                    <span>How I&apos;ll handle their concerns <span className="muted small">(optional)</span></span>
+                    <span className="small muted">They asked about: {[...cs, (l.concerns_other ?? '').trim()].filter(Boolean).join(', ')}</span>
+                    <textarea name="concern_note" rows={3} maxLength={600} defaultValue={(myBid as any)?.concern_note ?? ''} placeholder="Example: Two-person crew, done in 5 days. Plastic walls and a vacuum on the sander." />
+                  </label>
+                );
+              })()}
               {hasAI && <p className="muted small">AI reference for this scope: {dollars(l.ai_low_cents as number)} – {dollars(l.ai_high_cents as number)}. Bid what the work really costs you.</p>}
               <div className="grid2">
                 <label className="fld">Your price ($)<input name="price" required inputMode="decimal" defaultValue={myBid && myBid.status !== 'withdrawn' ? String(myBid.price_cents / 100) : ''} placeholder="31400" /></label>

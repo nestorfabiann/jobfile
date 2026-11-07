@@ -238,3 +238,13 @@ export const detailPercent = (type: string, answers: unknown) => {
   const a = cleanAnswers(type, answers);
   return qs.length ? Math.round((qs.filter((q) => a[q.k]).length / qs.length) * 100) : 0;
 };
+
+/** "What matters most to you?" The homeowner picks up to 3. Contractors answer them in the bid. */
+export const CONCERNS = ['Staying on budget', 'Finishing on time', 'Quality of the work', 'Dust and mess', 'Pets or kids at home', 'Clear communication', 'Surprises behind the walls', 'Permits and paperwork'] as const;
+export const MAX_CONCERNS = 3;
+export function cleanConcerns(raw: unknown): string[] {
+  const list = Array.isArray(raw) ? raw : String(raw ?? '').split('|');
+  const out: string[] = [];
+  for (const v of list.map((x) => String(x).trim())) if ((CONCERNS as readonly string[]).includes(v) && !out.includes(v)) out.push(v);
+  return out.slice(0, MAX_CONCERNS);
+}

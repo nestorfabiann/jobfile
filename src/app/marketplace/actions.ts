@@ -14,7 +14,7 @@ import {
   requireMarketplace, scopeText, type Bid, type Listing,
 } from '@/lib/marketplace';
 import { aiConfigured, makeReference, makePostReview, type Reference } from '@/lib/marketplaceAI';
-import { cleanAnswers, questionsFor } from '@/lib/scopeQuestions';
+import { cleanAnswers, cleanConcerns, questionsFor } from '@/lib/scopeQuestions';
 import { cleanDraft } from '@/lib/drafts';
 import { tellTeamPartners } from '@/lib/team';
 import { hasContactInfo } from '@/lib/contactInfo';
@@ -144,7 +144,11 @@ async function createListingInner(formData: FormData): Promise<CreateResult> {
   const visitPref = ['yes', 'maybe', 'no'].includes(String(formData.get('visit_pref'))) ? String(formData.get('visit_pref')) : 'yes';
   const visitFree = formData.getAll('visit_free').map(String).filter((x) => ['Weekday mornings', 'Weekday evenings', 'Saturdays', 'Sundays'].includes(x)).join(', ');
   const maxBids = cleanMaxBids(formData.get('max_bids'));
-  let { data: l, error } = await db.from('marketplace_listings').insert({ ...row, answers, visit_pref: visitPref, visit_free: visitFree, max_bids: maxBids }).select(cols).single();
+  const concerns = cleanConcerns(formData.getAll('concerns')).join('|');
+  const concernsOther = txt(formData, 'concerns_other', 120);
+  let { data: l, error } = await db.from('marketplace_listings').insert({ ...row, answers, visit_pref: visitPref, visit_free: visitFree, max_bids: maxBids, concerns, concerns_other: concernsOther }).select(cols).single();
+  // Until the 059 columns exist, post without them rather than fail.
+  if (error && /concerns/i.test(error.message ?? '')) ({ data: l, error } = await db.from('marketplace_listings').insert({ ...row, answers, visit_pref: visitPref, visit_free: visitFree, max_bids: maxBids }).select(cols).single());
   // Until the 055 column exists, post without it rather than fail.
   if (error && /max_bids/i.test(error.message ?? '')) ({ data: l, error } = await db.from('marketplace_listings').insert({ ...row, answers, visit_pref: visitPref, visit_free: visitFree }).select(cols).single());
   // Until the 023 and 032 columns exist, post without them rather than fail.
@@ -431,10 +435,13 @@ export async function placeBid(formData: FormData) {
     if ((count ?? 0) >= MAX_BIDS_PER_DAY) back(path, 'You have placed a lot of bids today. Try again tomorrow.');
   }
   const row = { price_cents: price, weeks, start_date: start, inclusions: txt(formData, 'inclusions', 500), note: txt(formData, 'note', 1000), status: 'waiting', updated_at: new Date().toISOString() };
+  const concernNote = txt(formData, 'concern_note', 600);
   if (existing) {
-    await db.from('marketplace_bids').update({ ...row, bidder_id: user.id }).eq('id', existing.id);
+    let { error: ue } = await db.from('marketplace_bids').update({ ...row, concern_note: concernNote, bidder_id: user.id }).eq('id', existing.id);
+    if (ue && /concern_note/i.test(ue.message ?? '')) await db.from('marketplace_bids').update({ ...row, bidder_id: user.id }).eq('id', existing.id);
   } else {
-    const { error } = await db.from('marketplace_bids').insert({ ...row, listing_id: l.id, company_id: co.companyId, bidder_id: user.id });
+    let { error } = await db.from('marketplace_bids').insert({ ...row, concern_note: concernNote, listing_id: l.id, company_id: co.companyId, bidder_id: user.id });
+    if (error && /concern_note/i.test(error.message ?? '')) ({ error } = await db.from('marketplace_bids').insert({ ...row, listing_id: l.id, company_id: co.companyId, bidder_id: user.id }));
     if (error) back(path, 'Could not save your bid. Check that the database step was run.');
   }
   // Two contractors can send at the same moment. If this bid went past the limit, the newest one steps back.
