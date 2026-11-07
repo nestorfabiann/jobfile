@@ -979,3 +979,9 @@ html { scroll-behavior: smooth; }
 .gta-nt small { display: block; color: #666; font-size: 8.5px; }
 @media (prefers-reduced-motion: no-preference) { .gta-b { animation: gtafloat 5s ease-in-out infinite; } }
 @keyframes gtafloat { 0%, 100% { transform: rotate(7deg) translateY(0); } 50% { transform: rotate(7deg) translateY(-5px); } }
+
+/* Contractor Projects: compact action buttons and a slim money row */
+.cpage .startp-row .ptile { flex-direction: row; align-items: center; justify-content: center; min-height: 0; padding: 11px 12px; border-radius: 99px; gap: 8px; }
+.cpage .startp-row .ptile .pti { width: 24px; height: 24px; border-radius: 50%; font-size: 14px; }
+.cpage .startp-row .ptile > span:last-child { display: none; }
+.cp-money { flex-direction: row; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 14px; text-decoration: none; color: inherit; flex-wrap: wrap; }

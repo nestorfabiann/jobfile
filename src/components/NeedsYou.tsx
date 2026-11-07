@@ -34,7 +34,7 @@ export default function NeedsYou({ items, caughtUp, compact }: { items: NeedItem
   return (
     <section aria-label="Needs you" className="card" style={{ background: 'var(--accent-soft, #f9efe4)', borderColor: 'var(--line)', gap: 8 }}>
       <h2 style={{ fontSize: 20 }}>Needs you <span style={{ color: 'var(--accent)' }}>{items.length}</span></h2>
-      <p className="muted small" style={{ margin: 0 }}>Oldest first. Each one leaves this list when it is done.</p>
+      <p className="muted small" style={{ margin: 0 }}>Oldest first.</p>
       {items.map((i) => {
         const age = ageOf(i.at);
         return (

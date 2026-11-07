@@ -172,6 +172,10 @@ export default function ContractorProjects(p: {
 
       <AvailabilityBar company={p.availability} />
 
+      {p.error ? <div className="box bad">{p.error}</div> : null}
+      {p.needsCard}
+      {p.invites}
+
       <div className="startp-row">
         <Link className="ptile pri" href="/marketplace">
           <span className="pti" aria-hidden="true">&#128269;</span>
@@ -181,11 +185,6 @@ export default function ContractorProjects(p: {
         <StartProjectForm companyId={p.companyId} companyName={p.companyName} open={!!p.error} ghost />
       </div>
 
-      {!first && <PushCard />}
-      {p.error ? <div className="box bad">{p.error}</div> : null}
-      {p.needsCard}
-      {p.invites}
-
       {first && (
         <div className="card">
           <h2>Get started</h2>
@@ -194,16 +193,6 @@ export default function ContractorProjects(p: {
           <p style={{ margin: 0 }}><b>3.</b> Got a customer already? Start a project and invite them.</p>
           <Link className="btn ghost" href="/settings/business">Finish my business profile</Link>
         </div>
-      )}
-
-      {(p.collected > 0 || p.toCollect > 0) && (
-        <section className="stack" aria-label="Money">
-          <div className="grid2" style={{ gridTemplateColumns: 'repeat(2, 1fr)' }}>
-            <div className="card" style={{ gap: 2 }}><b style={{ fontSize: 22 }}>{dollars(p.collected)}</b><span className="muted small">Collected so far</span></div>
-            <div className="card" style={{ gap: 2 }}><b style={{ fontSize: 22 }}>{dollars(p.toCollect)}</b><span className="muted small">Still to collect</span></div>
-          </div>
-          <Link href="/settings/business/money" style={{ fontWeight: 700 }}>Open My money ›</Link>
-        </section>
       )}
 
       {!first && (ongoing.length > 0 || p.bids.length > 0 || done.length > 0) && (
@@ -216,6 +205,15 @@ export default function ContractorProjects(p: {
           ]}
         />
       )}
+
+      {(p.collected > 0 || p.toCollect > 0) && (
+        <Link href="/settings/business/money" className="card cp-money" aria-label="Open My money">
+          <span><b>{dollars(p.collected)}</b> <span className="muted small">collected</span> &middot; <b>{dollars(p.toCollect)}</b> <span className="muted small">to collect</span></span>
+          <span style={{ fontWeight: 700, color: 'var(--accent)' }}>My money &rsaquo;</span>
+        </Link>
+      )}
+
+      {!first && <PushCard />}
 
       {!first && (
         <InviteCard title="Know a contractor who needs work?" body="Jobfile is free to join. Send it to a friend in the trades." cta="Invite a contractor" back="/projects" />
