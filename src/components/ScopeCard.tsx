@@ -100,12 +100,23 @@ export default function ScopeCard({ projectId, role, lines: serverLines, phases:
   }
   const known = new Set(phases.map((p) => p.id));
   const tagged = lines.some((l) => l.phaseId && known.has(l.phaseId));
+  const isCo = (l: ScopeLine) => !!l.auto;
   const groups: { id: string; title: string; lines: ScopeLine[] }[] = tagged
     ? [
-        ...phases.map((p) => ({ id: p.id, title: p.title, lines: lines.filter((l) => l.phaseId === p.id) })).filter((g) => g.lines.length),
-        ...(lines.some((l) => !l.phaseId || !known.has(l.phaseId)) ? [{ id: '', title: 'No phase yet', lines: lines.filter((l) => !l.phaseId || !known.has(l.phaseId)) }] : []),
+        ...phases.filter((p) => !p.co).map((p) => ({ id: p.id, title: p.title, lines: lines.filter((l) => !isCo(l) && l.phaseId === p.id) })).filter((g) => g.lines.length),
+        ...(lines.some((l) => !isCo(l) && (!l.phaseId || !known.has(l.phaseId))) ? [{ id: '', title: 'No phase yet', lines: lines.filter((l) => !isCo(l) && (!l.phaseId || !known.has(l.phaseId))) }] : []),
+        ...(lines.some(isCo) ? [{ id: 'co', title: 'Change orders', lines: lines.filter(isCo) }] : []),
       ]
     : [{ id: '', title: '', lines }];
+  // Phases that are fully done and still open, for the "Mark phase done" prompt.
+  const readyPhases = (g: { id: string; lines: ScopeLine[] }) => {
+    if (role !== 'contractor') return [] as ScopePhase[];
+    const ids = g.id === 'co' ? Array.from(new Set(g.lines.map((l) => l.phaseId).filter(Boolean) as string[])) : g.id ? [g.id] : [];
+    return ids.map((id) => phases.find((p) => p.id === id)).filter((p): p is ScopePhase => !!p && p.status !== 'done' && !skip.includes(p.id)).filter((p) => {
+      const ls = lines.filter((l) => l.phaseId === p.id);
+      return ls.length > 0 && ls.every((l) => l.status === 'done');
+    });
+  };
 
   return (
     <section className="card sc-card" id="scope" aria-label="Scope of work">
@@ -114,18 +125,16 @@ export default function ScopeCard({ projectId, role, lines: serverLines, phases:
       <input ref={fileRef} type="file" accept="image/*" hidden onChange={onPhoto} aria-label="Add a photo of the finished work" />
       {err ? <div className="box warn" role="alert">{err}</div> : null}
       {groups.map((g) => {
-        const ph = phases.find((p) => p.id === g.id);
         const doneN = g.lines.filter((l) => l.status === 'done').length;
-        const allDone = doneN === g.lines.length && g.lines.length > 0;
         return (
           <div key={g.id || 'none'} className={tagged ? 'sc-grp' : undefined}>
             {tagged ? <div className="sc-gh"><span>{g.title}</span><span>{doneN} of {g.lines.length}</span></div> : null}
-            {tagged && ph && role === 'contractor' && allDone && ph.status !== 'done' && !skip.includes(ph.id) ? (
-              <div className="box warn sc-pp">
-                <b>All scope lines in &ldquo;{ph.title}&rdquo; are done.</b>
-                <div className="sc-act"><button type="button" className="sc-b pr" disabled={!!busy} onClick={() => closePhase(ph.id)}>{busy === `ph:${ph.id}` ? 'Saving…' : 'Mark phase done'}</button><button type="button" className="sc-b" onClick={() => setSkip((x) => [...x, ph.id])}>Not yet</button></div>
+            {tagged ? readyPhases(g).map((rp) => (
+              <div key={rp.id} className="box warn sc-pp">
+                <b>All scope lines in &ldquo;{rp.title}&rdquo; are done.</b>
+                <div className="sc-act"><button type="button" className="sc-b pr" disabled={!!busy} onClick={() => closePhase(rp.id)}>{busy === `ph:${rp.id}` ? 'Saving…' : 'Mark phase done'}</button><button type="button" className="sc-b" onClick={() => setSkip((x) => [...x, rp.id])}>Not yet</button></div>
               </div>
-            ) : null}
+            )) : null}
         {g.lines.map((l) => {
         const k = key(l);
         return (
@@ -140,8 +149,8 @@ export default function ScopeCard({ projectId, role, lines: serverLines, phases:
               {l.reaction === 'question' ? <div className="sc-q">{role === 'homeowner' ? 'You asked' : 'Homeowner asked'}: {l.note}{role === 'homeowner' ? ' (sent in Messages)' : ' (see Messages)'}</div> : null}
               {role === 'contractor' ? (
                 <div className="sc-act">
-                  {l.status !== 'done' ? <button type="button" className="sc-b pr" disabled={!!busy} onClick={() => { pending.current = l; fileRef.current?.click(); }}>{busy === k ? 'Saving…' : 'Mark done + photo'}</button> : null}
-                  {l.status !== 'done' ? <button type="button" className="sc-b" disabled={!!busy} onClick={() => set(l, 'done')}>Done, no photo</button> : null}
+                  {l.status !== 'done' ? <button type="button" className="sc-b pr" disabled={!!busy} onClick={() => { pending.current = l; fileRef.current?.click(); }}>{busy === k ? 'Saving…' : 'Done + photo'}</button> : null}
+                  {l.status !== 'done' ? <button type="button" className="sc-b" disabled={!!busy} onClick={() => set(l, 'done')}>Done only</button> : null}
                   {l.status === 'not_started' ? <button type="button" className="sc-b" disabled={!!busy} onClick={() => set(l, 'in_progress')}>Start</button> : null}
                   {l.status !== 'not_started' ? <button type="button" className="sc-b" disabled={!!busy} onClick={() => set(l, l.status === 'done' ? 'in_progress' : 'not_started')}>{l.status === 'done' ? 'Undo' : 'Reset'}</button> : null}
                   {phases.some((p) => !p.co) && !l.auto ? (
