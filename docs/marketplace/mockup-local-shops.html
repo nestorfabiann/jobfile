@@ -1,0 +1,41 @@
+<title>Local Shops Mockup</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+:root{--bg:#f9f7f3;--fg:#2a2118;--mut:#6f6356;--ac:#c4813f;--card:#fff;--line:#e4dccf;--loc:#e9f1ec;--locl:#b9d3c3;--locf:#1f6b45}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1b1713;--fg:#f1e9de;--mut:#a89a8a;--ac:#d99a58;--card:#262019;--line:#3a3128;--loc:#1c2e25;--locl:#2f5a45;--locf:#7fc6a0;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#1b1713;--fg:#f1e9de;--mut:#a89a8a;--ac:#d99a58;--card:#262019;--line:#3a3128;--loc:#1c2e25;--locl:#2f5a45;--locf:#7fc6a0;color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,sans-serif;padding-block:20px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));line-height:1.4}
+h1{font-size:21px;margin:0 0 6px}p.i{margin:0 0 14px;color:var(--mut);max-width:64ch}
+.row{display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start}
+.cap{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);margin-bottom:6px}
+.ph{width:min(100%,350px);border:1px solid var(--line);border-radius:22px;padding:12px;min-width:0;background:var(--bg)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:10px}
+h2{font-size:16px;margin:0}
+.it{display:flex;gap:10px;align-items:center}.sw{width:38px;height:38px;border-radius:10px;flex:none}
+.it b{display:block;font-size:15px}.it span{font-size:13px;color:var(--mut)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.c{border:1.5px solid var(--line);border-radius:99px;padding:6px 11px;font-size:12.5px;font-weight:700;background:var(--card)}
+.c.l{background:var(--loc);border-color:var(--locl);color:var(--locf)}
+.lab{font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--mut);font-weight:700;margin-top:2px}
+hr{border:0;border-top:1px solid var(--line);margin:2px 0;width:100%}
+.zip{display:flex;gap:8px;align-items:center;font-size:13px;color:var(--mut)}.zip i{font-style:normal;border:1.5px solid var(--line);border-radius:10px;padding:6px 12px;color:var(--fg);font-weight:600}
+.n{font-size:12px;color:var(--mut);margin:0}
+.note{font-size:12px;color:var(--mut);max-width:350px;margin-top:8px}
+</style>
+<h1>Local shops next to the big stores</h1>
+<p class="i">Green chips open a map of that kind of shop near the ZIP. Example design: bathroom with wood-look tile, navy vanity, brass fixtures.</p>
+<div class="row">
+<div><div class="cap">Under one item</div><div class="ph"><div class="card">
+<div class="it"><div class="sw" style="background:#2b3748"></div><div><b>Vanity</b><span>Navy vanity</span></div></div>
+<div class="lab">Big stores</div><div class="chips"><span class="c">Home Depot ↗</span><span class="c">Lowe's ↗</span><span class="c">Wayfair ↗</span></div>
+<div class="lab">Local shops near 75074</div><div class="chips"><span class="c l">Cabinet shops ↗</span><span class="c l">Bath showrooms ↗</span></div>
+</div></div><div class="note">Each item gets only the local shop types that fit it. Tile: tile and flooring stores. Fixtures: plumbing supply and lighting showrooms.</div></div>
+
+<div><div class="cap">Bottom card</div><div class="ph"><div class="card">
+<h2>Find a store near you</h2>
+<div class="zip">ZIP <i>75074</i><i>Update</i></div>
+<div class="lab">Big stores</div><div class="chips"><span class="c">Home Depot ↗</span><span class="c">Lowe's ↗</span><span class="c">Floor &amp; Decor ↗</span><span class="c">Ferguson ↗</span></div>
+<div class="lab">Local shops for this design</div><div class="chips"><span class="c l">Tile stores ↗</span><span class="c l">Flooring stores ↗</span><span class="c l">Cabinet shops ↗</span><span class="c l">Plumbing supply ↗</span><span class="c l">Lighting showrooms ↗</span></div>
+<p class="n">These open a map of shops near your ZIP. Jobfile does not know what any shop has in stock. Links open other websites.</p>
+</div></div><div class="note">No paint chips here because this design has no paint. A design with a wall color would add "Paint stores".</div></div>
+</div>
