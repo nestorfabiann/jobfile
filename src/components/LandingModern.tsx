@@ -43,6 +43,44 @@ const PriceBar = () => {
     </div>
   );
 };
+const MeetVisual = () => {
+  const ref = useRef<HTMLDivElement | null>(null);
+  // 0 = chips only, 1-3 = highlight hops, 4 = visit card, 5 = you checked, 6 = contractor checked, 7 = confirmed line
+  const [st, setSt] = useState(0);
+  useEffect(() => {
+    let reduce = false;
+    try { reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch { /* ignore */ }
+    if (reduce) { setSt(7); return; }
+    const timers: ReturnType<typeof setTimeout>[] = [];
+    let started = false;
+    const run = () => {
+      if (started) return;
+      started = true;
+      [[500, 1], [900, 2], [1300, 3], [1900, 4], [2700, 5], [3400, 6], [3900, 7]].forEach(([ms, v]) => timers.push(setTimeout(() => setSt(v), ms)));
+    };
+    let io: IntersectionObserver | null = null;
+    if (typeof IntersectionObserver === 'undefined' || !ref.current) run();
+    else { io = new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting)) { run(); io?.disconnect(); } }, { threshold: 0.6 }); io.observe(ref.current); }
+    return () => { timers.forEach(clearTimeout); io?.disconnect(); };
+  }, []);
+  const chips = ['Sat 10:00 AM', 'Sat 2:00 PM', 'Mon 5:30 PM'];
+  const hot = st === 1 ? 2 : st === 2 ? 1 : st >= 3 && st < 4 ? 0 : -1;
+  return (
+    <div className="lm-mv" ref={ref}>
+      <span className="lm-sample">Sample</span>
+      <div className="lm-mv-pick" style={{ opacity: st >= 4 ? 0 : 1 }}>
+        <div className="lm-mv-l">Pick a time</div>
+        <div className="lm-mv-chips">{chips.map((c, i) => <span key={c} className={i === hot ? 'on' : ''}>{c}</span>)}</div>
+      </div>
+      <div className={`lm-mv-visit${st >= 4 ? ' show' : ''}`}><span className="lm-mv-lg">P</span><div><b>Plano Pro Paint</b><span>Sat 10:00 AM · at your home</span></div><em>in 2 days</em></div>
+      <div className={`lm-mv-both${st >= 5 ? ' show' : ''}`}>
+        <span className={st >= 5 ? 'on' : ''}><i>✓</i>You</span>
+        <span className={st >= 6 ? 'on' : ''}><i>✓</i>Contractor</span>
+      </div>
+      <div className={`lm-mv-done${st >= 7 ? ' show' : ''}`}>Visit confirmed by both</div>
+    </div>
+  );
+};
 const Radius = () => (
   <>
     <div className="lm-vrad"><i /><i /><i /><svg viewBox="0 0 24 24" dangerouslySetInnerHTML={{ __html: ICON.pin }} /></div>
@@ -319,6 +357,7 @@ export default function LandingModern({ signedIn, nums, children }: { signedIn: 
           <span className="lm-tic o" aria-hidden="true"><Svg n={ic} size={18} /></span>
           <b>{t}</b>
           <p>{d}</p>
+          {t === 'Meet before you hire' ? <MeetVisual /> : null}
         </section>
       ))}
 
