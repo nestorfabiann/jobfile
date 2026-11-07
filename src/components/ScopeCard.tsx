@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { reactScope, setScopeStatus } from '@/app/projects/[id]/overview/scopeActions';
 import { uploadPhoto } from '@/app/projects/[id]/photos/actions';
@@ -20,8 +20,18 @@ async function shrink(file: File, max = 1600): Promise<Blob> {
   return await new Promise<Blob>((res, rej) => canvas.toBlob((b) => (b ? res(b) : rej(new Error('encode'))), 'image/jpeg', 0.82));
 }
 
-export default function ScopeCard({ projectId, role, lines }: { projectId: string; role: 'contractor' | 'homeowner'; lines: ScopeLine[] }) {
+export default function ScopeCard({ projectId, role, lines: serverLines }: { projectId: string; role: 'contractor' | 'homeowner'; lines: ScopeLine[] }) {
   const router = useRouter();
+  // The card updates right away on this screen, and the page data catches up in the background.
+  const [lines, setLines] = useState(serverLines);
+  useEffect(() => { setLines(serverLines); }, [serverLines]);
+  const patch = (l: ScopeLine, p: Partial<ScopeLine>) => setLines((cur) => cur.map((x) => (x.kind === l.kind && x.id === l.id ? { ...x, ...p } : x)));
+  // Refresh the server data without losing the place on the page.
+  const sync = () => {
+    const y = window.scrollY;
+    router.refresh();
+    [60, 250, 700].forEach((ms) => setTimeout(() => { if (Math.abs(window.scrollY - y) > 4) window.scrollTo(0, y); }, ms));
+  };
   const [busy, setBusy] = useState('');
   const [err, setErr] = useState('');
   const [asking, setAsking] = useState('');
@@ -36,7 +46,11 @@ export default function ScopeCard({ projectId, role, lines }: { projectId: strin
     setBusy(key(l)); setErr('');
     const r = await setScopeStatus({ projectId, kind: l.kind, id: l.id, to, photoId });
     setBusy('');
-    if (!r.ok) setErr(r.error); else router.refresh();
+    if (!r.ok) setErr(r.error);
+    else {
+      patch(l, to === 'done' ? { status: 'done', doneOn: 'today' } : { status: to, doneOn: null, reaction: null, note: '' });
+      sync();
+    }
   }
   async function onPhoto(e: React.ChangeEvent<HTMLInputElement>) {
     const l = pending.current; const f = e.target.files?.[0];
@@ -60,7 +74,8 @@ export default function ScopeCard({ projectId, role, lines }: { projectId: strin
     const r = await reactScope({ projectId, kind: l.kind, id: l.id, reaction, note });
     setBusy('');
     if (!r.ok) return void setErr(r.error);
-    setAsking(''); setQ(''); router.refresh();
+    patch(l, { reaction, note: reaction === 'question' ? (note ?? '') : '' });
+    setAsking(''); setQ(''); sync();
   }
 
   return (
@@ -77,7 +92,7 @@ export default function ScopeCard({ projectId, role, lines }: { projectId: strin
             <div className="sc-tx">
               <b>{l.title}</b>
               <small>
-                {l.status === 'done' ? `Done${l.doneOn ? ` ${l.doneOn}` : ''}${l.reaction === 'ok' ? ' · Homeowner said looks good' : ''}` : l.status === 'in_progress' ? 'In progress' : 'Not started'}
+                {l.status === 'done' ? `Done${l.doneOn ? (l.doneOn === 'today' ? ' just now' : ` ${l.doneOn}`) : ''}${l.reaction === 'ok' ? ' · Homeowner said looks good' : ''}` : l.status === 'in_progress' ? 'In progress' : 'Not started'}
                 {l.kind === 'co' ? ' · Added by change order' : ''}
               </small>
               {l.reaction === 'question' ? <div className="sc-q">{role === 'homeowner' ? 'You asked' : 'Homeowner asked'}: {l.note}{role === 'homeowner' ? ' (sent in Messages)' : ' (see Messages)'}</div> : null}
