@@ -1,0 +1,56 @@
+<title>When Would You Like It Done</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+:root{--bg:#f6f2ec;--fg:#2a2118;--mut:#6f6356;--ac:#c4813f;--acbg:#f9efe4;--card:#fff;--line:#e4dccf;--gr:#1f4d3a;--rd:#b3402a;--rdbg:#fbe9e4}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1b1713;--fg:#f1e9de;--mut:#a89a8a;--ac:#d99a58;--acbg:#33281c;--card:#262019;--line:#3a3128;--gr:#7fc6a0;--rd:#f0a08c;--rdbg:#3b2420;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#1b1713;--fg:#f1e9de;--mut:#a89a8a;--ac:#d99a58;--acbg:#33281c;--card:#262019;--line:#3a3128;--gr:#7fc6a0;--rd:#f0a08c;--rdbg:#3b2420;color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,sans-serif;padding-block:20px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));line-height:1.4}
+h1{font-size:21px;margin:0 0 6px}p.i{margin:0 0 14px;color:var(--mut);max-width:62ch}
+.row{display:flex;gap:18px;flex-wrap:wrap}
+.cap{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);margin-bottom:6px}
+.ph{width:min(100%,340px);border:1px solid var(--line);border-radius:22px;padding:14px;min-width:0;display:flex;flex-direction:column;gap:10px}
+.card{border:1px solid var(--line);background:var(--card);border-radius:18px;padding:14px}
+.card h3{margin:0 0 4px;font-size:18px}.card p{margin:0 0 10px;font-size:13px;color:var(--mut)}
+.opt{display:flex;gap:10px;align-items:center;border:1.5px solid var(--line);border-radius:14px;padding:10px 12px;margin-top:8px;font-size:14px}
+.opt .rd{flex:none;width:18px;height:18px;border-radius:50%;border:2px solid var(--line)}
+.opt small{display:block;color:var(--mut);font-size:12px}
+.opt.on{border-color:var(--ac);background:var(--acbg)}.opt.on .rd{border-color:var(--ac);background:radial-gradient(var(--ac) 45%,transparent 50%)}
+.date{margin-top:8px;border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;font-size:14px;color:var(--mut)}
+.job{display:flex;flex-direction:column;gap:6px}
+.job b{font-size:15px}.job .m{font-size:12.5px;color:var(--mut)}
+.tags{display:flex;gap:6px;flex-wrap:wrap}
+.tag{font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:999px;background:var(--acbg);color:var(--fg);border:1px solid var(--line)}
+.tag.u{background:var(--rdbg);color:var(--rd);border-color:transparent}
+.kv{display:flex;justify-content:space-between;font-size:13px;padding:7px 0;border-top:1px solid var(--line)}.kv:first-of-type{border-top:0}.kv span{color:var(--mut)}
+.ok{color:var(--gr);font-weight:700}.warn{color:var(--rd);font-weight:700}
+.note{font-size:12px;color:var(--mut);max-width:340px}
+</style>
+<h1>When would you like it done?</h1>
+<p class="i">Three screens: the new question on the Post form, how a contractor sees it on a job card, and how it lines up with a bid. Sample data only.</p>
+<div class="row">
+<div><div class="cap">1 · Post form (new section)</div><div class="ph">
+<div class="card"><h3>When would you like it done?</h3><p>Helps contractors plan. You can change it later.</p>
+<div class="opt on"><i class="rd"></i><div>As soon as possible<small>Contractors see an ASAP tag</small></div></div>
+<div class="opt"><i class="rd"></i><div>Within a month</div></div>
+<div class="opt"><i class="rd"></i><div>In 1 to 3 months</div></div>
+<div class="opt"><i class="rd"></i><div>Just planning, no rush</div></div>
+<div class="opt"><i class="rd"></i><div>Pick a date</div></div>
+<div class="date">Choose a date (only if you pick "Pick a date")</div>
+</div>
+</div><div class="note" style="margin-top:6px">Goes between Photos and Budget. Optional, so nobody gets stuck.</div></div>
+<div><div class="cap">2 · Contractor sees it on the job</div><div class="ph">
+<div class="card job"><b>Kitchen and walls painting</b><span class="m">Plano · Posted today</span>
+<div class="tags"><span class="tag u">ASAP</span><span class="tag">$20,000 to $30,000</span><span class="tag">6 photos</span></div></div>
+<div class="card job"><b>Exterior paint, front and sides</b><span class="m">Frisco · Posted 2 days ago</span>
+<div class="tags"><span class="tag">In 1 to 3 months</span><span class="tag">$6,000 to $9,000</span></div></div>
+<div class="card job"><b>Bathroom refresh</b><span class="m">Allen · Posted 4 days ago</span>
+<div class="tags"><span class="tag">No rush</span></div></div>
+</div><div class="note" style="margin-top:6px">Find work can also be sorted so ASAP jobs show first.</div></div>
+<div><div class="cap">3 · Next to each bid</div><div class="ph">
+<div class="card"><h3>Compare bids</h3><p>You asked for: <b>Within a month</b></p>
+<div class="kv"><span>Nesty's Painting</span><b>$24,500</b></div>
+<div class="kv"><span>Earliest start</span><span class="ok">Nov 18 · fits</span></div>
+<div class="kv"><span>Lone Star Coatings</span><b>$22,900</b></div>
+<div class="kv"><span>Earliest start</span><span class="warn">Jan 12 · later than you asked</span></div>
+</div></div><div class="note" style="margin-top:6px">A mismatch is shown plainly. The homeowner still decides.</div></div>
+</div>
