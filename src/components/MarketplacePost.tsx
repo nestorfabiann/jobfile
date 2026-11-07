@@ -314,7 +314,16 @@ export default function MarketplacePost({ types, aiOn, draft, inviteCompany, inv
         <div className="card">
           <h2>AI cost reference</h2>
           <p className="muted small">Get a typical local price range for the scope you picked. It is a reference only, not a quote.</p>
-          <div className="row"><button type="button" className="btn ghost" disabled={busy} onClick={reference}>{busy ? 'Checking local pricing…' : '✦ Get AI cost reference'}</button></div>
+          {!ref ? (
+            <div className="rx-ex" aria-hidden="true">
+              <span className="rx-tag">Example</span>
+              <div className="rx-big">$8,000 – $14,000</div>
+              <div className="rx-bar"><i /><b /></div>
+              <div className="small">Most likely about $11,000</div>
+              <div className="small muted" style={{ marginTop: 6 }}>Yours is based on the work you picked and your ZIP.</div>
+            </div>
+          ) : null}
+          <div className="row"><button type="button" className={ref ? 'btn ghost' : 'btn accent'} disabled={busy} onClick={reference}>{busy ? 'Checking local pricing…' : ref ? '✦ Get AI cost reference' : '✦ Get my AI cost reference'}</button></div>
           {err ? <div className="box bad">{err}</div> : null}
           {ref && (
             <div className="box" style={{ background: 'var(--surface-2)' }}>

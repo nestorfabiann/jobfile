@@ -1032,3 +1032,14 @@ html { scroll-behavior: smooth; }
 .tm-fit { font-weight: 700; } .tm-fit.ok { color: #1f6b46; } .tm-fit.late { color: #b3402a; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme='light']) .tm-pill { background: #33281c; } :root:not([data-theme='light']) .tm-pill.u { background: #3b2420; color: #f0a08c; } :root:not([data-theme='light']) .tm-fit.ok { color: #7fc6a0; } :root:not([data-theme='light']) .tm-fit.late { color: #f0a08c; } }
 :root[data-theme='dark'] .tm-pill { background: #33281c; } :root[data-theme='dark'] .tm-pill.u { background: #3b2420; color: #f0a08c; } :root[data-theme='dark'] .tm-fit.ok { color: #7fc6a0; } :root[data-theme='dark'] .tm-fit.late { color: #f0a08c; }
+
+/* AI cost reference example bar */
+.rx-ex { position: relative; border: 1.5px dashed var(--line); border-radius: 14px; padding: 14px 12px 12px; background: #f9efe4; }
+.rx-tag { position: absolute; top: -9px; left: 12px; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; font-size: 10.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 2px 9px; color: var(--ink-2); }
+.rx-big { font-size: 22px; font-weight: 800; letter-spacing: -0.01em; opacity: 0.55; }
+.rx-bar { position: relative; height: 10px; border-radius: 8px; background: var(--line); margin: 14px 0 6px; }
+.rx-bar i { position: absolute; top: 0; bottom: 0; left: 18%; width: 60%; border-radius: 8px; background: color-mix(in srgb, var(--accent) 45%, transparent); opacity: 0.55; }
+.rx-bar b { position: absolute; top: -5px; width: 4px; height: 20px; border-radius: 2px; background: var(--ink); left: 50%; opacity: 0.55; }
+@media (prefers-reduced-motion: no-preference) { .rx-bar i { animation: rxgrow 1.1s ease-out both; } @keyframes rxgrow { from { width: 0; } to { width: 60%; } } }
+@media (prefers-color-scheme: dark) { :root:not([data-theme='light']) .rx-ex { background: #33281c; } }
+:root[data-theme='dark'] .rx-ex { background: #33281c; }
