@@ -1297,3 +1297,6 @@ html { scroll-behavior: smooth; }
 .sc-chip.ok { background: #dcf0e3; color: #1f6b45; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme='light']) .sc-chip { background: #3a3016; color: #e6c04f; } :root:not([data-theme='light']) .sc-chip.ok { background: #1c2e25; color: #7fc6a0; } }
 :root[data-theme='dark'] .sc-chip { background: #3a3016; color: #e6c04f; } :root[data-theme='dark'] .sc-chip.ok { background: #1c2e25; color: #7fc6a0; }
+/* Keep the "Sample screen" note visible on tall step screens */
+.lm-stv-in { padding-bottom: 20px; box-sizing: border-box; }
+.lm-stv-in .lm-stv-note { position: absolute; right: 0; bottom: 0; padding-left: 8px; background: var(--warn-bg); }
