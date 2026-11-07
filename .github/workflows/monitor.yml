@@ -1,0 +1,21 @@
+name: Watch the live site
+# Opens the live site like a visitor every 30 minutes and after each deploy. A failed run emails the repository owner.
+on:
+  schedule:
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+  deployment_status:
+jobs:
+  smoke:
+    if: github.event_name != 'deployment_status' || github.event.deployment_status.state == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm install --no-save --no-audit --no-fund playwright@1.48.2
+      - run: npx playwright install --with-deps chromium
+      - run: node tests/smoke.mjs
+        env:
+          SITE_URL: https://jobfile-rosy.vercel.app
