@@ -1266,3 +1266,4 @@ html { scroll-behavior: smooth; }
 .sc-ask { display: flex; flex-direction: column; gap: 6px; margin-top: 6px; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme='light']) .sc-hd b { color: #7fc6a0; } :root:not([data-theme='light']) .sc-bar i, :root:not([data-theme='light']) .sc-ck.d { background: #7fc6a0; border-color: #7fc6a0; color: #10241a; } :root:not([data-theme='light']) .sc-q { background: #1d2c3d; color: #7fb2e6; } }
 :root[data-theme='dark'] .sc-hd b { color: #7fc6a0; } :root[data-theme='dark'] .sc-bar i, :root[data-theme='dark'] .sc-ck.d { background: #7fc6a0; border-color: #7fc6a0; color: #10241a; } :root[data-theme='dark'] .sc-q { background: #1d2c3d; color: #7fb2e6; }
+
