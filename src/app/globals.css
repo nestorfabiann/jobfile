@@ -1308,3 +1308,12 @@ html { scroll-behavior: smooth; }
 /* Smaller scope buttons so they fit on one row */
 .sc-act { gap: 6px; }
 .sc-b { padding: 6px 10px; font-size: 12px; min-height: 34px; white-space: nowrap; }
+
+/* Welcome-back line on Home */
+.wb-row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.wb-w{font-weight:700;font-size:15px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wb-pill{display:inline-flex;align-items:center;gap:6px;border-radius:99px;padding:6px 12px;font-weight:700;font-size:13px;white-space:nowrap;border:1.5px solid var(--accent-line,#e3c9a1);background:var(--accent-soft,#f6e8d6);color:var(--accent,#c4813f);text-decoration:none}
+.wb-pill.ok{background:#dcf0e3;border-color:transparent;color:#1f6b45}
+.wb-n{background:#b3261e;color:#fff;border-radius:99px;min-width:20px;height:20px;display:inline-grid;place-items:center;font-size:12px;padding:0 5px}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .wb-pill.ok{background:#1c2e25;color:#7fc6a0}}
+:root[data-theme="dark"] .wb-pill.ok{background:#1c2e25;color:#7fc6a0}

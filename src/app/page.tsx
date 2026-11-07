@@ -4,6 +4,7 @@ import { supabaseServer } from '@/lib/supabase/server';
 import { marketplaceEnabled } from '@/lib/marketplace';
 import { contractorFit, isContractor, landingStats, listingThumbs, publicListings } from '@/lib/publicMarketplace';
 import PublicJobCard from '@/components/PublicJobCard';
+import { needsCount } from '@/lib/needsCount';
 import LandingModern from '@/components/LandingModern';
 
 export const dynamic = 'force-dynamic';
@@ -12,6 +13,15 @@ export default async function Home() {
   const { data: { user } } = await supabaseServer().auth.getUser();
   if (!marketplaceEnabled()) redirect(user ? '/projects' : '/login');
   const signedIn = !!user;
+  let firstName = '';
+  let waiting = 0;
+  if (user) {
+    try {
+      const { data: me } = await supabaseServer().from('profiles').select('full_name').eq('id', user.id).maybeSingle();
+      firstName = String((me as any)?.full_name ?? '').trim().split(/\s+/)[0] ?? '';
+      waiting = await needsCount(user.id);
+    } catch { /* keep the line simple if anything fails */ }
+  }
 
   const { listings, counts } = await publicListings('', 3);
   const thumbs = (await isContractor(user?.id)) ? await listingThumbs(listings.map((l) => l.id)) : null;
@@ -25,8 +35,11 @@ export default async function Home() {
   return (
     <div className="landing">
       {signedIn && (
-        <div className="row" style={{ justifyContent: 'flex-end' }}>
-          <Link className="pill" href="/projects">Go to Projects →</Link>
+        <div className="wb-row">
+          <span className="wb-w">{firstName ? `Welcome back, ${firstName}` : 'Welcome back'}</span>
+          <Link className={`wb-pill${waiting ? '' : ' ok'}`} href="/projects">
+            {waiting ? <><span className="wb-n">{waiting > 99 ? '99+' : waiting}</span>need you ›</> : '✓ All caught up'}
+          </Link>
         </div>
       )}
       <LandingModern signedIn={signedIn} nums={nums}>
