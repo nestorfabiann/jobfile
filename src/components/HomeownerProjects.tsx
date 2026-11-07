@@ -191,8 +191,8 @@ export default function HomeownerProjects(p: {
         </Link>
         <Link className="ptile alt" href="/invites/new" title="Hired someone on your own? Add them to keep the agreement, photos, payments and messages in one place. They do not need a Jobfile account yet.">
           <span className="pti" aria-hidden="true">&#9993;</span>
-          <b>I already have a contractor</b>
-          <span>Invite them, free.</span>
+          <b>Already hired someone?</b>
+          <span>Invite them free. Track it all in one place.</span>
         </Link>
       </div>
 
