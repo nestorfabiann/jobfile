@@ -1,0 +1,99 @@
+<title>Announcement Styles Mockup</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+:root{--bg:#f6f2ec;--fg:#2a2118;--mut:#6f6356;--ac:#c4813f;--acbg:#f9efe4;--card:#fff;--line:#e4dccf;--gr:#1f4d3a;--grbg:#dff1e7}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1b1713;--fg:#f1e9de;--mut:#a89a8a;--ac:#d99a58;--acbg:#33281c;--card:#262019;--line:#3a3128;--gr:#7fc6a0;--grbg:#1f3a2c;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#1b1713;--fg:#f1e9de;--mut:#a89a8a;--ac:#d99a58;--acbg:#33281c;--card:#262019;--line:#3a3128;--gr:#7fc6a0;--grbg:#1f3a2c;color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,sans-serif;padding-block:20px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));line-height:1.4}
+h1{font-size:21px;margin:0 0 6px}p.i{margin:0 0 14px;color:var(--mut);max-width:64ch}
+.row{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start}
+.cap{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);margin-bottom:6px}
+.ph{width:min(100%,340px);border:1px solid var(--line);border-radius:22px;padding:14px;min-width:0;display:flex;flex-direction:column;gap:10px;position:relative;overflow:hidden;min-height:330px}
+.fake{height:46px;border-radius:12px;background:var(--card);border:1px solid var(--line)}
+.btn{margin-top:4px;border:1.5px solid var(--line);background:var(--card);color:var(--fg);border-radius:999px;padding:10px 18px;font-weight:700;font-size:14px;cursor:pointer;min-height:44px;align-self:flex-start}
+.sm{font-size:12px;color:var(--mut)}
+/* 1 hero banner */
+.hero{position:relative;overflow:hidden;border-radius:20px;padding:16px;color:#fff;background:linear-gradient(135deg,#1f4d3a,#2f7a57);opacity:0;transform:translateY(-14px);transition:all .5s}
+.hero.show{opacity:1;transform:none}
+.hero h3{margin:0 0 4px;font-size:19px;padding-right:56px}.hero p{margin:0 0 10px;font-size:13px;opacity:.9}
+.hero .go{display:inline-block;background:#fff;color:#1f4d3a;font-weight:800;font-size:13px;border-radius:999px;padding:8px 14px}
+.hero .ico{position:absolute;right:14px;top:12px;width:48px;height:48px;border-radius:16px;background:rgba(255,255,255,.18);display:grid;place-items:center;font-size:24px}
+.hero::after{content:"";position:absolute;top:0;bottom:0;width:60px;left:-80px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.25),transparent);transform:skewX(-20deg)}
+.hero.show::after{animation:shine 1.6s .5s ease-out 1 both}@keyframes shine{to{left:120%}}
+.x{position:absolute;top:8px;right:12px;font-size:16px;color:rgba(255,255,255,.8)}
+/* 2 bottom sheet */
+.dim{position:absolute;inset:0;background:rgba(20,15,10,.45);opacity:0;transition:opacity .4s}
+.sheet{position:absolute;left:0;right:0;bottom:0;background:var(--card);border-radius:22px 22px 0 0;padding:0 0 16px;transform:translateY(105%);transition:transform .55s cubic-bezier(.2,.9,.25,1);overflow:hidden}
+.on .dim{opacity:1}.on .sheet{transform:none}
+.pic{height:120px;background:repeating-linear-gradient(45deg,#e9d7bd,#e9d7bd 12px,#e2cdaf 12px,#e2cdaf 24px);display:grid;place-items:center;font-size:12px;font-weight:700;color:#7a5a30;letter-spacing:.06em;text-transform:uppercase}
+.sheet .b{padding:12px 16px 0}.sheet h3{margin:0 0 4px;font-size:18px}.sheet p{margin:0 0 12px;font-size:13.5px;color:var(--mut)}
+.sheet .go{display:block;text-align:center;background:var(--ac);color:#fff;font-weight:800;border-radius:12px;padding:12px;font-size:14.5px}
+.sheet .later{display:block;text-align:center;font-size:12.5px;color:var(--mut);margin-top:10px}
+/* 3 offer + countdown */
+.offer{border-radius:20px;padding:16px;background:var(--acbg);border:1.5px solid var(--ac);position:relative;opacity:0;transform:scale(.94);transition:all .45s cubic-bezier(.2,1.4,.4,1)}
+.offer.show{opacity:1;transform:none}
+.offer .tag{display:inline-block;background:var(--ac);color:#fff;font-size:10.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;border-radius:999px;padding:3px 10px}
+.offer h3{margin:8px 0 4px;font-size:20px}.offer p{margin:0 0 10px;font-size:13px;color:var(--mut)}
+.cd{display:flex;gap:6px;margin-bottom:12px}.cd div{flex:1;background:var(--card);border-radius:10px;text-align:center;padding:6px 0}.cd b{display:block;font-size:20px;font-variant-numeric:tabular-nums}.cd span{font-size:10px;color:var(--mut);text-transform:uppercase;letter-spacing:.05em}
+.offer .go{display:inline-block;background:var(--ac);color:#fff;font-weight:800;font-size:13px;border-radius:999px;padding:9px 16px}
+/* 4 story */
+.story{position:absolute;inset:0;background:linear-gradient(160deg,#1b1a18,#3a2a18);color:#fff;padding:16px;display:flex;flex-direction:column;opacity:0;transition:opacity .4s}
+.on .story{opacity:1}
+.bars{display:flex;gap:4px}.bars i{flex:1;height:3px;border-radius:2px;background:rgba(255,255,255,.3);overflow:hidden;position:relative}.bars i b{position:absolute;inset:0;width:0;background:#fff}
+.slide{flex:1;display:flex;flex-direction:column;justify-content:center;gap:10px;opacity:0;transform:translateY(10px);transition:all .45s;position:absolute;left:16px;right:16px;top:60px;bottom:90px}
+.slide.cur{opacity:1;transform:none}
+.slide .big{font-size:44px}.slide h3{margin:0;font-size:24px;letter-spacing:-.02em}.slide p{margin:0;font-size:14px;opacity:.85}
+.story .go{margin-top:auto;display:block;text-align:center;background:var(--ac);color:#fff;font-weight:800;border-radius:12px;padding:12px}
+.story .cl{position:absolute;top:26px;right:18px;font-size:16px;opacity:.8}
+/* composer */
+.comp .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px}
+.comp h3{margin:0 0 8px;font-size:15px}
+.styles{display:grid;grid-template-columns:1fr 1fr;gap:6px}.styles span{border:1.5px solid var(--line);border-radius:12px;padding:9px;font-size:12.5px;font-weight:700;text-align:center}.styles span.on{border-color:var(--ac);background:var(--acbg)}
+.sw{display:flex;gap:6px;margin-top:6px}.sw i{width:26px;height:26px;border-radius:50%;border:2px solid var(--card);box-shadow:0 0 0 1.5px var(--line)}
+.up{border:1.5px dashed var(--line);border-radius:12px;padding:12px;text-align:center;font-size:12.5px;color:var(--mut);margin-top:6px}
+.note{font-size:12px;color:var(--mut);max-width:340px;margin-top:8px}
+@media (prefers-reduced-motion:reduce){.hero,.sheet,.offer,.slide,.dim,.story{transition:none}.hero.show::after{animation:none}}
+</style>
+<h1>Announcement styles</h1>
+<p class="i">Four looks you can pick from, with motion. Each plays when it appears. Tap Replay. You choose the style, colors, an optional picture and a button. Still one at a time, dismissible, and no more than one a week. Texts and numbers are sample data.</p>
+<div class="row">
+<div><div class="cap">A · Hero banner</div><div class="ph" id="p1"><div class="fake"></div>
+<div class="hero" id="h1"><span class="x">×</span><span class="ico">🎨</span><h3>Painting season is open in Plano</h3><p>Post your project and get bids from insured local pros.</p><span class="go">Post a project →</span></div>
+<div class="fake"></div><div class="fake"></div><button class="btn" data-r="1" type="button">Replay</button></div><div class="note">Slides down from the top with a light shine across it once.</div></div>
+<div><div class="cap">B · Slide-up sheet with picture</div><div class="ph" id="p2"><div class="fake"></div><div class="fake"></div><div class="fake"></div>
+<div class="dim"></div><div class="sheet"><div class="pic">Your picture here</div><div class="b"><h3>See your room finished before you hire</h3><p>Try Design ideas with a photo of your kitchen or home. It is free.</p><span class="go">Try Design ideas</span><span class="later">Not now</span></div></div>
+<button class="btn" data-r="2" type="button" style="position:relative;z-index:3">Replay</button></div><div class="note">Slides up from the bottom over a dimmed page. Picture is one you upload, or a plain color.</div></div>
+<div><div class="cap">C · Offer with countdown</div><div class="ph" id="p3"><div class="fake"></div>
+<div class="offer" id="o3"><span class="tag">Limited time</span><h3>Free price check</h3><p>Get the AI cost reference on any project you post this week.</p>
+<div class="cd"><div><b id="cd1">02</b><span>days</span></div><div><b id="cd2">14</b><span>hrs</span></div><div><b id="cd3">36</b><span>min</span></div></div><span class="go">Post a project</span></div>
+<div class="fake"></div><div class="fake"></div><button class="btn" data-r="3" type="button">Replay</button></div><div class="note">Pops in with a small bounce. The clock counts to an end date you set, then the announcement ends by itself. Only use it for real deadlines.</div></div>
+<div><div class="cap">D · Story (2 to 3 slides)</div><div class="ph" id="p4"><div class="fake"></div><div class="fake"></div><div class="fake"></div>
+<div class="story"><div class="bars"><i><b id="b1"></b></i><i><b id="b2"></b></i><i><b id="b3"></b></i></div><span class="cl">×</span>
+<div class="slide" id="s1"><span class="big">📸</span><h3>Add photos, get better bids</h3><p>Posts with 6 or more photos get more accurate prices.</p></div>
+<div class="slide" id="s2"><span class="big">🛡️</span><h3>Every pro is checked</h3><p>Insurance and ratings show on every bid.</p></div>
+<div class="slide" id="s3"><span class="big">✨</span><h3>Try Design ideas</h3><p>See new looks for your room before you hire.</p></div>
+<span class="go">Post a project</span></div>
+<button class="btn" data-r="4" type="button" style="position:relative;z-index:3">Replay</button></div><div class="note">Full screen, auto-advances every 3 seconds, tap to move on, × to close. Best for a new feature, not for every message.</div></div>
+<div><div class="cap">Owner tool: picking the look</div><div class="ph comp"><div class="card"><h3>Style</h3><div class="styles"><span class="on">Hero banner</span><span>Slide-up sheet</span><span>Offer + countdown</span><span>Story</span></div></div>
+<div class="card"><h3>Look</h3><div class="sw"><i style="background:#1f4d3a"></i><i style="background:#c4813f"></i><i style="background:#1b56e0"></i><i style="background:#5b4bb0"></i></div><div class="up">+ Add a picture (optional)</div><div class="sm" style="margin-top:8px">Live preview updates as you type.</div></div></div><div class="note">Same audience tool as before: role, ZIP codes, activity, and a reach count.</div></div>
+</div>
+<script>
+(function(){
+var reduce=false;try{reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches}catch(e){}
+var $=function(i){return document.getElementById(i)};var T={};
+function at(k,ms,f){(T[k]=T[k]||[]).push(setTimeout(f,ms))}function clr(k){(T[k]||[]).forEach(clearTimeout);T[k]=[]}
+function r1(){clr(1);$('h1').classList.remove('show');at(1,reduce?0:250,function(){$('h1').classList.add('show')})}
+function r2(){clr(2);$('p2').classList.remove('on');at(2,reduce?0:250,function(){$('p2').classList.add('on')})}
+function r3(){clr(3);$('o3').classList.remove('show');at(3,reduce?0:250,function(){$('o3').classList.add('show')});
+  var secs=2*86400+14*3600+36*60;function tick(){secs--;var d=Math.floor(secs/86400),h=Math.floor(secs%86400/3600),m=Math.floor(secs%3600/60);$('cd1').textContent=('0'+d).slice(-2);$('cd2').textContent=('0'+h).slice(-2);$('cd3').textContent=('0'+m).slice(-2)}
+  clearInterval(r3.i);r3.i=setInterval(tick,60000)}
+function r4(){clr(4);$('p4').classList.remove('on');[1,2,3].forEach(function(n){$('s'+n).classList.remove('cur');var b=$('b'+n);b.style.transition='none';b.style.width='0'});
+  at(4,reduce?0:200,function(){$('p4').classList.add('on')});
+  if(reduce){$('s3').classList.add('cur');[1,2,3].forEach(function(n){$('b'+n).style.width='100%'});return}
+  [1,2,3].forEach(function(n,i){at(4,500+i*3000,function(){[1,2,3].forEach(function(k){$('s'+k).classList.remove('cur')});$('s'+n).classList.add('cur');var b=$('b'+n);b.style.transition='width 3s linear';b.style.width='100%'})})}
+var fn={1:r1,2:r2,3:r3,4:r4};
+[].forEach.call(document.querySelectorAll('[data-r]'),function(b){b.addEventListener('click',function(){fn[b.dataset.r]()})});
+var ids={p1:1,p2:2,p3:3,p4:4};
+if('IntersectionObserver' in window){var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting&&!e.target._s){e.target._s=1;fn[ids[e.target.id]]()}})},{threshold:.5});Object.keys(ids).forEach(function(k){io.observe($(k))})}else{r1();r2();r3();r4()}
+})();
+</script>
