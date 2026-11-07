@@ -81,6 +81,15 @@ const MeetVisual = () => {
     </div>
   );
 };
+const FairBar = () => {
+  const sw = useSweep(52);
+  return (
+    <div ref={sw.ref}>
+      <div className="lm-fbar"><i style={{ right: 'auto', width: `${60 * sw.fill}%` }} /><u style={{ left: `${sw.mark}%` }} /></div>
+      <div className="lm-frg" style={{ marginTop: 10 }}><span>Typical <b>{usd(4200 * sw.count)} to {usd(6100 * sw.count)}</b></span><span style={{ opacity: sw.done ? 1 : 0, transition: 'opacity .4s' }}><b>$5,008</b> bid</span></div>
+    </div>
+  );
+};
 const Radius = () => (
   <>
     <div className="lm-vrad"><i /><i /><i /><svg viewBox="0 0 24 24" dangerouslySetInnerHTML={{ __html: ICON.pin }} /></div>
@@ -253,8 +262,7 @@ export default function LandingModern({ signedIn, nums, children }: { signedIn: 
             <span className="lm-fl">See what it should cost</span>
             <b>Know the price before you talk to anyone</b>
             <span className="lm-fj">Example: interior painting · 3 rooms · Plano</span>
-            <div className="lm-fbar"><i /><u /></div>
-            <div className="lm-frg"><span>Typical <b>$4,200 to $6,100</b></span><span><b>$5,008</b> bid</span></div>
+            <FairBar />
             <span className="lm-ff">An estimate to guide you, not a quote.</span>
           </div>
         )}
