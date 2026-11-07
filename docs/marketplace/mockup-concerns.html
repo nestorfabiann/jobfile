@@ -1,0 +1,58 @@
+<title>Main Concerns Mockup</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+:root{--bg:#f9f7f3;--fg:#2a2118;--mut:#6f6356;--ac:#c4813f;--acbg:#f6e8d6;--card:#fff;--line:#e4dccf;--gr:#1f6b45;--grbg:#e9f1ec}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1b1713;--fg:#f1e9de;--mut:#a89a8a;--ac:#d99a58;--acbg:#3a2c1c;--card:#262019;--line:#3a3128;--gr:#7fc6a0;--grbg:#1c2e25;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#1b1713;--fg:#f1e9de;--mut:#a89a8a;--ac:#d99a58;--acbg:#3a2c1c;--card:#262019;--line:#3a3128;--gr:#7fc6a0;--grbg:#1c2e25;color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,sans-serif;padding-block:20px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));line-height:1.4}
+h1{font-size:21px;margin:0 0 6px}p.i{margin:0 0 14px;color:var(--mut);max-width:64ch}
+.row{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start}
+.cap{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);margin-bottom:6px}
+.ph{width:min(100%,330px);border:1px solid var(--line);border-radius:22px;padding:12px;min-width:0;background:var(--bg);display:flex;flex-direction:column;gap:10px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:8px}
+h2{font-size:15px;margin:0}h3{font-size:13px;margin:0}
+.sm{font-size:12px;color:var(--mut);margin:0}
+.chips{display:flex;flex-wrap:wrap;gap:6px}.c{border:1.5px solid var(--line);border-radius:99px;padding:6px 11px;font-size:12.5px;font-weight:600}.c.on{background:var(--acbg);border-color:var(--ac);color:var(--ac)}
+.f{border:1.5px solid var(--line);border-radius:10px;padding:8px 10px;font-size:13px;color:var(--mut)}.f.t{min-height:52px}
+.cnt{font-size:12px;color:var(--mut);font-weight:600}
+.top{display:flex;gap:6px;flex-wrap:wrap;align-items:center}.top b{font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--mut)}
+.tag{border-radius:99px;padding:4px 10px;font-size:12px;font-weight:700;background:var(--acbg);color:var(--ac)}
+.price{font-size:20px;font-weight:800}
+.ans{background:var(--grbg);border-radius:12px;padding:8px 10px;font-size:13px}.ans b{display:block;font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--gr);margin-bottom:2px}
+.btn{text-align:center;border-radius:99px;padding:10px;font-weight:700;font-size:14px;background:var(--ac);color:#fff}
+.note{font-size:12px;color:var(--mut);max-width:330px;margin-top:8px}
+</style>
+<h1>Main concerns</h1>
+<p class="i">The homeowner picks up to 3. The contractor sees them and answers in the bid. Example content.</p>
+<div class="row">
+
+<div><div class="cap">1 · Post step 3 (homeowner)</div><div class="ph"><div class="card">
+<h2>What matters most to you? <span class="sm">(optional)</span></h2>
+<p class="sm">Pick up to 3. Contractors will see these.</p>
+<div class="chips"><span class="c">Staying on budget</span><span class="c on">Finishing on time</span><span class="c">Quality of the work</span><span class="c on">Dust and mess</span><span class="c on">Pets or kids at home</span><span class="c">Clear communication</span><span class="c">Surprises behind the walls</span><span class="c">Permits and paperwork</span></div>
+<div class="f">Something else (optional)</div>
+<span class="cnt">3 of 3 picked</span>
+</div></div><div class="note">A fourth tap is blocked with a short message. Skipping the question is fine.</div></div>
+
+<div><div class="cap">2 · Job page (contractor)</div><div class="ph"><div class="card">
+<h2>Bathroom refresh · 75074</h2>
+<p class="sm">Floor tile, vanity, fixtures</p>
+<div class="top"><b>Top concerns</b><span class="tag">Finishing on time</span><span class="tag">Dust and mess</span><span class="tag">Pets or kids at home</span></div>
+<p class="sm">Homeowner's own words: "Two dogs, one is nervous."</p>
+</div></div><div class="note">Shown on the job page in the same place for every contractor. Contractors never see anything else private.</div></div>
+
+<div><div class="cap">3 · Bid form (contractor)</div><div class="ph"><div class="card">
+<h2>Your bid</h2>
+<div class="top"><b>Their concerns</b><span class="tag">Finishing on time</span><span class="tag">Dust and mess</span><span class="tag">Pets</span></div>
+<div class="f t">How I'll handle these (optional). Example: "Two-person crew, done in 5 days. Plastic walls and a vacuum on the sander."</div>
+<div class="f">Price $</div>
+<div class="btn">Send bid</div>
+</div></div><div class="note">One optional box. It sits above the price so the contractor reads the concerns first.</div></div>
+
+<div><div class="cap">4 · Comparing bids (homeowner)</div><div class="ph"><div class="card">
+<h3>Nesty's Painting</h3><div class="price">$5,883</div>
+<div class="ans"><b>From the contractor</b>Two-person crew, done in 5 days. Plastic walls and a vacuum on the sander.</div>
+<p class="sm">This is the contractor's own note, not a promise from Jobfile.</p>
+</div></div><div class="note">The note appears next to each price, labeled as the contractor's words.</div></div>
+
+</div>
