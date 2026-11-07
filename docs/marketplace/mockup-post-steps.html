@@ -1,0 +1,60 @@
+<title>Post Steps Mockup</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+:root{--bg:#f9f7f3;--fg:#2a2118;--mut:#6f6356;--ac:#c4813f;--acbg:#f6e8d6;--card:#fff;--line:#e4dccf;--gr:#1f6b45}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1b1713;--fg:#f1e9de;--mut:#a89a8a;--ac:#d99a58;--acbg:#3a2c1c;--card:#262019;--line:#3a3128;--gr:#7fc6a0;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#1b1713;--fg:#f1e9de;--mut:#a89a8a;--ac:#d99a58;--acbg:#3a2c1c;--card:#262019;--line:#3a3128;--gr:#7fc6a0;color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,sans-serif;padding-block:20px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));line-height:1.4}
+h1{font-size:21px;margin:0 0 6px}p.i{margin:0 0 14px;color:var(--mut);max-width:64ch}
+.row{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start}
+.cap{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);margin-bottom:6px}
+.ph{width:min(100%,330px);border:1px solid var(--line);border-radius:22px;padding:12px;min-width:0;background:var(--bg);display:flex;flex-direction:column;gap:10px}
+.prog{display:flex;flex-direction:column;gap:5px}
+.bar{display:flex;gap:4px}.bar i{height:5px;flex:1;border-radius:9px;background:var(--line)}.bar i.on{background:var(--ac)}
+.pl{display:flex;justify-content:space-between;font-size:12px;color:var(--mut);font-weight:600}.pl b{color:var(--fg)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:8px}
+h2{font-size:15px;margin:0}
+.chips{display:flex;flex-wrap:wrap;gap:6px}.c{border:1.5px solid var(--line);border-radius:99px;padding:5px 11px;font-size:12.5px;font-weight:600}.c.on{background:var(--acbg);border-color:var(--ac);color:var(--ac)}
+.f{border:1.5px solid var(--line);border-radius:10px;padding:8px 10px;font-size:13px;color:var(--mut)}
+.f.t{min-height:46px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.sm{font-size:12px;color:var(--mut);margin:0}
+.nav{display:flex;gap:8px}.nav span{flex:1;text-align:center;border-radius:99px;padding:10px;font-weight:700;font-size:14px;border:1.5px solid var(--line)}.nav .go{background:var(--ac);border-color:var(--ac);color:#fff}
+.chk{font-size:13px;display:flex;flex-direction:column;gap:3px}.chk b{color:var(--gr);font-weight:700}
+.tip{background:var(--acbg);border-radius:12px;padding:8px 10px;font-size:12.5px}
+.note{font-size:12px;color:var(--mut);max-width:330px;margin-top:8px}
+</style>
+<h1>Post a project in four short steps</h1>
+<p class="i">Same questions as today, split across four screens with a progress bar. Nothing is removed. Example answers shown.</p>
+<div class="row">
+
+<div><div class="cap">Step 1</div><div class="ph">
+<div class="prog"><div class="bar"><i class="on"></i><i></i><i></i><i></i></div><div class="pl"><b>The job</b><span>1 of 4</span></div></div>
+<div class="card"><h2>What kind of job?</h2><div class="chips"><span class="c on">Painting</span><span class="c">Flooring</span><span class="c">Roofing</span><span class="c">Bathroom</span></div></div>
+<div class="card"><h2>Tap what you want done</h2><div class="chips"><span class="c on">Cabinets</span><span class="c on">Walls</span><span class="c">Trim</span><span class="c">Ceiling</span></div><div class="f t">Something else you want done</div></div>
+<div class="nav"><span class="go">Next</span></div></div>
+<div class="note">The kind of job and what needs doing. Short and quick to answer.</div></div>
+
+<div><div class="cap">Step 2</div><div class="ph">
+<div class="prog"><div class="bar"><i class="on"></i><i class="on"></i><i></i><i></i></div><div class="pl"><b>Details and photos</b><span>2 of 4</span></div></div>
+<div class="card"><h2>Painting: the details</h2><div class="two"><div class="f">Sq ft</div><div class="f">ZIP 75074</div></div><div class="chips"><span class="c on">Walls</span><span class="c">Not sure</span></div><div class="f t">Anything else? (optional)</div></div>
+<div class="card"><h2>Photos and videos</h2><div class="tip">Photos help contractors bid closer. Add a few.</div><div class="f">+ Add photos or a video</div></div>
+<div class="nav"><span>Back</span><span class="go">Next</span></div></div>
+<div class="note">The questions that make bids accurate, with the photo nudge right beside them.</div></div>
+
+<div><div class="cap">Step 3</div><div class="ph">
+<div class="prog"><div class="bar"><i class="on"></i><i class="on"></i><i class="on"></i><i></i></div><div class="pl"><b>Timing and bids</b><span>3 of 4</span></div></div>
+<div class="card"><h2>When do you want to start?</h2><div class="chips"><span class="c on">Within 2 weeks</span><span class="c">This month</span></div></div>
+<div class="card"><h2>How many bids?</h2><div class="chips"><span class="c">3</span><span class="c on">5</span><span class="c">10</span><span class="c">Any</span></div></div>
+<div class="card"><h2>Your budget (optional)</h2><div class="two"><div class="f">From</div><div class="f">To</div></div></div>
+<div class="nav"><span>Back</span><span class="go">Next</span></div></div>
+<div class="note">Start time, bid limit and budget together.</div></div>
+
+<div><div class="cap">Step 4</div><div class="ph">
+<div class="prog"><div class="bar"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></div><div class="pl"><b>Review and post</b><span>4 of 4</span></div></div>
+<div class="card"><h2>Before it goes live</h2><div class="chk"><span><b>✓</b> Kind of job</span><span><b>✓</b> What you want done</span><span><b>✓</b> ZIP and size</span><span><b>✓</b> 2 or more photos</span></div></div>
+<div class="card"><h2>Address and site visits</h2><div class="f">Street address (optional)</div><p class="sm">Your address stays private until you hire.</p></div>
+<div class="nav"><span>Back</span><span class="go">Publish project</span></div></div>
+<div class="note">A checklist, address, site visits, then Publish. "Check my post" and the AI cost reference would sit here as optional extras.</div></div>
+
+</div>
