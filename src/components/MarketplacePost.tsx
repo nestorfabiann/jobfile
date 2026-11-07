@@ -60,7 +60,8 @@ export default function MarketplacePost({ types, aiOn, draft, inviteCompany, inv
   const mediaCard = useRef<HTMLDivElement>(null);
   const [step, setStep] = useState(1);
   const [stepErr, setStepErr] = useState('');
-  const STEPS = ['The job', 'Details and photos', 'Timing and bids', 'Review and post'];
+  const STEPS = ['The job', 'Details and photos', 'When and bids', 'Review and post'];
+  const SHORT = ['The job', 'Details', 'When', 'Review'];
   const go = (n: number) => { setStep(n); setStepErr(''); };
   // Scroll to the top once the new step is on screen. Doing it before the step changes leaves the page near the bottom.
   const stepMoved = useRef(false);
@@ -206,7 +207,7 @@ export default function MarketplacePost({ types, aiOn, draft, inviteCompany, inv
       ) : null}
       {saveMsg && !listingId ? (
         <div role="status" className="small" style={{ display: 'flex', alignItems: 'center', gap: 8, fontWeight: 600, color: saveMsg.tone === 'ok' ? 'var(--ok)' : saveMsg.tone === 'bad' ? 'var(--bad)' : 'var(--accent)' }}>
-          <span aria-hidden="true" style={{ width: 8, height: 8, borderRadius: '50%', background: 'currentColor' }} />{saveMsg.text}
+          <span aria-hidden="true" style={{ width: 8, height: 8, borderRadius: '50%', background: 'currentColor' }} />{saveMsg.text}{/drafts/.test(saveMsg.text) ? <> <a href="/marketplace" style={{ textDecoration: 'underline' }}>Open Posted jobs</a></> : null}
         </div>
       ) : null}
       {draft?.id && !saveMsg ? <div className="box ok">Welcome back. We restored your draft from {new Date(draft.at).toLocaleString('en-US', { timeZone: 'America/Chicago', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}. Photos and videos need to be added again before you publish.</div> : null}
@@ -215,9 +216,17 @@ export default function MarketplacePost({ types, aiOn, draft, inviteCompany, inv
       <input type="hidden" name="answers" value={JSON.stringify(answers)} />
       {ref ? <input type="hidden" name="ref_id" value={ref.id} /> : null}
 
-      <div className="ps-prog" aria-label={`Step ${step} of 4`}>
-        <div className="ps-bar">{STEPS.map((_, i) => <i key={i} className={i < step ? 'on' : ''} />)}</div>
-        <div className="ps-pl"><b>{STEPS[step - 1]}</b><span>{step} of 4</span></div>
+      <div className="ps-prog">
+        <div className="ph-steps" role="list" aria-label="Four short steps">
+          {SHORT.map((t, i) => (
+            <button type="button" role="listitem" key={t} className={`ps-pill${step === i + 1 ? ' on' : ''}${i + 1 < step ? ' done' : ''}`} disabled={i + 1 >= step || posting} aria-current={step === i + 1 ? 'step' : undefined} onClick={() => go(i + 1)}><i>{i + 1 < step ? '✓' : i + 1}</i>{t}</button>
+          ))}
+        </div>
+        {step === 1 ? (
+          <p className="muted small" style={{ margin: 0 }}>4 short steps, about 3 minutes: the job, details and photos, when you want to start and how many bids, then a quick review. We save a draft as you go, so you can leave and come back.</p>
+        ) : (
+          <div className="ps-pl"><b>{STEPS[step - 1]}</b><span>Step {step} of 4</span></div>
+        )}
       </div>
 
       <div className={stepCls(1)}>

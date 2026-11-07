@@ -66,9 +66,6 @@ export default async function NewListing({ searchParams }: { searchParams: { err
           <h1>Post a project</h1>
         </div>
         <p className="muted ph-sub">Pick what you want done and local contractors can send you bids.</p>
-        <div className="ph-steps" aria-label="Three short steps">
-          <b className="on"><i>1</i>What</b><b><i>2</i>Details</b><b><i>3</i>Send</b>
-        </div>
       </div>
       {designEnabled() && !ideaCard ? (
         <Link href="/design" className="box idea-card">

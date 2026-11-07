@@ -1332,3 +1332,12 @@ html { scroll-behavior: smooth; }
 .ps-nav{display:flex;gap:10px}
 .ps-nav .btn{flex:1}
 
+
+.ps-pill{display:inline-flex;gap:6px;align-items:center;font:inherit;font-size:12px;font-weight:600;padding:5px 10px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink-2);cursor:default}
+.ps-pill i{font-style:normal;display:grid;place-items:center;width:16px;height:16px;border-radius:50%;background:var(--line);color:var(--ink-2);font-size:10px}
+.ps-pill.on{background:#f9efe4;border-color:var(--accent);color:var(--ink)}
+.ps-pill.on i,.ps-pill.done i{background:var(--accent);color:#fff}
+.ps-pill.done{cursor:pointer;color:var(--ink)}
+.ps-pill:disabled{opacity:1}
+@media (prefers-color-scheme:dark){:root:not([data-theme='light']) .ps-pill.on{background:#33281c}}
+:root[data-theme='dark'] .ps-pill.on{background:#33281c}
