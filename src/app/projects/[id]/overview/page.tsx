@@ -14,6 +14,7 @@ import { projectTasks, type NeedItem } from '@/lib/needs';
 import ProjectStepper from '@/components/ProjectStepper';
 import { daysBetween, fmtDay, todayChi } from '@/lib/schedule';
 import { categoryLabel, type Issue } from '@/lib/issues';
+import ScopeCard, { type ScopeLine } from '@/components/ScopeCard';
 
 const TZ = 'America/Chicago';
 const day = (d: string) => new Date(`${d.slice(0, 10)}T12:00:00`).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
@@ -49,6 +50,33 @@ export default async function Overview({ params, searchParams }: { params: { id:
   } catch { /* table not created yet */ }
   const items = (itemRows ?? []) as Item[];
   const cos = (coRows ?? []) as ChangeOrder[];
+  // Scope of work with progress: the agreement's work lines plus approved change orders. Left out if the 056 table is missing.
+  let scopeLines: ScopeLine[] = [];
+  try {
+    const adm = supabaseAdmin();
+    const [{ data: wk }, { data: st }] = await Promise.all([
+      adm.from('agreement_items').select('id,title,kind,position').eq('project_id', project.id).eq('kind', 'work').order('position'),
+      adm.from('project_scope_status').select('*').eq('project_id', project.id),
+    ]);
+    const stRows = (st ?? []) as any[];
+    const photoIds = stRows.map((r) => r.photo_id).filter(Boolean) as string[];
+    const photoPath = new Map<string, string>();
+    if (photoIds.length) {
+      const { data: pp } = await adm.from('photos').select('id,path').in('id', photoIds);
+      (pp ?? []).forEach((x: any) => photoPath.set(x.id, x.path));
+    }
+    const { data: su } = photoPath.size ? await adm.storage.from('project-photos').createSignedUrls(Array.from(photoPath.values()), 3600) : { data: [] as any[] };
+    const urlOf = new Map<string, string>(((su ?? []) as any[]).filter((x) => x.path && x.signedUrl).map((x) => [x.path as string, x.signedUrl as string]));
+    const lineOf = (kind: 'item' | 'co', id: string, title: string): ScopeLine => {
+      const r = stRows.find((x) => x.ref_kind === kind && x.ref_id === id);
+      const pth = r?.photo_id ? photoPath.get(r.photo_id) : undefined;
+      return { kind, id, title, status: (r?.status ?? 'not_started') as ScopeLine['status'], doneOn: r?.done_at ? new Date(r.done_at).toLocaleDateString('en-US', { timeZone: 'America/Chicago', month: 'short', day: 'numeric' }) : null, photoUrl: pth ? urlOf.get(pth) ?? null : null, reaction: r?.ho_reaction ?? null, note: r?.ho_note ?? '' };
+    };
+    scopeLines = [
+      ...((wk ?? []) as any[]).map((w) => lineOf('item', w.id, w.title)),
+      ...cos.filter((c) => c.status === 'approved').map((c) => lineOf('co', c.id, `Change order ${c.number}: ${c.title}`)),
+    ];
+  } catch { /* scope table not created yet */ }
   const t = totals(items, cos);
   const executed = !!agr?.executed_at;
   const signed = new Set((sigRows ?? []).map((s) => s.role as string));
@@ -146,8 +174,11 @@ export default async function Overview({ params, searchParams }: { params: { id:
           <Link href={base}>Message</Link>
           <Link href={`${base}/photos`}>Photos</Link>
           {role === 'contractor' ? <Link href={`${base}/payments`}>Bill</Link> : <Link href={`${base}/schedule`}>Schedule</Link>}
+          {executed && scopeLines.length ? <a href="#scope">Scope {scopeLines.filter((l) => l.status === 'done').length}/{scopeLines.length}</a> : null}
         </div>
       </section>
+
+      {executed && scopeLines.length ? <ScopeCard projectId={project.id} role={role} lines={scopeLines} /> : null}
 
       <ProjectPartners variant="top" projectId={project.id} role={role} notice={searchParams.partner === 'sent' ? 'Invite sent. They will see it as soon as they sign in.' : undefined} />
 

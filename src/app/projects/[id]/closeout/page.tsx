@@ -38,6 +38,11 @@ export default async function Closeout({ params, searchParams }: { params: { id:
   const openFixes = fixes.filter((p: any) => p.status === 'open' || p.status === 'fixed').length;
   const pendingCos = (cos as any[]).filter((c) => c.status !== 'approved' && c.status !== 'declined' && c.status !== 'rejected' && c.status !== 'withdrawn');
 
+  const doneOn = new Map<string, string>();
+  try {
+    const { data: st } = await supabaseAdmin().from('project_scope_status').select('ref_id,status,done_at').eq('project_id', project.id).eq('ref_kind', 'item');
+    ((st ?? []) as any[]).forEach((r) => { if (r.status === 'done' && r.done_at) doneOn.set(r.ref_id, when(r.done_at)); });
+  } catch { /* scope table not created yet */ }
   const cf = await loadConfirms(project.id);
   const mine = cf[role];
   const theirs = cf[other];
@@ -75,6 +80,7 @@ export default async function Closeout({ params, searchParams }: { params: { id:
             return (
               <fieldset key={i.id} style={{ border: 0, padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
                 <legend style={{ fontWeight: 700, padding: 0 }}>{i.title}</legend>
+                <span className="muted small">{doneOn.has(i.id) ? `Marked done by the contractor ${doneOn.get(i.id)}` : 'Not marked done on the Overview yet'}</span>
                 <div className="row" style={{ gap: 14 }}>
                   <label className="row small" style={{ gap: 6 }}><input type="radio" name={`s_${i.id}`} value="done" defaultChecked={cur === 'done'} /> Done</label>
                   <label className="row small" style={{ gap: 6 }}><input type="radio" name={`s_${i.id}`} value={alt[0]} defaultChecked={cur === alt[0]} /> {alt[1]}</label>

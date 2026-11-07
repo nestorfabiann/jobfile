@@ -10,7 +10,7 @@ const BUCKET = 'project-photos';
 const MAX_BYTES = 3_500_000;
 const TYPES: Record<string, string> = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' };
 
-export type UploadResult = { ok: true } | { ok: false; error: string };
+export type UploadResult = { ok: true; id?: string } | { ok: false; error: string };
 
 /** Saves one photo. The browser shrinks it first, so each request stays small. */
 export async function uploadPhoto(formData: FormData): Promise<UploadResult> {
@@ -35,19 +35,19 @@ export async function uploadPhoto(formData: FormData): Promise<UploadResult> {
     });
     if (up.error) return { ok: false, error: 'Could not store the photo. Check that the storage step was run.' };
 
-    const { error } = await admin.from('photos').insert({
+    const { data: ins, error } = await admin.from('photos').insert({
       project_id: project.id,
       uploaded_by: user.id,
       uploader_role: role,
       kind,
       caption,
       path,
-    });
+    }).select('id').single();
     if (error) {
       await admin.storage.from(BUCKET).remove([path]);
       return { ok: false, error: 'Could not save the photo record.' };
     }
-    return { ok: true };
+    return { ok: true, id: ins?.id as string | undefined };
   } catch {
     return { ok: false, error: 'Something went wrong saving that photo.' };
   }

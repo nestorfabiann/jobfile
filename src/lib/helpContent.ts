@@ -147,6 +147,9 @@ export const HELP: HelpItem[] = [
   { topic: 'trust', who: 'both', pages: ['p-rating'], q: "How do ratings work?", a: "After the job is complete, each side rates the other. Keep it honest and about the project. Abusive or unrelated reviews can be removed." },
   { topic: 'trust', who: 'both', pages: ['p-rating'], q: "Why can I not rate yet?", a: "Ratings open when the contractor marks the project complete on the Overview tab, and stay open for a limited time." },
   { topic: 'bidding', who: 'h', pages: ['p-price'], q: "What is Price check?", a: "It compares the priced lines in your agreement with typical local costs. It is a guide, not a verdict. It needs the agreement to be sent first." },
+  { topic: 'projects', who: 'both', pages: ['p-overview'], q: "What is the Scope of work card?", a: "Every work line from the signed agreement, plus approved change orders, with its status: not started, in progress or done. The bar shows how much is finished." },
+  { topic: 'projects', who: 'c', pages: ['p-overview'], q: "How do I mark a line done?", a: "Tap Mark done + photo to take or pick a picture of the finished work, or Done, no photo. The photo also appears on the Photos tab. Undo puts it back to in progress." },
+  { topic: 'projects', who: 'h', pages: ['p-overview'], q: "What do Looks good and Question do?", a: "Done shows as soon as the contractor marks it, so nothing waits on you. Looks good records that you saw it. Question sends your words to Messages with that line quoted." },
 ];
 
 /** Which topic to lead with, by page. */
