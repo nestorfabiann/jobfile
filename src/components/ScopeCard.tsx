@@ -30,12 +30,23 @@ export default function ScopeCard({ projectId, role, lines: serverLines, phases:
   useEffect(() => { setPhases(serverPhases); }, [serverPhases]);
   const [skip, setSkip] = useState<string[]>([]);
   const patch = (l: ScopeLine, p: Partial<ScopeLine>) => setLines((cur) => cur.map((x) => (x.kind === l.kind && x.id === l.id ? { ...x, ...p } : x)));
-  // Refresh the server data without losing the place on the page.
-  const sync = () => {
+  // Keeps the page where it is while an action and its refresh run. Next.js can move the page during a refresh,
+  // so for a few seconds the place is put back every frame, until the person touches or scrolls the screen.
+  const hold = () => {
     const y = window.scrollY;
-    router.refresh();
-    [60, 250, 700].forEach((ms) => setTimeout(() => { if (Math.abs(window.scrollY - y) > 4) window.scrollTo(0, y); }, ms));
+    const end = Date.now() + 6000;
+    let stop = false;
+    const off = () => { stop = true; };
+    const evs = ['touchstart', 'wheel', 'keydown', 'mousedown'] as const;
+    evs.forEach((e) => window.addEventListener(e, off, { once: true, passive: true }));
+    const tick = () => {
+      if (stop || Date.now() > end) { evs.forEach((e) => window.removeEventListener(e, off)); return; }
+      if (Math.abs(window.scrollY - y) > 2) window.scrollTo(0, y);
+      requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
   };
+  const sync = () => { hold(); router.refresh(); };
   const [busy, setBusy] = useState('');
   const [err, setErr] = useState('');
   const [asking, setAsking] = useState('');
@@ -47,7 +58,7 @@ export default function ScopeCard({ projectId, role, lines: serverLines, phases:
   const key = (l: ScopeLine) => `${l.kind}:${l.id}`;
 
   async function set(l: ScopeLine, to: 'not_started' | 'in_progress' | 'done', photoId?: string) {
-    setBusy(key(l)); setErr('');
+    hold(); setBusy(key(l)); setErr('');
     const r = await setScopeStatus({ projectId, kind: l.kind, id: l.id, to, photoId });
     setBusy('');
     if (!r.ok) setErr(r.error);
@@ -61,7 +72,7 @@ export default function ScopeCard({ projectId, role, lines: serverLines, phases:
     e.target.value = '';
     if (!l) return;
     if (!f) return void set(l, 'done');
-    setBusy(key(l)); setErr('');
+    hold(); setBusy(key(l)); setErr('');
     let photoId: string | undefined;
     try {
       const blob = await shrink(f);
@@ -74,7 +85,7 @@ export default function ScopeCard({ projectId, role, lines: serverLines, phases:
     await set(l, 'done', photoId);
   }
   async function react(l: ScopeLine, reaction: 'ok' | 'question', note?: string) {
-    setBusy(key(l)); setErr('');
+    hold(); setBusy(key(l)); setErr('');
     const r = await reactScope({ projectId, kind: l.kind, id: l.id, reaction, note });
     setBusy('');
     if (!r.ok) return void setErr(r.error);
@@ -83,7 +94,7 @@ export default function ScopeCard({ projectId, role, lines: serverLines, phases:
   }
 
   async function pickPhase(l: ScopeLine, phaseId: string) {
-    setBusy(key(l)); setErr('');
+    hold(); setBusy(key(l)); setErr('');
     const r = await setScopePhase({ projectId, kind: l.kind, id: l.id, phaseId: phaseId || null });
     setBusy('');
     if (!r.ok) return void setErr(r.error);
@@ -91,7 +102,7 @@ export default function ScopeCard({ projectId, role, lines: serverLines, phases:
     sync();
   }
   async function closePhase(id: string) {
-    setBusy(`ph:${id}`); setErr('');
+    hold(); setBusy(`ph:${id}`); setErr('');
     const r = await finishPhase({ projectId, phaseId: id });
     setBusy('');
     if (!r.ok) return void setErr(r.error);
