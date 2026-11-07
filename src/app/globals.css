@@ -1183,3 +1183,52 @@ html { scroll-behavior: smooth; }
 .cp-chev { margin-left: auto; color: #1f4d3a; font-size: 24px; font-weight: 700; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme='light']) .cp-money { background: #1c2e25; border-color: #2f4d3e; } :root:not([data-theme='light']) .cp-ico { background: #7fc6a0; color: #10241a; } :root:not([data-theme='light']) .cp-chev { color: #7fc6a0; } }
 :root[data-theme='dark'] .cp-money { background: #1c2e25; border-color: #2f4d3e; } :root[data-theme='dark'] .cp-ico { background: #7fc6a0; color: #10241a; } :root[data-theme='dark'] .cp-chev { color: #7fc6a0; }
+
+/* Project tabs: tinted icon tiles */
+.ptabs a .pt-ic { width: 34px; height: 34px; border-radius: 11px; display: grid; place-items: center; background: var(--tb); color: var(--tc); }
+.ptabs a.ptab-wide .pt-ic { width: 28px; height: 28px; border-radius: 9px; }
+.ptabs a[aria-current='page'] { border-width: 1.5px; }
+.pt-overview { --tb: #f3e6d3; --tc: #a8691f; }
+.pt-messages { --tb: #e1ecf8; --tc: #2d6aa8; }
+.pt-agreement { --tb: #ece4f7; --tc: #6b46b0; }
+.pt-photos { --tb: #fae3ea; --tc: #b83e63; }
+.pt-schedule { --tb: #fde9d4; --tc: #c4661a; }
+.pt-selections { --tb: #d9f0ee; --tc: #1d7d77; }
+.pt-documents { --tb: #e6e9ee; --tc: #4b5a6e; }
+.pt-changes { --tb: #fbefc9; --tc: #9a7208; }
+.pt-payments { --tb: #dcf0e3; --tc: #1f6b45; }
+.pt-my-money { --tb: #dcf0e3; --tc: #1f6b45; }
+.pt-team { --tb: #e2e4f8; --tc: #4452b3; }
+.pt-ratings { --tb: #fbefc9; --tc: #9a7208; }
+.pt-problems { --tb: #fae3ea; --tc: #b83e63; }
+.pt-price-check { --tb: #d9f0ee; --tc: #1d7d77; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .pt-overview { --tb: #3a2c1c; --tc: #e0a866; }
+  :root:not([data-theme='light']) .pt-messages { --tb: #1d2c3d; --tc: #7fb2e6; }
+  :root:not([data-theme='light']) .pt-agreement { --tb: #2c2340; --tc: #b79cec; }
+  :root:not([data-theme='light']) .pt-photos { --tb: #3d2230; --tc: #ee8aa8; }
+  :root:not([data-theme='light']) .pt-schedule { --tb: #3d2a18; --tc: #f0a05e; }
+  :root:not([data-theme='light']) .pt-selections { --tb: #183431; --tc: #6cc9c2; }
+  :root:not([data-theme='light']) .pt-documents { --tb: #262c35; --tc: #a3b0c2; }
+  :root:not([data-theme='light']) .pt-changes { --tb: #3a3016; --tc: #e6c04f; }
+  :root:not([data-theme='light']) .pt-payments { --tb: #1c2e25; --tc: #7fc6a0; }
+  :root:not([data-theme='light']) .pt-my-money { --tb: #1c2e25; --tc: #7fc6a0; }
+  :root:not([data-theme='light']) .pt-team { --tb: #262a45; --tc: #9ca6f0; }
+  :root:not([data-theme='light']) .pt-ratings { --tb: #3a3016; --tc: #e6c04f; }
+  :root:not([data-theme='light']) .pt-problems { --tb: #3d2230; --tc: #ee8aa8; }
+  :root:not([data-theme='light']) .pt-price-check { --tb: #183431; --tc: #6cc9c2; }
+}
+:root[data-theme='dark'] .pt-overview { --tb: #3a2c1c; --tc: #e0a866; }
+:root[data-theme='dark'] .pt-messages { --tb: #1d2c3d; --tc: #7fb2e6; }
+:root[data-theme='dark'] .pt-agreement { --tb: #2c2340; --tc: #b79cec; }
+:root[data-theme='dark'] .pt-photos { --tb: #3d2230; --tc: #ee8aa8; }
+:root[data-theme='dark'] .pt-schedule { --tb: #3d2a18; --tc: #f0a05e; }
+:root[data-theme='dark'] .pt-selections { --tb: #183431; --tc: #6cc9c2; }
+:root[data-theme='dark'] .pt-documents { --tb: #262c35; --tc: #a3b0c2; }
+:root[data-theme='dark'] .pt-changes { --tb: #3a3016; --tc: #e6c04f; }
+:root[data-theme='dark'] .pt-payments { --tb: #1c2e25; --tc: #7fc6a0; }
+:root[data-theme='dark'] .pt-my-money { --tb: #1c2e25; --tc: #7fc6a0; }
+:root[data-theme='dark'] .pt-team { --tb: #262a45; --tc: #9ca6f0; }
+:root[data-theme='dark'] .pt-ratings { --tb: #3a3016; --tc: #e6c04f; }
+:root[data-theme='dark'] .pt-problems { --tb: #3d2230; --tc: #ee8aa8; }
+:root[data-theme='dark'] .pt-price-check { --tb: #183431; --tc: #6cc9c2; }

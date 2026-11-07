@@ -44,7 +44,9 @@ export default function ProjectTabs({ id, priceCheck = false, rating = false, mo
         const active = href === base ? path === base : path === href || path.startsWith(`${href}/`);
         return (
           <Link key={href} href={href} aria-current={active ? 'page' : undefined}>
-            <svg viewBox="0 0 24 24" width={22} height={22} fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{ICONS[label]}</svg>
+            <span className={`pt-ic pt-${label.toLowerCase().replace(/ /g, '-')}`} aria-hidden="true">
+              <svg viewBox="0 0 24 24" width={20} height={20} fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">{ICONS[label]}</svg>
+            </span>
             <span>{label}</span>
             {dots.includes(label) ? <span className="ptab-dot" aria-label="Needs you" /> : null}
           </Link>
@@ -55,7 +57,7 @@ export default function ProjectTabs({ id, priceCheck = false, rating = false, mo
         const active = path === href || path.startsWith(`${href}/`);
         return (
           <Link href={href} className="ptab-wide" aria-current={active ? 'page' : undefined}>
-            <svg viewBox="0 0 24 24" width={20} height={20} fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{ICONS.Problems}</svg>
+            <span className="pt-ic pt-problems" aria-hidden="true"><svg viewBox="0 0 24 24" width={17} height={17} fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">{ICONS.Problems}</svg></span>
             <span>Problems</span>
             <span className={`pill ${problems.open === 0 ? 'ok' : 'wt'}`}>{problems.open === 0 ? 'None open' : problems.mine > 0 ? `${problems.open} open · waiting on you` : `${problems.open} open`}</span>
             {problems.mine > 0 ? <span className="ptab-dot" style={{ right: 12, top: 'calc(50% - 4px)' }} aria-label="Needs you" /> : null}
