@@ -1,0 +1,104 @@
+<title>My Properties Mockup</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+:root{--bg:#f9f7f3;--fg:#2a2118;--mut:#6f6356;--ac:#c4813f;--acbg:#f6e8d6;--card:#fff;--line:#e4dccf;--gr:#1f6b45;--grbg:#e9f1ec;--rd:#b3261e;--rdbg:#fbe9e7}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1b1713;--fg:#f1e9de;--mut:#a89a8a;--ac:#d99a58;--acbg:#3a2c1c;--card:#262019;--line:#3a3128;--gr:#7fc6a0;--grbg:#1c2e25;--rd:#f09a92;--rdbg:#3a1f1c;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#1b1713;--fg:#f1e9de;--mut:#a89a8a;--ac:#d99a58;--acbg:#3a2c1c;--card:#262019;--line:#3a3128;--gr:#7fc6a0;--grbg:#1c2e25;--rd:#f09a92;--rdbg:#3a1f1c;color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,sans-serif;padding-block:20px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));line-height:1.4}
+h1{font-size:21px;margin:0 0 6px}p.i{margin:0 0 14px;color:var(--mut);max-width:64ch}
+.row{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start}
+.cap{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);margin-bottom:6px}
+.ph{width:min(100%,330px);border:1px solid var(--line);border-radius:22px;padding:12px;min-width:0;background:var(--bg);display:flex;flex-direction:column;gap:10px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:8px;min-width:0}
+h2{font-size:15px;margin:0}h3{font-size:14px;margin:0}
+.sm{font-size:12px;color:var(--mut);margin:0}
+.hd{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.tag{border-radius:99px;padding:3px 9px;font-size:11.5px;font-weight:700;background:var(--acbg);color:var(--ac);white-space:nowrap}
+.tag.g{background:var(--grbg);color:var(--gr)}.tag.r{background:var(--rdbg);color:var(--rd)}
+.bar{height:7px;border-radius:99px;background:var(--line);overflow:hidden;position:relative}.bar i{display:block;height:100%;background:var(--ac);border-radius:99px}
+.bar.over i{background:var(--rd)}
+.kv{display:flex;justify-content:space-between;gap:8px;font-size:12.5px}.kv b{font-variant-numeric:tabular-nums}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.tile{border:1px solid var(--line);border-radius:12px;padding:8px;min-width:0}.tile b{display:block;font-size:15px;font-variant-numeric:tabular-nums}.tile span{font-size:11px;color:var(--mut)}
+.need{display:flex;gap:8px;align-items:flex-start;border-top:1px solid var(--line);padding-top:8px;font-size:13px}.need:first-of-type{border-top:0;padding-top:0}
+.need small{display:block;color:var(--mut);font-size:11.5px}
+.dot{min-width:20px;height:20px;border-radius:99px;background:var(--rd);color:#fff;font-size:11.5px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.btn{text-align:center;border-radius:99px;padding:10px;font-weight:700;font-size:14px;background:var(--ac);color:#fff}
+.btn.o{background:none;color:var(--ac);border:1.5px solid var(--ac)}
+.prj{display:flex;justify-content:space-between;gap:8px;font-size:13px;border-top:1px solid var(--line);padding-top:8px}.prj:first-of-type{border-top:0;padding-top:0}
+.note{font-size:12px;color:var(--mut);max-width:330px;margin-top:8px}
+.ex{font-size:11px;color:var(--mut);text-align:center}
+</style>
+<h1>My properties</h1>
+<p class="i">For homeowners who run several houses at once, such as flippers. Everything below is example content. Nothing here is a real address or amount.</p>
+<div class="row">
+
+<div><div class="cap">1 · Projects tab, "My properties"</div><div class="ph">
+<div class="hd"><h2>My properties</h2><span class="sm">3 houses</span></div>
+<div class="card">
+<div class="hd"><h3>412 Maple Ct, Plano</h3><span class="dot">3</span></div>
+<p class="sm">2 projects · Kitchen, Roof</p>
+<div class="bar"><i style="width:62%"></i></div>
+<div class="kv"><span>Paid $18,600 of $30,000</span><b>62%</b></div>
+<span class="tag r">Approve finished work</span>
+</div>
+<div class="card">
+<div class="hd"><h3>88 Oak Ridge, Frisco</h3><span class="dot">1</span></div>
+<p class="sm">1 project · Full interior paint</p>
+<div class="bar"><i style="width:30%"></i></div>
+<div class="kv"><span>Paid $2,400 of $8,000</span><b>30%</b></div>
+<span class="tag">Next: second payment</span>
+</div>
+<div class="card">
+<div class="hd"><h3>1207 Pine St, Allen</h3><span class="tag g">Waiting for bids</span></div>
+<p class="sm">1 project · Bathroom · 4 bids in</p>
+</div>
+<div class="btn o">+ Add a property</div>
+<div class="ex">Example content</div>
+</div><div class="note">Grouped by the address already saved on each project. Red number is what waits on you at that house.</div></div>
+
+<div><div class="cap">2 · One property</div><div class="ph">
+<div class="card">
+<h2>412 Maple Ct, Plano</h2>
+<div class="tiles">
+<div class="tile"><b>$30,000</b><span>Contracted</span></div>
+<div class="tile"><b>$18,600</b><span>Paid</span></div>
+<div class="tile"><b>$11,400</b><span>Left</span></div>
+</div>
+<div class="kv"><span>Your budget for this house</span><b>$34,000</b></div>
+<div class="bar"><i style="width:88%"></i></div>
+<p class="sm">$4,000 of budget unassigned</p>
+</div>
+<div class="card">
+<h3>Projects at this house</h3>
+<div class="prj"><span>Kitchen<br><span class="sm">Nesty's Painting · cabinets</span></span><span class="tag r">Approve work</span></div>
+<div class="prj"><span>Roof<br><span class="sm">Example Roofing Co.</span></span><span class="tag">In progress</span></div>
+</div>
+<div class="btn">Post another project here</div>
+<div class="btn o">Property record (PDF)</div>
+<div class="ex">Example content</div>
+</div><div class="note">Budget is optional and private. Contractors never see it. The record PDF combines every project at the house.</div></div>
+
+<div><div class="cap">3 · Needs you, all houses</div><div class="ph">
+<div class="card">
+<div class="hd"><h2>Needs you</h2><span class="sm">4 items</span></div>
+<div class="need"><span class="dot">!</span><span>Approve finished kitchen work<small>412 Maple Ct · Nesty's Painting</small></span></div>
+<div class="need"><span class="dot">!</span><span>Pay request: $2,400<small>88 Oak Ridge · Interior paint</small></span></div>
+<div class="need"><span class="dot">2</span><span>New messages<small>412 Maple Ct · Roof</small></span></div>
+<div class="need"><span class="dot">4</span><span>Review 4 bids<small>1207 Pine St · Bathroom</small></span></div>
+</div>
+<div class="card">
+<h2>Money across houses</h2>
+<div class="tiles">
+<div class="tile"><b>$62,000</b><span>Contracted</span></div>
+<div class="tile"><b>$21,000</b><span>Paid</span></div>
+<div class="tile"><b>$41,000</b><span>Left</span></div>
+</div>
+<div class="kv"><span>412 Maple Ct</span><b>62% paid</b></div>
+<div class="kv"><span>88 Oak Ridge</span><b>30% paid</b></div>
+<p class="sm">Payments are records you and your contractor log. Jobfile does not move money.</p>
+</div>
+<div class="ex">Example content</div>
+</div><div class="note">Same Needs-you list as today, with the house named on each row. The money box only appears with two or more properties.</div></div>
+
+</div>
