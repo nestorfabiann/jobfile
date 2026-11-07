@@ -1,0 +1,69 @@
+<title>Price Bar Sweep Mockup</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+:root{--bg:#f6f2ec;--fg:#2a2118;--mut:#6f6356;--ac:#c4813f;--acbg:#f9efe4;--card:#fff;--line:#e4dccf;--gr:#1f4d3a;--mint:#7fd0a8}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1b1713;--fg:#f1e9de;--mut:#a89a8a;--ac:#d99a58;--acbg:#33281c;--card:#262019;--line:#3a3128;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#1b1713;--fg:#f1e9de;--mut:#a89a8a;--ac:#d99a58;--acbg:#33281c;--card:#262019;--line:#3a3128;color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,sans-serif;padding-block:20px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));line-height:1.4}
+h1{font-size:21px;margin:0 0 6px}p.i{margin:0 0 14px;color:var(--mut);max-width:62ch}
+.row{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start}
+.cap{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);margin-bottom:6px}
+.ph{width:min(100%,340px);border:1px solid var(--line);border-radius:22px;padding:14px;min-width:0}
+.tile{background:var(--acbg);border:1px solid var(--line);border-radius:22px;padding:16px}
+.tile h3{margin:6px 0 6px;font-size:22px;letter-spacing:-.01em}.tile p{margin:0 0 14px;color:var(--mut);font-size:14px}
+.in{background:var(--card);border-radius:16px;padding:14px;position:relative}
+.sample{position:absolute;top:10px;right:12px;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);border:1px solid var(--line);border-radius:999px;padding:2px 8px}
+.bar{position:relative;height:12px;border-radius:8px;background:var(--line);margin:22px 0 10px}
+.bar .rng{position:absolute;top:0;bottom:0;left:18%;width:0;border-radius:8px;background:var(--mint)}
+.bar .mk{position:absolute;top:-6px;width:5px;height:24px;border-radius:3px;background:var(--fg);left:5%}
+.t{font-size:13px;color:var(--mut)}.t b{color:var(--fg)}
+.bid{font-size:12.5px;color:var(--mut);margin-top:8px}.bid b{display:block;font-size:26px;color:var(--fg);opacity:0;transition:opacity .4s}
+.done .bid b{opacity:1}
+.btn{margin-top:12px;border:1.5px solid var(--line);background:var(--card);color:var(--fg);border-radius:999px;padding:10px 18px;font-weight:700;font-size:14px;cursor:pointer;min-height:44px}
+.note{font-size:12px;color:var(--mut);max-width:340px;margin-top:8px}
+</style>
+<h1>Price bar: sweep, then settle</h1>
+<p class="i">The green range fills in, the marker searches back and forth, slows, and locks onto the bid while the numbers count up. It plays once when the card scrolls into view. Tap Replay to watch it again. With reduced motion on, only the finished bar shows. Numbers are sample data.</p>
+<div class="row">
+<div><div class="cap">Landing card · Know it's fair</div><div class="ph"><div class="tile" id="tile"><h3>Know it's fair</h3><p>An AI cost reference for your project before you commit, so you are not guessing.</p>
+<div class="in"><span class="sample">Sample</span><div class="bar" id="bar"><div class="rng" id="rng"></div><div class="mk" id="mk"></div></div>
+<div class="t">Typical <b id="lo">$0</b> to <b id="hi">$0</b></div><div class="bid">Your bid<b id="bid">$5,008</b></div></div></div>
+<button class="btn" id="replay" type="button">Replay</button></div>
+<div class="note">Plays once when the card is on screen. Small "Sample" label so it does not look like a live calculation.</div></div>
+<div><div class="cap">Same motion in the Post form</div><div class="ph"><div class="tile"><h3 style="font-size:18px">AI cost reference</h3><p>While checking local pricing, the marker sweeps. When the range arrives it settles on "most likely".</p>
+<div class="in"><div class="bar" id="bar2"><div class="rng" id="rng2"></div><div class="mk" id="mk2"></div></div><div class="t">Typical <b id="lo2">$0</b> to <b id="hi2">$0</b></div><div class="bid">Most likely<b id="bid2" style="font-size:22px">$23,100</b></div></div></div>
+<button class="btn" id="replay2" type="button">Replay</button></div></div>
+</div>
+<script>
+(function(){
+var reduce=false;try{reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches}catch(e){}
+function money(n){return '$'+Math.round(n).toLocaleString('en-US')}
+function setup(o){
+  var tile=document.getElementById(o.tile),rng=document.getElementById(o.rng),mk=document.getElementById(o.mk),lo=document.getElementById(o.elLo),hi=document.getElementById(o.elHi),bar=document.getElementById(o.bar);
+  var timer=null;
+  function final(){rng.style.width='60%';mk.style.left=o.end+'%';lo.textContent=money(o.lo);hi.textContent=money(o.hi);bar.parentNode.classList.add('done')}
+  function run(){
+    if(reduce){final();return}
+    cancelAnimationFrame(timer);bar.parentNode.classList.remove('done');
+    var t0=null,D=2600;
+    function ease(x){return 1-Math.pow(1-x,3)}
+    function frame(ts){
+      if(t0===null)t0=ts;var p=Math.min(1,(ts-t0)/D);
+      rng.style.width=(60*ease(Math.min(1,p*2.2)))+'%';
+      var amp=(1-p)*(1-p)*45;var pos=o.end+Math.sin(p*Math.PI*5)*amp;
+      mk.style.left=Math.max(2,Math.min(94,pos))+'%';
+      var c=ease(Math.max(0,(p-.35)/.65));
+      lo.textContent=money(o.lo*c);hi.textContent=money(o.hi*c);
+      if(p<1)timer=requestAnimationFrame(frame);else{final()}
+    }
+    timer=requestAnimationFrame(frame);
+  }
+  document.getElementById(o.btn).addEventListener('click',run);
+  if(reduce){final();return}
+  var seen=false;
+  if('IntersectionObserver' in window){var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting&&!seen){seen=true;run()}})},{threshold:.5});io.observe(tile)}else{run()}
+}
+setup({tile:'tile',rng:'rng',mk:'mk',elLo:'lo',elHi:'hi',bar:'bar',btn:'replay',end:46,lo:4200,hi:6100});
+setup({tile:'bar2',rng:'rng2',mk:'mk2',elLo:'lo2',elHi:'hi2',bar:'bar2',btn:'replay2',end:48,lo:19200,hi:27800});
+})();
+</script>
