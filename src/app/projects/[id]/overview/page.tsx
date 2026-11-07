@@ -173,12 +173,6 @@ export default async function Overview({ params, searchParams }: { params: { id:
           <div><b>{agr?.start_date ? fmtDay((agr.start_date as string).slice(0, 10)) : '–'}</b><span>Started</span></div>
           <div><b>{endISO ? fmtDay(endISO) : '–'}</b><span>Finish</span></div>
         </div>
-        <div className="phead-acts">
-          <Link href={base}>Message</Link>
-          <Link href={`${base}/photos`}>Photos</Link>
-          {role === 'contractor' ? <Link href={`${base}/payments`}>Bill</Link> : <Link href={`${base}/schedule`}>Schedule</Link>}
-          {executed && scopeLines.length ? <a href="#scope">Scope {scopeLines.filter((l) => l.status === 'done').length}/{scopeLines.length}</a> : null}
-        </div>
       </section>
 
       {executed && scopeLines.length ? <ScopeCard projectId={project.id} role={role} lines={scopeLines} phases={scopePhases} /> : null}
