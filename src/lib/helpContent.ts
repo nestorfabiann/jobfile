@@ -1,6 +1,8 @@
 /** Ready answers for the Help button. Plain text only. Keep each answer short and true to how the app works today. */
 export type HelpTopic = 'start' | 'bidding' | 'payments' | 'visits' | 'projects' | 'trust' | 'team' | 'community' | 'design';
-export type PageKey = 'home' | 'projects' | 'marketplace' | 'community' | 'find' | 'settings' | 'business' | 'invite' | 'app' | 'design';
+export type PageKey = 'home' | 'projects' | 'marketplace' | 'community' | 'find' | 'settings' | 'business' | 'invite' | 'app' | 'design'
+  | 'post' | 'job' | 'mybids' | 'collab' | 'newinvite' | 'cmoney'
+  | 'p-overview' | 'p-messages' | 'p-agreement' | 'p-photos' | 'p-schedule' | 'p-selections' | 'p-documents' | 'p-changes' | 'p-payments' | 'p-money' | 'p-team' | 'p-issues' | 'p-closeout' | 'p-rating' | 'p-price';
 export type HelpItem = { q: string; a: string; topic: HelpTopic; who: 'h' | 'c' | 'both'; pages?: PageKey[] };
 
 export const TOPICS: [HelpTopic, string][] = [
@@ -92,6 +94,59 @@ export const HELP: HelpItem[] = [
   { topic: 'design', who: 'h', pages: ['design'], q: 'What happens to my photo?', a: 'It is sent to an outside AI service to make the pictures. Only you can see your ideas in Jobfile. Contractors see a picture only if you choose to share it when you post a project.' },
   { topic: 'design', who: 'h', pages: ['design'], q: 'How do I start a project from an idea?', a: 'Open your ideas and tap Start a project with this one under the picture you like. The Post page opens with the room type and matching items filled in. You choose whether contractors see the AI picture and your original photo.' },
   { topic: 'design', who: 'h', pages: ['design'], q: 'Is the AI picture a price or a promise?', a: 'No. It is a picture to spark conversation. Contractors bid on the work you describe, and the final look depends on materials, the room and the contractor.' },
+  { topic: 'bidding', who: 'h', pages: ['post'], q: "How many bids should I pick?", a: "Five is a good start. You usually get a few solid options and still have time to compare. Pick 3 if you want it quick, 10 for more choice, or Any for no limit. Bidding closes when you reach the number, and you can allow more later from the project." },
+  { topic: 'bidding', who: 'h', pages: ['post'], q: "Why are photos and details asked for?", a: "Contractors price from what they can see. Clear photos, the size and what you want done lead to closer bids and fewer questions." },
+  { topic: 'bidding', who: 'h', pages: ['post'], q: "What is the AI cost reference?", a: "A typical price range for similar work in your area, made from your scope and size. It is a guide, not a quote. Real bids come from contractors. Tap Get my AI cost reference to see it." },
+  { topic: 'trust', who: 'h', pages: ['post'], q: "Who sees my project and address?", a: "Contractors near you who do this kind of work can see the project, your first name and the general area. Your street address stays private until you hire someone." },
+  { topic: 'projects', who: 'h', pages: ['post'], q: "Can I save and finish later?", a: "Yes. Your post is saved as a draft as you go. Find it on Projects and tap Keep going." },
+  { topic: 'visits', who: 'h', pages: ['post'], q: "What does the visit question do?", a: "It tells contractors whether they can ask to see the job before bidding, and when you are free. You approve each time." },
+  { topic: 'bidding', who: 'h', pages: ['job'], q: "How do I change how many bids I get?", a: "Use the Bids card near the top. Pick 3, 5, 10 or Any and tap Change limit. If bidding is full, choose a higher number and tap Allow more bids. You cannot go below the bids you already have." },
+  { topic: 'bidding', who: 'h', pages: ['job'], q: "What happens when I reach my limit?", a: "Bidding closes for new contractors, and you get a notice. The bids you have stay. A contractor who withdraws frees a spot." },
+  { topic: 'bidding', who: 'h', pages: ['job'], q: "How do I compare and hire?", a: "Tick Compare on up to 3 bids to see price, time, rating and insurance side by side. When you are sure, tap Accept on one. That starts the project." },
+  { topic: 'bidding', who: 'h', pages: ['job'], q: "Can I talk to a contractor before I hire?", a: "Yes. Each bid has a message thread and a way to ask for a site visit. Phone numbers and emails stay hidden until you accept." },
+  { topic: 'bidding', who: 'h', pages: ['job'], q: "What does Extend or Close do?", a: "Extend keeps the project open 30 more days. Close stops all bidding and tells the contractors who bid. You can say why." },
+  { topic: 'bidding', who: 'c', pages: ['job'], q: "How do I send a bid?", a: "Scroll to Place a bid, add your price, weeks, start date and what is included, then send. You can change it until the homeowner decides. Update my bid saves changes." },
+  { topic: 'bidding', who: 'c', pages: ['job'], q: "What does Bids full mean?", a: "The homeowner chose a limit, such as 5, and has that many bids. You cannot add a new bid unless they allow more or a bidder withdraws. If you already bid, yours stays." },
+  { topic: 'bidding', who: 'c', pages: ['job'], q: "Why can I not bid yet?", a: "You need at least one trade and a business ZIP in your business profile. The card on the page takes you there and brings you back." },
+  { topic: 'visits', who: 'c', pages: ['job'], q: "Can I see the job before I bid?", a: "If the homeowner allows visits, tap See the job first and suggest times. They pick one, and both of you confirm it after." },
+  { topic: 'bidding', who: 'c', pages: ['job'], q: "What do the start tags and the fits note mean?", a: "Tags show when the homeowner wants to start. On your bid, fits when you want to start or later than you asked compares your start date with theirs." },
+  { topic: 'bidding', who: 'c', pages: ['mybids'], q: "What do the bid labels mean?", a: "Waiting means the homeowner has not decided. Hired means you won. Not selected means they chose someone else or closed the project. Withdrawn means you took your bid back." },
+  { topic: 'bidding', who: 'c', pages: ['mybids'], q: "Can I change a bid?", a: "Yes, while it is waiting. Open the job and use Update my bid, or Withdraw my bid to take it back." },
+  { topic: 'team', who: 'c', pages: ['collab'], q: "What is on this page?", a: "Invites waiting for you, your team bids, jobs where you are a partner, past partners, and a way to find a partner. Open one to see what each company agreed to." },
+  { topic: 'start', who: 'both', pages: ['newinvite'], q: "Who can I invite here?", a: "Your own homeowner or contractor, even if they are not on Jobfile yet. They get an email and join with one tap. Nothing is shared until they accept." },
+  { topic: 'start', who: 'both', pages: ['newinvite'], q: "What happens after I send it?", a: "They see the project name and what you asked. When they join, the project is shared, and you both keep the agreement, photos, schedule and payments in one place." },
+  { topic: 'payments', who: 'c', pages: ['cmoney'], q: "What is on My money?", a: "All your jobs in one place: what you collected, what is still to collect, and profit so far. Open a job to add expenses." },
+  { topic: 'payments', who: 'c', pages: ['cmoney'], q: "Where do the numbers come from?", a: "Collected counts payments the homeowner confirmed. Spent comes from expenses you add on each job. Nothing is guessed." },
+  { topic: 'projects', who: 'both', pages: ['p-overview'], q: "What is on Overview?", a: "Where the job stands: the stage, key dates, money, the schedule, and what happens next. Use the tabs above for details like photos and changes." },
+  { topic: 'projects', who: 'both', pages: ['p-overview'], q: "Why does Finish show a date?", a: "It is the agreed end date plus any days added by approved change orders." },
+  { topic: 'projects', who: 'both', pages: ['p-overview'], q: "How do we finish the project?", a: "When the work is done, the contractor starts closeout and the homeowner confirms. After that you can rate each other." },
+  { topic: 'projects', who: 'both', pages: ['p-messages'], q: "Who sees my messages?", a: "Only the people on this project. Messages are saved here as part of the record, so nothing gets lost in texts." },
+  { topic: 'projects', who: 'both', pages: ['p-agreement'], q: "How does the agreement work?", a: "The contractor writes the scope and price. The homeowner reviews and signs, then the contractor signs. After both sign, scope and price are locked." },
+  { topic: 'projects', who: 'both', pages: ['p-agreement'], q: "What if something needs to change after signing?", a: "Use the Changes tab. A change order is approved by the other side before the work starts." },
+  { topic: 'projects', who: 'h', pages: ['p-agreement'], q: "What is the homestead notice?", a: "A Texas step for work on your homestead. Complete it before work begins. Jobfile shows it here and on Overview." },
+  { topic: 'projects', who: 'both', pages: ['p-photos'], q: "What should I photograph?", a: "Progress at each stage, and anything that needs fixing. Mark a photo Needs fixing and it goes on the list of details to fix." },
+  { topic: 'projects', who: 'both', pages: ['p-photos'], q: "How do I mark something fixed?", a: "The contractor taps Mark fixed. The homeowner taps Confirm it\u2019s fixed. It leaves the list once both agree." },
+  { topic: 'visits', who: 'both', pages: ['p-schedule'], q: "How does the schedule work?", a: "The contractor adds phases with dates. Visits for a measure, inspection or final walkthrough also show here with a countdown and a calendar button." },
+  { topic: 'visits', who: 'both', pages: ['p-schedule'], q: "What if the dates move?", a: "The contractor updates the phase. If a change order adds days, the finish date moves with it." },
+  { topic: 'projects', who: 'both', pages: ['p-selections'], q: "What are Selections?", a: "Choices the homeowner makes, such as tile, paint or fixtures. The contractor adds a choice, the homeowner types what they chose and taps Mark as chosen, and both can see it." },
+  { topic: 'projects', who: 'c', pages: ['p-selections'], q: "How do I add a choice?", a: "Tap Add a choice, fill it in, and tap Add and tell the homeowner. If a pick will not work, tap Ask them to choose again." },
+  { topic: 'projects', who: 'both', pages: ['p-documents'], q: "What goes in Documents?", a: "Permits, receipts, warranties and manuals. The signed agreement and the contractor\u2019s insurance appear by themselves. Both sides can see everything here." },
+  { topic: 'payments', who: 'both', pages: ['p-changes'], q: "What is a change order?", a: "Extra work, new materials or a schedule change, with a price. The other side approves before it starts, and it gets its own payment line." },
+  { topic: 'payments', who: 'both', pages: ['p-changes'], q: "Who approves a change?", a: "Whoever did not ask for it. Once approved it is saved in the project, and the price and days are added." },
+  { topic: 'payments', who: 'h', pages: ['p-payments'], q: "How do I confirm a payment?", a: "Pay the contractor directly, the way you agreed, then confirm the milestone here so both records match. Jobfile does not move money." },
+  { topic: 'payments', who: 'c', pages: ['p-payments'], q: "How do I request a payment?", a: "Tap Request on the next milestone. The homeowner gets a notice, pays you directly, and confirms." },
+  { topic: 'payments', who: 'both', pages: ['p-payments'], q: "What are milestones?", a: "The payment schedule from the signed agreement. Each one has an amount and a status, so both sides see what is paid and what is next." },
+  { topic: 'payments', who: 'c', pages: ['p-money'], q: "What is this tab?", a: "Your private numbers for this job: what you were paid, what you spent, and what is left. The homeowner cannot see it." },
+  { topic: 'payments', who: 'c', pages: ['p-money'], q: "How do I add an expense?", a: "Tap Add expense, pick a type, enter the amount, and save. Materials, helpers and permits all count toward profit." },
+  { topic: 'team', who: 'both', pages: ['p-team'], q: "What is the Team tab?", a: "Partner companies on this job, such as a plumber your contractor brought in. Each partner sees only their own part, price and dates." },
+  { topic: 'team', who: 'h', pages: ['p-team'], q: "Can I remove a partner?", a: "Yes. Tap Remove next to the partner. Your contractor is told." },
+  { topic: 'projects', who: 'both', pages: ['p-issues'], q: "What is a problem report?", a: "A written record of something that went wrong, with what would feel fair. The other side has 3 days to answer. Fixes are suggested by both, and accepted ones are saved." },
+  { topic: 'projects', who: 'both', pages: ['p-issues'], q: "Can Jobfile decide who is right?", a: "No. Jobfile does not hold money or rule on disputes. If you are stuck, you can ask a Jobfile mediator to read the record. It only applies if you both accept." },
+  { topic: 'projects', who: 'both', pages: ['p-closeout'], q: "What is closeout?", a: "A last check before the job is closed: scope done, payments confirmed, nothing left to fix. Each side confirms its part. It never blocks closing and is saved in the record." },
+  { topic: 'projects', who: 'both', pages: ['p-closeout'], q: "What does Not done or Changed do?", a: "It sends that line to the other side with your note, so nothing is argued from memory. Use a change order for new work." },
+  { topic: 'trust', who: 'both', pages: ['p-rating'], q: "How do ratings work?", a: "After the job is complete, each side rates the other. Keep it honest and about the project. Abusive or unrelated reviews can be removed." },
+  { topic: 'trust', who: 'both', pages: ['p-rating'], q: "Why can I not rate yet?", a: "Ratings open when the contractor marks the project complete on the Overview tab, and stay open for a limited time." },
+  { topic: 'bidding', who: 'h', pages: ['p-price'], q: "What is Price check?", a: "It compares the priced lines in your agreement with typical local costs. It is a guide, not a verdict. It needs the agreement to be sent first." },
 ];
 
 /** Which topic to lead with, by page. */
@@ -119,5 +174,17 @@ export function pageKey(path: string): PageKey | null {
   if (path === '/invite') return 'invite';
   if (path === '/app') return 'app';
   if (/^\/design/.test(path)) return 'design';
+  if (path === '/marketplace/new') return 'post';
+  if (path === '/marketplace/bids') return 'mybids';
+  if (/^\/marketplace\/[^/]+$/.test(path)) return 'job';
+  if (/^\/(collaborate|partner)/.test(path)) return 'collab';
+  if (/^\/invites\/(new|[^/]+)$/.test(path)) return 'newinvite';
+  if (path === '/settings/business/money') return 'cmoney';
+  const m = path.match(/^\/projects\/[^/]+(?:\/([^/]+))?/);
+  if (m) {
+    const tab: Record<string, PageKey> = { overview: 'p-overview', agreement: 'p-agreement', photos: 'p-photos', schedule: 'p-schedule', selections: 'p-selections', documents: 'p-documents', changes: 'p-changes', payments: 'p-payments', money: 'p-money', partners: 'p-team', issues: 'p-issues', closeout: 'p-closeout', rating: 'p-rating', 'price-check': 'p-price' };
+    if (!m[1]) return 'p-messages';
+    return tab[m[1]] ?? null;
+  }
   return null;
 }

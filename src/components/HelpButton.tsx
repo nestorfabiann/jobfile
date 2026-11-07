@@ -76,7 +76,7 @@ export default function HelpButton({ who }: { who: Who }) {
             <div className="hp-list">
               {items.length === 0 && <p className="muted" style={{ margin: 0 }}>Nothing matches that. Try another word.</p>}
               {items.map((x, i) => (
-                <div key={x.q} className="hp-q">
+                <div key={`${x.q}-${i}`} className="hp-q">
                   <button type="button" aria-expanded={which === i} onClick={() => setWhich(which === i ? null : i)}>
                     <span>{x.q}</span>
                     <svg viewBox="0 0 24 24" width={18} height={18} fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
