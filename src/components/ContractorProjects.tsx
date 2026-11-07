@@ -208,9 +208,13 @@ export default function ContractorProjects(p: {
       )}
 
       {(p.collected > 0 || p.toCollect > 0) && (
-        <Link href="/settings/business/money" className="card cp-money" aria-label="Open My money">
-          <span><b>{dollars(p.collected)}</b> <span className="muted small">collected</span> &middot; <b>{dollars(p.toCollect)}</b> <span className="muted small">to collect</span></span>
-          <span style={{ fontWeight: 700, color: 'var(--accent)' }}>My money &rsaquo;</span>
+        <Link href="/settings/business/money" className="card cp-money" aria-label={`Open My money. ${dollars(p.collected)} collected, ${dollars(p.toCollect)} to collect`}>
+          <span className="cp-ico" aria-hidden="true">$</span>
+          <span className="cp-tx">
+            <span><b>{dollars(p.collected)}</b> <span className="muted small">collected</span></span>
+            <span><b>{dollars(p.toCollect)}</b> <span className="muted small">to collect</span></span>
+          </span>
+          <span className="cp-chev" aria-hidden="true">&rsaquo;</span>
         </Link>
       )}
 

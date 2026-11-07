@@ -1175,3 +1175,11 @@ html { scroll-behavior: smooth; }
 .shop-st { display: flex; flex-direction: column; gap: 6px; padding: 2px 0 10px 50px; }
 .shop-chip { display: inline-flex; align-items: center; min-height: 40px; padding: 0 12px; border: 1.5px solid var(--line); border-radius: 999px; background: var(--surface); font-size: 13px; font-weight: 700; color: var(--ink); text-decoration: none; }
 .shop-find { display: flex; flex-direction: column; gap: 8px; border-top: 1px solid var(--line); padding-top: 12px; margin-top: 6px; }
+
+/* Money card in green */
+.cp-money { flex-wrap: nowrap; justify-content: flex-start; gap: 12px; padding: 14px 16px; background: #eaf5ee; border-color: #bfe0cc; }
+.cp-ico { flex: none; width: 42px; height: 42px; border-radius: 50%; background: #1f4d3a; color: #fff; display: grid; place-items: center; font-weight: 800; font-size: 20px; }
+.cp-tx { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; font-size: 17px; }
+.cp-chev { margin-left: auto; color: #1f4d3a; font-size: 24px; font-weight: 700; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme='light']) .cp-money { background: #1c2e25; border-color: #2f4d3e; } :root:not([data-theme='light']) .cp-ico { background: #7fc6a0; color: #10241a; } :root:not([data-theme='light']) .cp-chev { color: #7fc6a0; } }
+:root[data-theme='dark'] .cp-money { background: #1c2e25; border-color: #2f4d3e; } :root[data-theme='dark'] .cp-ico { background: #7fc6a0; color: #10241a; } :root[data-theme='dark'] .cp-chev { color: #7fc6a0; }
