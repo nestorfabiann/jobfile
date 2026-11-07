@@ -55,7 +55,7 @@ export async function setScopeStatus(input: { projectId: string; kind: 'item' | 
       const { error } = await db.from('project_scope_status').upsert(row, { onConflict: 'project_id,ref_kind,ref_id' });
       if (error) return { ok: false, error: 'Could not save. Check that the database step was run.' };
       if (input.to === 'done') {
-        await notifyOtherSide({ projectId: project.id, senderId: user.id, senderRole: 'contractor', kind: 'photo', title: (n) => `Work finished on ${n}: ${title.slice(0, 80)}`, body: 'Open the Overview tab to see the scope and what is done. You can tap Looks good or ask a question.', throttle: true });
+        await notifyOtherSide({ projectId: project.id, senderId: user.id, senderRole: 'contractor', kind: 'scope', title: (n) => `Work finished on ${n}: ${title.slice(0, 80)}`, body: 'Open the Overview tab to see the scope and what is done. You can tap Looks good or ask a question.', throttle: true });
       }
     }
     revalidatePath(`/projects/${project.id}/overview`);

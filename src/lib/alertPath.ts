@@ -14,6 +14,7 @@ const TAB: Record<string, string> = {
   selection: '/selections',
   document: '/documents',
   visit: '/schedule',
+  scope: '/overview#scope',
 };
 
 export function alertHref(projectId: string | null | undefined, kind: string | null | undefined): string {
