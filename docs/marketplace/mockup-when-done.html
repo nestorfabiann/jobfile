@@ -23,34 +23,33 @@ h1{font-size:21px;margin:0 0 6px}p.i{margin:0 0 14px;color:var(--mut);max-width:
 .tag.u{background:var(--rdbg);color:var(--rd);border-color:transparent}
 .kv{display:flex;justify-content:space-between;font-size:13px;padding:7px 0;border-top:1px solid var(--line)}.kv:first-of-type{border-top:0}.kv span{color:var(--mut)}
 .ok{color:var(--gr);font-weight:700}.warn{color:var(--rd);font-weight:700}
-.note{font-size:12px;color:var(--mut);max-width:340px}
+.tag.on2{background:var(--acbg);border-color:var(--ac)}.note{font-size:12px;color:var(--mut);max-width:340px}
 </style>
-<h1>When would you like it done?</h1>
-<p class="i">Three screens: the new question on the Post form, how a contractor sees it on a job card, and how it lines up with a bid. Sample data only.</p>
+<h1>Start timing: smaller version</h1>
+<p class="i">The question "When do you want to start?" already exists. It is in the details questions and shows to contractors only in a list lower on the job page. This version uses the same four answers and makes them easier to see. Sample data only.</p>
 <div class="row">
-<div><div class="cap">1 · Post form (new section)</div><div class="ph">
-<div class="card"><h3>When would you like it done?</h3><p>Helps contractors plan. You can change it later.</p>
-<div class="opt on"><i class="rd"></i><div>As soon as possible<small>Contractors see an ASAP tag</small></div></div>
-<div class="opt"><i class="rd"></i><div>Within a month</div></div>
-<div class="opt"><i class="rd"></i><div>In 1 to 3 months</div></div>
-<div class="opt"><i class="rd"></i><div>Just planning, no rush</div></div>
-<div class="opt"><i class="rd"></i><div>Pick a date</div></div>
-<div class="date">Choose a date (only if you pick "Pick a date")</div>
-</div>
-</div><div class="note" style="margin-top:6px">Goes between Photos and Budget. Optional, so nobody gets stuck.</div></div>
-<div><div class="cap">2 · Contractor sees it on the job</div><div class="ph">
+<div><div class="cap">1 · Post form: its own block near the top</div><div class="ph">
+<div class="card"><h3>When do you want to start? *</h3><p>Contractors see this first. You can say if the date can move.</p>
+<div class="opt on"><i class="rd"></i><div>Within 2 weeks<small>Shown to contractors as ASAP</small></div></div>
+<div class="opt"><i class="rd"></i><div>This month</div></div>
+<div class="opt"><i class="rd"></i><div>1 to 3 months</div></div>
+<div class="opt"><i class="rd"></i><div>Just pricing</div></div>
+<div style="font-weight:600;font-size:14px;margin-top:12px">Is the date flexible?</div>
+<div class="tags" style="margin-top:6px"><span class="tag">Fixed deadline</span><span class="tag on2">Somewhat</span><span class="tag">Very flexible</span></div>
+</div></div><div class="note" style="margin-top:6px">Same questions as today, just moved up so they are not buried. Still required to post.</div></div>
+<div><div class="cap">2 · Contractor sees it on the job card</div><div class="ph">
 <div class="card job"><b>Kitchen and walls painting</b><span class="m">Plano · Posted today</span>
-<div class="tags"><span class="tag u">ASAP</span><span class="tag">$20,000 to $30,000</span><span class="tag">6 photos</span></div></div>
+<div class="tags"><span class="tag u">ASAP · within 2 weeks</span><span class="tag">$20,000 to $30,000</span><span class="tag">6 photos</span></div></div>
 <div class="card job"><b>Exterior paint, front and sides</b><span class="m">Frisco · Posted 2 days ago</span>
-<div class="tags"><span class="tag">In 1 to 3 months</span><span class="tag">$6,000 to $9,000</span></div></div>
+<div class="tags"><span class="tag">Start: 1 to 3 months</span><span class="tag">Flexible</span><span class="tag">$6,000 to $9,000</span></div></div>
 <div class="card job"><b>Bathroom refresh</b><span class="m">Allen · Posted 4 days ago</span>
-<div class="tags"><span class="tag">No rush</span></div></div>
-</div><div class="note" style="margin-top:6px">Find work can also be sorted so ASAP jobs show first.</div></div>
+<div class="tags"><span class="tag">Just pricing</span></div></div>
+</div><div class="note" style="margin-top:6px">Today this answer is only in a list lower on the job page. The same line would also show at the top of the job page.</div></div>
 <div><div class="cap">3 · Next to each bid</div><div class="ph">
-<div class="card"><h3>Compare bids</h3><p>You asked for: <b>Within a month</b></p>
+<div class="card"><h3>Compare bids</h3><p>You asked to start: <b>This month</b></p>
 <div class="kv"><span>Nesty's Painting</span><b>$24,500</b></div>
 <div class="kv"><span>Earliest start</span><span class="ok">Nov 18 · fits</span></div>
 <div class="kv"><span>Lone Star Coatings</span><b>$22,900</b></div>
 <div class="kv"><span>Earliest start</span><span class="warn">Jan 12 · later than you asked</span></div>
-</div></div><div class="note" style="margin-top:6px">A mismatch is shown plainly. The homeowner still decides.</div></div>
+</div></div><div class="note" style="margin-top:6px">Shown only when the contractor gave a start date. A mismatch is shown plainly and the homeowner decides. "Just pricing" shows nothing.</div></div>
 </div>
