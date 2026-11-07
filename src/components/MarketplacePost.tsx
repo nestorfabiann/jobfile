@@ -58,7 +58,17 @@ export default function MarketplacePost({ types, aiOn, draft, inviteCompany, inv
   const [step, setStep] = useState(1);
   const [stepErr, setStepErr] = useState('');
   const STEPS = ['The job', 'Details and photos', 'Timing and bids', 'Review and post'];
-  const go = (n: number) => { setStep(n); setStepErr(''); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+  const go = (n: number) => { setStep(n); setStepErr(''); };
+  // Scroll to the top once the new step is on screen. Doing it before the step changes leaves the page near the bottom.
+  const stepMoved = useRef(false);
+  useEffect(() => {
+    if (!stepMoved.current) { stepMoved.current = true; return; }
+    const top = () => window.scrollTo({ top: 0, left: 0, behavior: 'instant' as ScrollBehavior });
+    top();
+    const raf = requestAnimationFrame(() => requestAnimationFrame(top));
+    const t = setTimeout(top, 150);
+    return () => { cancelAnimationFrame(raf); clearTimeout(t); };
+  }, [step]);
   const goNext = () => {
     if (step === 1 && !picks.length) return setStepErr('Tap at least one thing you want done.');
     if (step === 2 && !/^\d{5}$/.test(zip)) return setStepErr('Enter your 5-digit ZIP code.');
