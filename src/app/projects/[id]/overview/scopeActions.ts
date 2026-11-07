@@ -41,6 +41,15 @@ export async function setScopeStatus(input: { projectId: string; kind: 'item' | 
         photoId = (ph?.id as string | undefined) ?? null;
       }
       const row: Record<string, unknown> = { project_id: project.id, ref_kind: input.kind, ref_id: input.id, status: input.to, updated_at: new Date().toISOString() };
+      // With no phase picked yet, use the phase that is in progress right now, if there is exactly one.
+      if (input.kind === 'item') {
+        const { data: ex } = await db.from('project_scope_status').select('phase_id').eq('project_id', project.id).eq('ref_kind', 'item').eq('ref_id', input.id).maybeSingle();
+        if (!ex?.phase_id) {
+          const { data: cur } = await db.from('project_phases').select('id,note').eq('project_id', project.id).eq('status', 'in_progress');
+          const open = ((cur ?? []) as any[]).filter((p) => p.note !== 'From a change order');
+          if (open.length === 1) row.phase_id = open[0].id;
+        }
+      }
       if (input.to === 'done') { row.done_at = new Date().toISOString(); row.done_by = user.id; if (photoId) row.photo_id = photoId; }
       else { row.done_at = null; row.done_by = null; row.ho_reaction = null; row.ho_note = ''; row.ho_at = null; }
       const { error } = await db.from('project_scope_status').upsert(row, { onConflict: 'project_id,ref_kind,ref_id' });

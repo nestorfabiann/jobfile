@@ -40,8 +40,8 @@ export default async function Overview({ params, searchParams }: { params: { id:
       sb.from('photos').select('id,kind,status,path,caption,created_at').eq('project_id', project.id).order('created_at', { ascending: false }).limit(200),
       sb.from('messages').select('sender_role,tag,created_at').eq('project_id', project.id).order('created_at', { ascending: false }).limit(50),
     ]);
-  let phaseRows: { id: string; title: string; starts_on: string | null; ends_on: string | null; status: string; position: number }[] = [];
-  try { const { data: pr } = await sb.from('project_phases').select('id,title,starts_on,ends_on,status,position').eq('project_id', project.id).order('position'); phaseRows = (pr ?? []) as typeof phaseRows; } catch { /* schedule tables missing */ }
+  let phaseRows: { id: string; note?: string; title: string; starts_on: string | null; ends_on: string | null; status: string; position: number }[] = [];
+  try { const { data: pr } = await sb.from('project_phases').select('id,title,note,starts_on,ends_on,status,position').eq('project_id', project.id).order('position'); phaseRows = (pr ?? []) as typeof phaseRows; } catch { /* schedule tables missing */ }
 
   let openIssues: Issue[] = [];
   try {
@@ -52,14 +52,15 @@ export default async function Overview({ params, searchParams }: { params: { id:
   const cos = (coRows ?? []) as ChangeOrder[];
   // Scope of work with progress: the agreement's work lines plus approved change orders. Left out if the 056 table is missing.
   let scopeLines: ScopeLine[] = [];
-  let scopePhases: { id: string; title: string; status: string }[] = [];
+  let scopePhases: { id: string; title: string; status: string; co: boolean }[] = [];
   try {
     const adm = supabaseAdmin();
     const [{ data: wk }, { data: st }] = await Promise.all([
       adm.from('agreement_items').select('id,title,kind,position').eq('project_id', project.id).eq('kind', 'work').order('position'),
       adm.from('project_scope_status').select('*').eq('project_id', project.id),
     ]);
-    scopePhases = phaseRows.map((p) => ({ id: (p as any).id as string, title: p.title, status: p.status }));
+    scopePhases = phaseRows.map((p) => ({ id: p.id, title: p.title, status: p.status, co: p.note === 'From a change order' }));
+    const coPhaseFor = (title: string) => phaseRows.find((p) => p.note === 'From a change order' && p.title.trim().toLowerCase() === title.trim().toLowerCase())?.id ?? null;
     const stRows = (st ?? []) as any[];
     const photoIds = stRows.map((r) => r.photo_id).filter(Boolean) as string[];
     const photoPath = new Map<string, string>();
@@ -69,14 +70,14 @@ export default async function Overview({ params, searchParams }: { params: { id:
     }
     const { data: su } = photoPath.size ? await adm.storage.from('project-photos').createSignedUrls(Array.from(photoPath.values()), 3600) : { data: [] as any[] };
     const urlOf = new Map<string, string>(((su ?? []) as any[]).filter((x) => x.path && x.signedUrl).map((x) => [x.path as string, x.signedUrl as string]));
-    const lineOf = (kind: 'item' | 'co', id: string, title: string): ScopeLine => {
+    const lineOf = (kind: 'item' | 'co', id: string, title: string, coTitle?: string): ScopeLine => {
       const r = stRows.find((x) => x.ref_kind === kind && x.ref_id === id);
       const pth = r?.photo_id ? photoPath.get(r.photo_id) : undefined;
-      return { kind, id, title, status: (r?.status ?? 'not_started') as ScopeLine['status'], doneOn: r?.done_at ? new Date(r.done_at).toLocaleDateString('en-US', { timeZone: 'America/Chicago', month: 'short', day: 'numeric' }) : null, photoUrl: pth ? urlOf.get(pth) ?? null : null, reaction: r?.ho_reaction ?? null, note: r?.ho_note ?? '', phaseId: r?.phase_id ?? null };
+      return { kind, id, title, status: (r?.status ?? 'not_started') as ScopeLine['status'], doneOn: r?.done_at ? new Date(r.done_at).toLocaleDateString('en-US', { timeZone: 'America/Chicago', month: 'short', day: 'numeric' }) : null, photoUrl: pth ? urlOf.get(pth) ?? null : null, reaction: r?.ho_reaction ?? null, note: r?.ho_note ?? '', phaseId: kind === 'co' ? (coPhaseFor(coTitle ?? '') ?? r?.phase_id ?? null) : r?.phase_id ?? null, auto: kind === 'co' };
     };
     scopeLines = [
       ...((wk ?? []) as any[]).map((w) => lineOf('item', w.id, w.title)),
-      ...cos.filter((c) => c.status === 'approved').map((c) => lineOf('co', c.id, `Change order ${c.number}: ${c.title}`)),
+      ...cos.filter((c) => c.status === 'approved').map((c) => lineOf('co', c.id, `Change order ${c.number}: ${c.title}`, c.title)),
     ];
   } catch { /* scope table not created yet */ }
   const t = totals(items, cos);

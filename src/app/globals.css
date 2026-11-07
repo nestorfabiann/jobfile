@@ -1300,3 +1300,7 @@ html { scroll-behavior: smooth; }
 /* Keep the "Sample screen" note visible on tall step screens */
 .lm-stv-in { padding-bottom: 20px; box-sizing: border-box; }
 .lm-stv-in .lm-stv-note { position: absolute; right: 0; bottom: 0; padding-left: 8px; background: var(--warn-bg); }
+
+/* Compact phase picker */
+.sc-ph { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: var(--ink-2); }
+.sc-ph .sc-sel { min-height: 30px; padding: 4px 8px; font-size: 12px; border-radius: 10px; width: auto; max-width: 160px; }

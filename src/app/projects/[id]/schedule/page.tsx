@@ -24,6 +24,18 @@ export default async function Schedule({ params, searchParams }: { params: { id:
   try {
     const { data: sc } = await supabaseAdmin().from('project_scope_status').select('phase_id,status').eq('project_id', project.id).not('phase_id', 'is', null);
     ((sc ?? []) as any[]).forEach((r) => { const c = scopeBy.get(r.phase_id) ?? { n: 0, d: 0 }; c.n += 1; if (r.status === 'done') c.d += 1; scopeBy.set(r.phase_id, c); });
+    // Change-order phases are tied to their own scope line by title.
+    const coPh = phases.filter((p) => (p as any).note === 'From a change order');
+    if (coPh.length) {
+      const { data: cs } = await supabaseAdmin().from('change_orders').select('id,title,status').eq('project_id', project.id).eq('status', 'approved');
+      const { data: st } = await supabaseAdmin().from('project_scope_status').select('ref_id,status').eq('project_id', project.id).eq('ref_kind', 'co');
+      ((cs ?? []) as any[]).forEach((c) => {
+        const ph = coPh.find((p) => p.title.trim().toLowerCase() === String(c.title).trim().toLowerCase());
+        if (!ph) return;
+        const done = ((st ?? []) as any[]).some((r) => r.ref_id === c.id && r.status === 'done');
+        scopeBy.set(ph.id, { n: 1, d: done ? 1 : 0 });
+      });
+    }
   } catch { /* scope table not created yet */ }
   const changes = (chgRows ?? []) as any[];
   const state = scheduleState(phases, today);

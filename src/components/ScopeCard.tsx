@@ -5,8 +5,8 @@ import { useRouter } from 'next/navigation';
 import { finishPhase, reactScope, setScopePhase, setScopeStatus } from '@/app/projects/[id]/overview/scopeActions';
 import { uploadPhoto } from '@/app/projects/[id]/photos/actions';
 
-export type ScopeLine = { kind: 'item' | 'co'; id: string; title: string; status: 'not_started' | 'in_progress' | 'done'; doneOn: string | null; photoUrl: string | null; reaction: 'ok' | 'question' | null; note: string; phaseId: string | null };
-export type ScopePhase = { id: string; title: string; status: string };
+export type ScopeLine = { kind: 'item' | 'co'; id: string; title: string; status: 'not_started' | 'in_progress' | 'done'; doneOn: string | null; photoUrl: string | null; reaction: 'ok' | 'question' | null; note: string; phaseId: string | null; auto?: boolean };
+export type ScopePhase = { id: string; title: string; status: string; co?: boolean };
 
 async function shrink(file: File, max = 1600): Promise<Blob> {
   const bmp = await createImageBitmap(file, { imageOrientation: 'from-image' });
@@ -144,11 +144,13 @@ export default function ScopeCard({ projectId, role, lines: serverLines, phases:
                   {l.status !== 'done' ? <button type="button" className="sc-b" disabled={!!busy} onClick={() => set(l, 'done')}>Done, no photo</button> : null}
                   {l.status === 'not_started' ? <button type="button" className="sc-b" disabled={!!busy} onClick={() => set(l, 'in_progress')}>Start</button> : null}
                   {l.status !== 'not_started' ? <button type="button" className="sc-b" disabled={!!busy} onClick={() => set(l, l.status === 'done' ? 'in_progress' : 'not_started')}>{l.status === 'done' ? 'Undo' : 'Reset'}</button> : null}
-                  {phases.length ? (
-                    <select className="sc-sel" aria-label={`Phase for ${l.title}`} value={l.phaseId && known.has(l.phaseId) ? l.phaseId : ''} disabled={!!busy} onChange={(e) => pickPhase(l, e.target.value)}>
-                      <option value="">No phase</option>
-                      {phases.map((p) => <option key={p.id} value={p.id}>{p.title}</option>)}
-                    </select>
+                  {phases.some((p) => !p.co) && !l.auto ? (
+                    <label className="sc-ph">Phase
+                      <select className="sc-sel" aria-label={`Phase for ${l.title}`} value={l.phaseId && known.has(l.phaseId) ? l.phaseId : ''} disabled={!!busy} onChange={(e) => pickPhase(l, e.target.value)}>
+                        <option value="">None</option>
+                        {phases.filter((p) => !p.co).map((p) => <option key={p.id} value={p.id}>{p.title}</option>)}
+                      </select>
+                    </label>
                   ) : null}
                 </div>
               ) : l.status === 'done' && !l.reaction ? (
