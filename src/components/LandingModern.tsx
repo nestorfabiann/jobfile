@@ -145,19 +145,19 @@ function Screen({ side, step }: { side: Side; step: number }): ReactNode {
     if (step === 0) return (<>
       <div className="lm-ph">New project <span className="lm-pill o">Draft</span></div>
       <div className="lm-mini"><b>What work?</b><div className="lm-chips"><span className="on">Walls</span><span className="on">Trim and doors</span><span>Ceiling</span></div></div>
-      <div className="lm-mini"><b>Budget</b><div className="lm-vm">$6,000 to $6,500</div></div>
+      <div className="lm-mini"><b>Budget</b><div className="lm-vm lm-type">$6,000 to $6,500</div></div>
       <div className="lm-mini"><b>Site visits</b><div className="lm-vm">Yes, weekday evenings</div></div>
       <div className="lm-mini lm-go">Publish project</div></>);
     if (step === 1) return (<>
       <div className="lm-ph">3 bids <span className="lm-pill b">Compare</span></div>
-      <div className="lm-mini"><b>Nesty’s Painting</b> <span className="lm-pill">✓ Verified</span><div className="lm-price">$5,008</div><div className="lm-bar"><i /><u /></div><div className="lm-vm">Typical range · insured to Mar 2027</div></div>
+      <div className="lm-mini"><b>Nesty’s Painting</b> <span className="lm-pill lm-vfy">✓ Verified</span><div className="lm-price">$5,008</div><div className="lm-bar"><i /><u /></div><div className="lm-vm">Typical range · insured to Mar 2027</div></div>
       <div className="lm-mini"><b>Plano Pro Paint</b><div className="lm-price">$6,200</div><div className="lm-vm">★ 4.8 · 12 reviews</div></div>
       <div className="lm-mini"><b>Lone Star Finishes</b><div className="lm-price">$5,750</div><div className="lm-vm">★ 4.9 · 8 reviews</div></div></>);
     return (<>
       <div className="lm-ph">Needs you <span className="lm-pill o">2</span></div>
       <div className="lm-mini"><b>Pick a time for the site visit</b><div className="lm-vm">Thu, Nov 13 · 10:00 am</div></div>
       <div className="lm-mini"><b>Choose: Kitchen tile</b><div className="lm-vm">Needed by Fri</div></div>
-      <div className="lm-mini"><b>Payments</b><div className="lm-ms"><span>Deposit</span><span className="lm-pill">Paid</span></div><div className="lm-ms"><span>Midpoint</span><span className="lm-pill o">Requested</span></div></div></>);
+      <div className="lm-mini"><b>Payments</b><div className="lm-ms"><span>Deposit</span><span className="lm-pill">Paid</span></div><div className="lm-ms"><span>Midpoint</span><span className="lm-flip"><span className="lm-pill o fa">Requested</span><span className="lm-pill fb">Paid ✓</span></span></div></div></>);
   }
   if (step === 0) return (<>
     <div className="lm-ph">Open near you <span className="lm-pill b">3</span></div>
@@ -215,7 +215,7 @@ export default function LandingModern({ signedIn, nums, children }: { signedIn: 
   const [held, setHeld] = useState(false);
   const [reduce, setReduce] = useState(false);
   const stepsRef = useRef<HTMLElement | null>(null);
-  const STEP_MS = 4000;
+  const STEP_MS = 5000;
   useEffect(() => {
     try { setReduce(!!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches); } catch { /* fine */ }
     const el = stepsRef.current;
@@ -272,10 +272,6 @@ export default function LandingModern({ signedIn, nums, children }: { signedIn: 
             {nums.map(([n, t]) => (<div key={t}><b>{n}</b><span>{t}</span></div>))}
           </div>
         )}
-      </section>
-
-      <section className="lm-stage" aria-label="Preview of the app">
-        <div className="lm-phone"><div key={side} className="lm-fade"><Screen side={side} step={2} /></div></div>
       </section>
 
       <section ref={stepsRef} className={`lm-steps${held ? ' lm-hold' : ''}`} aria-label="How it works"
