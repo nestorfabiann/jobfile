@@ -9,6 +9,8 @@ import { useCollab } from '@/lib/useCollab';
 import { useIsNew } from '@/lib/useSeen';
 
 /** Signed-in header menu: Home first, then the usual links. Closes on navigation, outside tap and Escape. */
+const SUB: Record<string, string> = { '/community': 'Tips and ideas from other users', '/design': 'AI ideas for your space' };
+
 export default function AppMenu({ marketplace, contractor, admin, invites = 0, community = 0, design = false, signOutAction }: { marketplace: boolean; design?: boolean; contractor?: boolean; admin: boolean; invites?: number; community?: number; signOutAction: () => void | Promise<void> }) {
   const [open, setOpen] = useState(false);
   const path = usePathname();
@@ -57,7 +59,7 @@ export default function AppMenu({ marketplace, contractor, admin, invites = 0, c
       {open && (
         <nav id="appmenu-sheet" className="appmenu-sheet" aria-label="Main">
           {items.filter(([href]) => !(href === '/app' && installed)).map(([href, label, icon]) => (
-            <Link key={href} href={href} className={(href === '/app' && getApp) || (href === '/collaborate' && collab.highlight) ? 'mi-new' : undefined} aria-current={current(href) ? 'page' : undefined}><MenuIcon name={icon} tile />{href === '/app' ? <span>{label}<small className="mi-sub">Alerts on your phone</small></span> : href === '/collaborate' ? <span>{label}<small className="mi-sub">Team up on bids</small></span> : label}{href === '/app' && getApp ? <span className="mi-tag">New</span> : null}{href === '/collaborate' && collab.tag ? <span className="mi-tag">{collab.tag}</span> : null}{href === '/community' && community > 0 ? <span className="mi-count" aria-label={`${community} unread`}>{community}</span> : href === '/community' && commNew ? <span className="mi-tag">New</span> : href === '/design' && designNew ? <span className="mi-tag">New</span> : null}</Link>
+            <Link key={href} href={href} className={(href === '/app' && getApp) || (href === '/collaborate' && collab.highlight) ? 'mi-new' : undefined} aria-current={current(href) ? 'page' : undefined}><MenuIcon name={icon} tile />{href === '/app' ? <span>{label}<small className="mi-sub">Alerts on your phone</small></span> : href === '/collaborate' ? <span>{label}<small className="mi-sub">Team up on bids</small></span> : SUB[href] ? <span>{label}<small className="mi-sub">{SUB[href]}</small></span> : label}{href === '/app' && getApp ? <span className="mi-tag">New</span> : null}{href === '/collaborate' && collab.tag ? <span className="mi-tag">{collab.tag}</span> : null}{href === '/community' && community > 0 ? <span className="mi-count" aria-label={`${community} unread`}>{community}</span> : href === '/community' && commNew ? <span className="mi-tag">New</span> : href === '/design' && designNew ? <span className="mi-tag">New</span> : null}</Link>
           ))}
           <hr />
           <form action={signOutAction}><button type="submit" className="menu-out"><MenuIcon name="out" tile />Sign out</button></form>

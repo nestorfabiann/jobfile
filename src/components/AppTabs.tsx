@@ -17,6 +17,8 @@ const IC: Record<string, string> = {
 };
 
 /** Bottom tab bar for signed-in people. Homeowners get Post, contractors get Find work. */
+const SUB: Record<string, string> = { '/community': 'Tips and ideas from other users', '/design': 'AI ideas for your space' };
+
 export default function AppTabs({ contractor, marketplace, waiting, admin, invites = 0, community = 0, design = false, signOutAction }: { design?: boolean; contractor: boolean; marketplace: boolean; waiting: number; admin: boolean; invites?: number; community?: number; signOutAction: () => void | Promise<void> }) {
   const path = usePathname() || '/';
   const [open, setOpen] = useState(false);
@@ -63,7 +65,7 @@ export default function AppTabs({ contractor, marketplace, waiting, admin, invit
       {open && <div className="apptabs-shade" onClick={() => setOpen(false)} aria-hidden="true" />}
       {open && (
         <nav className="apptabs-sheet" id="apptabs-sheet" aria-label="More">
-          {links.filter(([h]) => !(h === '/app' && installed)).map(([h, l, i]) => h === '/app' ? <Link key={h} href={h} className={getApp ? 'mi-new' : undefined}><MenuIcon name={i} tile /><span>{l}<small className="mi-sub">Alerts on your phone</small></span>{getApp ? <span className="mi-tag">New</span> : null}</Link> : h === '/collaborate' ? <Link key={h} href={h} className={collab.highlight ? 'mi-new' : undefined}><MenuIcon name={i} tile /><span>{l}<small className="mi-sub">Team up on bids</small></span>{collab.tag ? <span className="mi-tag">{collab.tag}</span> : null}</Link> : <Link key={h} href={h}><MenuIcon name={i} tile />{l}{h === '/community' && community > 0 ? <span className="mi-count" aria-label={`${community} unread`}>{community}</span> : h === '/community' && commNew ? <span className="mi-tag">New</span> : h === '/design' && designNew ? <span className="mi-tag">New</span> : null}</Link>)}
+          {links.filter(([h]) => !(h === '/app' && installed)).map(([h, l, i]) => h === '/app' ? <Link key={h} href={h} className={getApp ? 'mi-new' : undefined}><MenuIcon name={i} tile /><span>{l}<small className="mi-sub">Alerts on your phone</small></span>{getApp ? <span className="mi-tag">New</span> : null}</Link> : h === '/collaborate' ? <Link key={h} href={h} className={collab.highlight ? 'mi-new' : undefined}><MenuIcon name={i} tile /><span>{l}<small className="mi-sub">Team up on bids</small></span>{collab.tag ? <span className="mi-tag">{collab.tag}</span> : null}</Link> : <Link key={h} href={h}><MenuIcon name={i} tile />{SUB[h] ? <span>{l}<small className="mi-sub">{SUB[h]}</small></span> : l}{h === '/community' && community > 0 ? <span className="mi-count" aria-label={`${community} unread`}>{community}</span> : h === '/community' && commNew ? <span className="mi-tag">New</span> : h === '/design' && designNew ? <span className="mi-tag">New</span> : null}</Link>)}
           <form action={signOutAction}><button type="submit"><MenuIcon name="out" tile />Sign out</button></form>
         </nav>
       )}
