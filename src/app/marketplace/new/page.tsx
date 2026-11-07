@@ -71,9 +71,10 @@ export default async function NewListing({ searchParams }: { searchParams: { err
         </div>
       </div>
       {designEnabled() && !ideaCard ? (
-        <Link href="/design" className="box" style={{ background: 'var(--accent-soft, #f9efe4)', display: 'block' }}>
-          <b>Not sure what you want?</b>
-          <span className="small" style={{ display: 'block' }}>Add a photo of a room or your home and see AI design ideas first. →</span>
+        <Link href="/design" className="box idea-card">
+          <span className="idea-tile" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z" /><path d="M18 15l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z" /></svg></span>
+          <span className="idea-txt"><b>Not sure what you want?</b><span className="small">Add a photo of a room or your home and see AI design ideas first.</span></span>
+          <span className="idea-go" aria-hidden="true">›</span>
         </Link>
       ) : null}
       {searchParams.error ? <div className="box bad">{searchParams.error}</div> : null}

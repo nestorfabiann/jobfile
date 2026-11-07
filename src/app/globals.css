@@ -1014,3 +1014,12 @@ html { scroll-behavior: smooth; }
 .ph-steps b:not(.on) i { background: var(--line); color: var(--ink-2); }
 @media (prefers-color-scheme: dark) { :root:not([data-theme='light']) .ph-tile, :root:not([data-theme='light']) .ph-steps b.on { background: #33281c; } }
 :root[data-theme='dark'] .ph-tile, :root[data-theme='dark'] .ph-steps b.on { background: #33281c; }
+
+.idea-card { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--ink); background: #f9efe4; }
+.idea-tile { flex: none; width: 44px; height: 44px; border-radius: 14px; background: #ece9f8; color: #5b4bb0; display: grid; place-items: center; }
+.idea-tile svg { width: 24px; height: 24px; }
+.idea-txt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.idea-txt .small { color: var(--ink-2); }
+.idea-go { flex: none; font-size: 24px; color: var(--accent); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme='light']) .idea-card { background: #33281c; } :root:not([data-theme='light']) .idea-tile { background: #272340; color: #a99af0; } }
+:root[data-theme='dark'] .idea-card { background: #33281c; } :root[data-theme='dark'] .idea-tile { background: #272340; color: #a99af0; }
