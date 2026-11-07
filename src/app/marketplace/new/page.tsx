@@ -56,10 +56,19 @@ export default async function NewListing({ searchParams }: { searchParams: { err
   const leads = (await leadCompanies(user.email)).map((c) => ({ name: c.name, trades: c.trades }));
   return (
     <>
-      <div className="stack">
-        <Link href="/marketplace" className="small">‹ Marketplace</Link>
-        <h1>Post a project</h1>
-        <p className="muted">Pick what you want done, and local contractors can send you bids.</p>
+      <div className="stack ph-head">
+        <Link href="/marketplace" className="ph-back">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7" /></svg>
+          Marketplace
+        </Link>
+        <div className="ph-ttl">
+          <span className="ph-tile" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14" /></svg></span>
+          <h1>Post a project</h1>
+        </div>
+        <p className="muted ph-sub">Pick what you want done and local contractors can send you bids.</p>
+        <div className="ph-steps" aria-label="Three short steps">
+          <b className="on"><i>1</i>What</b><b><i>2</i>Details</b><b><i>3</i>Send</b>
+        </div>
       </div>
       {designEnabled() && !ideaCard ? (
         <Link href="/design" className="box" style={{ background: 'var(--accent-soft, #f9efe4)', display: 'block' }}>

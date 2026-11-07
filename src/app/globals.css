@@ -997,3 +997,20 @@ html { scroll-behavior: smooth; }
 .ra-tm { flex: none; font-size: 12px; color: var(--ink-2, #6b655e); }
 .ra-more summary { cursor: pointer; font-size: 13px; font-weight: 600; color: var(--accent, #c4813f); padding: 8px 0 2px; list-style: none; }
 .ra-more summary::-webkit-details-marker { display: none; }
+
+/* Post a project header */
+.ph-head { gap: 10px; }
+.ph-back { display: inline-flex; align-items: center; gap: 4px; align-self: flex-start; padding: 6px 12px 6px 8px; border: 1px solid var(--line); background: var(--surface); border-radius: 999px; font-size: 13px; font-weight: 600; color: var(--ink); text-decoration: none; }
+.ph-back svg { width: 14px; height: 14px; }
+.ph-ttl { display: flex; gap: 12px; align-items: center; }
+.ph-ttl h1 { margin: 0; font-size: 26px; line-height: 1.15; font-weight: 700; letter-spacing: -0.02em; }
+.ph-tile { flex: none; width: 44px; height: 44px; border-radius: 14px; background: #f9efe4; border: 1px solid var(--line); display: grid; place-items: center; color: var(--accent); }
+.ph-tile svg { width: 22px; height: 22px; }
+.ph-sub { margin: 0; font-size: 14.5px; line-height: 1.45; }
+.ph-steps { display: flex; gap: 6px; align-items: center; font-size: 12px; color: var(--ink-2); flex-wrap: wrap; }
+.ph-steps b { display: inline-flex; gap: 6px; align-items: center; font-weight: 600; padding: 5px 10px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); }
+.ph-steps b.on { background: #f9efe4; border-color: var(--accent); color: var(--ink); }
+.ph-steps i { font-style: normal; display: grid; place-items: center; width: 16px; height: 16px; border-radius: 50%; background: var(--accent); color: #fff; font-size: 10px; }
+.ph-steps b:not(.on) i { background: var(--line); color: var(--ink-2); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme='light']) .ph-tile, :root:not([data-theme='light']) .ph-steps b.on { background: #33281c; } }
+:root[data-theme='dark'] .ph-tile, :root[data-theme='dark'] .ph-steps b.on { background: #33281c; }
