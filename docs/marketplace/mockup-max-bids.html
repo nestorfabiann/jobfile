@@ -1,0 +1,41 @@
+<title>Bid Limit Mockup</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+:root{--bg:#f6f2ec;--fg:#2a2118;--mut:#6f6356;--ac:#c4813f;--card:#fff;--line:#e4dccf;--selbg:#faeedd;--selline:#e3b983;--gr:#1f6b45;--grbg:#dcf0e3;--wn:#9a7208;--wnbg:#fbefc9}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1b1713;--fg:#f1e9de;--mut:#a89a8a;--ac:#d99a58;--card:#262019;--line:#3a3128;--selbg:#3a2c1c;--selline:#8a6638;--gr:#7fc6a0;--grbg:#1c2e25;--wn:#e6c04f;--wnbg:#3a3016;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#1b1713;--fg:#f1e9de;--mut:#a89a8a;--ac:#d99a58;--card:#262019;--line:#3a3128;--selbg:#3a2c1c;--selline:#8a6638;--gr:#7fc6a0;--grbg:#1c2e25;--wn:#e6c04f;--wnbg:#3a3016;color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,sans-serif;padding-block:20px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));line-height:1.4}
+h1{font-size:21px;margin:0 0 6px}p.i{margin:0 0 14px;color:var(--mut);max-width:64ch}
+.row{display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start}
+.cap{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);margin-bottom:6px}
+.ph{width:min(100%,350px);border:1px solid var(--line);border-radius:22px;padding:14px;min-width:0;display:flex;flex-direction:column;gap:10px}
+.card{background:var(--card);border:1.5px solid var(--line);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.card h3{margin:0;font-size:16px}.small{font-size:12.5px;color:var(--mut)}
+.chips{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.chip{border:1.5px solid var(--line);border-radius:14px;padding:10px 2px;text-align:center;font-weight:700;font-size:15px;background:var(--card);display:flex;flex-direction:column;gap:2px}
+.chip small{font-weight:600;font-size:10.5px;color:var(--mut)}
+.chip.on{background:var(--selbg);border-color:var(--selline);color:var(--ac)}
+.meter{display:flex;gap:5px}.meter i{flex:1;height:8px;border-radius:5px;background:var(--line)}.meter i.f{background:var(--ac)}.meter.full i.f{background:var(--wn)}
+.pill{display:inline-block;border-radius:99px;padding:3px 10px;font-size:12px;font-weight:700;background:var(--grbg);color:var(--gr)}
+.pill.w{background:var(--wnbg);color:var(--wn)}
+.btn{border-radius:14px;padding:12px;text-align:center;font-weight:700;background:var(--ac);color:#fff}
+.btn.off{background:var(--line);color:var(--mut)}
+.btn.o{background:var(--card);color:var(--fg);border:1.5px solid var(--line)}
+.jr{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.note{font-size:12px;color:var(--mut);max-width:350px;margin-top:8px}
+</style>
+<h1>Choose how many bids you want</h1>
+<p class="i">Homeowner picks a limit when posting. When the limit is reached, new bids stop and the homeowner can raise it any time. Example screens with sample numbers.</p>
+<div class="row">
+<div><div class="cap">1. Post form (homeowner)</div><div class="ph"><div class="card"><h3>How many bids do you want? *</h3><div class="small">We close bidding once you have this many, so you are not flooded. You can raise it later.</div>
+<div class="chips"><div class="chip">3<small>quick</small></div><div class="chip on">5<small>popular</small></div><div class="chip">10<small>more choice</small></div><div class="chip">Any<small>no limit</small></div></div>
+<div class="small">With 5, you will usually get 3 to 5 solid options and still have time to compare.</div></div></div></div>
+
+<div><div class="cap">2. Homeowner's job page</div><div class="ph"><div class="card"><div class="jr"><h3>Bids: 3 of 5</h3><span class="pill">Open</span></div><div class="meter"><i class="f"></i><i class="f"></i><i class="f"></i><i></i><i></i></div><div class="small">2 spots left. Change limit ›</div></div>
+<div class="card"><div class="jr"><h3>Bids: 5 of 5</h3><span class="pill w">Full</span></div><div class="meter full"><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i></div><div class="small">Bidding closed. No more contractors can bid.</div><div class="btn o">Allow 3 more bids</div></div></div>
+<div class="note">Withdrawn bids free up a spot. Changing the limit works on open or full listings.</div></div>
+
+<div><div class="cap">3. Contractor (Find work + job)</div><div class="ph"><div class="card"><div class="jr"><h3>Kitchen painting</h3><span class="pill w">4 of 5 bids</span></div><div class="small">1 spot left. Bid soon.</div><div class="btn">Place a bid</div></div>
+<div class="card"><div class="jr"><h3>Bathroom remodel</h3><span class="pill w">Bids full</span></div><div class="small">The homeowner reached their limit of 5. Check back, they may open more.</div><div class="btn off">Bidding closed</div></div></div>
+<div class="note">Team bids count as one. The limit is checked when a bid is sent, so two contractors cannot both take the last spot.</div></div>
+</div>
