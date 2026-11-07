@@ -1122,3 +1122,14 @@ html { scroll-behavior: smooth; }
 .ann-sheet .ann-go { align-self: stretch; }
 .ann-sheet .ann-later { align-self: center; }
 @media (prefers-reduced-motion: reduce) { .ann, .ann-dim, .ann-sheet { transition: none; } .ann-banner.show::after { animation: none; } }
+
+/* How it works: keep the number beside the title and a fixed preview height so the page does not jump */
+.lm-stt { flex: 1; min-width: 0; display: block; }
+.lm-stv { height: 232px; }
+.lm-stv.open { max-height: 232px; }
+.lm-stv-in { height: 100%; overflow: hidden; display: block; }
+.lm-stv-in .lm-ph { margin-bottom: 5px; font-size: 12.5px; }
+.lm-stv-in .lm-mini { padding: 7px 9px; margin-bottom: 5px; font-size: 11px; }
+.lm-stv-in .lm-mini b { font-size: 12px; }
+.lm-stv-in .lm-go, .lm-stv-in .lm-map { display: none; }
+.lm-stv-in .lm-mini:nth-of-type(n+5) { display: none; }

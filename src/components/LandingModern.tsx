@@ -284,7 +284,7 @@ export default function LandingModern({ signedIn, nums, children }: { signedIn: 
         {c.steps.map(([t, d], i) => (
           <button key={t} type="button" className="lm-st" aria-pressed={step === i} onClick={() => { setStep(i); setStopped(true); }}>
             <span className="lm-n">{i + 1}</span>
-            <span><b>{t}</b><span className="lm-d">{d}</span></span>
+            <span className="lm-stt"><b>{t}</b><span className="lm-d">{d}</span></span>
             <span className={`lm-stv${step === i ? ' open' : ''}`} aria-hidden={step !== i}><span className="lm-stv-in"><Screen side={side} step={i} /><span className="lm-stv-note">Sample screen</span></span></span>
             {step === i && ready && !stopped && !reduce ? <i key={`${side}-${step}`} className="lm-sbar" style={{ animationDuration: `${STEP_MS}ms` }} aria-hidden="true" /> : null}
           </button>
