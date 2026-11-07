@@ -11,7 +11,6 @@ import {
   type Milestone,
   type Signature,
 } from '@/lib/agreement';
-import { TX_DISCLOSURE_IS_PLACEHOLDER, TX_DISCLOSURE_TEXT } from '@/lib/texas';
 import AgreementEditor from '@/components/AgreementEditor';
 import { saveHomestead, sendAgreement, signAgreement, startAgreement } from './actions';
 
@@ -125,6 +124,9 @@ export default async function AgreementPage({
         <div className="row">
           {role === 'contractor' && !executed && (
             <a className="btn ghost" href={`/projects/${project.id}/agreement?edit=1`}>Edit agreement</a>
+          )}
+          {role === 'contractor' && !executed && !a.sent_at && issues.length === 0 && (
+            <div className="box" style={{ flexBasis: '100%' }}><b>Tip: the Texas disclosure is yours to give.</b><span className="small" style={{ display: 'block' }}>Texas law requires the contractor to give the homeowner a written disclosure statement before they sign a residential construction contract. Jobfile does not supply that wording, so give it to your customer yourself and ask your attorney if you are unsure. The homeowner confirms they received it when they sign.</span></div>
           )}
           {role === 'contractor' && !executed && !a.sent_at && issues.length === 0 && (
             <form action={sendAgreement}>
@@ -257,16 +259,11 @@ export default async function AgreementPage({
             <>
               <div className="stack">
                 <h3>Texas disclosure statement</h3>
-                {TX_DISCLOSURE_IS_PLACEHOLDER && (
-                  <div className="box bad">The statutory disclosure text has not been loaded yet. Do not use this for a real contract until it is.</div>
-                )}
-                <div className="box" style={{ background: 'var(--surface-2)', whiteSpace: 'pre-wrap', maxHeight: 240, overflow: 'auto' }}>
-                  {TX_DISCLOSURE_TEXT}
-                </div>
+                <p className="muted small" style={{ margin: 0 }}>Texas law requires your contractor to give you a written disclosure statement before you sign a residential construction contract. If you have not received it, ask your contractor for it before you sign.</p>
               </div>
               <label className="row" style={{ flexWrap: 'nowrap', alignItems: 'flex-start' }}>
                 <input type="checkbox" name="disclosure" />
-                <span>I received and read the disclosure statement above before signing.</span>
+                <span>My contractor gave me the Texas disclosure statement before I signed.</span>
               </label>
             </>
           )}

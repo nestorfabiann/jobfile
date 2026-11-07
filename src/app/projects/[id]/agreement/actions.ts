@@ -166,7 +166,7 @@ export async function signAgreement(formData: FormData) {
   if (name.length < 3) fail(projectId, 'Type your full name to sign.');
   if (formData.get('agree') !== 'on') fail(projectId, 'Tick the box to confirm you agree.');
   if (role === 'homeowner' && formData.get('disclosure') !== 'on')
-    fail(projectId, 'Confirm that you received and read the disclosure statement.');
+    fail(projectId, 'Confirm that your contractor gave you the Texas disclosure statement before you sign.');
 
   const { error } = await admin
     .from('agreement_signatures')

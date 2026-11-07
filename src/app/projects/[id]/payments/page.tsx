@@ -162,10 +162,12 @@ export default async function Payments({ params, searchParams }: { params: { id:
           );
         })}
 
-      <p className="muted small">
-        Texas homeowners are advised to hold back 10% of payments during the work and for 30 days after completion, and to get a
-        bills-paid affidavit and lien releases with the final payment. Ask your attorney how this applies to your job.
-      </p>
+      {role === 'homeowner' && ms.length > 0 && ms[ms.length - 1].pay_status === 'requested' ? (
+        <div className="box">
+          <b>Tip before you pay the final amount</b>
+          <span className="small" style={{ display: 'block' }}>Texas has rules about holding back part of the payments and about getting a bills-paid affidavit and lien releases at the final payment. What applies depends on your job and your contract, so ask your attorney. If you want a holdback or lien releases, put them in your written agreement.</span>
+        </div>
+      ) : null}
     </>
   );
 }
