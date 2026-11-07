@@ -1043,3 +1043,9 @@ html { scroll-behavior: smooth; }
 @media (prefers-reduced-motion: no-preference) { .rx-bar i { animation: rxgrow 1.1s ease-out both; } @keyframes rxgrow { from { width: 0; } to { width: 60%; } } }
 @media (prefers-color-scheme: dark) { :root:not([data-theme='light']) .rx-ex { background: #33281c; } }
 :root[data-theme='dark'] .rx-ex { background: #33281c; }
+
+/* Price bar sweep */
+.lm-vprice { position: relative; }
+.lm-sample { position: absolute; top: 8px; right: 10px; font-size: 9.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #6b655e; border: 1px solid rgba(0,0,0,0.12); border-radius: 999px; padding: 1px 7px; }
+.rx-scan i { animation: none; width: 60%; }
+@media (prefers-reduced-motion: no-preference) { .rx-scan b { animation: rxscan 1.3s ease-in-out infinite alternate; } @keyframes rxscan { from { left: 8%; } to { left: 88%; } } }

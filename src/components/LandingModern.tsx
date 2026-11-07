@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import Link from 'next/link';
+import { useSweep } from '@/lib/useSweep';
 
 type Side = 'ho' | 'co';
 
@@ -31,12 +32,17 @@ const BidCard = ({ name, sub, price }: { name: string; sub: string; price?: stri
     <div className="lm-vb"><span>✓ Verified</span><span>Insured to Mar 2027</span></div>
   </div>
 );
-const PriceBar = () => (
-  <div className="lm-vprice">
-    <div className="lm-vbar"><i /><u /></div>
-    <div className="lm-vm2"><span>Typical $4,200 to $6,100</span><b>Your bid $5,008</b></div>
-  </div>
-);
+const usd = (n: number) => `$${Math.round(n).toLocaleString('en-US')}`;
+const PriceBar = () => {
+  const sw = useSweep(46);
+  return (
+    <div className="lm-vprice" ref={sw.ref}>
+      <span className="lm-sample">Sample</span>
+      <div className="lm-vbar"><i style={{ width: `${56 * sw.fill}%` }} /><u style={{ left: `${sw.mark}%` }} /></div>
+      <div className="lm-vm2"><span>Typical {usd(4200 * sw.count)} to {usd(6100 * sw.count)}</span><b style={{ opacity: sw.done ? 1 : 0, transition: 'opacity .4s' }}>Your bid $5,008</b></div>
+    </div>
+  );
+};
 const Radius = () => (
   <>
     <div className="lm-vrad"><i /><i /><i /><svg viewBox="0 0 24 24" dangerouslySetInnerHTML={{ __html: ICON.pin }} /></div>

@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { checkPost, createListing, getReference, saveDraft, type RefResult } from '@/app/marketplace/actions';
 import type { DraftData } from '@/lib/drafts';
-import RangeBar from '@/components/RangeBar';
+import SweepRangeBar from '@/components/SweepRangeBar';
 import MediaPicker from '@/components/MediaPicker';
 import { tipsFor } from '@/lib/photoTips';
 import { uploadMedia, type MediaItem, type FileState } from '@/lib/uploadMedia';
@@ -314,7 +314,13 @@ export default function MarketplacePost({ types, aiOn, draft, inviteCompany, inv
         <div className="card">
           <h2>AI cost reference</h2>
           <p className="muted small">Get a typical local price range for the scope you picked. It is a reference only, not a quote.</p>
-          {!ref ? (
+          {busy ? (
+            <div className="rx-ex" role="status" aria-live="polite">
+              <div className="small">Checking local pricing for your scope…</div>
+              <div className="rx-bar rx-scan"><i /><b /></div>
+            </div>
+          ) : null}
+          {!ref && !busy ? (
             <div className="rx-ex" aria-hidden="true">
               <span className="rx-tag">Example</span>
               <div className="rx-big">$8,000 – $14,000</div>
@@ -329,7 +335,7 @@ export default function MarketplacePost({ types, aiOn, draft, inviteCompany, inv
             <div className="box" style={{ background: 'var(--surface-2)' }}>
               <div className="small muted">Typical range for your scope ({ref.ref.confidence} confidence)</div>
               <div style={{ fontSize: 26, fontWeight: 800 }}>{money(ref.ref.low)} – {money(ref.ref.high)}</div>
-              <RangeBar price={ref.ref.likely} lo={ref.ref.low} hi={ref.ref.high} />
+              <SweepRangeBar price={ref.ref.likely} lo={ref.ref.low} hi={ref.ref.high} />
               <div className="small">Most likely about {money(ref.ref.likely)}</div>
               {ref.ref.breakdown.map((b) => (
                 <div className="row small" key={b.group} style={{ justifyContent: 'space-between', flexWrap: 'nowrap' }}><span>{b.group}</span><b>{money(b.low)}–{money(b.high)}</b></div>
