@@ -1,0 +1,100 @@
+<title>Steps With Motion Mockup</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+:root{--bg:#f6f2ec;--fg:#2a2118;--mut:#6f6356;--ac:#c4813f;--acbg:#f9efe4;--card:#fff;--line:#e4dccf;--gr:#1f4d3a;--grbg:#dff1e7;--mint:#8fd4b4}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1b1713;--fg:#f1e9de;--mut:#a89a8a;--ac:#d99a58;--acbg:#33281c;--card:#262019;--line:#3a3128;--gr:#7fc6a0;--grbg:#1f3a2c;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#1b1713;--fg:#f1e9de;--mut:#a89a8a;--ac:#d99a58;--acbg:#33281c;--card:#262019;--line:#3a3128;--gr:#7fc6a0;--grbg:#1f3a2c;color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,sans-serif;padding-block:20px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));line-height:1.4}
+h1{font-size:21px;margin:0 0 6px}p.i{margin:0 0 14px;color:var(--mut);max-width:64ch}
+.row{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start}
+.cap{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);margin-bottom:6px}
+.ph{width:min(100%,340px);border:1px solid var(--line);border-radius:22px;padding:14px;min-width:0;display:flex;flex-direction:column;gap:10px}
+h2{margin:0 0 2px;font-size:24px;letter-spacing:-.02em}
+.st{position:relative;overflow:hidden;text-align:left;width:100%;font:inherit;color:inherit;background:var(--card);border:1.5px solid var(--line);border-radius:20px;padding:14px;cursor:pointer;display:block}
+.st.on{border-color:var(--ac);background:var(--acbg)}
+.top{display:flex;gap:12px;align-items:flex-start}.top>div{flex:1;min-width:0}
+.n{flex:none;width:34px;height:34px;border-radius:50%;background:var(--line);display:grid;place-items:center;font-weight:800;color:var(--mut)}
+.on .n{background:var(--ac);color:#fff}
+.top b{display:block;font-size:17px}.top span.d{display:block;font-size:14px;color:var(--mut)}
+.body{height:0;opacity:0;overflow:hidden;transition:height .4s ease,opacity .3s ease}
+.on .body{height:206px;opacity:1;margin-top:10px}
+.mini{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:7px 10px;font-size:11.5px;margin-top:5px;transition:all .35s}
+.mini b{font-size:12.5px}.mini .m{color:var(--mut);font-size:11px}
+.hd{display:flex;justify-content:space-between;align-items:center;font-weight:800;font-size:12.5px}
+.pill{font-size:10px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--grbg);color:var(--gr)}.pill.o{background:var(--acbg);color:var(--ac);border:1px solid var(--line)}
+.chips{display:flex;gap:5px;margin-top:4px;flex-wrap:wrap}.chips span{font-size:11px;font-weight:600;padding:4px 9px;border-radius:999px;border:1px solid var(--line);transition:all .3s}.chips span.s{background:var(--ac);color:#fff;border-color:var(--ac)}
+.pre{opacity:0;transform:translateY(8px)}.pre.in{opacity:1;transform:none}
+.bar{position:relative;height:7px;border-radius:5px;background:var(--line);margin:6px 0 3px}.bar i{position:absolute;left:18%;width:0;top:0;bottom:0;border-radius:5px;background:var(--mint);transition:width .8s}.bar u{position:absolute;left:6%;top:-4px;width:4px;height:15px;background:var(--fg);border-radius:2px;transition:left 1s cubic-bezier(.3,1.3,.5,1)}
+.bar.go i{width:56%}.bar.go u{left:46%}
+.price{font-size:15px;font-weight:800}
+.go2{background:var(--ac);color:#fff;text-align:center;font-weight:700;border-radius:10px;padding:7px;margin-top:5px;font-size:12.5px}
+.go2.pulse{animation:pl 1s ease-in-out 2}@keyframes pl{50%{transform:scale(1.04)}}
+.ms{display:flex;justify-content:space-between;align-items:center;padding:3px 0}
+.pill.flip{transition:all .3s}
+.prog{position:absolute;left:0;bottom:0;height:3px;background:var(--ac);width:0}.on .prog.run{animation:p 5s linear forwards}@keyframes p{to{width:100%}}
+.sm{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);text-align:right;margin-top:4px}
+/* hero options */
+.hero{border:5px solid #1b1a18;border-radius:30px;background:var(--card);padding:12px;width:70%;margin:0 auto;position:relative;overflow:hidden}
+.hero.crop{height:210px}
+.hero .mini{margin-top:6px}
+.notif{position:absolute;left:10px;right:10px;top:8px;background:#1b1a18;color:#fff;border-radius:14px;padding:8px 10px;font-size:11.5px;transform:translateY(-70px);transition:transform .5s cubic-bezier(.2,1.2,.4,1);z-index:2}
+.notif.in{transform:none}
+.ck{display:inline-grid;place-items:center;width:16px;height:16px;border-radius:50%;border:1.5px solid var(--line);font-size:10px;color:#fff;margin-right:6px;vertical-align:-3px;transition:all .3s}
+.done .ck{background:var(--gr);border-color:var(--gr)}
+.btn{margin-top:8px;border:1.5px solid var(--line);background:var(--card);color:var(--fg);border-radius:999px;padding:10px 18px;font-weight:700;font-size:14px;cursor:pointer;min-height:44px;align-self:flex-start}
+.note{font-size:12px;color:var(--mut);max-width:340px;margin-top:8px}
+@media (prefers-reduced-motion:reduce){.body,.mini,.bar i,.bar u,.pre{transition:none}.go2.pulse,.on .prog.run{animation:none}}
+</style>
+<h1>Steps with motion, and the hero phone</h1>
+<p class="i">Left: the open step plays a short animation once, steps advance by themselves every 5 seconds, tap to jump and stop. Right: three choices for the phone at the top. Sample data only.</p>
+<div class="row">
+<div><div class="cap">Steps (live, tap them)</div><div class="ph" id="box">
+<h2>How it works in 3 steps</h2>
+<button class="st on" type="button" data-i="0"><div class="top"><span class="n">1</span><div><b>Post it</b><span class="d">Pick the work, add photos and a budget. Takes a few minutes.</span></div></div>
+<div class="body"><div class="hd">New project <span class="pill o">Draft</span></div>
+<div class="mini"><b>What work?</b><div class="chips"><span id="w1">Walls</span><span id="w2">Trim and doors</span><span>Ceiling</span></div></div>
+<div class="mini"><b>Budget</b> <span class="m" id="bud">$</span></div>
+<div class="go2" id="pub">Publish project</div><div class="sm">Sample screen</div></div><i class="prog run"></i></button>
+<button class="st" type="button" data-i="1"><div class="top"><span class="n">2</span><div><b>Compare bids</b><span class="d">See price, insurance and ratings side by side.</span></div></div>
+<div class="body"><div class="hd">3 bids <span class="pill">Compare</span></div>
+<div class="mini pre" id="b1"><b>Nesty's Painting</b> <span class="pill" id="vf" style="opacity:0;transition:opacity .3s">✓ Verified</span><div class="price">$5,008</div><div class="bar" id="bb"><i></i><u></u></div></div>
+<div class="mini pre" id="b2"><b>Plano Pro Paint</b> <span class="price" style="float:right;font-size:13px">$6,200</span><div class="m">★ 4.8 · 12 reviews</div></div>
+<div class="mini pre" id="b3"><b>Lone Star Finishes</b> <span class="price" style="float:right;font-size:13px">$5,750</span><div class="m">★ 4.9 · 8 reviews</div></div><div class="sm">Sample screen</div></div><i class="prog"></i></button>
+<button class="st" type="button" data-i="2"><div class="top"><span class="n">3</span><div><b>Run the job</b><span class="d">Schedule, changes and payments in one place.</span></div></div>
+<div class="body"><div class="hd">Needs you <span class="pill o" id="cnt">2</span></div>
+<div class="mini pre" id="r1"><b>Pick a time for the site visit</b><div class="m">Thu, Nov 13 · 10:00 am</div></div>
+<div class="mini pre" id="r2"><b>Choose: Kitchen tile</b><div class="m">Needed by Fri</div></div>
+<div class="mini pre" id="r3"><b>Payments</b><div class="ms"><span>Deposit</span><span class="pill">Paid</span></div><div class="ms"><span>Midpoint</span><span class="pill o flip" id="mp">Requested</span></div></div><div class="sm">Sample screen</div></div><i class="prog"></i></button>
+</div></div>
+<div><div class="cap">Hero phone: option 1, remove it</div><div class="ph"><div class="m" style="font-size:13px;color:var(--mut)">The steps carry the story. The page is shorter and "How it works" sits right under the trust cards.</div></div>
+<div class="cap" style="margin-top:14px">Option 2, animated hero (cropped)</div><div class="ph"><div class="hero crop" id="hp"><div class="notif" id="nt"><b>New bid: $5,008</b><div style="opacity:.8">Nesty's Painting · Plano</div></div>
+<div class="hd" style="margin-top:34px">Needs you <span class="pill o">3</span></div>
+<div class="mini" id="h1"><span class="ck">✓</span><b>Pick a time for the site visit</b></div>
+<div class="mini" id="h2"><span class="ck">✓</span><b>Choose: Kitchen tile</b></div>
+<div class="mini" id="h3"><span class="ck">✓</span><b>Approve change order</b></div></div>
+<button class="btn" id="rp2" type="button">Replay</button></div>
+<div class="note">A notification drops in, then the items check themselves off. The phone is cropped so it does not end in empty space.</div></div>
+</div>
+<script>
+(function(){
+var reduce=false;try{reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches}catch(e){}
+var $=function(i){return document.getElementById(i)};var tm=[];function at(ms,f){tm.push(setTimeout(f,reduce?0:ms))}function clr(){tm.forEach(clearTimeout);tm=[]}
+function reset(){['w1','w2'].forEach(function(i){$(i).className=''});$('bud').textContent='$';$('pub').className='go2';
+ ['b1','b2','b3','r1','r2','r3'].forEach(function(i){$(i).classList.remove('in')});$('bb').className='bar';$('vf').style.opacity=0;$('mp').textContent='Requested';$('mp').className='pill o flip';$('cnt').textContent='2'}
+function play(i){clr();reset();
+ if(i===0){at(400,function(){$('w1').className='s'});at(900,function(){$('w2').className='s'});
+  var txt='$6,000 to $6,500';for(var k=1;k<=txt.length;k++)(function(k){at(1300+k*45,function(){$('bud').textContent=txt.slice(0,k)})})(k);
+  at(2300,function(){$('pub').className='go2 pulse'})}
+ if(i===1){at(300,function(){$('b1').classList.add('in')});at(700,function(){$('b2').classList.add('in')});at(1100,function(){$('b3').classList.add('in')});at(900,function(){$('bb').className='bar go'});at(1700,function(){$('vf').style.opacity=1})}
+ if(i===2){at(300,function(){$('r1').classList.add('in')});at(700,function(){$('r2').classList.add('in')});at(1100,function(){$('r3').classList.add('in')});at(2300,function(){$('mp').textContent='Paid ✓';$('mp').className='pill flip';$('cnt').textContent='1'})}
+ if(reduce){['w1','w2'].forEach(function(x){$(x).className='s'});$('bud').textContent='$6,000 to $6,500';['b1','b2','b3','r1','r2','r3'].forEach(function(x){$(x).classList.add('in')});$('bb').className='bar go';$('vf').style.opacity=1;if(i===2){$('mp').textContent='Paid ✓';$('mp').className='pill'}}}
+var btns=[].slice.call(document.querySelectorAll('#box .st')),cur=0,t=null,stopped=false;
+function show(i){cur=i;btns.forEach(function(b,k){b.classList.toggle('on',k===i);var p=b.querySelector('.prog');p.className='prog';if(k===i&&!stopped&&!reduce){void p.offsetWidth;p.className='prog run'}});play(i)}
+function next(){if(stopped)return;show((cur+1)%3);t=setTimeout(next,5000)}
+btns.forEach(function(b){b.addEventListener('click',function(){stopped=true;clearTimeout(t);show(+b.dataset.i)})});
+show(0);if(!reduce)t=setTimeout(next,5000);
+var ht=[];function hp(){ht.forEach(clearTimeout);ht=[];['h1','h2','h3'].forEach(function(i){$(i).classList.remove('done')});$('nt').classList.remove('in');
+ function a(ms,f){ht.push(setTimeout(f,reduce?0:ms))}a(400,function(){$('nt').classList.add('in')});a(1500,function(){$('h1').classList.add('done')});a(2100,function(){$('h2').classList.add('done')});a(2700,function(){$('h3').classList.add('done')});a(3600,function(){$('nt').classList.remove('in')})}
+$('rp2').addEventListener('click',hp);hp();
+})();
+</script>
