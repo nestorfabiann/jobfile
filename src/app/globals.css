@@ -1083,3 +1083,10 @@ html { scroll-behavior: smooth; }
 .lm-stv-in .lm-mini { background: var(--surface); margin-bottom: 6px; }
 @media (prefers-reduced-motion: reduce) { .lm-stv { transition: none; } }
 .lm-stv-note { display: block; font-size: 10.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-2); text-align: right; }
+
+/* Meet visual: flow layout so rows never overlap */
+.lm-mv { display: grid; grid-template-columns: 1fr; gap: 10px; min-height: 0; padding-top: 30px; }
+.lm-mv-pick, .lm-mv-visit { grid-area: 1 / 1; }
+.lm-mv-visit { position: static; left: auto; right: auto; top: auto; align-self: start; }
+.lm-mv-both { position: static; left: auto; right: auto; top: auto; grid-area: 2 / 1; }
+.lm-mv-done { position: static; left: auto; right: auto; top: auto; grid-area: 3 / 1; }
