@@ -125,7 +125,9 @@ export default async function Overview({ params, searchParams }: { params: { id:
   }
 
   const allPaid = (pms.length === 0 || pms.every((m) => m.pay_status === 'confirmed')) && coBill.every((c) => c.pay_status === 'confirmed');
+  const allDone = scopeLines.length > 0 && scopeLines.every((l) => l.status === 'done');
   const checks = [
+    ...(scopeLines.length ? [{ ok: allDone, text: allDone ? 'All scope lines done' : `${scopeLines.filter((l) => l.status !== 'done').length} scope line${scopeLines.filter((l) => l.status !== 'done').length === 1 ? '' : 's'} not done yet` }] : []),
     { ok: allPaid, text: allPaid ? 'Final payment confirmed received' : 'Some payments are not confirmed yet' },
     { ok: openFixes === 0 && awaitingConfirm === 0, text: openFixes === 0 && awaitingConfirm === 0 ? 'No open punch-list items' : `${openFixes + awaitingConfirm} punch-list item${openFixes + awaitingConfirm === 1 ? '' : 's'} still open` },
   ];
@@ -151,6 +153,27 @@ export default async function Overview({ params, searchParams }: { params: { id:
           ? `Active · day ${Math.min(Math.max(daysBetween(startISO as string, todayChi()) + 1, 1), jobDays)} of ${jobDays}`
           : 'Active';
   const finish = endISO ? day(endISO) : null;
+
+  const finishEl = (
+        <div id="closeout" style={{ scrollMarginTop: 12 }}>
+        <FinishCard
+          role={role}
+          projectId={project.id}
+          completed={!!project.completed_at}
+          closeoutStarted={!!project.closeout_started_at}
+          checks={checks}
+          otherName={role === 'contractor' ? homeownerName : contractorName}
+          asked={asked}
+          setStage={setStage}
+          requestFinish={requestFinish}
+          cancelFinish={cancelFinish}
+          allDone={allDone}
+          lastPayRequested={role === 'homeowner' && pms.length > 0 && pms[pms.length - 1].pay_status === 'requested'}
+          messagesHref={base}
+          reportHref={`${base}/issues`}
+        />
+        </div>
+  );
 
   return (
     <>
@@ -207,6 +230,8 @@ export default async function Overview({ params, searchParams }: { params: { id:
         check={{ done: checks.filter((c) => c.ok).length, of: checks.length }}
       />
 
+      {executed && allDone && role === 'homeowner' && !project.completed_at ? finishEl : null}
+
       {executed && !project.completed_at ? (
         <Link href={`${base}/closeout`} className="card" style={{ color: 'inherit', textDecoration: 'none', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10, padding: '12px 14px' }}>
           <span><b style={{ display: 'block' }}>Closeout checklist</b><span className="muted small">Confirm scope, extra work and payments before the job is closed.</span></span>
@@ -214,22 +239,11 @@ export default async function Overview({ params, searchParams }: { params: { id:
         </Link>
       ) : null}
 
-      {executed && (
-        <div id="closeout" style={{ scrollMarginTop: 12 }}>
-        <FinishCard
-          role={role}
-          projectId={project.id}
-          completed={!!project.completed_at}
-          closeoutStarted={!!project.closeout_started_at}
-          checks={checks}
-          otherName={role === 'contractor' ? homeownerName : contractorName}
-          asked={asked}
-          setStage={setStage}
-          requestFinish={requestFinish}
-          cancelFinish={cancelFinish}
-        />
-        </div>
-      )}
+      {executed && !(allDone && role === 'homeowner' && !project.completed_at) ? finishEl : null}
+
+      {role === 'contractor' && executed && allDone && !project.completed_at ? (
+        <p className="muted small" style={{ margin: 0 }}>Everything on the list is done. We asked {homeownerName} to review the work and close out.</p>
+      ) : null}
 
       {openIssues.length > 0 ? (
         <Link href={`${base}/issues/${openIssues[0].id}`} className="card" style={{ color: 'inherit', textDecoration: 'none', background: 'var(--warn-bg, #fbeccd)', gap: 4 }}>

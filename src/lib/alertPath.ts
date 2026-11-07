@@ -15,6 +15,7 @@ const TAB: Record<string, string> = {
   document: '/documents',
   visit: '/schedule',
   scope: '/overview#scope',
+  closeout_ready: '/overview#closeout',
 };
 
 export function alertHref(projectId: string | null | undefined, kind: string | null | undefined): string {

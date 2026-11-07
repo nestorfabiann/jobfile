@@ -1,4 +1,13 @@
 {
-  "crons": [{ "path": "/api/cron/listings", "schedule": "0 14 * * *" }],
+  "crons": [
+    {
+      "path": "/api/cron/listings",
+      "schedule": "0 14 * * *"
+    },
+    {
+      "path": "/api/cron/closeout",
+      "schedule": "0 15 * * *"
+    }
+  ],
   "ignoreCommand": "git diff --quiet HEAD^ HEAD -- src public package.json package-lock.json next.config.js tsconfig.json vercel.json"
 }

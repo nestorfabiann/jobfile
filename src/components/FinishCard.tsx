@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 
 type Check = { ok: boolean; text: string };
 
@@ -16,6 +17,12 @@ export default function FinishCard(props: {
   setStage: (fd: FormData) => void | Promise<void>;
   requestFinish: (fd: FormData) => void | Promise<void>;
   cancelFinish?: (fd: FormData) => void | Promise<void>;
+  /** Every scope line and approved change order is marked done. */
+  allDone?: boolean;
+  /** The last payment has been requested and is waiting on the homeowner. */
+  lastPayRequested?: boolean;
+  messagesHref?: string;
+  reportHref?: string;
 }) {
   const { role, projectId, completed, closeoutStarted, checks, otherName, asked } = props;
   const [confirm, setConfirm] = useState(false);
@@ -33,13 +40,34 @@ export default function FinishCard(props: {
   }
 
   if (role === 'homeowner') {
+    const nudge = !!props.allDone && !asked;
     return (
-      <section className="card" aria-label="Is the work finished?" style={{ background: 'var(--accent-soft, #f9efe4)' }}>
-        <h2>Is the work finished?</h2>
-        <p className="muted">Tell {otherName} the work is done. They confirm and close the job, then you both rate each other.</p>
+      <section className="card" aria-label={nudge ? 'Everything on the list is done' : 'Is the work finished?'} style={{ background: 'var(--accent-soft, #f9efe4)' }}>
+        <h2>{nudge ? 'Everything on the list is done' : 'Is the work finished?'}</h2>
+        <p className="muted">
+          {nudge
+            ? `All scope lines and approved change orders are done. When you are happy with the work, tell ${otherName} it is finished. They confirm and close the job, then you both rate each other.`
+            : `Tell ${otherName} the work is done. They confirm and close the job, then you both rate each other.`}
+        </p>
+        {nudge ? (
+          <div className="stack" style={{ gap: 6 }}>
+            {checks.map((c) => (
+              <div key={c.text} className="row" style={{ alignItems: 'flex-start', flexWrap: 'nowrap', gap: 10 }}>
+                <span aria-hidden="true" style={{ flex: 'none', width: 22, height: 22, borderRadius: '50%', display: 'grid', placeItems: 'center', fontSize: 13, background: c.ok ? 'var(--ok-bg)' : 'var(--line)', color: c.ok ? 'var(--ok)' : 'var(--ink-2)' }}>{c.ok ? '✓' : '•'}</span>
+                <span className="small">{c.text}</span>
+              </div>
+            ))}
+          </div>
+        ) : null}
         {asked ? (
           <>
             <div className="box ok">Sent. We asked {otherName} to mark the project complete. You will get an alert when they do.</div>
+            {props.lastPayRequested ? (
+              <div className="box">
+                <b>Tip before you pay the final amount</b>
+                <span className="small" style={{ display: 'block' }}>You may want to confirm that everything is done before you pay the last payment. What you can hold back, and what paperwork you can ask for, depends on what your contract says. If you want a holdback or lien releases, they need to be in your written agreement. Ask your attorney if you are unsure.</span>
+              </div>
+            ) : null}
             {props.cancelFinish ? (
               <form action={props.cancelFinish} className="stack" style={{ gap: 4 }}>
                 {hidden}
@@ -49,7 +77,15 @@ export default function FinishCard(props: {
             ) : null}
           </>
         ) : (
-          <form action={props.requestFinish}>{hidden}<button className="btn" type="submit">The work is finished</button></form>
+          <>
+            <form action={props.requestFinish}>{hidden}<button className="btn" type="submit">The work is finished</button></form>
+            {nudge && props.messagesHref ? (
+              <>
+                <Link className="btn ghost" href={props.messagesHref}>Something&apos;s missing</Link>
+                <p className="muted small" style={{ margin: 0 }}>Tell {otherName} what is missing in Messages.{props.reportHref ? <> If you cannot agree, you can <Link href={props.reportHref}>report a problem</Link>.</> : null}</p>
+              </>
+            ) : null}
+          </>
         )}
       </section>
     );
