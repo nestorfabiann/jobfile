@@ -157,9 +157,9 @@ export default async function Overview({ params, searchParams }: { params: { id:
         <div className="phead-top">
           <KitchenArt size={46} />
           <div style={{ minWidth: 0 }}>
-            <b className="phead-name">{project.name}</b>
+            <b className="phead-name">{headStatus}</b>
             <span className="phead-sub">
-              {role === 'homeowner' ? <Link href={`/contractors/${project.company_id}`} style={{ color: 'inherit', textDecoration: 'underline' }}>{contractorName}</Link> : homeownerName} · {headStatus}
+              {role === 'homeowner' ? <Link href={`/contractors/${project.company_id}`} style={{ color: 'inherit', textDecoration: 'underline' }}>{contractorName}</Link> : homeownerName}
             </span>
           </div>
         </div>
