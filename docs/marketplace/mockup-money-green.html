@@ -1,0 +1,32 @@
+<title>Money Card Green Mockup</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+:root{--bg:#f6f2ec;--fg:#2a2118;--mut:#6f6356;--ac:#c4813f;--card:#fff;--line:#e4dccf;--gr:#1f4d3a;--mint:#eaf5ee;--mintline:#bfe0cc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1b1713;--fg:#f1e9de;--mut:#a89a8a;--ac:#d99a58;--card:#262019;--line:#3a3128;--gr:#7fc6a0;--mint:#1c2e25;--mintline:#2f4d3e;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#1b1713;--fg:#f1e9de;--mut:#a89a8a;--ac:#d99a58;--card:#262019;--line:#3a3128;--gr:#7fc6a0;--mint:#1c2e25;--mintline:#2f4d3e;color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,sans-serif;padding-block:20px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));line-height:1.4}
+h1{font-size:21px;margin:0 0 6px}p.i{margin:0 0 14px;color:var(--mut);max-width:64ch}
+.row{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start}
+.cap{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);margin-bottom:6px}
+.ph{width:min(100%,340px);border:1px solid var(--line);border-radius:22px;padding:14px;min-width:0;display:flex;flex-direction:column;gap:10px}
+.fake{height:44px;border-radius:12px;background:var(--card);border:1px solid var(--line)}
+.old{background:var(--card);border:1.5px solid var(--line);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.old b{font-size:17px}.old span{color:var(--mut);font-size:14px}.old a{color:var(--ac);font-weight:700;font-size:16px}
+.new{background:var(--mint);border:1.5px solid var(--mintline);border-radius:22px;padding:14px 16px;display:flex;align-items:center;gap:12px}
+.ico{flex:none;width:42px;height:42px;border-radius:50%;background:var(--gr);color:#fff;display:grid;place-items:center;font-weight:800;font-size:20px}
+.dark .ico,:root[data-theme="dark"] .ico{color:#10241a}
+.new .t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.new .t div b{font-size:17px}.new .t div span{color:var(--mut);font-size:13px}
+.new .go{color:var(--gr);font-weight:800;font-size:14px}
+.chev{margin-left:auto;color:var(--gr);font-size:22px;font-weight:700}
+.note{font-size:12px;color:var(--mut);max-width:340px;margin-top:8px}
+</style>
+<h1>Money card in green</h1>
+<p class="i">Same two numbers and the same link. A pale mint card with a green dollar tile on the left, and the whole card is the tap target. Amounts stay dark. Light and dark mode both shown through your phone's setting.</p>
+<div class="row">
+<div><div class="cap">Before</div><div class="ph"><div class="old"><div><b>$1,001.60</b> <span>collected ·</span> <b>$4,881.40</b> <span>to collect</span></div><a href="#" onclick="return false">My money ›</a></div></div></div>
+<div><div class="cap">After</div><div class="ph"><div class="fake"></div>
+<div class="new"><span class="ico">$</span><span class="t"><div><b>$1,001.60</b> <span>collected</span></div><div><b>$4,881.40</b> <span>to collect</span></div></span><span class="chev">›</span></div>
+<div class="fake"></div></div><div class="note">Two lines are easier to read than one long line, and the whole card taps through to My money. "to collect" stays gray, not orange.</div></div>
+<div><div class="cap">After, single line (closer to today)</div><div class="ph"><div class="new"><span class="ico">$</span><span class="t"><div><b>$1,001.60</b> <span>collected ·</span> <b>$4,881.40</b> <span>to collect</span></div><span class="go">My money ›</span></span></div></div><div class="note">Keeps today's wording and the "My money ›" link, just in green with the dollar tile.</div></div>
+</div>
