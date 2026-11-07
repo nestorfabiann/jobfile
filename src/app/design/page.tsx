@@ -25,18 +25,22 @@ export default async function Design({ searchParams }: { searchParams: { error?:
       <h1>Design ideas</h1>
       <p className="muted">Add a photo of a room or the outside of your home and see new looks. Then start a project from the one you like.</p>
       {searchParams.error ? <div className="box bad" role="alert">{searchParams.error}</div> : null}
-      <DesignForm picks={PICKS} styles={[...STYLES]} spaces={SPACE_LIST} />
       {past.length > 0 ? (
-        <section className="stack" style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <section className="stack" style={{ display: 'flex', flexDirection: 'column', gap: 10 }} aria-label="Your ideas">
           <h2 style={{ margin: 0, fontSize: 20 }}>Your ideas</h2>
-          {past.map((p) => (
-            <Link key={p.id} href={`/design/${p.id}`} className="card" style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-              {urls.get(p.results[0]) ? /* eslint-disable-next-line @next/next/no-img-element */ <img src={urls.get(p.results[0])} alt="" style={{ width: 72, height: 72, objectFit: 'cover', borderRadius: 12 }} /> : null}
-              <span><b>{spaceLabel(p.space)}</b><br /><span className="muted small">{p.style} · {new Date(p.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span></span>
-            </Link>
-          ))}
+          <div className="di-row">
+            {past.map((p) => (
+              <Link key={p.id} href={`/design/${p.id}`} className="di-card">
+                {urls.get(p.results[0]) ? /* eslint-disable-next-line @next/next/no-img-element */ <img src={urls.get(p.results[0])} alt="" /> : <span className="di-ph" aria-hidden="true" />}
+                <b>{spaceLabel(p.space)}</b>
+                <span className="muted small">{p.style} · {new Date(p.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+              </Link>
+            ))}
+          </div>
+          <h2 style={{ margin: '10px 0 0', fontSize: 20 }}>Make new ideas</h2>
         </section>
       ) : null}
+      <DesignForm picks={PICKS} styles={[...STYLES]} spaces={SPACE_LIST} />
     </div>
   );
 }
