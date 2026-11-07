@@ -1,0 +1,53 @@
+<title>Contractor Projects Layout</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+:root{--bg:#f6f2ec;--fg:#2a2118;--mut:#6f6356;--ac:#c4813f;--acbg:#f9efe4;--card:#fff;--line:#e4dccf;--ok:#1f6b45}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1b1713;--fg:#f1e9de;--mut:#a89a8a;--ac:#d99a58;--acbg:#33281c;--card:#262019;--line:#3a3128;--ok:#8fd0ab;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#1b1713;--fg:#f1e9de;--mut:#a89a8a;--ac:#d99a58;--acbg:#33281c;--card:#262019;--line:#3a3128;--ok:#8fd0ab;color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:system-ui,sans-serif;padding-block:20px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));line-height:1.4}
+h1{font-size:21px;margin:0 0 6px}p.i{margin:0 0 14px;color:var(--mut);max-width:62ch}
+.row{display:flex;gap:18px;flex-wrap:wrap}
+.cap{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);margin-bottom:6px}
+.ph{width:min(100%,330px);border:1px solid var(--line);border-radius:22px;padding:12px;display:flex;flex-direction:column;gap:8px;min-width:0;position:relative}
+.fold{border-top:2px dashed var(--ac);color:var(--ac);font-size:10px;font-weight:700;text-align:center;letter-spacing:.06em;padding-top:3px;margin:2px 0}
+.box{border:1px solid var(--line);background:var(--card);border-radius:14px;padding:10px 12px;font-size:13px}
+.box b{display:block}.sm{font-size:12px;color:var(--mut)}
+.chip{display:inline-flex;gap:6px;align-items:center;font-size:12px;font-weight:600;border:1px solid var(--line);background:var(--card);border-radius:99px;padding:4px 10px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--ok)}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.t{border-radius:16px;padding:12px;min-height:92px;font-size:12px}.t b{display:block;font-size:15px}
+.t1{background:var(--ac);color:#fff}.t2{border:2px solid var(--ac);background:var(--card)}
+.btns{display:grid;grid-template-columns:1fr 1fr;gap:8px}.bt{border-radius:99px;text-align:center;padding:9px;font-size:13px;font-weight:700}
+.bt.p{background:var(--ac);color:#fff}.bt.o{border:2px solid var(--ac);background:var(--card)}
+.need{background:var(--acbg);border-radius:16px;padding:10px 12px}.need h3{margin:0 0 6px;font-size:16px}
+.money{display:grid;grid-template-columns:1fr 1fr;gap:8px}.m{border:1px solid var(--line);background:var(--card);border-radius:14px;padding:10px}.m b{display:block;font-size:20px}
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--line);border-radius:16px;background:var(--card);padding:4px;text-align:center;font-size:11px}
+.tabs div{padding:7px 2px;border-radius:12px}.tabs b{display:block;font-size:18px;color:var(--ac)}.tabs .on{background:var(--ac);color:#fff}.tabs .on b{color:#fff}
+.slim{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12px}
+.slim span b{font-size:14px}
+a{color:var(--ac);font-weight:600}
+</style>
+<h1>Contractor Projects page: before and after</h1>
+<p class="i">The dashed line marks about where a phone screen ends. In the after version the Ongoing, Bids and Completed tabs and the first project fit above it.</p>
+<div class="row">
+<div><div class="cap">Before</div><div class="ph">
+<div class="box" style="display:flex;justify-content:space-between"><span><span class="dot" style="display:inline-block"></span> <b style="display:inline">Taking new jobs</b></span><span class="chip">Change</span></div>
+<div class="tiles"><div class="t t1"><b>Find work</b>Homeowners near you.</div><div class="t t2"><b>Start a project</b>For a customer you already have.</div></div>
+<div class="need"><h3>Needs you 1</h3><div class="sm">Oldest first. Each one leaves this list when it is done.</div><div class="box" style="margin-top:6px"><b>Finish and send the agreement</b><span class="sm">Bathroom remodel</span></div></div>
+<div class="money"><div class="m"><b>$1,001.60</b><span class="sm">Collected so far</span></div><div class="m"><b>$4,881.40</b><span class="sm">Still to collect</span></div></div>
+<a href="#" onclick="return false">Open My money ›</a>
+<div class="fold">SCREEN ENDS HERE</div>
+<div class="tabs"><div class="on"><b>2</b>Ongoing</div><div><b>2</b>Bids</div><div><b>1</b>Completed</div></div>
+<div class="box"><b>Kitchen and walls painting</b><span class="sm">First project, below the fold</span></div>
+</div></div>
+<div><div class="cap">After</div><div class="ph">
+<div class="slim"><b style="font-size:18px">Projects</b><span class="chip"><span class="dot"></span>Taking new jobs · Change</span></div>
+<div class="need"><h3>Needs you 1</h3><div class="sm">Oldest first.</div><div class="box" style="margin-top:6px"><b>Finish and send the agreement</b><span class="sm">Bathroom remodel · waiting 2 days</span></div></div>
+<div class="btns"><div class="bt p">Find work</div><div class="bt o">Start a project</div></div>
+<div class="tabs"><div class="on"><b>2</b>Ongoing</div><div><b>2</b>Bids</div><div><b>1</b>Completed</div></div>
+<div class="box"><b>Kitchen and walls painting</b><span class="sm">Plano · in progress</span></div>
+<div class="fold">SCREEN ENDS HERE</div>
+<div class="box"><b>Bathroom remodel</b><span class="sm">Frisco · agreement waiting</span></div>
+<div class="box slim"><span><b>$1,001.60</b> collected · <b>$4,881.40</b> to collect</span><a href="#" onclick="return false">My money ›</a></div>
+</div></div>
+</div>
