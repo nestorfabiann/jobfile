@@ -2,10 +2,11 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { reactScope, setScopeStatus } from '@/app/projects/[id]/overview/scopeActions';
+import { finishPhase, reactScope, setScopePhase, setScopeStatus } from '@/app/projects/[id]/overview/scopeActions';
 import { uploadPhoto } from '@/app/projects/[id]/photos/actions';
 
-export type ScopeLine = { kind: 'item' | 'co'; id: string; title: string; status: 'not_started' | 'in_progress' | 'done'; doneOn: string | null; photoUrl: string | null; reaction: 'ok' | 'question' | null; note: string };
+export type ScopeLine = { kind: 'item' | 'co'; id: string; title: string; status: 'not_started' | 'in_progress' | 'done'; doneOn: string | null; photoUrl: string | null; reaction: 'ok' | 'question' | null; note: string; phaseId: string | null };
+export type ScopePhase = { id: string; title: string; status: string };
 
 async function shrink(file: File, max = 1600): Promise<Blob> {
   const bmp = await createImageBitmap(file, { imageOrientation: 'from-image' });
@@ -20,11 +21,14 @@ async function shrink(file: File, max = 1600): Promise<Blob> {
   return await new Promise<Blob>((res, rej) => canvas.toBlob((b) => (b ? res(b) : rej(new Error('encode'))), 'image/jpeg', 0.82));
 }
 
-export default function ScopeCard({ projectId, role, lines: serverLines }: { projectId: string; role: 'contractor' | 'homeowner'; lines: ScopeLine[] }) {
+export default function ScopeCard({ projectId, role, lines: serverLines, phases: serverPhases }: { projectId: string; role: 'contractor' | 'homeowner'; lines: ScopeLine[]; phases: ScopePhase[] }) {
   const router = useRouter();
   // The card updates right away on this screen, and the page data catches up in the background.
   const [lines, setLines] = useState(serverLines);
   useEffect(() => { setLines(serverLines); }, [serverLines]);
+  const [phases, setPhases] = useState(serverPhases);
+  useEffect(() => { setPhases(serverPhases); }, [serverPhases]);
+  const [skip, setSkip] = useState<string[]>([]);
   const patch = (l: ScopeLine, p: Partial<ScopeLine>) => setLines((cur) => cur.map((x) => (x.kind === l.kind && x.id === l.id ? { ...x, ...p } : x)));
   // Refresh the server data without losing the place on the page.
   const sync = () => {
@@ -78,13 +82,51 @@ export default function ScopeCard({ projectId, role, lines: serverLines }: { pro
     setAsking(''); setQ(''); sync();
   }
 
+  async function pickPhase(l: ScopeLine, phaseId: string) {
+    setBusy(key(l)); setErr('');
+    const r = await setScopePhase({ projectId, kind: l.kind, id: l.id, phaseId: phaseId || null });
+    setBusy('');
+    if (!r.ok) return void setErr(r.error);
+    patch(l, { phaseId: phaseId || null });
+    sync();
+  }
+  async function closePhase(id: string) {
+    setBusy(`ph:${id}`); setErr('');
+    const r = await finishPhase({ projectId, phaseId: id });
+    setBusy('');
+    if (!r.ok) return void setErr(r.error);
+    setPhases((cur) => cur.map((p) => (p.id === id ? { ...p, status: 'done' } : p)));
+    sync();
+  }
+  const known = new Set(phases.map((p) => p.id));
+  const tagged = lines.some((l) => l.phaseId && known.has(l.phaseId));
+  const groups: { id: string; title: string; lines: ScopeLine[] }[] = tagged
+    ? [
+        ...phases.map((p) => ({ id: p.id, title: p.title, lines: lines.filter((l) => l.phaseId === p.id) })).filter((g) => g.lines.length),
+        ...(lines.some((l) => !l.phaseId || !known.has(l.phaseId)) ? [{ id: '', title: 'No phase yet', lines: lines.filter((l) => !l.phaseId || !known.has(l.phaseId)) }] : []),
+      ]
+    : [{ id: '', title: '', lines }];
+
   return (
     <section className="card sc-card" id="scope" aria-label="Scope of work">
       <div className="sc-hd"><h2>Scope of work</h2><b>{done} of {lines.length} done</b></div>
       <div className="sc-bar" role="img" aria-label={`${pct} percent of the scope is done`}><i style={{ width: `${pct}%` }} /></div>
       <input ref={fileRef} type="file" accept="image/*" hidden onChange={onPhoto} aria-label="Add a photo of the finished work" />
       {err ? <div className="box warn" role="alert">{err}</div> : null}
-      {lines.map((l) => {
+      {groups.map((g) => {
+        const ph = phases.find((p) => p.id === g.id);
+        const doneN = g.lines.filter((l) => l.status === 'done').length;
+        const allDone = doneN === g.lines.length && g.lines.length > 0;
+        return (
+          <div key={g.id || 'none'} className={tagged ? 'sc-grp' : undefined}>
+            {tagged ? <div className="sc-gh"><span>{g.title}</span><span>{doneN} of {g.lines.length}</span></div> : null}
+            {tagged && ph && role === 'contractor' && allDone && ph.status !== 'done' && !skip.includes(ph.id) ? (
+              <div className="box warn sc-pp">
+                <b>All scope lines in &ldquo;{ph.title}&rdquo; are done.</b>
+                <div className="sc-act"><button type="button" className="sc-b pr" disabled={!!busy} onClick={() => closePhase(ph.id)}>{busy === `ph:${ph.id}` ? 'Saving…' : 'Mark phase done'}</button><button type="button" className="sc-b" onClick={() => setSkip((x) => [...x, ph.id])}>Not yet</button></div>
+              </div>
+            ) : null}
+        {g.lines.map((l) => {
         const k = key(l);
         return (
           <div className="sc-ln" key={k}>
@@ -102,6 +144,12 @@ export default function ScopeCard({ projectId, role, lines: serverLines }: { pro
                   {l.status !== 'done' ? <button type="button" className="sc-b" disabled={!!busy} onClick={() => set(l, 'done')}>Done, no photo</button> : null}
                   {l.status === 'not_started' ? <button type="button" className="sc-b" disabled={!!busy} onClick={() => set(l, 'in_progress')}>Start</button> : null}
                   {l.status !== 'not_started' ? <button type="button" className="sc-b" disabled={!!busy} onClick={() => set(l, l.status === 'done' ? 'in_progress' : 'not_started')}>{l.status === 'done' ? 'Undo' : 'Reset'}</button> : null}
+                  {phases.length ? (
+                    <select className="sc-sel" aria-label={`Phase for ${l.title}`} value={l.phaseId && known.has(l.phaseId) ? l.phaseId : ''} disabled={!!busy} onChange={(e) => pickPhase(l, e.target.value)}>
+                      <option value="">No phase</option>
+                      {phases.map((p) => <option key={p.id} value={p.id}>{p.title}</option>)}
+                    </select>
+                  ) : null}
                 </div>
               ) : l.status === 'done' && !l.reaction ? (
                 asking === k ? (
@@ -118,6 +166,9 @@ export default function ScopeCard({ projectId, role, lines: serverLines }: { pro
               // eslint-disable-next-line @next/next/no-img-element
               <img className="sc-th" src={l.photoUrl} alt={`Finished: ${l.title}`} loading="lazy" />
             ) : null}
+          </div>
+        );
+      })}
           </div>
         );
       })}

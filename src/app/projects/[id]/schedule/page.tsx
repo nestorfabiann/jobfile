@@ -19,6 +19,12 @@ export default async function Schedule({ params, searchParams }: { params: { id:
     supabaseAdmin().from('visits').select('*').eq('project_id', project.id).neq('status', 'canceled').order('created_at'),
   ]);
   const phases = (phaseRows ?? []) as Phase[];
+  // How many scope lines are tied to each phase, and how many are done. Left out if the 058 column is missing.
+  const scopeBy = new Map<string, { n: number; d: number }>();
+  try {
+    const { data: sc } = await supabaseAdmin().from('project_scope_status').select('phase_id,status').eq('project_id', project.id).not('phase_id', 'is', null);
+    ((sc ?? []) as any[]).forEach((r) => { const c = scopeBy.get(r.phase_id) ?? { n: 0, d: 0 }; c.n += 1; if (r.status === 'done') c.d += 1; scopeBy.set(r.phase_id, c); });
+  } catch { /* scope table not created yet */ }
   const changes = (chgRows ?? []) as any[];
   const state = scheduleState(phases, today);
   const missing = role === 'contractor' && phases.length > 0 ? await missingFromAgreement(supabaseAdmin(), project.id) : [];
@@ -94,6 +100,8 @@ export default async function Schedule({ params, searchParams }: { params: { id:
                 <b>{p.title}</b>
                 <div className="muted small">{fmtRange(p.starts_on, p.ends_on)} · {p.status === 'done' ? 'done' : p.status === 'in_progress' ? 'in progress' : 'upcoming'}</div>
                 {p.note ? <div className="muted small">{p.note}</div> : null}
+                {scopeBy.get(p.id) ? <span className={`sc-chip${scopeBy.get(p.id)!.d === scopeBy.get(p.id)!.n ? ' ok' : ''}`}>Scope {scopeBy.get(p.id)!.d} of {scopeBy.get(p.id)!.n} done</span> : null}
+                {role === 'contractor' && !p.starts_on && !p.ends_on && p.status !== 'done' ? <span className="sc-chip">Needs dates</span> : null}
                 {role === 'contractor' && (
                   <details style={{ marginTop: 6 }}>
                     <summary className="small" style={{ cursor: 'pointer', fontWeight: 700 }}>Edit</summary>

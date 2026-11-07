@@ -31,7 +31,9 @@ export async function setScopeStatus(input: { projectId: string; kind: 'item' | 
     if (!title) return { ok: false, error: 'That line was not found.' };
     const db = supabaseAdmin();
     if (input.to === 'not_started') {
-      await db.from('project_scope_status').delete().eq('project_id', project.id).eq('ref_kind', input.kind).eq('ref_id', input.id);
+      const { data: ex } = await db.from('project_scope_status').select('id,phase_id').eq('project_id', project.id).eq('ref_kind', input.kind).eq('ref_id', input.id).maybeSingle();
+      if (ex?.phase_id) await db.from('project_scope_status').update({ status: 'not_started', done_at: null, done_by: null, ho_reaction: null, ho_note: '', ho_at: null, updated_at: new Date().toISOString() }).eq('id', ex.id);
+      else if (ex) await db.from('project_scope_status').delete().eq('id', ex.id);
     } else {
       let photoId: string | null = null;
       if (input.photoId && /^[0-9a-f-]{36}$/i.test(input.photoId)) {
@@ -75,6 +77,58 @@ export async function reactScope(input: { projectId: string; kind: 'item' | 'co'
     await db.from('project_scope_status').update({ ho_reaction: input.reaction, ho_note: input.reaction === 'question' ? note : '', ho_at: new Date().toISOString() }).eq('id', cur.id);
     revalidatePath(`/projects/${project.id}/overview`);
     revalidatePath(`/projects/${project.id}`);
+    return { ok: true };
+  } catch {
+    return { ok: false, error: 'Something went wrong. Try again.' };
+  }
+}
+
+/** Contractor: tie a scope line to a schedule phase (or clear it). */
+export async function setScopePhase(input: { projectId: string; kind: 'item' | 'co'; id: string; phaseId: string | null }): Promise<ScopeResult> {
+  try {
+    const { role, project } = await loadProject(input.projectId);
+    if (role !== 'contractor') return { ok: false, error: 'Only the contractor updates the scope.' };
+    if (!['item', 'co'].includes(input.kind) || !/^[0-9a-f-]{36}$/i.test(input.id)) return { ok: false, error: 'That line was not found.' };
+    const title = await lineTitle(project.id, input.kind, input.id);
+    if (!title) return { ok: false, error: 'That line was not found.' };
+    const db = supabaseAdmin();
+    let phaseId: string | null = null;
+    if (input.phaseId) {
+      const { data: ph } = await db.from('project_phases').select('id').eq('id', input.phaseId).eq('project_id', project.id).maybeSingle();
+      if (!ph) return { ok: false, error: 'That phase was not found.' };
+      phaseId = ph.id as string;
+    }
+    const { data: ex } = await db.from('project_scope_status').select('id,status').eq('project_id', project.id).eq('ref_kind', input.kind).eq('ref_id', input.id).maybeSingle();
+    if (ex) {
+      const { error } = await db.from('project_scope_status').update({ phase_id: phaseId, updated_at: new Date().toISOString() }).eq('id', ex.id);
+      if (error) return { ok: false, error: 'Could not save. Check that the database step was run.' };
+      if (!phaseId && ex.status === 'not_started') await db.from('project_scope_status').delete().eq('id', ex.id);
+    } else if (phaseId) {
+      const { error } = await db.from('project_scope_status').insert({ project_id: project.id, ref_kind: input.kind, ref_id: input.id, status: 'not_started', phase_id: phaseId });
+      if (error) return { ok: false, error: 'Could not save. Check that the database step was run.' };
+    }
+    revalidatePath(`/projects/${project.id}/overview`);
+    revalidatePath(`/projects/${project.id}/schedule`);
+    return { ok: true };
+  } catch {
+    return { ok: false, error: 'Something went wrong. Try again.' };
+  }
+}
+
+/** Contractor: the prompt after the last scope line in a phase is done. Same effect as Mark done on the Schedule tab. */
+export async function finishPhase(input: { projectId: string; phaseId: string }): Promise<ScopeResult> {
+  try {
+    const { role, user, project } = await loadProject(input.projectId);
+    if (role !== 'contractor') return { ok: false, error: 'Only the contractor updates the schedule.' };
+    const db = supabaseAdmin();
+    const { data: ph } = await db.from('project_phases').select('id,title,status').eq('id', input.phaseId).eq('project_id', project.id).maybeSingle();
+    if (!ph) return { ok: false, error: 'That phase was not found.' };
+    if (ph.status !== 'done') {
+      await db.from('project_phases').update({ status: 'done' }).eq('id', ph.id);
+      await notifyOtherSide({ projectId: project.id, senderId: user.id, senderRole: 'contractor', kind: 'schedule', throttle: true, title: (n) => `${ph.title} is done on ${n}`, body: 'Open the Schedule tab to see what is next.' });
+    }
+    revalidatePath(`/projects/${project.id}/overview`);
+    revalidatePath(`/projects/${project.id}/schedule`);
     return { ok: true };
   } catch {
     return { ok: false, error: 'Something went wrong. Try again.' };
