@@ -1,0 +1,50 @@
+<title>Scope And Schedule Link</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+:root{--bg:#f6f2ec;--fg:#2a2118;--mut:#6f6356;--ac:#c4813f;--card:#fff;--line:#e4dccf;--gr:#1f6b45;--grbg:#dcf0e3;--wn:#9a7208;--wnbg:#fbefc9}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1b1713;--fg:#f1e9de;--mut:#a89a8a;--ac:#d99a58;--card:#262019;--line:#3a3128;--gr:#7fc6a0;--grbg:#1c2e25;--wn:#e6c04f;--wnbg:#3a3016;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#1b1713;--fg:#f1e9de;--mut:#a89a8a;--ac:#d99a58;--card:#262019;--line:#3a3128;--gr:#7fc6a0;--grbg:#1c2e25;--wn:#e6c04f;--wnbg:#3a3016;color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,sans-serif;padding-block:20px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));line-height:1.4}
+h1{font-size:21px;margin:0 0 6px}p.i{margin:0 0 14px;color:var(--mut);max-width:64ch}
+.row{display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start}
+.cap{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);margin-bottom:6px}
+.ph{width:min(100%,350px);border:1px solid var(--line);border-radius:22px;padding:12px;min-width:0;display:flex;flex-direction:column;gap:10px}
+.card{background:var(--card);border:1.5px solid var(--line);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:8px}
+.hd{display:flex;justify-content:space-between;align-items:center;gap:8px}.hd h3{margin:0;font-size:17px}.hd b{font-size:13px;color:var(--gr)}
+.bar{height:9px;border-radius:6px;background:var(--line);overflow:hidden}.bar i{display:block;height:100%;background:var(--gr);border-radius:6px}
+.grp{border-top:1px solid var(--line);padding-top:10px;display:flex;flex-direction:column;gap:6px}
+.gh{display:flex;justify-content:space-between;gap:8px;font-size:12px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.05em}
+.ln{display:flex;gap:10px;align-items:center;font-size:14.5px;font-weight:600;padding:3px 0}
+.ck{flex:none;width:22px;height:22px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;font-size:12px;font-weight:800;color:transparent}.ck.d{background:var(--gr);border-color:var(--gr);color:#fff}.ck.p{border-color:var(--ac);background:linear-gradient(90deg,var(--ac) 50%,transparent 50%)}
+.sel{border:1.5px solid var(--line);border-radius:12px;padding:9px 11px;font-size:13px;display:flex;justify-content:space-between;background:var(--card)}
+.b{border:1.5px solid var(--line);border-radius:12px;padding:8px 12px;font-size:12.5px;font-weight:700;background:var(--card);display:inline-block}.b.pr{background:var(--ac);border-color:var(--ac);color:#fff}
+.ph2{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-top:1px solid var(--line)}
+.dot{flex:none;width:14px;height:14px;border-radius:50%;margin-top:4px;border:2px solid var(--line)}.dot.d{background:var(--gr);border-color:var(--gr)}.dot.p{border-color:var(--ac);background:var(--ac)}
+.tx b{font-size:15px;display:block}.tx small{color:var(--mut);font-size:12.5px;display:block}
+.chip{display:inline-block;margin-top:4px;border-radius:99px;padding:2px 10px;font-size:11.5px;font-weight:700;background:var(--grbg);color:var(--gr)}.chip.w{background:var(--wnbg);color:var(--wn)}
+.box{background:var(--wnbg);color:var(--wn);border-radius:12px;padding:10px 12px;font-size:13px}
+.note{font-size:12px;color:var(--mut);max-width:350px;margin-top:8px}
+</style>
+<h1>Scope of work and schedule, linked</h1>
+<p class="i">Two lists that stay separate, with a link between them. Example lines.</p>
+<div class="row">
+<div><div class="cap">1. Contractor picks a phase</div><div class="ph"><div class="card"><b style="font-size:15px">Paint walls, 2 coats</b><div class="sel"><span>Phase</span><b>Finish and paint ▾</b></div><div class="sel"><span>Phase options</span><span style="color:var(--mut)">Demo · Main · Finish · Cleanup</span></div><div><span class="b pr">Mark done + photo</span> <span class="b">Done, no photo</span></div></div></div>
+<div class="note">An optional drop-down on each line. Lines with no phase still work.</div></div>
+
+<div><div class="cap">2. Scope grouped by phase (Overview)</div><div class="ph"><div class="card"><div class="hd"><h3>Scope of work</h3><b>3 of 6 done</b></div><div class="bar"><i style="width:50%"></i></div>
+<div class="grp"><div class="gh"><span>Demo and prep</span><span>1 of 1</span></div><div class="ln"><span class="ck d">✓</span>Prep and mask kitchen</div></div>
+<div class="grp"><div class="gh"><span>Finish and paint</span><span>2 of 3</span></div><div class="ln"><span class="ck d">✓</span>Paint cabinets</div><div class="ln"><span class="ck d">✓</span>Prime walls</div><div class="ln"><span class="ck p"></span>Paint walls, 2 coats</div></div>
+<div class="grp"><div class="gh"><span>Cleanup and walkthrough</span><span>0 of 1</span></div><div class="ln"><span class="ck"></span>Final cleanup</div></div>
+<div class="grp"><div class="gh"><span>No phase yet</span><span>0 of 1</span></div><div class="ln"><span class="ck"></span>Change order 2: Move range</div></div></div></div>
+<div class="note">Same card as today, just grouped. Without any phase tags it looks exactly as it does now.</div></div>
+
+<div><div class="cap">3. Schedule shows the count</div><div class="ph"><div class="card" style="gap:0">
+<div class="ph2" style="border-top:0"><span class="dot d"></span><div class="tx"><b>Demo and prep</b><small>Nov 25 · done</small><span class="chip">Scope 1 of 1 done</span></div></div>
+<div class="ph2"><span class="dot p"></span><div class="tx"><b>Finish and paint</b><small>Nov 27 · in progress</small><span class="chip w">Scope 2 of 3 done</span></div></div>
+<div class="ph2"><span class="dot"></span><div class="tx"><b>Cleanup and walkthrough</b><small>Nov 28 to Nov 30 · upcoming</small><span class="chip w">Scope 0 of 1 done</span></div></div>
+<div class="ph2"><span class="dot"></span><div class="tx"><b>Move range</b><small>From a change order · no dates yet</small><span class="chip w">Needs dates</span></div></div></div></div>
+<div class="note">Dates and progress in one place for the homeowner. Change orders without dates say "Needs dates".</div></div>
+
+<div><div class="cap">4. Phase finished prompt (contractor)</div><div class="ph"><div class="box"><b>All scope lines in "Finish and paint" are done.</b><div style="margin-top:8px"><span class="b pr">Mark phase done</span> <span class="b">Not yet</span></div></div></div>
+<div class="note">Shown right after the last line in a phase is marked done. It only asks. Nothing changes unless the contractor taps.</div></div>
+</div>
