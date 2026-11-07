@@ -1,0 +1,69 @@
+<title>Meet Before You Hire Mockup</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+:root{--bg:#f6f2ec;--fg:#2a2118;--mut:#6f6356;--ac:#c4813f;--acbg:#f9efe4;--card:#fff;--line:#e4dccf;--gr:#1f4d3a;--grbg:#dff1e7}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1b1713;--fg:#f1e9de;--mut:#a89a8a;--ac:#d99a58;--acbg:#33281c;--card:#262019;--line:#3a3128;--gr:#7fc6a0;--grbg:#1f3a2c;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#1b1713;--fg:#f1e9de;--mut:#a89a8a;--ac:#d99a58;--acbg:#33281c;--card:#262019;--line:#3a3128;--gr:#7fc6a0;--grbg:#1f3a2c;color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,sans-serif;padding-block:20px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));line-height:1.4}
+h1{font-size:21px;margin:0 0 6px}p.i{margin:0 0 14px;color:var(--mut);max-width:62ch}
+.row{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start}
+.cap{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);margin-bottom:6px}
+.ph{width:min(100%,340px);border:1px solid var(--line);border-radius:22px;padding:14px;min-width:0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:16px}
+.ic{width:42px;height:42px;border-radius:14px;background:var(--acbg);display:grid;place-items:center;color:var(--ac);font-size:20px}
+.card h3{margin:12px 0 6px;font-size:19px}.card p{margin:0 0 14px;color:var(--mut);font-size:14px}
+.stage{position:relative;background:var(--acbg);border-radius:16px;padding:12px;min-height:132px}
+.sample{position:absolute;top:8px;right:10px;font-size:9.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);border:1px solid var(--line);border-radius:999px;padding:1px 7px;background:var(--card)}
+.lbl{font-size:12px;font-weight:700;color:var(--mut);margin-bottom:8px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{font-size:12.5px;font-weight:600;padding:8px 11px;border-radius:12px;border:1.5px solid var(--line);background:var(--card);transition:all .25s}
+.chip.on{border-color:var(--ac);background:var(--ac);color:#fff;transform:scale(1.04)}
+.v{background:var(--card);border-radius:14px;padding:10px 12px;display:flex;gap:10px;align-items:center;opacity:0;transform:translateY(8px);transition:all .4s}
+.v.show{opacity:1;transform:none}
+.lg{flex:none;width:34px;height:34px;border-radius:10px;background:var(--acbg);color:var(--ac);display:grid;place-items:center;font-weight:800}
+.v b{display:block;font-size:14px}.v span{font-size:12px;color:var(--mut)}
+.cd{margin-left:auto;font-size:11.5px;font-weight:700;background:var(--grbg);color:var(--gr);border-radius:999px;padding:4px 9px;white-space:nowrap}
+.both{display:flex;gap:14px;align-items:center;margin-top:10px;opacity:0;transition:opacity .4s}
+.both.show{opacity:1}
+.ck{display:flex;gap:6px;align-items:center;font-size:12.5px;font-weight:600}
+.ck i{width:22px;height:22px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;font-style:normal;font-size:12px;color:#fff;transition:all .3s}
+.ck.on i{background:var(--gr);border-color:var(--gr)}
+.done{font-size:12.5px;font-weight:700;color:var(--gr);margin-top:8px;opacity:0;transition:opacity .4s}.done.show{opacity:1}
+.btn{margin-top:12px;border:1.5px solid var(--line);background:var(--card);color:var(--fg);border-radius:999px;padding:10px 18px;font-weight:700;font-size:14px;cursor:pointer;min-height:44px}
+.note{font-size:12px;color:var(--mut);max-width:340px;margin-top:8px}
+</style>
+<h1>Meet before you hire: animated card</h1>
+<p class="i">Plays once when the card scrolls into view: a time gets picked, the visit card appears with a countdown, then both sides check off. Tap Replay to watch again. With reduced motion on, only the finished card shows. Names and times are sample data.</p>
+<div class="row">
+<div><div class="cap">Before</div><div class="ph"><div class="card"><div class="ic">📅</div><h3>Meet before you hire</h3><p style="margin:0">Pick a time, see them at your home, then decide. Both sides confirm the visit happened.</p></div></div></div>
+<div><div class="cap">After</div><div class="ph"><div class="card" id="card"><div class="ic">📅</div><h3>Meet before you hire</h3><p>Pick a time, see them at your home, then decide. Both sides confirm the visit happened.</p>
+<div class="stage"><span class="sample">Sample</span>
+<div id="s1"><div class="lbl">Pick a time</div><div class="chips"><span class="chip" id="c1">Sat 10:00 AM</span><span class="chip" id="c2">Sat 2:00 PM</span><span class="chip" id="c3">Mon 5:30 PM</span></div></div>
+<div class="v" id="v" style="position:absolute;left:12px;right:12px;top:34px"><span class="lg">P</span><div><b>Plano Pro Paint</b><span>Sat 10:00 AM · at your home</span></div><span class="cd">in 2 days</span></div>
+<div class="both" id="both" style="position:absolute;left:12px;right:12px;top:92px"><span class="ck" id="k1"><i>✓</i>You</span><span class="ck" id="k2"><i>✓</i>Contractor</span></div>
+<div class="done" id="dn" style="position:absolute;left:12px;right:12px;top:118px">Visit confirmed by both</div>
+</div>
+</div><button class="btn" id="rp" type="button">Replay</button>
+<div class="note">Matches what Jobfile does: pick a time, a confirmed visit with countdown, and both sides confirming the visit happened.</div></div></div>
+</div>
+<script>
+(function(){
+var reduce=false;try{reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches}catch(e){}
+var $=function(i){return document.getElementById(i)};
+var tm=[];function at(ms,f){tm.push(setTimeout(f,ms))}
+function reset(){tm.forEach(clearTimeout);tm=[];['c1','c2','c3'].forEach(function(i){$(i).className='chip'});$('s1').style.opacity=1;$('v').className='v';$('both').className='both';$('k1').className='ck';$('k2').className='ck';$('dn').className='done'}
+function fin(){$('s1').style.opacity=0;$('v').className='v show';$('both').className='both show';$('k1').className='ck on';$('k2').className='ck on';$('dn').className='done show'}
+function run(){
+  reset();if(reduce){fin();return}
+  at(500,function(){$('c3').className='chip on'});
+  at(900,function(){$('c3').className='chip';$('c2').className='chip on'});
+  at(1300,function(){$('c2').className='chip';$('c1').className='chip on'});
+  at(1900,function(){$('s1').style.opacity=0;$('v').className='v show'});
+  at(2700,function(){$('both').className='both show';$('k1').className='ck on'});
+  at(3400,function(){$('k2').className='ck on'});
+  at(3900,function(){$('dn').className='done show'});
+}
+$('rp').addEventListener('click',run);
+if(reduce){fin()}else if('IntersectionObserver' in window){var seen=false;var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting&&!seen){seen=true;run()}})},{threshold:.6});io.observe($('card'))}else{run()}
+})();
+</script>
