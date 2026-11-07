@@ -55,6 +55,24 @@ export default function MarketplacePost({ types, aiOn, draft, inviteCompany, inv
   const skipPhotos = useRef(false);
   const formEl = useRef<HTMLFormElement>(null);
   const mediaCard = useRef<HTMLDivElement>(null);
+  const [step, setStep] = useState(1);
+  const [stepErr, setStepErr] = useState('');
+  const STEPS = ['The job', 'Details and photos', 'Timing and bids', 'Review and post'];
+  const go = (n: number) => { setStep(n); setStepErr(''); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+  const goNext = () => {
+    if (step === 1 && !picks.length) return setStepErr('Tap at least one thing you want done.');
+    if (step === 2 && !/^\d{5}$/.test(zip)) return setStepErr('Enter your 5-digit ZIP code.');
+    if (step === 3 && !answers.when) return setStepErr('Choose when you want to start.');
+    go(step + 1);
+  };
+  const stepCls = (n: number) => `ps-step${step === n ? '' : ' ps-off'}`;
+  const nav = (n: number) => (
+    <div className="ps-nav">
+      {n > 1 ? <button type="button" className="btn ghost" onClick={() => go(n - 1)}>Back</button> : null}
+      {n < 4 ? <button type="button" className="btn" onClick={goNext}>Next</button> : null}
+    </div>
+  );
+
 
   const changed = () => setRef(null);
   const chooseType = (t: string) => { setType(t); setPicks([]); setAnswers({}); setSize(String(types[t].size)); changed(); };
@@ -108,6 +126,7 @@ export default function MarketplacePost({ types, aiOn, draft, inviteCompany, inv
 
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (step < 4) { goNext(); return; } // Enter in a field moves to the next step, it never publishes early
     const formNode = e.currentTarget; // read now: React clears currentTarget after the first await
     if (posting) return;
     if (!answers.when) { setPostErr('Choose when you want to start. It is in the questions above.'); return; }
@@ -182,6 +201,13 @@ export default function MarketplacePost({ types, aiOn, draft, inviteCompany, inv
       {picks.map((p) => <input key={p} type="hidden" name="items" value={p} />)}
       <input type="hidden" name="answers" value={JSON.stringify(answers)} />
       {ref ? <input type="hidden" name="ref_id" value={ref.id} /> : null}
+
+      <div className="ps-prog" aria-label={`Step ${step} of 4`}>
+        <div className="ps-bar">{STEPS.map((_, i) => <i key={i} className={i < step ? 'on' : ''} />)}</div>
+        <div className="ps-pl"><b>{STEPS[step - 1]}</b><span>{step} of 4</span></div>
+      </div>
+
+      <div className={stepCls(1)}>
       {idea ? (
         <div className="card" style={{ borderColor: '#ecd4a8', display: 'flex', flexDirection: 'column', gap: 10 }}>
           <input type="hidden" name="idea_id" value={idea.id} />
@@ -196,7 +222,6 @@ export default function MarketplacePost({ types, aiOn, draft, inviteCompany, inv
           <p className="muted small" style={{ margin: 0 }}>Only signed-in contractors can see photos. Check there are no people or personal items in the shot. The AI picture is not a plan and not a price.</p>
         </div>
       ) : null}
-
       <div className="card">
         <h2>What kind of job?</h2>
         <div className="chips" role="radiogroup" aria-label="Job type">
@@ -205,7 +230,6 @@ export default function MarketplacePost({ types, aiOn, draft, inviteCompany, inv
           ))}
         </div>
       </div>
-
       {(() => {
         const names = (leads ?? []).filter((c) => c.trades.includes(type)).map((c) => c.name);
         return names.length ? (
@@ -239,6 +263,14 @@ export default function MarketplacePost({ types, aiOn, draft, inviteCompany, inv
           <b>Your scope ({picks.length} selected)</b>
           <div className="small muted" style={{ whiteSpace: 'pre-line' }}>{picks.length ? picks.map((p) => `• ${p}`).join('\n') : 'Nothing picked yet.'}</div>
         </div>
+      </div>
+        {stepErr && step === 1 ? <div className="box bad" role="alert">{stepErr}</div> : null}
+        {nav(1)}
+      </div>
+
+      <div className={stepCls(2)}>
+      <div className="card">
+        <h2>Size and place</h2>
         <div className="grid2">
           <label className="fld">{types[type].sizeLabel}<input name="size" inputMode="numeric" value={size} onChange={(e) => { setSize(e.target.value); changed(); }} /></label>
           <label className="fld">ZIP code<input name="zip" inputMode="numeric" maxLength={5} value={zip} onChange={(e) => { setZip(e.target.value.replace(/\D/g, '')); changed(); }} placeholder="75074" /></label>
@@ -247,39 +279,6 @@ export default function MarketplacePost({ types, aiOn, draft, inviteCompany, inv
         <label className="fld">Anything else? (optional)
           <textarea name="details" rows={3} maxLength={1000} value={details} onChange={(e) => { setDetails(e.target.value); changed(); }} placeholder="Example: I want to start in January. Dogs at home." />
         </label>
-      </div>
-
-      <div className="card">
-        <h2>How many bids do you want? *</h2>
-        <p className="muted small" style={{ margin: 0 }}>Bidding closes once you have this many, so you are not flooded. You can allow more later.</p>
-        <div className="chips mb-chips" role="radiogroup" aria-label="How many bids do you want">
-          {([['3', '3', 'quick'], ['5', '5', 'popular'], ['10', '10', 'more choice'], ['0', 'Any', 'no limit']] as const).map(([v, label, sub]) => (
-            <label className="chip" key={v}><input type="radio" name="max_bids" value={v} checked={maxBids === v} onChange={() => setMaxBids(v)} /><span><b>{label}</b><small>{sub}</small></span></label>
-          ))}
-        </div>
-        <p className="muted small" style={{ margin: 0 }}>{maxBids === '0' ? 'You may get many bids, which takes longer to compare.' : `With ${maxBids}, you will usually get a few solid options and still have time to compare them.`}</p>
-      </div>
-
-      <div className="card">
-        <h2>When do you want to start? *</h2>
-        <p className="muted small" style={{ margin: 0 }}>Contractors see this first. Say if the date can move.</p>
-        {whenQ ? (
-          <div className="chips" role="group" aria-label={whenQ.label}>
-            {(whenQ.options ?? []).map((o) => (
-              <label className="chip" key={o}><input type="checkbox" checked={answers.when === o} onChange={() => setAnswer('when', answers.when === o ? '' : o)} /><span>{o === 'Within 2 weeks' ? 'Within 2 weeks (ASAP)' : o}</span></label>
-            ))}
-          </div>
-        ) : null}
-        {flexQ ? (
-          <>
-            <div style={{ fontWeight: 600, fontSize: 14 }}>{flexQ.label}</div>
-            <div className="chips" role="group" aria-label={flexQ.label}>
-              {(flexQ.options ?? []).map((o) => (
-                <label className="chip" key={o}><input type="checkbox" checked={answers.flex === o} onChange={() => setAnswer('flex', answers.flex === o ? '' : o)} /><span>{o}</span></label>
-              ))}
-            </div>
-          </>
-        ) : null}
       </div>
 
       {picks.length > 0 ? (
@@ -313,13 +312,49 @@ export default function MarketplacePost({ types, aiOn, draft, inviteCompany, inv
           </div>
         </>
       ) : null}
-
       <div className="card" ref={mediaCard}>
         <h2>Photos and videos <span className="muted small" style={{ fontWeight: 400 }}>(optional)</span></h2>
         <p className="muted small" style={{ margin: 0 }}>Show contractors the space. A short walk-through video often gets more accurate bids.</p>
         <MediaPicker tips={tipsFor(type)} items={media} setItems={setMedia} onProblem={setMediaErr} disabled={posting} />
         {mediaErr ? <div className="box bad">{mediaErr}</div> : null}
         <p className="muted small" style={{ margin: 0 }}>Contractors never see your street address. Before you add media, check that house numbers, mail and documents are not in the frame.</p>
+      </div>
+        {stepErr && step === 2 ? <div className="box bad" role="alert">{stepErr}</div> : null}
+        {nav(2)}
+      </div>
+
+      <div className={stepCls(3)}>
+      <div className="card">
+        <h2>When do you want to start? *</h2>
+        <p className="muted small" style={{ margin: 0 }}>Contractors see this first. Say if the date can move.</p>
+        {whenQ ? (
+          <div className="chips" role="group" aria-label={whenQ.label}>
+            {(whenQ.options ?? []).map((o) => (
+              <label className="chip" key={o}><input type="checkbox" checked={answers.when === o} onChange={() => setAnswer('when', answers.when === o ? '' : o)} /><span>{o === 'Within 2 weeks' ? 'Within 2 weeks (ASAP)' : o}</span></label>
+            ))}
+          </div>
+        ) : null}
+        {flexQ ? (
+          <>
+            <div style={{ fontWeight: 600, fontSize: 14 }}>{flexQ.label}</div>
+            <div className="chips" role="group" aria-label={flexQ.label}>
+              {(flexQ.options ?? []).map((o) => (
+                <label className="chip" key={o}><input type="checkbox" checked={answers.flex === o} onChange={() => setAnswer('flex', answers.flex === o ? '' : o)} /><span>{o}</span></label>
+              ))}
+            </div>
+          </>
+        ) : null}
+      </div>
+
+      <div className="card">
+        <h2>How many bids do you want? *</h2>
+        <p className="muted small" style={{ margin: 0 }}>Bidding closes once you have this many, so you are not flooded. You can allow more later.</p>
+        <div className="chips mb-chips" role="radiogroup" aria-label="How many bids do you want">
+          {([['3', '3', 'quick'], ['5', '5', 'popular'], ['10', '10', 'more choice'], ['0', 'Any', 'no limit']] as const).map(([v, label, sub]) => (
+            <label className="chip" key={v}><input type="radio" name="max_bids" value={v} checked={maxBids === v} onChange={() => setMaxBids(v)} /><span><b>{label}</b><small>{sub}</small></span></label>
+          ))}
+        </div>
+        <p className="muted small" style={{ margin: 0 }}>{maxBids === '0' ? 'You may get many bids, which takes longer to compare.' : `With ${maxBids}, you will usually get a few solid options and still have time to compare them.`}</p>
       </div>
 
       {aiOn && (
@@ -359,6 +394,20 @@ export default function MarketplacePost({ types, aiOn, draft, inviteCompany, inv
       )}
       {!aiOn && err ? <div className="box bad">{err}</div> : null}
 
+      <div className="card">
+        <h2>Your budget (optional)</h2>
+        <div className="grid2">
+          <label className="fld">From<input name="budget_min" inputMode="numeric" value={bmin} onChange={(e) => setBmin(e.target.value)} placeholder="$20,000" /></label>
+          <label className="fld">To<input name="budget_max" inputMode="numeric" value={bmax} onChange={(e) => setBmax(e.target.value)} placeholder="$30,000" /></label>
+        </div>
+        {check ? <div className={`box ${check.tone}`}>{check.text}</div> : null}
+        {!ref && aiOn ? <p className="muted small">Tap the AI cost reference button above and these fill in for you. You can change them.</p> : null}
+      </div>
+        {stepErr && step === 3 ? <div className="box bad" role="alert">{stepErr}</div> : null}
+        {nav(3)}
+      </div>
+
+      <div className={stepCls(4)}>
       {picks.length > 0 ? (
         <div className="card">
           <h2>Before it goes live</h2>
@@ -385,13 +434,6 @@ export default function MarketplacePost({ types, aiOn, draft, inviteCompany, inv
       ) : null}
 
       <div className="card">
-        <h2>Your budget (optional)</h2>
-        <div className="grid2">
-          <label className="fld">From<input name="budget_min" inputMode="numeric" value={bmin} onChange={(e) => setBmin(e.target.value)} placeholder="$20,000" /></label>
-          <label className="fld">To<input name="budget_max" inputMode="numeric" value={bmax} onChange={(e) => setBmax(e.target.value)} placeholder="$30,000" /></label>
-        </div>
-        {check ? <div className={`box ${check.tone}`}>{check.text}</div> : null}
-        {!ref && aiOn ? <p className="muted small">Tap the AI cost reference button above and these fill in for you. You can change them.</p> : null}
         <h2>Address and details</h2>
         <label className="fld">Street address (optional)<input name="address" maxLength={200} autoComplete="street-address" /></label>
         <p className="muted small">Contractors never see your street address. It is shared only with the contractor you hire.</p>
@@ -412,8 +454,9 @@ export default function MarketplacePost({ types, aiOn, draft, inviteCompany, inv
           </div>
         ) : null}
         {postErr ? <div className="box bad">{postErr}</div> : null}
-        <div className="row"><button className="btn" type="submit" disabled={posting}>{posting ? (listingId ? 'Uploading…' : 'Publishing…') : 'Publish project'}</button></div>
+        <div className="row"><button type="button" className="btn ghost" onClick={() => go(3)} disabled={posting}>Back</button><button className="btn" type="submit" disabled={posting}>{posting ? (listingId ? 'Uploading…' : 'Publishing…') : 'Publish project'}</button></div>
         <p className="muted small">Contractors on Jobfile can then send you bids. You choose who to hire. Your project stays open for 30 days.</p>
+      </div>
       </div>
     </form>
   );

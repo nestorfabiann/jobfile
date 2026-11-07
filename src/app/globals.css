@@ -1319,3 +1319,15 @@ html { scroll-behavior: smooth; }
 :root[data-theme="dark"] .wb-pill.ok{background:#1c2e25;color:#7fc6a0}
 
 .shp-why{position:absolute;left:8px;right:8px;bottom:8px;border:0;border-radius:10px;background:rgba(0,0,0,.65);color:#fff;font-size:12px;font-weight:600;padding:8px 10px;cursor:pointer}
+
+/* Post a project: four steps */
+.ps-step{display:flex;flex-direction:column;gap:16px}
+.ps-off{display:none}
+.ps-prog{display:flex;flex-direction:column;gap:6px}
+.ps-bar{display:flex;gap:4px}
+.ps-bar i{height:5px;flex:1;border-radius:9px;background:var(--line)}
+.ps-bar i.on{background:var(--accent)}
+.ps-pl{display:flex;justify-content:space-between;font-size:13px;color:var(--muted,#6f6356);font-weight:600}
+.ps-pl b{color:var(--ink)}
+.ps-nav{display:flex;gap:10px}
+.ps-nav .btn{flex:1}
