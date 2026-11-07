@@ -1,4 +1,5 @@
 import { loadProject } from '@/lib/project';
+import { supabaseAdmin } from '@/lib/supabase/server';
 import AutoRefresh from '@/components/AutoRefresh';
 import MessageForm from '@/components/MessageForm';
 import TranslatedBody from '@/components/TranslatedBody';
@@ -19,6 +20,8 @@ export default async function Messages({
 }) {
   const { sb, user, project, role, contractorName, homeownerName } = await loadProject(params.id);
   const otherName = role === 'contractor' ? homeownerName : contractorName;
+  // Opening the Messages tab clears this project's new-message alerts, so they leave the Needs you list.
+  try { await supabaseAdmin().from('notifications').update({ read_at: new Date().toISOString() }).eq('user_id', user.id).eq('project_id', project.id).eq('kind', 'message').is('read_at', null); } catch { /* the page still loads */ }
 
   const { data: messages } = await sb
     .from('messages')

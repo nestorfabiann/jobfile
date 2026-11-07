@@ -48,11 +48,27 @@ export async function projectTasks(userId: string, projects: P[], myCompanyIds: 
   const { data: fin } = await db.from('notifications').select('project_id,created_at,kind').eq('user_id', userId).in('kind', ['finish_request', 'finish_cancel']).in('project_id', ids).gt('created_at', new Date(Date.now() - 14 * 86400000).toISOString()).order('created_at', { ascending: false });
   // Scope lines the contractor marked done that the homeowner has not answered yet (Looks good or Question).
   const { data: scopeDone } = await db.from('project_scope_status').select('project_id,done_at').in('project_id', ids).eq('status', 'done').is('ho_reaction', null);
+  // New messages not yet opened (the alert is marked read when the Messages tab is opened).
+  const { data: unreadMsgs } = await db.from('notifications').select('project_id,created_at').eq('user_id', userId).eq('kind', 'message').is('read_at', null).in('project_id', ids);
+  // Problem reports still open, and who spoke last on each one.
+  const { data: openIssues } = await db.from('project_issues').select('id,project_id,reporter_role,respond_by,created_at').in('project_id', ids).eq('status', 'open');
+  const issueIds = ((openIssues ?? []) as any[]).map((i) => i.id as string);
+  const { data: issueEvents } = issueIds.length ? await db.from('issue_events').select('issue_id,side,created_at').in('issue_id', issueIds).order('created_at', { ascending: true }) : { data: [] as any[] };
   const out: NeedItem[] = [];
   for (const p of active) {
     const f = (fin ?? []).find((x: any) => x.project_id === p.id) as any;
     if (f && f.kind === 'finish_request') out.push({ key: `fin-${p.id}`, icon: 'done', title: 'Homeowner says the work is finished', sub: `${p.name} · Mark it complete to open ratings`, href: alertHref(p.id, 'finish_request'), go: 'Review', at: f.created_at });
     const role = roleOf(p);
+    const um = ((unreadMsgs ?? []) as any[]).filter((x) => x.project_id === p.id).sort((a, b) => String(a.created_at).localeCompare(String(b.created_at)));
+    if (um.length) out.push({ key: `msg-${p.id}`, icon: 'msg', title: um.length === 1 ? 'New message' : `${um.length} new messages`, sub: `${p.name} · ${role === 'homeowner' ? 'from your contractor' : 'from your customer'}`, href: `/projects/${p.id}`, go: 'Read', at: um[0].created_at });
+    ((openIssues ?? []) as any[]).filter((i) => i.project_id === p.id).forEach((i) => {
+      const evs = ((issueEvents ?? []) as any[]).filter((e) => e.issue_id === i.id);
+      const last = evs[evs.length - 1];
+      const lastSide = last?.side ?? i.reporter_role;
+      if (lastSide === role) return; // the other side has the next move
+      const by = i.respond_by ? new Date(i.respond_by).toLocaleDateString('en-US', { timeZone: 'America/Chicago', month: 'short', day: 'numeric' }) : '';
+      out.push({ key: `issue-${i.id}`, icon: 'done', title: evs.length > 1 ? 'Reply on a problem report' : 'Answer a problem report', sub: `${p.name}${by ? ` · please answer by ${by}` : ''}`, href: `/projects/${p.id}/issues/${i.id}`, go: 'Open', at: last?.created_at ?? i.created_at });
+    });
     const ag: any = (ags ?? []).find((a: any) => a.project_id === p.id);
     const signed = new Set((sigs ?? []).filter((s: any) => s.project_id === p.id).map((s: any) => s.role as string));
     const here = (kind: string) => alertHref(p.id, kind);
