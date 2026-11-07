@@ -1,0 +1,45 @@
+<title>AI Cost Reference Example Bar</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+:root{--bg:#f6f2ec;--fg:#2a2118;--mut:#6f6356;--ac:#c4813f;--acbg:#f9efe4;--card:#fff;--line:#e4dccf;--gr:#1f4d3a}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1b1713;--fg:#f1e9de;--mut:#a89a8a;--ac:#d99a58;--acbg:#33281c;--card:#262019;--line:#3a3128;--gr:#7fc6a0;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#1b1713;--fg:#f1e9de;--mut:#a89a8a;--ac:#d99a58;--acbg:#33281c;--card:#262019;--line:#3a3128;--gr:#7fc6a0;color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,sans-serif;padding-block:20px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));line-height:1.4}
+h1{font-size:21px;margin:0 0 6px}p.i{margin:0 0 14px;color:var(--mut);max-width:62ch}
+.row{display:flex;gap:18px;flex-wrap:wrap}
+.cap{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);margin-bottom:6px}
+.ph{width:min(100%,340px);border:1px solid var(--line);border-radius:22px;padding:14px;min-width:0;display:flex;flex-direction:column;gap:10px}
+.card{border:1px solid var(--line);background:var(--card);border-radius:18px;padding:14px}
+.card h3{margin:0 0 4px;font-size:18px}.card p{margin:0 0 10px;font-size:13px;color:var(--mut)}
+.btn{display:inline-block;border:1.5px solid var(--line);border-radius:999px;padding:11px 18px;font-weight:700;font-size:14px;background:var(--card)}
+.btn.main{background:var(--ac);border-color:var(--ac);color:#fff}
+.ex{position:relative;border:1.5px dashed var(--line);border-radius:14px;padding:12px;margin:2px 0 12px;background:var(--acbg)}
+.ex .tag{position:absolute;top:-9px;left:12px;background:var(--card);border:1px solid var(--line);border-radius:999px;font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 9px;color:var(--mut)}
+.big{font-size:22px;font-weight:800;letter-spacing:-.01em}
+.ex .big{opacity:.55}
+.bar{position:relative;height:10px;border-radius:8px;background:var(--line);margin:14px 0 6px}
+.bar i{position:absolute;top:0;bottom:0;left:18%;width:60%;border-radius:8px;background:color-mix(in srgb,var(--ac) 45%,transparent)}
+.bar b{position:absolute;top:-5px;width:4px;height:20px;border-radius:2px;background:var(--fg);left:50%}
+.ex .bar i,.ex .bar b{opacity:.55}
+.sm{font-size:12px;color:var(--mut)}
+.res .kv{display:flex;justify-content:space-between;font-size:13px;padding:6px 0;border-top:1px solid var(--line)}
+.fld{border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;font-size:14px;margin-top:6px}
+.fld.f{color:var(--fg);font-weight:600}.fld.e{color:var(--mut)}
+.ok{color:var(--gr);font-weight:700;font-size:12.5px}
+.note{font-size:12px;color:var(--mut);max-width:340px}
+@media (prefers-reduced-motion:no-preference){.ex .bar i{animation:g 1.1s ease-out both}@keyframes g{from{width:0}to{width:60%}}}
+</style>
+<h1>AI cost reference: example bar</h1>
+<p class="i">Before tapping, the box shows a faded example bar so people see what they will get. After tapping, their own range replaces it in the same spot. Example numbers are made up.</p>
+<div class="row">
+<div><div class="cap">Before</div><div class="ph"><div class="card"><h3>AI cost reference</h3><p>Get a typical local price range for the scope you picked. It is a reference only, not a quote.</p><span class="btn">✦ Get AI cost reference</span></div></div></div>
+<div><div class="cap">After: before you tap</div><div class="ph"><div class="card"><h3>AI cost reference</h3><p>Get a typical local price range for the scope you picked. It is a reference only, not a quote.</p>
+<div class="ex"><span class="tag">Example</span><div class="big">$8,000 – $14,000</div><div class="bar"><i></i><b></b></div><div class="sm">Most likely about $11,000</div><div class="sm" style="margin-top:6px">Yours is based on the work you picked and your ZIP.</div></div>
+<span class="btn main">✦ Get my AI cost reference</span></div></div><div class="note" style="margin-top:6px">Faded and dashed with an Example tag so it cannot look like a quote. The bar grows once. No motion if reduced motion is on.</div></div>
+<div><div class="cap">After: you tapped</div><div class="ph"><div class="card res"><h3>AI cost reference</h3>
+<div class="big">$19,200 – $27,800</div><div class="bar"><i></i><b style="left:46%"></b></div><div class="sm" style="color:var(--fg)">Most likely about $23,100</div>
+<div class="kv" style="margin-top:8px"><span>Walls and ceilings</span><b>$9,400–$13,600</b></div><div class="kv"><span>Kitchen cabinets</span><b>$6,800–$9,900</b></div>
+<p class="sm" style="margin:8px 0 0">A reference only, not a quote.</p></div>
+<div class="card"><h3>Your budget (optional)</h3><div class="ok">✓ Filled in from the range. You can change them.</div><div class="fld e">From</div><div class="fld f">$19,200</div><div class="fld e">To</div><div class="fld f">$27,800</div></div>
+</div><div class="note" style="margin-top:6px">The real result looks the same as the example, in full color, so it feels like the example came to life.</div></div>
+</div>
