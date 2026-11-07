@@ -1,0 +1,45 @@
+<title>Post a Project Header</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+:root{--bg:#f6f2ec;--fg:#2a2118;--mut:#6f6356;--ac:#c4813f;--acbg:#f9efe4;--card:#fff;--line:#e4dccf}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1b1713;--fg:#f1e9de;--mut:#a89a8a;--ac:#d99a58;--acbg:#33281c;--card:#262019;--line:#3a3128;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#1b1713;--fg:#f1e9de;--mut:#a89a8a;--ac:#d99a58;--acbg:#33281c;--card:#262019;--line:#3a3128;color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,sans-serif;padding-block:20px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));line-height:1.4}
+h1{font-size:21px;margin:0 0 6px}p.i{margin:0 0 14px;color:var(--mut);max-width:62ch}
+.row{display:flex;gap:18px;flex-wrap:wrap}
+.cap{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);margin-bottom:6px}
+.ph{width:min(100%,340px);border:1px solid var(--line);border-radius:22px;padding:16px;min-width:0}
+.old a{color:var(--ac);text-decoration:underline;font-size:17px}
+.old h2{font-size:34px;line-height:1.1;font-weight:800;margin:14px 0 10px;letter-spacing:-.01em}
+.old p{margin:0;color:var(--mut);font-size:17px;line-height:1.5}
+.back{display:inline-flex;align-items:center;gap:4px;padding:6px 12px 6px 8px;border:1px solid var(--line);background:var(--card);border-radius:999px;font-size:13px;font-weight:600;color:var(--fg);text-decoration:none}
+.back svg{width:14px;height:14px}
+.ttl{display:flex;gap:12px;align-items:center;margin:14px 0 6px}
+.tile{flex:none;width:44px;height:44px;border-radius:14px;background:var(--acbg);border:1px solid var(--line);display:grid;place-items:center;color:var(--ac)}
+.tile svg{width:22px;height:22px}
+.new h2{font-size:26px;line-height:1.15;font-weight:700;margin:0;letter-spacing:-.02em}
+.new p{margin:0 0 12px;color:var(--mut);font-size:14.5px;line-height:1.45}
+.steps{display:flex;gap:6px;align-items:center;font-size:12px;color:var(--mut)}
+.steps b{display:inline-flex;gap:6px;align-items:center;font-weight:600;padding:5px 10px;border-radius:999px;border:1px solid var(--line);background:var(--card)}
+.steps b.on{background:var(--acbg);border-color:var(--ac);color:var(--fg)}
+.steps i{font-style:normal;display:grid;place-items:center;width:16px;height:16px;border-radius:50%;background:var(--ac);color:#fff;font-size:10px}
+.steps b:not(.on) i{background:var(--line);color:var(--mut)}
+.note{font-size:12px;color:var(--mut);margin-top:10px;max-width:340px}
+</style>
+<h1>Post a project header: before and after</h1>
+<p class="i">Same words. The back link becomes a small pill, the title gets lighter and smaller, and a small icon tile and a 3-step hint are added. Sample only.</p>
+<div class="row">
+<div><div class="cap">Before</div><div class="ph old">
+<a href="#" onclick="return false">‹ Marketplace</a>
+<h2>Post a project</h2>
+<p>Pick what you want done, and local contractors can send you bids.</p>
+</div></div>
+<div><div class="cap">After</div><div class="ph new">
+<a class="back" href="#" onclick="return false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>Marketplace</a>
+<div class="ttl"><span class="tile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></span><h2>Post a project</h2></div>
+<p>Pick what you want done and local contractors can send you bids.</p>
+<div class="steps"><b class="on"><i>1</i>What</b><b><i>2</i>Details</b><b><i>3</i>Send</b></div>
+</div>
+<div class="note">The 3 steps are only a hint of how short the form is. They do not change how the form works.</div>
+</div>
+</div>
