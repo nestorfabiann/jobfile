@@ -20,7 +20,7 @@ const day = (d: string) => new Date(`${d.slice(0, 10)}T12:00:00`).toLocaleDateSt
 const addDays = (d: string, n: number) => {
   const x = new Date(`${d}T12:00:00`);
   x.setDate(x.getDate() + n);
-  return x.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  return `${x.getFullYear()}-${String(x.getMonth() + 1).padStart(2, '0')}-${String(x.getDate()).padStart(2, '0')}`;
 };
 
 
