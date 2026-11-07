@@ -1347,3 +1347,4 @@ html { scroll-behavior: smooth; }
 .di-card{flex:0 0 128px;display:flex;flex-direction:column;gap:2px;text-decoration:none;color:var(--ink);scroll-snap-align:start;min-width:0}
 .di-card img,.di-ph{width:128px;height:128px;object-fit:cover;border-radius:14px;display:block;background:var(--line)}
 .di-card b{font-size:14px;margin-top:6px}
+
