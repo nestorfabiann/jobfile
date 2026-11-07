@@ -183,6 +183,7 @@ export default function ContractorProjects(p: {
           <span>Homeowners near you.</span>
         </Link>
         <StartProjectForm companyId={p.companyId} companyName={p.companyName} open={!!p.error} ghost />
+        <p className="muted small startp-hint" style={{ gridColumn: '1 / -1', order: 1 }}><b>Start a project</b> is for a customer you already have. They do not need to be on Jobfile yet. They get a free invite and can follow the job with you.</p>
       </div>
 
       {first && (
