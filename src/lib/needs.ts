@@ -46,6 +46,8 @@ export async function projectTasks(userId: string, projects: P[], myCompanyIds: 
 
   // Homeowners asking a contractor to close out a job (kept for 14 days, until the job is complete).
   const { data: fin } = await db.from('notifications').select('project_id,created_at,kind').eq('user_id', userId).in('kind', ['finish_request', 'finish_cancel']).in('project_id', ids).gt('created_at', new Date(Date.now() - 14 * 86400000).toISOString()).order('created_at', { ascending: false });
+  // Scope lines the contractor marked done that the homeowner has not answered yet (Looks good or Question).
+  const { data: scopeDone } = await db.from('project_scope_status').select('project_id,done_at').in('project_id', ids).eq('status', 'done').is('ho_reaction', null);
   const out: NeedItem[] = [];
   for (const p of active) {
     const f = (fin ?? []).find((x: any) => x.project_id === p.id) as any;
@@ -89,6 +91,8 @@ export async function projectTasks(userId: string, projects: P[], myCompanyIds: 
       ((sels ?? []) as any[]).filter((x) => x.project_id === p.id && x.needed_by && x.needed_by <= soon).forEach((x) => {
         out.push({ key: `sel-${x.id}`, icon: 'choice', title: `Choose: ${x.title}`, sub: `${p.name} · needed by ${new Date(`${x.needed_by}T12:00:00`).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`, href: here('selection'), go: 'Choose', at: x.created_at });
       });
+      const fin2 = ((scopeDone ?? []) as any[]).filter((x) => x.project_id === p.id).sort((a, b) => String(a.done_at).localeCompare(String(b.done_at)));
+      if (fin2.length) out.push({ key: `scope-${p.id}`, icon: 'done', title: `Review finished work (${fin2.length} ${fin2.length === 1 ? 'item' : 'items'})`, sub: `${p.name} · Tap Looks good, or ask a question`, href: `/projects/${p.id}/overview#scope`, go: 'Review', at: fin2[0].done_at ?? new Date().toISOString() });
       const mv = ((moved ?? []) as any[]).filter((x) => x.project_id === p.id).sort((a, b) => String(a.created_at).localeCompare(String(b.created_at)))[0];
       if (mv) out.push({ key: `moved-${p.id}`, icon: 'cal', title: 'A date changed on your schedule', sub: `${p.name} · see what moved and why`, href: here('schedule'), go: 'See', at: mv.created_at });
     }
