@@ -1,5 +1,6 @@
 import TradeIcon from '@/components/TradeIcon';
 import Link from 'next/link';
+import RecentActivity, { type Alert } from '@/components/RecentActivity';
 import { requireUser } from '@/lib/session';
 import { supabaseAdmin } from '@/lib/supabase/server';
 import KitchenArt from '@/components/KitchenArt';
@@ -36,9 +37,9 @@ export default async function Projects({ searchParams }: { searchParams: { error
     sb.from('company_members').select('company_id, companies(name)').eq('user_id', user.id),
     sb
       .from('notifications')
-      .select('id,title,created_at,project_id,kind')
+      .select('id,title,created_at,project_id,kind,read_at')
       .order('created_at', { ascending: false })
-      .limit(5),
+      .limit(6),
   ]);
 
   // Invitations I sent, and invitations sent to my (confirmed) email address.
@@ -277,19 +278,7 @@ export default async function Projects({ searchParams }: { searchParams: { error
       )}
     </>
   );
-  const alertsBlock = (alerts ?? []).length > 0 ? (
-    <section className="card" aria-label="Recent alerts">
-      <h2>Recent alerts</h2>
-      <ul className="stack" style={{ listStyle: 'none', margin: 0, padding: 0 }}>
-        {(alerts ?? []).map((a) => (
-          <li key={a.id}>
-            <Link href={`/n/${a.id}`}>{a.title}</Link>
-            <span className="muted small" style={{ display: 'block' }}>{when(a.created_at)}</span>
-          </li>
-        ))}
-      </ul>
-    </section>
-  ) : null;
+  const alertsBlock = (alerts ?? []).length > 0 ? <RecentActivity alerts={(alerts ?? []) as Alert[]} /> : null;
 
   // Contractors: ongoing work first, then bids and money.
   if (mk && company) {
@@ -487,19 +476,7 @@ export default async function Projects({ searchParams }: { searchParams: { error
         </>
       )}
 
-      {(alerts ?? []).length > 0 && (
-        <section className="card" aria-label="Recent alerts">
-          <h2>Recent alerts</h2>
-          <ul className="stack" style={{ listStyle: 'none', margin: 0, padding: 0 }}>
-            {(alerts ?? []).map((a) => (
-              <li key={a.id}>
-                <Link href={`/n/${a.id}`}>{a.title}</Link>
-                <span className="muted small" style={{ display: 'block' }}>{when(a.created_at)}</span>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
+      {alertsBlock}
     </>
   );
 }

@@ -18,15 +18,11 @@ export default function HomeScreenCard() {
   if (!show) return null;
   const hide = () => { try { localStorage.setItem(KEY, '1'); } catch { /* ignore */ } setShow(false); };
   return (
-    <section className="hsc" aria-label="Get the app">
-      <div className="hsc-top">
-        <img src="/icons/icon-192.png" alt="" width={56} height={56} />
-        <div><b>Get Jobfile on your phone</b><span>Instant alerts when a contractor bids or replies. Takes 10 seconds.</span></div>
-      </div>
-      <div className="hsc-row">
-        <Link className="hsc-go" href="/app" onClick={hide}>Show me how</Link>
-        <button type="button" onClick={hide}>Not now</button>
-      </div>
+    <section aria-label="Get the app" className="card" style={{ flexDirection: 'row', alignItems: 'center', gap: 10, padding: '9px 12px' }}>
+      <img src="/icons/icon-192.png" alt="" width={26} height={26} style={{ borderRadius: 8, flex: 'none' }} />
+      <span style={{ flex: 1, minWidth: 0, fontSize: 14 }}><b>Jobfile on your phone</b></span>
+      <Link href="/app" onClick={hide} style={{ fontWeight: 700, fontSize: 13 }}>Add</Link>
+      <button type="button" onClick={hide} aria-label="Not now" style={{ background: 'none', border: 0, fontSize: 18, lineHeight: 1, color: 'var(--ink-2, #6b655e)', cursor: 'pointer', padding: '0 4px' }}>&times;</button>
     </section>
   );
 }
