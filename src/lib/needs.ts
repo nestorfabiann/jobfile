@@ -3,7 +3,7 @@ import { dollars } from '@/lib/money';
 import { alertHref } from '@/lib/alertPath';
 import { visitTodo, type Visit } from '@/lib/visits';
 import { addDays, todayChi } from '@/lib/schedule';
-import { projectsAllScopeDone } from '@/lib/scopeDone';
+import { projectsAllScopeDone, projectsReady } from '@/lib/scopeDone';
 import { finishAsked } from '@/lib/finishRequest';
 import { milestoneAmounts, totals, type ChangeOrder, type Item, type Milestone } from '@/lib/agreement';
 
@@ -56,12 +56,13 @@ export async function projectTasks(userId: string, projects: P[], myCompanyIds: 
   const { data: openIssues } = await db.from('project_issues').select('id,project_id,reporter_role,respond_by,created_at').in('project_id', ids).eq('status', 'open');
   const issueIds = ((openIssues ?? []) as any[]).map((i) => i.id as string);
   const { data: issueEvents } = issueIds.length ? await db.from('issue_events').select('issue_id,side,created_at').in('issue_id', issueIds).order('created_at', { ascending: true }) : { data: [] as any[] };
-  const scopeAll = await projectsAllScopeDone(ids);
+  const [scopeAll, readyAll] = await Promise.all([projectsAllScopeDone(ids), projectsReady(ids)]);
   const out: NeedItem[] = [];
   for (const p of active) {
     const f = (fin ?? []).find((x: any) => x.project_id === p.id) as any;
     if (f && f.kind === 'finish_request') out.push({ key: `fin-${p.id}`, icon: 'done', title: 'Homeowner says the work is finished', sub: `${p.name} · Mark it complete to open ratings`, href: alertHref(p.id, 'finish_request'), go: 'Review', at: f.created_at });
     const role = roleOf(p);
+    if (role === 'contractor' && readyAll.has(p.id) && !(f && f.kind === 'finish_request')) out.push({ key: `ready-${p.id}`, icon: 'done', title: 'Ready to complete', sub: `${p.name} · unlocks ratings`, href: `/projects/${p.id}/overview#closeout`, go: 'Complete', at: new Date().toISOString() });
     const um = ((unreadMsgs ?? []) as any[]).filter((x) => x.project_id === p.id).sort((a, b) => String(a.created_at).localeCompare(String(b.created_at)));
     if (um.length) out.push({ key: `msg-${p.id}`, icon: 'msg', title: um.length === 1 ? 'New message' : `${um.length} new messages`, sub: `${p.name} · ${role === 'homeowner' ? 'from your contractor' : 'from your customer'}`, href: `/projects/${p.id}`, go: 'Read', at: um[0].created_at });
     ((openIssues ?? []) as any[]).filter((i) => i.project_id === p.id).forEach((i) => {
@@ -112,7 +113,7 @@ export async function projectTasks(userId: string, projects: P[], myCompanyIds: 
       });
       const fin2 = ((scopeDone ?? []) as any[]).filter((x) => x.project_id === p.id).sort((a, b) => String(a.done_at).localeCompare(String(b.done_at)));
       if (fin2.length) out.push({ key: `scope-${p.id}`, icon: 'done', title: `Review finished work (${fin2.length} ${fin2.length === 1 ? 'item' : 'items'})`, sub: `${p.name} · Tap Looks good, or ask a question`, href: `/projects/${p.id}/overview#scope`, go: 'Review', at: fin2[0].done_at ?? new Date().toISOString() });
-      if (scopeAll.has(p.id) && !(await finishAsked(p.id))) out.push({ key: `closeout-${p.id}`, icon: 'done', title: 'Ready to close out?', sub: `${p.name} · everything on the list is done`, href: `/projects/${p.id}/overview#closeout`, go: 'Review', at: [...fin2].reverse()[0]?.done_at ?? new Date().toISOString() });
+      if ((scopeAll.has(p.id) || readyAll.has(p.id)) && !(await finishAsked(p.id))) out.push({ key: `closeout-${p.id}`, icon: 'done', title: 'Ready to close out?', sub: `${p.name} · ${readyAll.has(p.id) ? 'everything is done and paid, then you can rate each other' : 'everything on the list is done'}`, href: `/projects/${p.id}/overview#closeout`, go: 'Review', at: [...fin2].reverse()[0]?.done_at ?? new Date().toISOString() });
       const mv = ((moved ?? []) as any[]).filter((x) => x.project_id === p.id).sort((a, b) => String(a.created_at).localeCompare(String(b.created_at)))[0];
       if (mv) out.push({ key: `moved-${p.id}`, icon: 'cal', title: 'A date changed on your schedule', sub: `${p.name} · see what moved and why`, href: here('schedule'), go: 'See', at: mv.created_at });
     }

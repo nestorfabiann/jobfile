@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { loadProject } from '@/lib/project';
 import { supabaseAdmin } from '@/lib/supabase/server';
 import { notifyOtherSide } from '@/lib/notify';
-import { projectsAllScopeDone } from '@/lib/scopeDone';
+import { projectsAllScopeDone, nudgeIfReady } from '@/lib/scopeDone';
 
 export type ScopeResult = { ok: true } | { ok: false; error: string };
 
@@ -58,7 +58,9 @@ export async function setScopeStatus(input: { projectId: string; kind: 'item' | 
       if (input.to === 'done') {
         // The last line done means the list is finished: one alert that invites the homeowner to close out, instead of the usual line alert.
         const all = (await projectsAllScopeDone([project.id])).has(project.id);
-        if (all && !project.completed_at) {
+        if (all && !project.completed_at && (await nudgeIfReady(project.id, user.id, 'contractor'))) {
+          // Everything is done and paid: both sides already got the ready-to-complete alert.
+        } else if (all && !project.completed_at) {
           await notifyOtherSide({ projectId: project.id, senderId: user.id, senderRole: 'contractor', kind: 'closeout_ready', title: (n) => `Everything on your list is done. Ready to close out ${n}?`, body: 'Take a look at the finished work. When you are happy with it, tell your contractor the work is finished.', throttle: false });
         } else {
           await notifyOtherSide({ projectId: project.id, senderId: user.id, senderRole: 'contractor', kind: 'scope', title: (n) => `Work finished on ${n}: ${title.slice(0, 80)}`, body: 'Open the Overview tab to see the scope and what is done. You can tap Looks good or ask a question.', throttle: true });

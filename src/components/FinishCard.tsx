@@ -3,7 +3,16 @@
 import { useState } from 'react';
 import Link from 'next/link';
 
-type Check = { ok: boolean; text: string };
+type Check = { ok: boolean; text: string; href?: string; go?: string };
+
+function RateBox({ who }: { who: 'contractor' | 'homeowner' }) {
+  return (
+    <div style={{ background: 'var(--accent-soft, #f9efe4)', border: '1px solid var(--accent, #c4813f)', borderRadius: 12, padding: '9px 10px', display: 'flex', flexDirection: 'column', gap: 3 }}>
+      <b className="small" style={{ letterSpacing: '.05em', textTransform: 'uppercase', color: 'var(--accent, #c4813f)' }}>{who === 'contractor' ? 'Unlocks ratings' : 'Then you can rate each other'}</b>
+      <span className="small"><span aria-hidden="true" style={{ color: 'var(--accent, #c4813f)', letterSpacing: 2 }}>★★★★★ </span>{who === 'contractor' ? 'Your homeowner can rate your work. Ratings show on your public profile.' : 'Rate your contractor and help other homeowners choose.'} Ratings show once you both rate, or after 14 days.</span>
+    </div>
+  );
+}
 
 /** "Is the work finished?" card at the top of Overview. Contractors close the job; homeowners ask. */
 export default function FinishCard(props: {
@@ -19,6 +28,8 @@ export default function FinishCard(props: {
   cancelFinish?: (fd: FormData) => void | Promise<void>;
   /** Every scope line and approved change order is marked done. */
   allDone?: boolean;
+  /** Scope done, every payment confirmed and nothing open on the punch list. */
+  ready?: boolean;
   /** The last payment has been requested and is waiting on the homeowner. */
   lastPayRequested?: boolean;
   messagesHref?: string;
@@ -43,7 +54,7 @@ export default function FinishCard(props: {
     const nudge = !!props.allDone && !asked;
     return (
       <section className="card" aria-label={nudge ? 'Everything on the list is done' : 'Is the work finished?'} style={{ background: 'var(--accent-soft, #f9efe4)' }}>
-        <h2>{nudge ? 'Everything on the list is done' : 'Is the work finished?'}</h2>
+        <h2>{nudge ? (props.ready ? 'Everything is done and paid' : 'Everything on the list is done') : 'Is the work finished?'}</h2>
         <p className="muted">
           {nudge
             ? `All scope lines and approved change orders are done. When you are happy with the work, tell ${otherName} it is finished. They confirm and close the job, then you both rate each other.`
@@ -59,6 +70,7 @@ export default function FinishCard(props: {
             ))}
           </div>
         ) : null}
+        {!asked ? <RateBox who="homeowner" /> : null}
         {asked ? (
           <>
             <div className="box ok">Sent. We asked {otherName} to mark the project complete. You will get an alert when they do.</div>
@@ -95,9 +107,12 @@ export default function FinishCard(props: {
     return (
       <section className="card" aria-label="Mark complete">
         <h2>Mark this project complete?</h2>
-        <p className="muted">This is what happens next:</p>
+        <div style={{ background: 'var(--accent-soft, #f9efe4)', borderRadius: 12, padding: '9px 10px', display: 'flex', flexDirection: 'column', gap: 3 }}>
+          <b className="small" style={{ letterSpacing: '.05em', textTransform: 'uppercase', color: 'var(--accent, #c4813f)' }}>What you get</b>
+          <span className="small">{otherName} is asked to rate your work. Ratings appear on your public profile.</span>
+        </div>
+        <p className="muted" style={{ margin: 0 }}>This is what happens next:</p>
         <ol style={{ margin: 0, paddingLeft: 20, display: 'flex', flexDirection: 'column', gap: 6 }}>
-          <li>{otherName} gets an alert to rate your work.</li>
           <li>You rate {otherName}. Ratings show only after you both rate, or after 14 days.</li>
           <li>The project moves to Completed. You can move it back to active if something comes up.</li>
         </ol>
@@ -108,15 +123,15 @@ export default function FinishCard(props: {
   }
 
   return (
-    <section className="card" aria-label="Is the work finished?" style={{ background: 'var(--accent-soft, #f9efe4)' }}>
-      <h2>Is the work finished?</h2>
+    <section className="card" aria-label="Is the work finished?" style={{ background: props.ready ? 'var(--ok-bg, #e9f1ec)' : 'var(--accent-soft, #f9efe4)' }}>
+      <h2>{props.ready ? 'Everything is done and paid' : props.allDone ? 'Almost ready to complete' : 'Is the work finished?'}</h2>
       {checks.map((c) => (
         <div key={c.text} className="row" style={{ alignItems: 'flex-start', flexWrap: 'nowrap', gap: 10 }}>
           <span aria-hidden="true" style={{ flex: 'none', width: 22, height: 22, borderRadius: '50%', display: 'grid', placeItems: 'center', fontSize: 13, background: c.ok ? 'var(--ok-bg)' : 'var(--line)', color: c.ok ? 'var(--ok)' : 'var(--ink-2)' }}>{c.ok ? '✓' : '•'}</span>
-          <span>{c.text}</span>
+          <span>{c.text}{!c.ok && c.href ? <> <Link href={c.href} className="small" style={{ fontWeight: 700 }}>{c.go ?? 'Open'} ›</Link></> : null}</span>
         </div>
       ))}
-      <p className="muted small" style={{ margin: 0 }}>Marking it complete opens ratings for you and the homeowner.</p>
+      <RateBox who="contractor" />
       {ready || closeoutStarted ? (
         <button type="button" className="btn" onClick={() => setConfirm(true)}>Mark project complete</button>
       ) : (

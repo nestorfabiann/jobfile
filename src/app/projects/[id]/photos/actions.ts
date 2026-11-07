@@ -1,5 +1,6 @@
 'use server';
 
+import { nudgeIfReady } from '@/lib/scopeDone';
 import { randomUUID } from 'node:crypto';
 import { revalidatePath } from 'next/cache';
 import { loadProject } from '@/lib/project';
@@ -109,6 +110,7 @@ export async function setFixStatus(formData: FormData) {
           ? `${label} was confirmed as fixed.`
           : `${label} still needs work.`,
   });
+  if (next === 'confirmed') await nudgeIfReady(project.id, user.id, role);
   revalidatePath(`/projects/${project.id}/photos`);
   revalidatePath(`/projects/${project.id}/overview`);
 }

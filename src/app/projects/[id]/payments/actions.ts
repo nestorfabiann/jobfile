@@ -1,5 +1,6 @@
 'use server';
 
+import { nudgeIfReady } from '@/lib/scopeDone';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 import { loadProject } from '@/lib/project';
@@ -117,6 +118,7 @@ export async function confirmReceived(formData: FormData) {
     title: (n) => `Payment received on ${n}: ${dollars(amount)}`,
     body: `${m.label} was confirmed received.${lien ? ' A lien waiver was provided.' : ''}`,
   });
+  await nudgeIfReady(project.id, user.id, role);
   done(project.id);
 }
 
