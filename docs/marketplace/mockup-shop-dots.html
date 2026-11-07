@@ -1,0 +1,51 @@
+<title>Shop This Look Dots</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+:root{--bg:#f6f2ec;--fg:#2a2118;--mut:#6f6356;--ac:#c4813f;--card:#fff;--line:#e4dccf}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1b1713;--fg:#f1e9de;--mut:#a89a8a;--ac:#d99a58;--card:#262019;--line:#3a3128;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#1b1713;--fg:#f1e9de;--mut:#a89a8a;--ac:#d99a58;--card:#262019;--line:#3a3128;color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,sans-serif;padding-block:20px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));line-height:1.4}
+h1{font-size:21px;margin:0 0 6px}p.i{margin:0 0 14px;color:var(--mut);max-width:64ch}
+.row{display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start}
+.cap{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);margin-bottom:6px}
+.ph{width:min(100%,350px);border:1px solid var(--line);border-radius:22px;padding:12px;min-width:0;display:flex;flex-direction:column;gap:10px}
+.pic{position:relative;border-radius:18px;overflow:hidden;aspect-ratio:4/5;background:#cdbfa8}
+.pic svg{position:absolute;inset:0;width:100%;height:100%}
+.dot{position:absolute;width:26px;height:26px;margin:-13px 0 0 -13px;border-radius:50%;background:rgba(255,255,255,.92);border:2px solid var(--ac);display:grid;place-items:center;font-size:12px;font-weight:800;color:var(--ac);box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.dot::after{content:"";position:absolute;inset:-7px;border-radius:50%;border:2px solid var(--ac);opacity:.5;animation:pu 1.8s ease-out infinite}
+@keyframes pu{from{transform:scale(.7);opacity:.6}to{transform:scale(1.4);opacity:0}}
+@media (prefers-reduced-motion:reduce){.dot::after{animation:none}}
+.tip{position:absolute;background:var(--card);color:var(--fg);border-radius:12px;padding:8px 10px;font-size:12.5px;font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,.28);display:flex;flex-direction:column;gap:2px;min-width:130px}
+.tip span{color:var(--ac);font-size:12px}
+.tag{position:absolute;left:10px;bottom:10px;background:rgba(0,0,0,.6);color:#fff;border-radius:99px;padding:5px 11px;font-size:12px;font-weight:700}
+.strip{background:var(--card);border:1.5px solid var(--line);border-radius:18px;padding:12px;display:flex;flex-direction:column;gap:10px}
+.strip .t{display:flex;justify-content:space-between;align-items:center;gap:8px}.strip b{font-size:15px}.strip small{color:var(--mut);font-size:12px}
+.sw{display:flex;gap:8px;flex-wrap:wrap}
+.sc{display:flex;align-items:center;gap:7px;border:1.5px solid var(--line);border-radius:99px;padding:5px 11px 5px 5px;font-size:12.5px;font-weight:700}
+.sc i{width:22px;height:22px;border-radius:50%;display:block;border:1px solid rgba(0,0,0,.15)}
+.go{background:var(--ac);color:#fff;border-radius:14px;padding:11px;text-align:center;font-weight:700;font-size:14px}
+.btn{background:var(--ac);color:#fff;border-radius:999px;padding:13px;text-align:center;font-weight:700}
+.note{font-size:12px;color:var(--mut);max-width:350px;margin-top:8px}
+</style>
+<h1>Pointing people to Shop this look</h1>
+<p class="i">Illustration of a bathroom idea, not a real picture. The strip works on every idea. The dots show only when the app can place them on the right object.</p>
+<div class="row">
+<div><div class="cap">A. Strip under the photo (always)</div><div class="ph">
+<div class="pic"><svg viewBox="0 0 400 500" preserveAspectRatio="xMidYMid slice"><rect width="400" height="500" fill="#cbbfa9"/><rect x="250" y="40" width="110" height="200" rx="14" fill="#e6e1d6" stroke="#b79b54" stroke-width="7"/><rect x="60" y="280" width="270" height="40" rx="8" fill="#f4f1ea"/><rect x="75" y="320" width="240" height="130" fill="#26324a"/><rect x="85" y="335" width="105" height="105" fill="#2d3b57"/><rect x="200" y="335" width="105" height="105" fill="#2d3b57"/><path d="M0 450 L400 450 L400 500 L0 500Z" fill="#9c8767"/><path d="M200 255 q0 -30 30 -30 v20" stroke="#b79b54" stroke-width="9" fill="none"/></svg><span class="tag">Idea 1 · Modern</span></div>
+<div class="strip"><div class="t"><b>Shop this look</b><small>3 items</small></div>
+<div class="sw"><span class="sc"><i style="background:#c4a574"></i>Floor</span><span class="sc"><i style="background:#2a3647"></i>Vanity</span><span class="sc"><i style="background:#b09b50"></i>Fixtures</span></div>
+<div class="go">Find these items ↓</div></div>
+<div class="btn">Start a project with this one →</div></div>
+<div class="note">Tapping the button or a swatch scrolls to that item in the shop section below.</div></div>
+
+<div><div class="cap">B. Dots on the picture</div><div class="ph">
+<div class="pic"><svg viewBox="0 0 400 500" preserveAspectRatio="xMidYMid slice"><rect width="400" height="500" fill="#cbbfa9"/><rect x="250" y="40" width="110" height="200" rx="14" fill="#e6e1d6" stroke="#b79b54" stroke-width="7"/><rect x="60" y="280" width="270" height="40" rx="8" fill="#f4f1ea"/><rect x="75" y="320" width="240" height="130" fill="#26324a"/><rect x="85" y="335" width="105" height="105" fill="#2d3b57"/><rect x="200" y="335" width="105" height="105" fill="#2d3b57"/><path d="M0 450 L400 450 L400 500 L0 500Z" fill="#9c8767"/><path d="M200 255 q0 -30 30 -30 v20" stroke="#b79b54" stroke-width="9" fill="none"/></svg>
+<span class="dot" style="left:55%;top:50%">1</span><span class="dot" style="left:40%;top:78%">2</span><span class="dot" style="left:50%;top:93%">3</span>
+<span class="tip" style="left:14%;top:30%"><b>Brass faucet</b><span>Find this item ›</span></span>
+<span class="tag">Tap a dot</span></div>
+<div class="btn">Start a project with this one →</div></div>
+<div class="note">Dots pulse softly, and stop with reduced motion. Tapping one opens a label, and "Find this item" jumps to that item's stores.</div></div>
+
+<div><div class="cap">Both together</div><div class="ph"><div class="strip"><div class="t"><b>Shop this look</b><small>Tap a dot or a swatch</small></div><div class="sw"><span class="sc"><i style="background:#b09b50"></i>1 Fixtures</span><span class="sc"><i style="background:#2a3647"></i>2 Vanity</span><span class="sc"><i style="background:#c4a574"></i>3 Floor</span></div></div></div>
+<div class="note">The numbers match the dots. If the app is unsure where an item is, that item shows in the strip without a dot, so a dot never points at the wrong thing.</div></div>
+</div>
