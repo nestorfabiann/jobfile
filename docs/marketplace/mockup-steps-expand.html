@@ -1,0 +1,66 @@
+<title>Steps With Preview Inside</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+:root{--bg:#f6f2ec;--fg:#2a2118;--mut:#6f6356;--ac:#c4813f;--acbg:#f9efe4;--card:#fff;--line:#e4dccf;--gr:#1f4d3a;--grbg:#dff1e7;--mint:#8fd4b4}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1b1713;--fg:#f1e9de;--mut:#a89a8a;--ac:#d99a58;--acbg:#33281c;--card:#262019;--line:#3a3128;--gr:#7fc6a0;--grbg:#1f3a2c;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#1b1713;--fg:#f1e9de;--mut:#a89a8a;--ac:#d99a58;--acbg:#33281c;--card:#262019;--line:#3a3128;--gr:#7fc6a0;--grbg:#1f3a2c;color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,sans-serif;padding-block:20px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));line-height:1.4}
+h1{font-size:21px;margin:0 0 6px}p.i{margin:0 0 14px;color:var(--mut);max-width:62ch}
+.row{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start}
+.cap{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);margin-bottom:6px}
+.ph{width:min(100%,340px);border:1px solid var(--line);border-radius:22px;padding:14px;min-width:0;display:flex;flex-direction:column;gap:10px}
+h2{margin:0 0 2px;font-size:24px;letter-spacing:-.02em}
+.st{position:relative;overflow:hidden;text-align:left;width:100%;font:inherit;color:inherit;background:var(--card);border:1.5px solid var(--line);border-radius:20px;padding:14px;cursor:pointer;display:block}
+.st.on{border-color:var(--ac);background:var(--acbg)}
+.top{display:flex;gap:12px;align-items:flex-start}
+.n{flex:none;width:34px;height:34px;border-radius:50%;background:var(--line);display:grid;place-items:center;font-weight:800;color:var(--mut)}
+.on .n{background:var(--ac);color:#fff}
+.top b{display:block;font-size:17px}.top span.d{display:block;font-size:14px;color:var(--mut)}
+.body{max-height:0;opacity:0;overflow:hidden;transition:max-height .45s ease,opacity .35s ease,margin .45s}
+.on .body{max-height:260px;opacity:1;margin-top:12px}
+.mini{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px 10px;font-size:12.5px;margin-top:6px}
+.mini b{font-size:13px}.mini .m{color:var(--mut);font-size:11.5px}
+.hd{display:flex;justify-content:space-between;align-items:center;font-weight:800;font-size:13.5px}
+.pill{font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--grbg);color:var(--gr)}.pill.o{background:var(--acbg);color:var(--ac);border:1px solid var(--line)}
+.chips{display:flex;gap:5px;margin-top:5px;flex-wrap:wrap}.chips span{font-size:11.5px;font-weight:600;padding:4px 9px;border-radius:999px;border:1px solid var(--line)}.chips span.s{background:var(--ac);color:#fff;border-color:var(--ac)}
+.go{background:var(--ac);color:#fff;text-align:center;font-weight:700;border-radius:10px;padding:8px;margin-top:6px;font-size:13px}
+.price{font-size:17px;font-weight:800}
+.bar{position:relative;height:7px;border-radius:5px;background:var(--line);margin:7px 0 4px}.bar i{position:absolute;left:18%;width:56%;top:0;bottom:0;border-radius:5px;background:var(--mint)}.bar u{position:absolute;left:46%;top:-4px;width:4px;height:15px;background:var(--fg);border-radius:2px}
+.ms{display:flex;justify-content:space-between;align-items:center;padding:4px 0}
+.prog{position:absolute;left:0;bottom:0;height:3px;background:var(--ac);width:0}
+.on .prog.run{animation:p 4s linear forwards}@keyframes p{to{width:100%}}
+.sm{position:absolute;top:10px;right:12px;font-size:9.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--mut)}
+.note{font-size:12px;color:var(--mut);max-width:340px;margin-top:8px}
+.hero{background:var(--card);border:1px solid var(--line);border-radius:30px;padding:12px;width:62%;margin:0 auto;border:5px solid #1b1a18}
+@media (prefers-reduced-motion:reduce){.body{transition:none}.on .prog.run{animation:none}}
+</style>
+<h1>How it works: preview inside the step</h1>
+<p class="i">The active step opens and shows its app screen right under the text. Steps advance by themselves every 4 seconds. Tap a step to jump to it and stop the autoplay. Sample data only.</p>
+<div class="row">
+<div><div class="cap">Before</div><div class="ph">
+<div style="font-size:12px;color:var(--mut)">Big phone is far above the steps. When step 3 is active the phone has already scrolled out of view.</div>
+<h2>How it works in 3 steps</h2>
+<div class="st"><div class="top"><span class="n">1</span><div><b>Post it</b><span class="d">Pick the work, add photos and a budget. Takes a few minutes.</span></div></div></div>
+<div class="st"><div class="top"><span class="n">2</span><div><b>Compare bids</b><span class="d">See price, insurance and ratings side by side.</span></div></div></div>
+<div class="st on"><div class="top"><span class="n">3</span><div><b>Run the job</b><span class="d">Schedule, changes and payments in one place.</span></div></div></div>
+</div></div>
+<div><div class="cap">After (live, tap the steps)</div><div class="ph" id="box">
+<h2>How it works in 3 steps</h2>
+<button class="st on" type="button" data-i="0"><div class="top"><span class="n">1</span><div><b>Post it</b><span class="d">Pick the work, add photos and a budget. Takes a few minutes.</span></div></div>
+<div class="body"><span class="sm">Sample</span><div class="hd">New project <span class="pill o">Draft</span></div><div class="mini"><b>What work?</b><div class="chips"><span class="s">Walls</span><span class="s">Trim and doors</span><span>Ceiling</span></div></div><div class="mini"><b>Budget</b> <span class="m">$6,000 to $6,500</span></div><div class="go">Publish project</div></div><i class="prog run"></i></button>
+<button class="st" type="button" data-i="1"><div class="top"><span class="n">2</span><div><b>Compare bids</b><span class="d">See price, insurance and ratings side by side.</span></div></div>
+<div class="body"><span class="sm">Sample</span><div class="hd">3 bids <span class="pill">Compare</span></div><div class="mini"><b>Nesty's Painting</b> <span class="pill">✓ Verified</span><div class="price">$5,008</div><div class="bar"><i></i><u></u></div><span class="m">Typical range · insured to Mar 2027</span></div><div class="mini"><b>Plano Pro Paint</b> <span class="price" style="font-size:14px;float:right">$6,200</span><div class="m">★ 4.8 · 12 reviews</div></div></div><i class="prog"></i></button>
+<button class="st" type="button" data-i="2"><div class="top"><span class="n">3</span><div><b>Run the job</b><span class="d">Schedule, changes and payments in one place.</span></div></div>
+<div class="body"><span class="sm">Sample</span><div class="hd">Needs you <span class="pill o">2</span></div><div class="mini"><b>Pick a time for the site visit</b><div class="m">Thu, Nov 13 · 10:00 am</div></div><div class="mini"><b>Payments</b><div class="ms"><span>Deposit</span><span class="pill">Paid</span></div><div class="ms"><span>Midpoint</span><span class="pill o">Requested</span></div></div></div><i class="prog"></i></button>
+</div><div class="note">The picture is always right under the step you are reading. Others stay as a title and one line.</div></div>
+</div>
+<script>
+(function(){
+var reduce=false;try{reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches}catch(e){}
+var btns=[].slice.call(document.querySelectorAll('#box .st')),cur=0,t=null,stopped=false;
+function show(i){cur=i;btns.forEach(function(b,k){b.classList.toggle('on',k===i);var p=b.querySelector('.prog');p.className='prog';if(k===i&&!stopped&&!reduce){void p.offsetWidth;p.className='prog run'}})}
+function next(){if(stopped)return;show((cur+1)%3);t=setTimeout(next,4000)}
+btns.forEach(function(b){b.addEventListener('click',function(){stopped=true;clearTimeout(t);show(+b.dataset.i)})});
+show(0);if(!reduce)t=setTimeout(next,4000);
+})();
+</script>
