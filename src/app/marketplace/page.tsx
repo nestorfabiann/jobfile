@@ -8,6 +8,7 @@ import { DEFAULT_RADIUS, miles, zipCoords } from '@/lib/matching';
 import { listingThumbs } from '@/lib/publicMarketplace';
 import { detailPercent } from '@/lib/scopeQuestions';
 import { firstNameInitial, JOB_TYPES, listingOpen, listingTitle, requireMarketplace, type Listing } from '@/lib/marketplace';
+import { timingTags } from '@/lib/startTiming';
 
 export const dynamic = 'force-dynamic';
 
@@ -276,6 +277,7 @@ export default async function Marketplace({ searchParams }: { searchParams: { ty
             )}
             <h3>{listingTitle(l)}</h3>
             <p className="muted small">{[l.city, `ZIP ${l.zip}`, away.has(l.id) ? `${Math.round(away.get(l.id) as number)} mi away` : '', l.size_sqft ? `${l.size_sqft.toLocaleString('en-US')} sq ft` : ''].filter(Boolean).join(' · ')}</p>
+            {timingTags((l as any).answers).length ? <div className="tm-tags">{timingTags((l as any).answers).map((t) => <span key={t.text} className={`tm-pill${t.urgent ? ' u' : ''}`}>{t.text}</span>)}</div> : null}
             <div className="row" style={{ justifyContent: 'space-between' }}>
               <b>{budget(l) || 'Budget not shared'}</b>
               <span className="muted small">

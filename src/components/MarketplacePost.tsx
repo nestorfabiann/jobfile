@@ -161,6 +161,9 @@ export default function MarketplacePost({ types, aiOn, draft, inviteCompany, inv
   }
 
   const qs = questionsFor(type);
+  const detailQs = qs.filter((q) => q.k !== 'when' && q.k !== 'flex');
+  const whenQ = qs.find((q) => q.k === 'when');
+  const flexQ = qs.find((q) => q.k === 'flex');
   const rd = readiness(type, answers, media.length, picks.length, size);
 
   return (
@@ -245,6 +248,28 @@ export default function MarketplacePost({ types, aiOn, draft, inviteCompany, inv
         </label>
       </div>
 
+      <div className="card">
+        <h2>When do you want to start? *</h2>
+        <p className="muted small" style={{ margin: 0 }}>Contractors see this first. Say if the date can move.</p>
+        {whenQ ? (
+          <div className="chips" role="group" aria-label={whenQ.label}>
+            {(whenQ.options ?? []).map((o) => (
+              <label className="chip" key={o}><input type="checkbox" checked={answers.when === o} onChange={() => setAnswer('when', answers.when === o ? '' : o)} /><span>{o === 'Within 2 weeks' ? 'Within 2 weeks (ASAP)' : o}</span></label>
+            ))}
+          </div>
+        ) : null}
+        {flexQ ? (
+          <>
+            <div style={{ fontWeight: 600, fontSize: 14 }}>{flexQ.label}</div>
+            <div className="chips" role="group" aria-label={flexQ.label}>
+              {(flexQ.options ?? []).map((o) => (
+                <label className="chip" key={o}><input type="checkbox" checked={answers.flex === o} onChange={() => setAnswer('flex', answers.flex === o ? '' : o)} /><span>{o}</span></label>
+              ))}
+            </div>
+          </>
+        ) : null}
+      </div>
+
       {picks.length > 0 ? (
         <>
           <div className="card" style={{ position: 'sticky', top: 0, zIndex: 5, gap: 6, padding: '10px 14px' }} aria-live="polite">
@@ -255,9 +280,9 @@ export default function MarketplacePost({ types, aiOn, draft, inviteCompany, inv
           <div className="card">
             <h2>{type}: the details</h2>
             <p className="muted small" style={{ margin: 0 }}>The questions a contractor would ask on a site visit. Pick &quot;Not sure&quot; when you do not know. Nobody gets stuck.</p>
-            {qs.map((q, i) => (
+            {detailQs.map((q, i) => (
               <div key={q.k} className="stack" style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                {i === 0 || qs[i - 1].group !== q.group ? <div className="small muted" style={{ textTransform: 'uppercase', letterSpacing: '.06em', fontWeight: 700, marginTop: i ? 8 : 0 }}>{q.group}</div> : null}
+                {i === 0 || detailQs[i - 1].group !== q.group ? <div className="small muted" style={{ textTransform: 'uppercase', letterSpacing: '.06em', fontWeight: 700, marginTop: i ? 8 : 0 }}>{q.group}</div> : null}
                 {q.kind === 'number' ? (
                   <label className="fld">{q.label}{q.req ? ' *' : ''}<input inputMode="numeric" maxLength={7} value={answers[q.k] ?? ''} onChange={(e) => setAnswer(q.k, e.target.value.replace(/\D/g, ''))} placeholder={q.placeholder} /></label>
                 ) : (

@@ -27,6 +27,7 @@ import { acceptBid, acceptTeamBoth, closeListing, deleteListingPhoto, deleteList
 import VisitCard, { NewVisit, VisitPrefEditor } from '@/components/VisitCard';
 import type { Visit } from '@/lib/visits';
 import { countMatchingContractors, DEFAULT_RADIUS } from '@/lib/matching';
+import { timingTags, startFit } from '@/lib/startTiming';
 
 export const dynamic = 'force-dynamic';
 const when = (iso: string) => new Date(iso).toLocaleDateString('en-US', { timeZone: 'America/Chicago', month: 'short', day: 'numeric', year: 'numeric' });
@@ -237,6 +238,7 @@ export default async function ListingPage({ params, searchParams }: { params: { 
           <span className="pill"><TradeIcon trade={l.job_type} size={15} />{l.job_type}</span>
           <span className={`pill ${open ? 'ok' : ''}`}>{l.status === 'awarded' ? 'Hired' : open ? 'Open for bids' : 'Closed'}</span>
           {l.is_homestead && <span className="pill warn">Homestead</span>}
+          {timingTags(l.answers).map((t) => <span key={t.text} className={`tm-pill${t.urgent ? ' u' : ''}`}>{t.text}</span>)}
         </div>
         <p className="muted small">{[l.city, `ZIP ${l.zip}`, l.size_sqft ? `${l.size_sqft.toLocaleString('en-US')} sq ft` : '', `Posted ${when(l.created_at)}`, owner ? '' : `by ${firstNameInitial(l.homeowner_name)}`].filter(Boolean).join(' · ')}</p>
       </div>
@@ -497,7 +499,7 @@ export default async function ListingPage({ params, searchParams }: { params: { 
                     </div>
                   );
                 })() : null}
-                <p className="muted small">{[b.weeks ? `${b.weeks} week${b.weeks > 1 ? 's' : ''}` : '', b.start_date ? `starts ${fmtDate(b.start_date)}` : ''].filter(Boolean).join(' · ') || 'Timeline not given'}</p>
+                <p className="muted small">{[b.weeks ? `${b.weeks} week${b.weeks > 1 ? 's' : ''}` : '', b.start_date ? `starts ${fmtDate(b.start_date)}` : ''].filter(Boolean).join(' · ') || 'Timeline not given'}{(() => { const f = startFit(l.answers, l.created_at, b.start_date); return f === 'fits' ? <span className="tm-fit ok"> · fits when you want to start</span> : f === 'later' ? <span className="tm-fit late"> · later than you asked</span> : null; })()}</p>
                 {hasAI && !sep && <RangeBar price={b.price_cents} lo={l.ai_low_cents as number} hi={l.ai_high_cents as number} />}
                 {low && <div className="box warn">This bid is well below the local range. Ask what is not included before you accept.</div>}
                 {high && <div className="box warn">This bid is well above the local range. Ask what makes it higher.</div>}

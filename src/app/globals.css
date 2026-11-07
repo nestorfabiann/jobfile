@@ -1024,3 +1024,11 @@ html { scroll-behavior: smooth; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme='light']) .idea-card { background: #33281c; } :root:not([data-theme='light']) .idea-tile { background: #272340; color: #a99af0; } }
 :root[data-theme='dark'] .idea-card { background: #33281c; } :root[data-theme='dark'] .idea-tile { background: #272340; color: #a99af0; }
 
+
+/* Start timing tags and bid fit */
+.tm-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+.tm-pill { display: inline-flex; align-items: center; font-size: 11.5px; font-weight: 700; padding: 4px 10px; border-radius: 999px; background: #f9efe4; border: 1px solid var(--line); color: var(--ink); }
+.tm-pill.u { background: #fbe9e4; color: #b3402a; border-color: transparent; }
+.tm-fit { font-weight: 700; } .tm-fit.ok { color: #1f6b46; } .tm-fit.late { color: #b3402a; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme='light']) .tm-pill { background: #33281c; } :root:not([data-theme='light']) .tm-pill.u { background: #3b2420; color: #f0a08c; } :root:not([data-theme='light']) .tm-fit.ok { color: #7fc6a0; } :root:not([data-theme='light']) .tm-fit.late { color: #f0a08c; } }
+:root[data-theme='dark'] .tm-pill { background: #33281c; } :root[data-theme='dark'] .tm-pill.u { background: #3b2420; color: #f0a08c; } :root[data-theme='dark'] .tm-fit.ok { color: #7fc6a0; } :root[data-theme='dark'] .tm-fit.late { color: #f0a08c; }
