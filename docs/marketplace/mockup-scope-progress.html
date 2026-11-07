@@ -1,0 +1,55 @@
+<title>Scope Progress Mockup</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+:root{--bg:#f6f2ec;--fg:#2a2118;--mut:#6f6356;--ac:#c4813f;--card:#fff;--line:#e4dccf;--gr:#1f6b45;--grbg:#dcf0e3;--wn:#9a7208;--wnbg:#fbefc9;--bl:#2d6aa8;--blbg:#e1ecf8}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1b1713;--fg:#f1e9de;--mut:#a89a8a;--ac:#d99a58;--card:#262019;--line:#3a3128;--gr:#7fc6a0;--grbg:#1c2e25;--wn:#e6c04f;--wnbg:#3a3016;--bl:#7fb2e6;--blbg:#1d2c3d;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#1b1713;--fg:#f1e9de;--mut:#a89a8a;--ac:#d99a58;--card:#262019;--line:#3a3128;--gr:#7fc6a0;--grbg:#1c2e25;--wn:#e6c04f;--wnbg:#3a3016;--bl:#7fb2e6;--blbg:#1d2c3d;color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,sans-serif;padding-block:20px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));line-height:1.4}
+h1{font-size:21px;margin:0 0 6px}p.i{margin:0 0 14px;color:var(--mut);max-width:64ch}
+.row{display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start}
+.cap{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);margin-bottom:6px}
+.ph{width:min(100%,350px);border:1px solid var(--line);border-radius:22px;padding:12px;min-width:0;display:flex;flex-direction:column;gap:10px}
+.fake{height:46px;border-radius:14px;background:var(--card);border:1px solid var(--line);display:grid;place-items:center;font-size:12px;color:var(--mut)}
+.card{background:var(--card);border:1.5px solid var(--line);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.hd{display:flex;justify-content:space-between;align-items:center;gap:8px}.hd h3{margin:0;font-size:17px}.hd b{font-size:13px;color:var(--gr)}
+.bar{height:9px;border-radius:6px;background:var(--line);overflow:hidden}.bar i{display:block;height:100%;width:43%;background:var(--gr);border-radius:6px}
+.ln{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-top:1px solid var(--line)}
+.ck{flex:none;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-size:14px;font-weight:800;border:2px solid var(--line);color:transparent}
+.ck.d{background:var(--gr);border-color:var(--gr);color:#fff}.ck.p{border-color:var(--ac);background:linear-gradient(90deg,var(--ac) 50%,transparent 50%)}
+.tx{flex:1;min-width:0}.tx b{font-size:14.5px;display:block}.tx small{color:var(--mut);font-size:12px}
+.st{font-size:11px;font-weight:700;border-radius:99px;padding:2px 9px;white-space:nowrap}
+.st.d{background:var(--grbg);color:var(--gr)}.st.p{background:var(--wnbg);color:var(--wn)}.st.n{background:var(--line);color:var(--mut)}.st.c{background:var(--blbg);color:var(--bl)}
+.th{width:44px;height:44px;border-radius:10px;background:repeating-linear-gradient(45deg,#d9c9ae,#d9c9ae 6px,#cdbb9d 6px,#cdbb9d 12px);flex:none}
+.act{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+.b{border:1.5px solid var(--line);border-radius:12px;padding:7px 12px;font-size:12.5px;font-weight:700;background:var(--card)}
+.b.pr{background:var(--ac);border-color:var(--ac);color:#fff}
+.q{background:var(--blbg);color:var(--bl);border-radius:10px;padding:8px 10px;font-size:12px;margin-top:6px}
+.note{font-size:12px;color:var(--mut);max-width:350px;margin-top:8px}
+</style>
+<h1>Scope of work on Overview</h1>
+<p class="i">Sits under the price and dates box. Each line comes from the signed agreement. Example lines and numbers.</p>
+<div class="row">
+<div><div class="cap">Contractor view</div><div class="ph"><div class="fake">Price and dates box</div>
+<div class="card"><div class="hd"><h3>Scope of work</h3><b>3 of 7 done</b></div><div class="bar"><i></i></div>
+<div class="ln"><span class="ck d">✓</span><div class="tx"><b>Prep and mask kitchen</b><small>Done Nov 8</small></div><span class="th"></span></div>
+<div class="ln"><span class="ck d">✓</span><div class="tx"><b>Repair drywall</b><small>Done Nov 9</small></div><span class="th"></span></div>
+<div class="ln"><span class="ck d">✓</span><div class="tx"><b>Prime walls</b><small>Done Nov 10</small></div></div>
+<div class="ln"><span class="ck p"></span><div class="tx"><b>Paint cabinets</b><small>In progress</small><div class="act"><span class="b pr">Mark done</span><span class="b">Add photo</span></div></div></div>
+<div class="ln"><span class="ck"></span><div class="tx"><b>Paint walls, 2 coats</b><small>Not started</small></div><span class="st n">Not started</span></div>
+<div class="ln"><span class="ck"></span><div class="tx"><b>Trim and doors</b><small>Not started</small></div><span class="st n">Not started</span></div>
+<div class="ln"><span class="ck"></span><div class="tx"><b>Add backsplash caulk</b><small>Added by change order</small></div><span class="st c">Change order</span></div></div></div>
+<div class="note">Tap a line to change its status. "Mark done" asks for an optional photo, which also appears on the Photos tab.</div></div>
+
+<div><div class="cap">Homeowner view</div><div class="ph"><div class="fake">Price and dates box</div>
+<div class="card"><div class="hd"><h3>Scope of work</h3><b>3 of 7 done</b></div><div class="bar"><i></i></div>
+<div class="ln"><span class="ck d">✓</span><div class="tx"><b>Prep and mask kitchen</b><small>Done Nov 8</small><div class="act"><span class="b">Looks good</span><span class="b">Question</span></div></div><span class="th"></span></div>
+<div class="ln"><span class="ck d">✓</span><div class="tx"><b>Repair drywall</b><small>Done Nov 9 · You said looks good</small></div><span class="th"></span></div>
+<div class="ln"><span class="ck d">✓</span><div class="tx"><b>Prime walls</b><small>Done Nov 10</small><div class="q">Your question: Is the primer low-odor? Sent to Nesty's Painting.</div></div></div>
+<div class="ln"><span class="ck p"></span><div class="tx"><b>Paint cabinets</b><small>In progress</small></div><span class="st p">In progress</span></div>
+<div class="ln"><span class="ck"></span><div class="tx"><b>Paint walls, 2 coats</b><small>Not started</small></div><span class="st n">Not started</span></div></div></div>
+<div class="note">Done shows as soon as the contractor marks it. "Looks good" and "Question" are extras. A question goes to Messages with the line quoted. Nothing waits on the homeowner.</div></div>
+
+<div><div class="cap">Top card shortcut</div><div class="ph"><div class="card" style="background:var(--ac);color:#fff;border-color:var(--ac)"><b style="font-size:17px">Kitchen and walls painting</b><span style="font-size:13px;opacity:.9">Nesty's Painting · Closeout</span><div style="display:flex;justify-content:space-between;font-size:13px;margin-top:4px"><span>Contract $5,883</span><span style="font-weight:800;text-decoration:underline">Scope 3 of 7 ›</span></div></div></div>
+<div class="note">A small link in the top card jumps down to the scope card.</div>
+<div class="cap" style="margin-top:16px">At closeout</div><div class="ph"><div class="card"><div class="hd"><h3>1 · Scope of work</h3></div><div class="tx"><small>Lines already marked done and approved are pre-filled. You only review what is left or changed.</small></div></div></div></div>
+</div>
