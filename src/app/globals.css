@@ -1317,3 +1317,5 @@ html { scroll-behavior: smooth; }
 .wb-n{background:#b3261e;color:#fff;border-radius:99px;min-width:20px;height:20px;display:inline-grid;place-items:center;font-size:12px;padding:0 5px}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .wb-pill.ok{background:#1c2e25;color:#7fc6a0}}
 :root[data-theme="dark"] .wb-pill.ok{background:#1c2e25;color:#7fc6a0}
+
+.shp-why{position:absolute;left:8px;right:8px;bottom:8px;border:0;border-radius:10px;background:rgba(0,0,0,.65);color:#fff;font-size:12px;font-weight:600;padding:8px 10px;cursor:pointer}

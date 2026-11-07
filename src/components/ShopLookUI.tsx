@@ -33,12 +33,15 @@ export function ShopStrip({ items, withDots }: { items: ShopLite[]; withDots: bo
 export function ShopPhoto({ designId, index, src, alt, items, initial, canLocate }: { designId: string; index: number; src: string; alt: string; items: ShopLite[]; initial: Spot[] | null; canLocate: boolean }) {
   const [spots, setSpots] = useState<Spot[]>(initial ?? []);
   const [open, setOpen] = useState(0);
+  const [why, setWhy] = useState('');
+  const [tick, setTick] = useState(0);
   useEffect(() => {
-    if (initial !== null || !canLocate) return;
+    if ((initial !== null && !tick) || !canLocate) return;
     let alive = true;
-    locateSpots(designId).then((r) => { if (alive && r.ok) setSpots(r.spots[String(index)] ?? []); }).catch(() => {});
+    setWhy('');
+    locateSpots(designId).then((r) => { if (!alive) return; if (r.ok) setSpots(r.spots[String(index)] ?? []); else setWhy(r.why ?? 'unknown'); }).catch(() => { if (alive) setWhy('network'); });
     return () => { alive = false; };
-  }, [designId, index, initial, canLocate]);
+  }, [designId, index, initial, canLocate, tick]);
   const cur = spots.find((s) => s.n === open);
   const item = cur ? items.find((i) => i.n === cur.n) : undefined;
   return (
@@ -54,6 +57,7 @@ export function ShopPhoto({ designId, index, src, alt, items, initial, canLocate
           <button type="button" onClick={() => { setOpen(0); jump(item.n); }}>Find this item ›</button>
         </div>
       ) : null}
+      {why && !spots.length ? <button type="button" className="shp-why" onClick={() => setTick((t) => t + 1)}>Dots could not load ({why}). Tap to retry</button> : null}
     </div>
   );
 }

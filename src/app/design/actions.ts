@@ -107,29 +107,31 @@ async function alertOutOfCredit() {
 }
 
 /** Finds where each shoppable item sits in each picture. One small AI look per picture, then kept. Returns nothing it is not sure about. */
-export async function locateSpots(designId: string): Promise<{ ok: true; spots: Record<string, Spot[]> } | { ok: false }> {
+export async function locateSpots(designId: string): Promise<{ ok: true; spots: Record<string, Spot[]> } | { ok: false; why?: string }> {
   try {
     requireMarketplace();
     if (!designEnabled() || !/^[0-9a-f-]{36}$/i.test(designId)) return { ok: false };
     const { user } = await requireUser();
     const db = supabaseAdmin();
     const { data: d } = await db.from('design_ideas').select('*').eq('id', designId).eq('user_id', user.id).maybeSingle<any>();
-    if (!d || !('spots' in d)) return { ok: false }; // the 057 column is missing
+    if (!d) return { ok: false, why: 'design not found' };
+    if (!('spots' in d)) return { ok: false, why: 'spots column missing' };
     if (d.spots && typeof d.spots === 'object') return { ok: true, spots: d.spots as Record<string, Spot[]> };
     const key = process.env.DESIGN_IMAGE_KEY;
-    if ((process.env.DESIGN_PROVIDER ?? 'gemini').toLowerCase() !== 'gemini' || !key) return { ok: false };
+    if ((process.env.DESIGN_PROVIDER ?? 'gemini').toLowerCase() !== 'gemini' || !key) return { ok: false, why: 'no Gemini key' };
     const items = shopItems(d.space as string, (d.picks ?? {}) as Record<string, string>);
     const results = (d.results ?? []) as string[];
-    if (!items.length || !results.length) return { ok: false };
+    if (!items.length || !results.length) return { ok: false, why: 'no items' };
     const model = process.env.DESIGN_LOCATE_MODEL || 'gemini-2.5-flash';
     const list = items.map((it, i) => `${i + 1}. ${it.label}: ${it.desc}`).join('\n');
     const prompt = `This is a picture of a room. For each numbered item, give one point at the middle of that object in the picture. Use whole numbers from 0 to 1000 for x (left to right) and y (top to bottom). Leave an item out if you cannot clearly see it. Never guess. Items:\n${list}\nAnswer only as JSON: {"items":[{"n":1,"x":500,"y":400}]}`;
     let allOk = true;
+    let why = '';
     const spots: Record<string, Spot[]> = {};
     await Promise.all(results.map(async (path, idx) => {
       try {
         const dl = await db.storage.from(DESIGN_BUCKET).download(path);
-        if (dl.error || !dl.data) { allOk = false; return; }
+        if (dl.error || !dl.data) { allOk = false; why = 'picture download failed'; return; }
         const buf = Buffer.from(await dl.data.arrayBuffer());
         const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {
           method: 'POST',
@@ -139,16 +141,18 @@ export async function locateSpots(designId: string): Promise<{ ok: true; spots: 
             generationConfig: { responseMimeType: 'application/json', temperature: 0 },
           }),
         });
-        if (!r.ok) { allOk = false; return; }
+        if (!r.ok) { allOk = false; why = `Gemini ${r.status}`; console.error('locateSpots', r.status, (await r.text()).slice(0, 300)); return; }
         const j = (await r.json()) as any;
         const txt = j?.candidates?.[0]?.content?.parts?.map((p: any) => p?.text ?? '').join('') ?? '';
-        spots[String(idx)] = cleanSpots(JSON.parse(txt), items.length);
-      } catch { allOk = false; }
+        spots[String(idx)] = cleanSpots(JSON.parse(txt.replace(/^```(?:json)?\s*|\s*```$/g, '').trim()), items.length);
+      } catch (e) { allOk = false; why = 'could not read the answer'; console.error('locateSpots', e); }
     }));
-    if (!allOk) return { ok: false };
+    if (!allOk) return { ok: false, why };
+    if (!Object.values(spots).some((a) => a.length)) return { ok: false, why: 'no items found in the picture' }; // do not save an empty result, so it can retry
     await db.from('design_ideas').update({ spots }).eq('id', designId).eq('user_id', user.id);
     return { ok: true, spots };
-  } catch {
-    return { ok: false };
+  } catch (e) {
+    console.error('locateSpots', e);
+    return { ok: false, why: 'error' };
   }
 }
