@@ -1,0 +1,40 @@
+<title>Project Tabs Color</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+:root{--bg:#f6f2ec;--fg:#2a2118;--mut:#6f6356;--ac:#c4813f;--card:#fff;--line:#e4dccf;--selbg:#faeedd;--selline:#e3b983}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1b1713;--fg:#f1e9de;--mut:#a89a8a;--ac:#d99a58;--card:#262019;--line:#3a3128;--selbg:#3a2c1c;--selline:#8a6638;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#1b1713;--fg:#f1e9de;--mut:#a89a8a;--ac:#d99a58;--card:#262019;--line:#3a3128;--selbg:#3a2c1c;--selline:#8a6638;color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,sans-serif;padding-block:20px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));line-height:1.4}
+h1{font-size:21px;margin:0 0 6px}p.i{margin:0 0 14px;color:var(--mut);max-width:64ch}
+.row{display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start}
+.cap{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);margin-bottom:6px}
+.ph{width:min(100%,350px);border:1px solid var(--line);border-radius:22px;padding:12px;min-width:0}
+.g{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.t{position:relative;background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:10px 2px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:11.5px;font-weight:600;min-width:0}
+.t.sel{background:var(--selbg);border-color:var(--selline);color:var(--ac)}
+.ic{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;background:var(--tb,transparent);color:var(--tc,var(--mut))}
+.ic svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.plain .ic{color:var(--mut)}
+.dot{position:absolute;top:5px;right:9px;width:10px;height:10px;border-radius:50%;background:#c0392b;border:2px solid var(--card)}
+.c1{--tb:#f3e6d3;--tc:#a8691f}.c2{--tb:#e1ecf8;--tc:#2d6aa8}.c3{--tb:#ece4f7;--tc:#6b46b0}.c4{--tb:#fae3ea;--tc:#b83e63}
+.c5{--tb:#fde9d4;--tc:#c4661a}.c6{--tb:#d9f0ee;--tc:#1d7d77}.c7{--tb:#e6e9ee;--tc:#4b5a6e}.c8{--tb:#fbefc9;--tc:#9a7208}
+.c9{--tb:#dcf0e3;--tc:#1f6b45}.c10{--tb:#dcf0e3;--tc:#1f6b45}.c11{--tb:#e2e4f8;--tc:#4452b3}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .ic.x{background:color-mix(in srgb,var(--tc) 22%,#1b1713)}:root:not([data-theme="light"]) .c1{--tc:#e0a866}:root:not([data-theme="light"]) .c2{--tc:#7fb2e6}:root:not([data-theme="light"]) .c3{--tc:#b79cec}:root:not([data-theme="light"]) .c4{--tc:#ee8aa8}:root:not([data-theme="light"]) .c5{--tc:#f0a05e}:root:not([data-theme="light"]) .c6{--tc:#6cc9c2}:root:not([data-theme="light"]) .c7{--tc:#a3b0c2}:root:not([data-theme="light"]) .c8{--tc:#e6c04f}:root:not([data-theme="light"]) .c9,:root:not([data-theme="light"]) .c10{--tc:#7fc6a0}:root:not([data-theme="light"]) .c11{--tc:#9ca6f0}}
+:root[data-theme="dark"] .ic.x{background:color-mix(in srgb,var(--tc) 22%,#1b1713)}
+.prob{margin-top:10px;background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:10px;display:flex;justify-content:center;align-items:center;gap:8px;font-size:13px;font-weight:600}
+.pill{background:#dcf0e3;color:#1f6b45;border-radius:99px;padding:3px 10px;font-size:12px}
+.note{font-size:12px;color:var(--mut);max-width:350px;margin-top:8px}
+</style>
+<h1>Project tabs with color</h1>
+<p class="i">Same 11 tabs, two options. Colors are muted so the tabs stay easy to find without competing with the page. Switch your phone to dark mode to see the dark version.</p>
+<div class="row">
+<div><div class="cap">Option A: every tab has its own color</div><div class="ph"><div class="g" id="a"></div><div class="prob"><span>⚑ Problems</span><span class="pill">None open</span></div></div><div class="note">Friendlier. Changes is selected: tan fill and tan border. A red dot shows on Messages when something is unread.</div></div>
+<div><div class="cap">Option B: only money tabs colored</div><div class="ph"><div class="g" id="b"></div><div class="prob"><span>⚑ Problems</span><span class="pill">None open</span></div></div><div class="note">Calmer. Payments, My money and Changes get color. The rest stay gray, so money stands out.</div></div>
+</div>
+<script>
+var P={Overview:'<path d="M3 11l9-8 9 8v10H3z"/>',Messages:'<path d="M4 5h16v11H9l-5 4z"/>',Agreement:'<path d="M6 3h9l4 4v14H6zM9 12h7M9 16h7"/>',Photos:'<path d="M4 8h3l2-3h6l2 3h3v12H4z"/><circle cx="12" cy="13" r="3.5"/>',Schedule:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',Selections:'<path d="M4 6h12M4 11h9M4 16h6M14 16l2 2 4-4"/>',Documents:'<path d="M3 6h7l2 2h9v11H3z"/>',Changes:'<path d="M4 9h15l-4-4M20 15H5l4 4"/>',Payments:'<rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/>','My money':'<path d="M12 3v18M16 7.5c-1-1.3-2.4-1.8-4-1.8-2.2 0-3.6 1.1-3.6 2.6 0 4 8 1.8 8 6 0 1.6-1.6 2.8-4.2 2.8-1.8 0-3.2-.6-4.2-1.8"/>',Team:'<circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.5 2.7-6 6-6s6 2.5 6 6M16 5a3 3 0 010 6M18 14c2 .6 3 2.4 3 5"/>'};
+var T=['Overview','Messages','Agreement','Photos','Schedule','Selections','Documents','Changes','Payments','My money','Team'];
+var money={Changes:1,Payments:1,'My money':1};
+function build(id,all){var h='';T.forEach(function(n,i){var col=all||money[n];h+='<div class="t'+(n==='Changes'?' sel':'')+'">'+(n==='Messages'?'<span class="dot"></span>':'')+'<span class="ic '+(col?'x c'+(i+1):'')+'"><svg viewBox="0 0 24 24">'+P[n]+'</svg></span>'+n+'</div>'});document.getElementById(id).innerHTML=h}
+build('a',true);build('b',false);
+</script>
