@@ -194,6 +194,7 @@ export type Listing = {
   ai_breakdown: { group: string; low: number; high: number }[]; ai_notes: string;
   answers?: Record<string, string> | null;
   visit_pref?: 'yes' | 'maybe' | 'no'; visit_free?: string;
+  max_bids?: number | null;
   status: 'open' | 'awarded' | 'closed'; expires_at: string; awarded_bid_id: string | null; project_id: string | null; created_at: string;
 };
 export type Bid = {
@@ -203,3 +204,25 @@ export type Bid = {
 export const listingOpen = (l: { status: string; expires_at: string }) => l.status === 'open' && new Date(l.expires_at).getTime() > Date.now();
 
 export { barPos } from './barPos';
+
+/** Bid limit choices on the Post form. 0 means no limit. */
+export const BID_LIMITS: [number, string, string][] = [[3, '3', 'quick'], [5, '5', 'popular'], [10, '10', 'more choice'], [0, 'Any', 'no limit']];
+export const cleanMaxBids = (v: unknown): number | null => {
+  const n = parseInt(String(v ?? ''), 10);
+  return [3, 5, 10].includes(n) ? n : null;
+};
+
+/** How many bids count against the limit: live bids (waiting or hired). A team bid with separate contracts counts once. */
+export async function bidsUsed(db: any, listingId: string): Promise<number> {
+  const { data } = await db.from('marketplace_bids').select('id').eq('listing_id', listingId).in('status', ['waiting', 'won']);
+  const ids = new Set<string>(((data ?? []) as any[]).map((b) => b.id as string));
+  try {
+    const { data: tbs } = await db.from('team_bids').select('id').eq('listing_id', listingId).eq('status', 'sent');
+    const tbIds = ((tbs ?? []) as any[]).map((t) => t.id as string);
+    if (tbIds.length) {
+      const { data: ps } = await db.from('team_partners').select('bid_id').in('team_bid_id', tbIds);
+      for (const p of (ps ?? []) as any[]) if (p.bid_id) ids.delete(p.bid_id as string);
+    }
+  } catch { /* team tables not created yet */ }
+  return ids.size;
+}

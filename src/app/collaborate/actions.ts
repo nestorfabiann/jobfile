@@ -6,7 +6,7 @@ import { requireUser } from '@/lib/session';
 import { supabaseAdmin } from '@/lib/supabase/server';
 import { notifyUsers } from '@/lib/notify';
 import { dollars, parseDollars } from '@/lib/money';
-import { listingOpen, listingTitle, MAX_BIDS_PER_DAY, requireMarketplace, type Listing } from '@/lib/marketplace';
+import { bidsUsed, listingOpen, listingTitle, MAX_BIDS_PER_DAY, requireMarketplace, type Listing } from '@/lib/marketplace';
 import { companyOf, isVerified, localPartners, memberIds, type TeamBid, type TeamPartner } from '@/lib/team';
 
 const txt = (f: FormData, k: string, n: number) => String(f.get(k) ?? '').trim().slice(0, n);
@@ -29,6 +29,11 @@ async function release(teamBidId: string) {
   if (!l || !listingOpen(l)) {
     await db.from('team_bids').update({ status: 'canceled', updated_at: new Date().toISOString() }).eq('id', tb.id);
     await notifyUsers({ userIds: [tb.lead_user_id], projectId: null, kind: 'bid', path: '/collaborate', title: 'Your team bid was not sent', body: 'The project is no longer taking bids.' });
+    return;
+  }
+  if ((l as any).max_bids && (await bidsUsed(db, l.id)) >= (l as any).max_bids) {
+    await db.from('team_bids').update({ status: 'canceled', updated_at: new Date().toISOString() }).eq('id', tb.id);
+    await notifyUsers({ userIds: [tb.lead_user_id], projectId: null, kind: 'bid', path: '/collaborate', title: 'Your team bid was not sent', body: 'The homeowner asked for a limited number of bids and already has them.' });
     return;
   }
   const total = tb.lead_cents + partners.reduce((n, p) => n + p.price_cents, 0);

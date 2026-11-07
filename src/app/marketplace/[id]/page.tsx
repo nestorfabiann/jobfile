@@ -10,7 +10,7 @@ import { dollars } from '@/lib/money';
 import { companyReviews, summarize } from '@/lib/reviews';
 import { outsideRatingsFor } from '@/lib/googleRatings';
 import { fmtDate, INSURANCE_KINDS, isCurrent, signedUrls } from '@/lib/companyProfile';
-import { firstNameInitial, JOB_TYPES, listingOpen, listingTitle, requireMarketplace, type Bid, type Listing, bidProfileReady } from '@/lib/marketplace';
+import { bidsUsed, BID_LIMITS, firstNameInitial, JOB_TYPES, listingOpen, listingTitle, requireMarketplace, type Bid, type Listing, bidProfileReady } from '@/lib/marketplace';
 import RangeBar from '@/components/RangeBar';
 import AcceptBid from '@/components/AcceptBid';
 import HireTeam from '@/components/HireTeam';
@@ -23,7 +23,7 @@ import ListingPhotoUploader from '@/components/ListingPhotoUploader';
 import BidViewNotice from '@/components/BidViewNotice';
 import { answerRows, detailPercent } from '@/lib/scopeQuestions';
 import { ackBidView, recordBidViews, recordCompared } from '@/lib/bidViews';
-import { acceptBid, acceptTeamBoth, closeListing, deleteListingPhoto, deleteListingVideo, extendListing, placeBid, withdrawBid } from '../actions';
+import { acceptBid, acceptTeamBoth, closeListing, deleteListingPhoto, deleteListingVideo, extendListing, placeBid, setMaxBids, withdrawBid } from '../actions';
 import VisitCard, { NewVisit, VisitPrefEditor } from '@/components/VisitCard';
 import type { Visit } from '@/lib/visits';
 import { countMatchingContractors, DEFAULT_RADIUS } from '@/lib/matching';
@@ -33,7 +33,7 @@ export const dynamic = 'force-dynamic';
 const when = (iso: string) => new Date(iso).toLocaleDateString('en-US', { timeZone: 'America/Chicago', month: 'short', day: 'numeric', year: 'numeric' });
 const range = (a: number | null, b: number | null) => [a, b].filter((x) => x != null).map((x) => dollars(x as number)).join(' – ');
 
-export default async function ListingPage({ params, searchParams }: { params: { id: string }; searchParams: { compare?: string | string[]; insured?: string; open?: string; posted?: string; extended?: string; media?: string; bid?: string; error?: string; inv?: string; invc?: string } }) {
+export default async function ListingPage({ params, searchParams }: { params: { id: string }; searchParams: { compare?: string | string[]; insured?: string; open?: string; posted?: string; extended?: string; limit?: string; media?: string; bid?: string; error?: string; inv?: string; invc?: string } }) {
   requireMarketplace();
   const { user } = await requireUser();
   if (!/^[0-9a-f-]{36}$/i.test(params.id)) notFound();
@@ -59,6 +59,9 @@ export default async function ListingPage({ params, searchParams }: { params: { 
   const ideaUrls = (l as any).idea_path ? await signedUrls('listing-photos', [(l as any).idea_path as string]) : new Map<string, string>();
   const videoUrls = await signedUrls('listing-videos', (videoRows ?? []).map((v) => v.path as string));
   const allBids = (bidRows ?? []) as Bid[];
+  const maxBids = l.max_bids ?? null;
+  const usedBids = maxBids ? await bidsUsed(db, l.id) : 0;
+  const isFull = !!maxBids && usedBids >= maxBids;
   // The homeowner has now seen the bids; the Projects page stops calling them new. Ignored if the 014 column is not there yet.
   // Invites and questions for this project (ignored if the 041 tables are not there yet).
   let invRows: any[] = [];
@@ -236,7 +239,8 @@ export default async function ListingPage({ params, searchParams }: { params: { 
         <h1>{listingTitle(l)}</h1>
         <div className="row">
           <span className="pill"><TradeIcon trade={l.job_type} size={15} />{l.job_type}</span>
-          <span className={`pill ${open ? 'ok' : ''}`}>{l.status === 'awarded' ? 'Hired' : open ? 'Open for bids' : 'Closed'}</span>
+          <span className={`pill ${open ? 'ok' : ''}`}>{l.status === 'awarded' ? 'Hired' : open ? (isFull ? 'Bids full' : 'Open for bids') : 'Closed'}</span>
+          {open && maxBids ? <span className={`pill ${isFull ? 'warn' : ''}`}>{usedBids} of {maxBids} bids</span> : null}
           {l.is_homestead && <span className="pill warn">Homestead</span>}
           {timingTags(l.answers).map((t) => <span key={t.text} className={`tm-pill${t.urgent ? ' u' : ''}`}>{t.text}</span>)}
         </div>
@@ -260,6 +264,28 @@ export default async function ListingPage({ params, searchParams }: { params: { 
         </div>
       ) : null}
       {searchParams.extended ? <div className="box ok">Done. This project stays open for 30 more days.</div> : null}
+      {searchParams.limit ? <div className="box ok">Done. Your bid limit is updated.</div> : null}
+      {owner && open ? (
+        <div className="card" id="bid-limit">
+          <div className="row" style={{ justifyContent: 'space-between' }}>
+            <h2 style={{ margin: 0 }}>{maxBids ? `Bids: ${usedBids} of ${maxBids}` : `Bids: ${usedBids} so far`}</h2>
+            {maxBids ? <span className={`pill ${isFull ? 'warn' : 'ok'}`}>{isFull ? 'Full' : 'Open'}</span> : <span className="pill ok">No limit</span>}
+          </div>
+          {maxBids ? (
+            <div className={`bl-meter${isFull ? ' full' : ''}`} aria-hidden="true">{Array.from({ length: Math.min(maxBids, 12) }).map((_, i) => <i key={i} className={i < usedBids ? 'f' : ''} />)}</div>
+          ) : null}
+          <p className="muted small" style={{ margin: 0 }}>{isFull ? 'Bidding is closed because you have the number of bids you asked for. Choose a higher number to let more contractors bid.' : maxBids ? `${maxBids - usedBids} spot${maxBids - usedBids === 1 ? '' : 's'} left. Bidding closes when it is full.` : 'Any number of contractors can bid.'}</p>
+          <form action={setMaxBids} className="stack" style={{ gap: 8 }}>
+            <input type="hidden" name="listing_id" value={l.id} />
+            <div className="chips mb-chips" role="radiogroup" aria-label="Bid limit">
+              {BID_LIMITS.map(([v, label, sub]) => (
+                <label className="chip" key={v}><input type="radio" name="max_bids" value={String(v)} defaultChecked={(maxBids ?? 0) === v} /><span><b>{label}</b><small>{sub}</small></span></label>
+              ))}
+            </div>
+            <button className="btn ghost" type="submit">{isFull ? 'Allow more bids' : 'Change limit'}</button>
+          </form>
+        </div>
+      ) : null}
       {showExtend ? (
         <div className="box warn">
           <b>{daysLeft > 0 ? `This post ends in ${daysLeft} day${daysLeft === 1 ? '' : 's'}.` : 'This post has ended.'}</b> After it ends, contractors can no longer bid.
@@ -565,8 +591,9 @@ export default async function ListingPage({ params, searchParams }: { params: { 
             </div>
           ) : null}
           {(() => {
-            const showForm = !needsProfile && open && !myTeamPart && !myTeamLead && (!myBid || myBid.status === 'waiting' || myBid.status === 'withdrawn');
-            const showTeam = !needsProfile && open && !myPendingTeam && (!myBid || myBid.status === 'withdrawn');
+            const blockedFull = isFull && (!myBid || myBid.status === 'withdrawn');
+            const showForm = !needsProfile && open && !blockedFull && !myTeamPart && !myTeamLead && (!myBid || myBid.status === 'waiting' || myBid.status === 'withdrawn');
+            const showTeam = !needsProfile && open && !blockedFull && !myPendingTeam && (!myBid || myBid.status === 'withdrawn');
             const formJsx = (<form action={placeBid} className="stack" style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               <input type="hidden" name="listing_id" value={l.id} />
               {hasAI && <p className="muted small">AI reference for this scope: {dollars(l.ai_low_cents as number)} – {dollars(l.ai_high_cents as number)}. Bid what the work really costs you.</p>}
@@ -625,6 +652,7 @@ export default async function ListingPage({ params, searchParams }: { params: { 
             <form action={withdrawBid}><input type="hidden" name="listing_id" value={l.id} /><button className="btn ghost" type="submit">Withdraw my bid</button></form>
           )}
           {!open && !myBid && <p className="muted">This project is no longer taking bids.</p>}
+          {open && isFull && (!myBid || myBid.status === 'withdrawn') ? <div className="box warn"><b>Bids are full.</b> The homeowner asked for up to {maxBids} bids and has them. Check back, they may allow more.</div> : null}
         </div>
       )}
     </>

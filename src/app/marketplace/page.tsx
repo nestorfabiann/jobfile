@@ -277,11 +277,12 @@ export default async function Marketplace({ searchParams }: { searchParams: { ty
             )}
             <h3>{listingTitle(l)}</h3>
             <p className="muted small">{[l.city, `ZIP ${l.zip}`, away.has(l.id) ? `${Math.round(away.get(l.id) as number)} mi away` : '', l.size_sqft ? `${l.size_sqft.toLocaleString('en-US')} sq ft` : ''].filter(Boolean).join(' · ')}</p>
+            {isPro && open && (l as any).max_bids && n >= (l as any).max_bids && !mine.has(l.id) ? <div className="tm-tags"><span className="tm-pill u">Bids full. The homeowner may allow more.</span></div> : null}
             {timingTags((l as any).answers).length ? <div className="tm-tags">{timingTags((l as any).answers).map((t) => <span key={t.text} className={`tm-pill${t.urgent ? ' u' : ''}`}>{t.text}</span>)}</div> : null}
             <div className="row" style={{ justifyContent: 'space-between' }}>
               <b>{budget(l) || 'Budget not shared'}</b>
               <span className="muted small">
-                {n} bid{n === 1 ? '' : 's'}
+                {(l as any).max_bids ? `${n} of ${(l as any).max_bids} bids` : `${n} bid${n === 1 ? '' : 's'}`}
                 {` · by ${firstNameInitial(l.homeowner_name)}`} · {when(l.created_at)}
                 {mine.has(l.id) ? ' · You bid' : ''}
               </span>

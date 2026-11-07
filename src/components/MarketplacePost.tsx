@@ -31,6 +31,7 @@ export default function MarketplacePost({ types, aiOn, draft, inviteCompany, inv
   const [bmin, setBmin] = useState(d0?.bmin ?? '');
   const [bmax, setBmax] = useState(d0?.bmax ?? '');
   const [answers, setAnswers] = useState<Answers>(d0?.answers ?? {});
+  const [maxBids, setMaxBids] = useState(d0?.maxBids ?? '5');
   const [review, setReview] = useState<{ busy: boolean; error: string; questions: string[] }>({ busy: false, error: '', questions: [] });
   const [saveMsg, setSaveMsg] = useState<{ tone: 'ok' | 'bad' | 'wait'; text: string } | null>(null);
   const draftId = useRef<string | undefined>(draft?.id);
@@ -85,7 +86,7 @@ export default function MarketplacePost({ types, aiOn, draft, inviteCompany, inv
   // Saves the form on the server a moment after each change, so nothing is lost if the page closes.
   useEffect(() => {
     if (posting) return;
-    const data = { type, picks, size, zip, city, details, bmin, bmax, answers };
+    const data = { type, picks, size, zip, city, details, bmin, bmax, answers, maxBids };
     const meaningful = picks.length > 0 || zip !== '' || city !== '' || details !== '' || Object.keys(answers).length > 0;
     const snap = JSON.stringify(data);
     if (firstRun.current) { firstRun.current = false; if (draft) { lastSaved.current = snap; return; } }
@@ -246,6 +247,17 @@ export default function MarketplacePost({ types, aiOn, draft, inviteCompany, inv
         <label className="fld">Anything else? (optional)
           <textarea name="details" rows={3} maxLength={1000} value={details} onChange={(e) => { setDetails(e.target.value); changed(); }} placeholder="Example: I want to start in January. Dogs at home." />
         </label>
+      </div>
+
+      <div className="card">
+        <h2>How many bids do you want? *</h2>
+        <p className="muted small" style={{ margin: 0 }}>Bidding closes once you have this many, so you are not flooded. You can allow more later.</p>
+        <div className="chips mb-chips" role="radiogroup" aria-label="How many bids do you want">
+          {([['3', '3', 'quick'], ['5', '5', 'popular'], ['10', '10', 'more choice'], ['0', 'Any', 'no limit']] as const).map(([v, label, sub]) => (
+            <label className="chip" key={v}><input type="radio" name="max_bids" value={v} checked={maxBids === v} onChange={() => setMaxBids(v)} /><span><b>{label}</b><small>{sub}</small></span></label>
+          ))}
+        </div>
+        <p className="muted small" style={{ margin: 0 }}>{maxBids === '0' ? 'You may get many bids, which takes longer to compare.' : `With ${maxBids}, you will usually get a few solid options and still have time to compare them.`}</p>
       </div>
 
       <div className="card">

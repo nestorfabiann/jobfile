@@ -10,7 +10,7 @@ import { supabaseAdmin } from '@/lib/supabase/server';
 import { notifyUsers } from '@/lib/notify';
 import { dollars, parseDollars } from '@/lib/money';
 import {
-  AI_DAILY_LIMIT, cleanItems, inputHash, JOB_TYPES, listingOpen, listingTitle, MAX_BIDS_PER_DAY, MAX_LISTINGS_PER_DAY, MAX_OPEN_LISTINGS, bidProfileReady,
+  AI_DAILY_LIMIT, cleanItems, inputHash, JOB_TYPES, listingOpen, listingTitle, MAX_BIDS_PER_DAY, MAX_LISTINGS_PER_DAY, bidsUsed, cleanMaxBids, MAX_OPEN_LISTINGS, bidProfileReady,
   requireMarketplace, scopeText, type Bid, type Listing,
 } from '@/lib/marketplace';
 import { aiConfigured, makeReference, makePostReview, type Reference } from '@/lib/marketplaceAI';
@@ -143,7 +143,10 @@ async function createListingInner(formData: FormData): Promise<CreateResult> {
   const cols = 'id,homeowner_id,job_type,zip,city,items,ai_low_cents,ai_high_cents';
   const visitPref = ['yes', 'maybe', 'no'].includes(String(formData.get('visit_pref'))) ? String(formData.get('visit_pref')) : 'yes';
   const visitFree = formData.getAll('visit_free').map(String).filter((x) => ['Weekday mornings', 'Weekday evenings', 'Saturdays', 'Sundays'].includes(x)).join(', ');
-  let { data: l, error } = await db.from('marketplace_listings').insert({ ...row, answers, visit_pref: visitPref, visit_free: visitFree }).select(cols).single();
+  const maxBids = cleanMaxBids(formData.get('max_bids'));
+  let { data: l, error } = await db.from('marketplace_listings').insert({ ...row, answers, visit_pref: visitPref, visit_free: visitFree, max_bids: maxBids }).select(cols).single();
+  // Until the 055 column exists, post without it rather than fail.
+  if (error && /max_bids/i.test(error.message ?? '')) ({ data: l, error } = await db.from('marketplace_listings').insert({ ...row, answers, visit_pref: visitPref, visit_free: visitFree }).select(cols).single());
   // Until the 023 and 032 columns exist, post without them rather than fail.
   if (error && /visit_/i.test(error.message ?? '')) ({ data: l, error } = await db.from('marketplace_listings').insert({ ...row, answers }).select(cols).single());
   if (error && /answers/i.test(error.message ?? '')) ({ data: l, error } = await db.from('marketplace_listings').insert(row).select(cols).single());
@@ -355,6 +358,27 @@ export async function closeListing(formData: FormData) {
   redirect('/marketplace');
 }
 
+/** The homeowner changes how many bids they want. Raising it reopens bidding when it was full. */
+export async function setMaxBids(formData: FormData) {
+  requireMarketplace();
+  const { user } = await requireUser();
+  const l = await loadListing(String(formData.get('listing_id') ?? ''));
+  if (!l || l.homeowner_id !== user.id) redirect('/marketplace');
+  const path = `/marketplace/${l.id}`;
+  if (l.status !== 'open') back(path, 'Only an open project can change its bid limit.');
+  const v = String(formData.get('max_bids') ?? '');
+  const next = v === '0' ? null : cleanMaxBids(v);
+  if (v !== '0' && next === null) back(path, 'Choose 3, 5, 10 or Any.');
+  const db = supabaseAdmin();
+  const used = await bidsUsed(db, l.id);
+  if (next && next < used) back(path, `You already have ${used} bids, so the limit cannot go below ${used}.`);
+  const { error } = await db.from('marketplace_listings').update({ max_bids: next }).eq('id', l.id).eq('status', 'open');
+  if (error) back(path, 'Could not change the limit. Check that the database step was run.');
+  revalidatePath(path);
+  revalidatePath('/marketplace');
+  redirect(`${path}?limit=1`);
+}
+
 /** Keep an open project taking bids for 30 more days, counted from today or its current end date, whichever is later. */
 export async function extendListing(formData: FormData) {
   requireMarketplace();
@@ -400,6 +424,8 @@ export async function placeBid(formData: FormData) {
   const db = supabaseAdmin();
   const { data: existing } = await db.from('marketplace_bids').select('id,status,price_cents').eq('listing_id', l.id).eq('company_id', co.companyId).maybeSingle();
   if (existing && (existing.status === 'won' || existing.status === 'not_selected')) back(path, 'Your bid on this project is closed.');
+  const isNewSlot = !existing || existing.status === 'withdrawn';
+  if (isNewSlot && l.max_bids && (await bidsUsed(db, l.id)) >= l.max_bids) back(path, `This homeowner asked for up to ${l.max_bids} bids and has them. Check back, they may allow more.`);
   if (!existing) {
     const { count } = await db.from('marketplace_bids').select('id', { count: 'exact', head: true }).eq('bidder_id', user.id).gt('created_at', new Date(Date.now() - 24 * 3600_000).toISOString());
     if ((count ?? 0) >= MAX_BIDS_PER_DAY) back(path, 'You have placed a lot of bids today. Try again tomorrow.');
@@ -411,11 +437,25 @@ export async function placeBid(formData: FormData) {
     const { error } = await db.from('marketplace_bids').insert({ ...row, listing_id: l.id, company_id: co.companyId, bidder_id: user.id });
     if (error) back(path, 'Could not save your bid. Check that the database step was run.');
   }
+  // Two contractors can send at the same moment. If this bid went past the limit, the newest one steps back.
+  if (isNewSlot && l.max_bids && (await bidsUsed(db, l.id)) > l.max_bids) {
+    const { data: mine } = await db.from('marketplace_bids').select('id,created_at').eq('listing_id', l.id).eq('company_id', co.companyId).maybeSingle();
+    const { data: live } = await db.from('marketplace_bids').select('id,created_at').eq('listing_id', l.id).in('status', ['waiting', 'won']).order('created_at').order('id');
+    const rank = ((live ?? []) as any[]).findIndex((b) => b.id === mine?.id);
+    if (mine && rank >= l.max_bids) {
+      if (existing) await db.from('marketplace_bids').update({ status: 'withdrawn', updated_at: new Date().toISOString() }).eq('id', mine.id);
+      else await db.from('marketplace_bids').delete().eq('id', mine.id);
+      back(path, `Another contractor took the last spot a moment ago. The homeowner asked for up to ${l.max_bids} bids.`);
+    }
+  }
   // A visit asked for before bidding now belongs to the bid.
   const { data: myBidRow } = await db.from('marketplace_bids').select('id').eq('listing_id', l.id).eq('company_id', co.companyId).maybeSingle();
   if (myBidRow) await db.from('visits').update({ bid_id: myBidRow.id }).eq('listing_id', l.id).eq('created_by', user.id).is('bid_id', null).neq('status', 'canceled');
   if (!existing || existing.status === 'withdrawn') {
     await notifyUsers({ userIds: [l.homeowner_id], projectId: null, kind: 'bid', path: `/marketplace/${l.id}`, title: `New bid on ${listingTitle(l)}: ${dollars(price)}`, body: `${co.name} bid ${dollars(price)}. Open Marketplace to compare your bids.` });
+    if (l.max_bids && (await bidsUsed(db, l.id)) >= l.max_bids) {
+      await notifyUsers({ userIds: [l.homeowner_id], projectId: null, kind: 'bid', path: `/marketplace/${l.id}`, title: `Bidding is full on ${listingTitle(l)}`, body: `You asked for up to ${l.max_bids} bids and you have them. No more contractors can bid. You can allow more any time from the project.`, cta: 'Open the project' });
+    }
     // Three waiting bids is the point where comparing becomes useful. Said once, when the third one arrives.
     const { count: waitingBids } = await db.from('marketplace_bids').select('id', { count: 'exact', head: true }).eq('listing_id', l.id).eq('status', 'waiting');
     if ((waitingBids ?? 0) === 3) {
